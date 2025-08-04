@@ -19,13 +19,13 @@ namespace Frog.Collections
     public unsafe ref struct TempRefList<T> where T : unmanaged
     {
         internal T* Buffer;
-        internal int Length;
+        internal int Capacity;
         internal int Count;
 
-        internal TempRefList(T* buffer, int length, int count)
+        internal TempRefList(T* buffer, int capacity, int count)
         {
             Buffer = buffer;
-            Length = length;
+            Capacity = capacity;
             Count = count;
         }
     }
@@ -34,13 +34,13 @@ namespace Frog.Collections
     public unsafe ref struct NativeRefList<T> where T : unmanaged
     {
         internal T* Buffer;
-        internal int Length;
+        internal int Capacity;
         internal int Count;
 
-        internal NativeRefList(T* buffer, int length, int count)
+        internal NativeRefList(T* buffer, int capacity, int count)
         {
             Buffer = buffer;
-            Length = length;
+            Capacity = capacity;
             Count = count;
         }
     }
@@ -87,7 +87,7 @@ namespace Frog.Collections
 
     public static class RefListImpl
     {
-        public static int Capacity<T>(this in RefList<T> list) where T : struct => list.Buffer?.Length ?? 0;
+        public static int Capacity<T>(this in RefList<T> list) where T : struct => list.GetBufferSize();
 
         public static int Count<T>(this in RefList<T> list) where T : struct => list.Count;
 
@@ -100,13 +100,13 @@ namespace Frog.Collections
         public static void Add<T>(this ref RefList<T> list, in T item) where T : struct
         {
             list.EnsureCanAdd();
-            list.Buffer[list.Count++] = item;
+            list.IndexBufferMut(list.Count++) = item;
         }
 
         public static ref T RefAdd<T>(this ref RefList<T> list) where T : struct
         {
             list.EnsureCanAdd();
-            return ref list.Buffer[list.Count++];
+            return ref list.IndexBufferMut(list.Count++);
         }
 
         private static void EnsureCanAdd<T>(this ref RefList<T> list) where T : struct
@@ -115,7 +115,7 @@ namespace Frog.Collections
                 return;
 
             var newSize = Math.Max(list.Capacity() * 2, 1);
-            Array.Resize(ref list.Buffer, newSize);
+            list.SetBufferSize(newSize);
         }
 
         public static void RemoveAt<T>(this ref RefList<T> list, int index) where T : struct
@@ -126,8 +126,8 @@ namespace Frog.Collections
             }
 
             list.Count--;
-            Array.Copy(list.Buffer, index + 1, list.Buffer, index, list.Count - index);
-            list.Buffer[list.Count] = default;
+            list.CopyBufferRange(index + 1, index, list.Count - index);
+            list.IndexBufferMut(list.Count) = default;
         }
 
         public static void Clear<T>(this ref RefList<T> list) where T : struct
@@ -135,7 +135,7 @@ namespace Frog.Collections
             if (list.Count == 0)
                 return;
 
-            Array.Clear(list.Buffer, 0, list.Count);
+            list.ClearBuffer();
             list.Count = 0;
         }
 
@@ -144,14 +144,7 @@ namespace Frog.Collections
             var newCount = list.Count + count;
 
             if (list.Capacity() < newCount)
-                Array.Resize(ref list.Buffer, newCount);
-
-            list.Count = newCount;
-        }
-
-        public static void Sort<T>(this ref RefList<T> list) where T : struct
-        {
-            Array.Sort(list.Buffer, 0, list.Count);
+                list.SetBufferSize(newCount);
         }
     }
 }
