@@ -4,12 +4,12 @@ namespace Frog.Collections
     {
         public static RefListReversedReadonlyIterator<T> RefReadonlyIterReversed<T>(this in RefList<T> self) where T : struct
         {
-            return new RefListReversedReadonlyIterator<T>(self.ItemArray, self.ItemCount);
+            return new RefListReversedReadonlyIterator<T>(self.Buffer, self.Count);
         }
 
         public static RefListReversedIterator<T> RefIterReversed<T>(this in RefList<T> self) where T : struct
         {
-            return new RefListReversedIterator<T>(self.ItemArray, self.ItemCount);
+            return new RefListReversedIterator<T>(self.Buffer, self.Count);
         }
     }
 

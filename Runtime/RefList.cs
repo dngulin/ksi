@@ -5,13 +5,43 @@ namespace Frog.Collections
     [NoCopy]
     public struct RefList<T> where T : struct
     {
-        internal T[] ItemArray;
-        internal int ItemCount;
+        internal T[] Buffer;
+        internal int Count;
 
-        internal RefList(T[] array, int itemCount)
+        internal RefList(T[] buffer, int count)
         {
-            ItemArray = array;
-            ItemCount = itemCount;
+            Buffer = buffer;
+            Count = count;
+        }
+    }
+
+    [NoCopy]
+    public unsafe ref struct TempRefList<T> where T : unmanaged
+    {
+        internal T* Buffer;
+        internal int Length;
+        internal int Count;
+
+        internal TempRefList(T* buffer, int length, int count)
+        {
+            Buffer = buffer;
+            Length = length;
+            Count = count;
+        }
+    }
+
+    [NoCopy]
+    public unsafe ref struct NativeRefList<T> where T : unmanaged
+    {
+        internal T* Buffer;
+        internal int Length;
+        internal int Count;
+
+        internal NativeRefList(T* buffer, int length, int count)
+        {
+            Buffer = buffer;
+            Length = length;
+            Count = count;
         }
     }
 
@@ -38,7 +68,7 @@ namespace Frog.Collections
         [NoCopyReturn]
         public static RefList<T> Move<T>(ref RefList<T> other) where T : struct
         {
-            var list = new RefList<T>(other.ItemArray, other.ItemCount);
+            var list = new RefList<T>(other.Buffer, other.Count);
             other = default;
             return list;
         }
@@ -50,78 +80,78 @@ namespace Frog.Collections
                 return default;
 
             var items = new T[other.Capacity()];
-            Array.Copy(other.ItemArray, items, other.ItemCount);
-            return new RefList<T>(other.ItemArray, other.ItemCount);
+            Array.Copy(other.Buffer, items, other.Count);
+            return new RefList<T>(other.Buffer, other.Count);
         }
     }
 
     public static class RefListImpl
     {
-        public static int Capacity<T>(this in RefList<T> list) where T : struct => list.ItemArray?.Length ?? 0;
+        public static int Capacity<T>(this in RefList<T> list) where T : struct => list.Buffer?.Length ?? 0;
 
-        public static int Count<T>(this in RefList<T> list) where T : struct => list.ItemCount;
+        public static int Count<T>(this in RefList<T> list) where T : struct => list.Count;
 
 
-        public static ref readonly T RefReadonlyAt<T>(this in RefList<T> list, int index) where T : struct => ref list.ItemArray[index];
+        public static ref readonly T RefReadonlyAt<T>(this in RefList<T> list, int index) where T : struct => ref list.Buffer[index];
 
-        public static ref T RefAt<T>(this ref RefList<T> list, int index) where T : struct => ref list.ItemArray[index];
+        public static ref T RefAt<T>(this ref RefList<T> list, int index) where T : struct => ref list.Buffer[index];
 
 
         public static void Add<T>(this ref RefList<T> list, in T item) where T : struct
         {
             list.EnsureCanAdd();
-            list.ItemArray[list.ItemCount++] = item;
+            list.Buffer[list.Count++] = item;
         }
 
         public static ref T RefAdd<T>(this ref RefList<T> list) where T : struct
         {
             list.EnsureCanAdd();
-            return ref list.ItemArray[list.ItemCount++];
+            return ref list.Buffer[list.Count++];
         }
 
         private static void EnsureCanAdd<T>(this ref RefList<T> list) where T : struct
         {
-            if (list.ItemCount < list.Capacity())
+            if (list.Count < list.Capacity())
                 return;
 
             var newSize = Math.Max(list.Capacity() * 2, 1);
-            Array.Resize(ref list.ItemArray, newSize);
+            Array.Resize(ref list.Buffer, newSize);
         }
 
         public static void RemoveAt<T>(this ref RefList<T> list, int index) where T : struct
         {
-            if (index < 0 || index >= list.ItemCount)
+            if (index < 0 || index >= list.Count)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            list.ItemCount--;
-            Array.Copy(list.ItemArray, index + 1, list.ItemArray, index, list.ItemCount - index);
-            list.ItemArray[list.ItemCount] = default;
+            list.Count--;
+            Array.Copy(list.Buffer, index + 1, list.Buffer, index, list.Count - index);
+            list.Buffer[list.Count] = default;
         }
 
         public static void Clear<T>(this ref RefList<T> list) where T : struct
         {
-            if (list.ItemCount == 0)
+            if (list.Count == 0)
                 return;
 
-            Array.Clear(list.ItemArray, 0, list.ItemCount);
-            list.ItemCount = 0;
+            Array.Clear(list.Buffer, 0, list.Count);
+            list.Count = 0;
         }
 
         public static void AppendDefault<T>(this ref RefList<T> list, int count) where T : struct
         {
-            var newCount = list.ItemCount + count;
+            var newCount = list.Count + count;
 
             if (list.Capacity() < newCount)
-                Array.Resize(ref list.ItemArray, newCount);
+                Array.Resize(ref list.Buffer, newCount);
 
-            list.ItemCount = newCount;
+            list.Count = newCount;
         }
 
         public static void Sort<T>(this ref RefList<T> list) where T : struct
         {
-            Array.Sort(list.ItemArray, 0, list.ItemCount);
+            Array.Sort(list.Buffer, 0, list.Count);
         }
     }
 }
