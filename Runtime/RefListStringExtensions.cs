@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Frog.Collections
+namespace DnDev
 {
     public static class RefListStringExtensions
     {

@@ -1,8 +1,8 @@
 {
-    "name": "Frog.Collections.Tests",
-    "rootNamespace": "Frog.Collections.Tests",
+    "name": "DnDev.RefList.Tests",
+    "rootNamespace": "DnDev.Tests",
     "references": [
-      "Frog.Collections"
+      "DnDev.RefList"
     ],
     "includePlatforms": [
         "Editor"

@@ -1,6 +1,6 @@
 using System;
 
-namespace Frog.Collections
+namespace DnDev
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class NoCopyReturnAttribute : Attribute

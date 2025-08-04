@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Frog.Collections.Tests
+namespace DnDev.Tests
 {
     [TestFixture]
     public class RefListTests

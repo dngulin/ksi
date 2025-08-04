@@ -1,6 +1,6 @@
 using System;
 
-namespace Frog.Collections
+namespace DnDev
 {
     [AttributeUsage(AttributeTargets.Struct)]
     public class NoCopyAttribute : Attribute

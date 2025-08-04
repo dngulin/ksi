@@ -1,6 +1,6 @@
 {
-    "name": "Frog.Collections",
-    "rootNamespace": "Frog.Collections",
+    "name": "DnDev.RefList",
+    "rootNamespace": "DnDev",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

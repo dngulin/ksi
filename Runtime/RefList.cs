@@ -1,6 +1,6 @@
 using System;
 
-namespace Frog.Collections
+namespace DnDev
 {
     [NoCopy]
     public struct RefList<T> where T : struct
