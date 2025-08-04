@@ -1,0 +1,38 @@
+# LFS Macro
+[attr]lfs               filter=lfs diff=lfs merge=lfs -text
+
+# Images
+*.[Pp][Nn][Gg]          lfs
+*.[Pp][Ss][Dd]          lfs
+*.[Jj][Pp][Gg]          lfs
+*.[Jj][Pp][Ee][Gg]      lfs
+*.[Ww][Ee][Bb][Pp]      lfs
+*.[Gg][Ii][Ff]          lfs
+*.[Tt][Gg][Aa]          lfs
+*.[Bb][Mm][Pp]          lfs
+
+# Libraries
+*.[Dd][Ll][Ll]          lfs
+*.[Ss][Oo]              lfs
+*.[Aa]                  lfs
+*.[Ll][Ii][Bb]          lfs
+*.[Pp][Dd][Bb]          lfs
+
+# Fonts
+*.[Oo][Tt][Ff]          lfs
+*.[Tt][Tt][Ff]          lfs
+
+# Audio
+*.[Ww][Aa][Vv]          lfs
+*.[Oo][Gg][Gg]          lfs
+*.[Mm][Pp]3             lfs
+
+# Documents
+*.[Pp][Dd][Ff]          lfs
+
+# Other
+*.[Bb][Ii][Nn]          lfs
+*.[Bb][Yy][Tt][Ee][Ss]  lfs
+
+# Text Mesh Pro
+*SDF.asset              lfs
