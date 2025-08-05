@@ -3,14 +3,7 @@ using System;
 namespace DnDev
 {
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class ManagedRefListApiAttribute : Attribute
+    internal class RefListApiAttribute : Attribute
     {
-
-    }
-
-    [AttributeUsage(AttributeTargets.Struct)]
-    internal class UnmanagedRefListApiAttribute : Attribute
-    {
-
     }
 }
