@@ -2,5 +2,8 @@
   "name": "dev.dngulin.reflist",
   "version": "0.0.1",
   "displayName": "RefList",
-  "description": "This package provides the RefList C# structure"
+  "description": "This package provides the RefList C# structure",
+  "dependencies": {
+    "dev.dngulin.nocopy": "0.0.1"
+  }
 }
