@@ -7,34 +7,36 @@ namespace DnDev
 {
     internal static class RefListBufferSizeExtensions
     {
-        public static int GetBufferSize<T>(this in RefList<T> list) where T : struct => list.Buffer?.Length ?? 0;
+        public static int GetBufferSize<T>(this in RefList<T> self) where T : struct => self.Buffer?.Length ?? 0;
 
-        public static int GetBufferSize<T>(this in TempRefList<T> list) where T : unmanaged => list.Capacity;
+        public static int GetBufferSize<T>(this in TempRefList<T> self) where T : unmanaged => self.Capacity;
 
-        public static int GetBufferSize<T>(this in NativeRefList<T> list) where T : unmanaged => list.Capacity;
+        public static int GetBufferSize<T>(this in NativeRefList<T> self) where T : unmanaged => self.Capacity;
     }
 
     internal static class RefListSetBufferSizeExtensions
     {
-        public static void SetBufferSize<T>(this ref RefList<T> list, int size) where T : struct
+        public static void SetBufferSize<T>(this ref RefList<T> self, int size) where T : struct
         {
             if (size == 0)
             {
-                list.Buffer = null;
+                self.Buffer = null;
+                self.Count = 0;
                 return;
             }
 
-            Array.Resize(ref list.Buffer, size);
+            Array.Resize(ref self.Buffer, size);
+            self.Count = Math.Min(self.Count, size);
         }
 
-        public static unsafe void SetBufferSize<T>(this ref TempRefList<T> list, int size) where T : unmanaged
+        public static unsafe void SetBufferSize<T>(this ref TempRefList<T> self, int size) where T : unmanaged
         {
-            ResizeBuffer(ref list.Buffer, ref list.Capacity, size, ref list.Count, Allocator.Temp);
+            ResizeBuffer(ref self.Buffer, ref self.Capacity, size, ref self.Count, Allocator.Temp);
         }
 
-        public static unsafe void SetBufferSize<T>(this ref NativeRefList<T> list, int size) where T : unmanaged
+        public static unsafe void SetBufferSize<T>(this ref NativeRefList<T> self, int size) where T : unmanaged
         {
-            ResizeBuffer(ref list.Buffer, ref list.Capacity, size, ref list.Count, Allocator.Persistent);
+            ResizeBuffer(ref self.Buffer, ref self.Capacity, size, ref self.Count, Allocator.Persistent);
         }
 
         private static unsafe void ResizeBuffer<T>(
@@ -74,77 +76,98 @@ namespace DnDev
 
     internal static class RefListIndexBufferExtensions
     {
-        public static ref readonly T IndexBuffer<T>(this in RefList<T> list, int index) where T : struct
+        public static ref readonly T IndexBuffer<T>(this in RefList<T> self, int index) where T : struct
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
 
-        public static ref T IndexBufferMut<T>(this ref RefList<T> list, int index) where T : struct
+        public static ref T IndexBufferMut<T>(this ref RefList<T> self, int index) where T : struct
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
 
-        public static unsafe ref readonly T IndexBuffer<T>(this in TempRefList<T> list, int index) where T : unmanaged
+        public static unsafe ref readonly T IndexBuffer<T>(this in TempRefList<T> self, int index) where T : unmanaged
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
 
-        public static unsafe ref T IndexBufferMut<T>(this ref TempRefList<T> list, int index) where T : unmanaged
+        public static unsafe ref T IndexBufferMut<T>(this ref TempRefList<T> self, int index) where T : unmanaged
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
 
-        public static unsafe ref readonly T IndexBuffer<T>(this in NativeRefList<T> list, int index) where T : unmanaged
+        public static unsafe ref readonly T IndexBuffer<T>(this in NativeRefList<T> self, int index) where T : unmanaged
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
 
-        public static unsafe ref T IndexBufferMut<T>(this ref NativeRefList<T> list, int index) where T : unmanaged
+        public static unsafe ref T IndexBufferMut<T>(this ref NativeRefList<T> self, int index) where T : unmanaged
         {
-            return ref list.Buffer[index];
+            return ref self.Buffer[index];
         }
     }
 
     internal static class RefListClearBufferExtensions
     {
-        public static void ClearBuffer<T>(this ref RefList<T> list) where T : struct
+        public static void ClearBuffer<T>(this ref RefList<T> self) where T : struct
         {
-            Array.Clear(list.Buffer, 0, list.Count);
+            Array.Clear(self.Buffer, 0, self.Count);
         }
 
-        public static unsafe void ClearBuffer<T>(this ref TempRefList<T> list) where T : unmanaged
+        public static unsafe void ClearBuffer<T>(this ref TempRefList<T> self) where T : unmanaged
         {
-            UnsafeUtility.MemSet(list.Buffer, 0, sizeof(T) * list.Count);
+            UnsafeUtility.MemSet(self.Buffer, 0, sizeof(T) * self.Count);
         }
 
-        public static unsafe void ClearBuffer<T>(this ref NativeRefList<T> list) where T : unmanaged
+        public static unsafe void ClearBuffer<T>(this ref NativeRefList<T> self) where T : unmanaged
         {
-            UnsafeUtility.MemSet(list.Buffer, 0, sizeof(T) * list.Count);
+            UnsafeUtility.MemSet(self.Buffer, 0, sizeof(T) * self.Count);
         }
     }
 
-    internal static class RefListCopyBufferRangeExtensions
+    internal static class RefListCopyWithinBufferExtensions
     {
-        public static void CopyBufferRange<T>(this ref RefList<T> list, int srcIdx, int dstIdx, int count)
+        public static void CopyWithinBuffer<T>(this ref RefList<T> self, int srcIdx, int dstIdx, int count)
             where T : struct
         {
-            Array.Copy(list.Buffer, srcIdx, list.Buffer, dstIdx, count);
+            Array.Copy(self.Buffer, srcIdx, self.Buffer, dstIdx, count);
         }
 
-        public static unsafe void CopyBufferRange<T>(
-            this ref TempRefList<T> list, int srcIdx, int dstIdx, int count
+        public static unsafe void CopyWithinBuffer<T>(
+            this ref TempRefList<T> self, int srcIdx, int dstIdx, int count
         )
             where T : unmanaged
         {
-            UnsafeUtility.MemMove(&list.Buffer[dstIdx], &list.Buffer[srcIdx], sizeof(T) * count);
+            UnsafeUtility.MemMove(&self.Buffer[dstIdx], &self.Buffer[srcIdx], sizeof(T) * count);
         }
 
-        public static unsafe void CopyBufferRange<T>(
-            this ref NativeRefList<T> list, int srcIdx, int dstIdx, int count
+        public static unsafe void CopyWithinBuffer<T>(
+            this ref NativeRefList<T> self, int srcIdx, int dstIdx, int count
         )
             where T : unmanaged
         {
-            UnsafeUtility.MemMove(&list.Buffer[dstIdx], &list.Buffer[srcIdx], sizeof(T) * count);
+            UnsafeUtility.MemMove(&self.Buffer[dstIdx], &self.Buffer[srcIdx], sizeof(T) * count);
+        }
+    }
+
+    internal static class RefListCopyBufferFromExtensions
+    {
+        public static void CopyBufferItemsFrom<T>(this ref RefList<T> self, in RefList<T> other)
+            where T : struct
+        {
+            Array.Copy(other.Buffer, self.Buffer, other.Count);
+        }
+
+        public static unsafe void CopyBufferItemsFrom<T>(this ref TempRefList<T> self, in TempRefList<T> other)
+            where T : unmanaged
+        {
+            UnsafeUtility.MemCpy(self.Buffer, other.Buffer, sizeof(T) * other.Count);
+        }
+
+        public static unsafe void CopyBufferItemsFrom<T>(this ref NativeRefList<T> self, in NativeRefList<T> other)
+            where T : unmanaged
+        {
+            UnsafeUtility.MemCpy(self.Buffer, other.Buffer, sizeof(T) * other.Count);
         }
     }
 }
