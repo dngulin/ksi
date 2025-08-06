@@ -52,6 +52,7 @@ namespace RefListRoslyn
                 {
                     ctx.AddSource($"{t}.g.cs", string.Format(Templates.StaticApi, t, c));
                     ctx.AddSource($"{t}Impl.g.cs", string.Format(Templates.Extensions, t, c));
+                    ctx.AddSource($"{t}Iterators.g.cs", string.Format(Templates.Iterators, t, c));
                 }
             });
         }
