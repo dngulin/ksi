@@ -28,7 +28,7 @@ namespace DnDev
         }
     }
 
-    [NoCopy, RefListApi]
+    [NoCopy, RefListApi, ImplementedDealloc]
     public unsafe ref struct NativeRefList<T> where T : unmanaged
     {
         internal T* Buffer;
