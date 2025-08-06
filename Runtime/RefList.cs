@@ -1,3 +1,5 @@
+using System;
+
 namespace DnDev
 {
     [NoCopy, RefListApi]
@@ -29,7 +31,7 @@ namespace DnDev
     }
 
     [NoCopy, RefListApi, ImplementedDealloc]
-    public unsafe ref struct NativeRefList<T> where T : unmanaged
+    public unsafe struct NativeRefList<T> where T : unmanaged
     {
         internal T* Buffer;
         internal int Capacity;
