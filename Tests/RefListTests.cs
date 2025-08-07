@@ -35,7 +35,7 @@ namespace DnDev.Tests
         [TestCase(16)]
         public void RefAddAndClear(int count)
         {
-            var list = RefList.WithCapacity<int>(count);
+            var list = RefList.WithCapacity<int>(count / 2);
             for (var i = 0; i < count; i++)
             {
                 list.RefAdd() = i;
