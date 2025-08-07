@@ -26,14 +26,14 @@ namespace RefListRoslyn
 
                     var c = structDecl.ConstraintClauses[0].Constraints[0];
 
-                    if (!(c.IsKind(SyntaxKind.StructConstraint) || IsUnmanagedConstraint(c)))
+                    if (!(c.IsKind(SyntaxKind.StructConstraint) || c.IsUnmanagedConstraint()))
                         return false;
 
-                    return HasAttribute(structDecl.AttributeLists, "RefListApi");
+                    return structDecl.AttributeLists.Contains("RefListApi");
                 },
                 transform: (ctx, _) =>
                 {
-                    var t = (TypeDeclarationSyntax)ctx.Node;
+                    var t = (StructDeclarationSyntax)ctx.Node;
                     var identifier = t.Identifier.ToString();
                     var constraint = t.ConstraintClauses[0].Constraints[0].IsKind(SyntaxKind.StructConstraint)
                         ? "struct"
@@ -54,23 +54,6 @@ namespace RefListRoslyn
                     ctx.AddSource($"{t}Iterators.g.cs", string.Format(Templates.Iterators, t, c));
                 }
             });
-        }
-
-        private static bool HasAttribute(SyntaxList<AttributeListSyntax> attrLists, string attributeName)
-        {
-            foreach (var attrList in attrLists)
-            foreach (var attr in attrList.Attributes)
-            {
-                if (attr.Name.ToString() == attributeName)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsUnmanagedConstraint(TypeParameterConstraintSyntax c)
-        {
-            return c.IsKind(SyntaxKind.TypeConstraint) && c is TypeConstraintSyntax tcs && tcs.Type.IsUnmanaged;
         }
     }
 }

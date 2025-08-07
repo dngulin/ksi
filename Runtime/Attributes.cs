@@ -8,7 +8,7 @@ namespace DnDev
     }
 
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class ImplementedDeallocAttribute : Attribute
+    internal class UnmanagedRefListAttribute : Attribute
     {
     }
 

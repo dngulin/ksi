@@ -15,7 +15,7 @@ namespace DnDev
         }
     }
 
-    [NoCopy, RefListApi]
+    [NoCopy, RefListApi, UnmanagedRefList]
     public unsafe ref struct TempRefList<T> where T : unmanaged
     {
         internal T* Buffer;
@@ -30,7 +30,7 @@ namespace DnDev
         }
     }
 
-    [NoCopy, RefListApi, ImplementedDealloc]
+    [NoCopy, RefListApi, UnmanagedRefList]
     public unsafe struct NativeRefList<T> where T : unmanaged
     {
         internal T* Buffer;
