@@ -42,6 +42,7 @@ namespace DnDev
 
             var list = WithCapacity<T>(other.Count);
             list.CopyBufferItemsFrom(other);
+            list.Count = other.Count;
 
             return list;
         }}
