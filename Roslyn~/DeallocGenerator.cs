@@ -54,8 +54,8 @@ namespace RefListRoslyn
 
                         if (ft.GetAttributes().Contains(DeallocApi))
                             result.Fields.Add((f.Name, false));
-                        else if (ft.GetAttributes().Contains(UnmanagedList) && ft.IsGenericOver(DeallocApi))
-                            result.Fields.Add((f.Name, true));
+                        else if (ft.GetAttributes().Contains(UnmanagedList))
+                            result.Fields.Add((f.Name, ft.IsGenericOver(DeallocApi)));
                     }
 
                     return result;
