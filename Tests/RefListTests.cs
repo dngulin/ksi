@@ -106,5 +106,21 @@ namespace DnDev.Tests
 
             Assert.That(list.Count() == 0, $"{nameof(RemoveAtBegin)}.Empty");
         }
+
+        [TestCase(16)]
+        [TestCase(17)]
+        [TestCase(18)]
+        public void Iterate(int count)
+        {
+            var list = RefList.Empty<int>();
+            list.AppendDefault(count);
+            var value = 0;
+
+            foreach (ref var item in list.RefIter())
+                item = value++;
+
+            foreach (ref readonly var item in list.RefReadonlyIterReversed())
+                Assert.That(item == --value, $" {nameof(Iterate)}.RefReadonlyIterReversed: {item} != {value}");
+        }
     }
 }

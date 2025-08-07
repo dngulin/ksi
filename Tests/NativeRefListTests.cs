@@ -143,5 +143,30 @@ namespace DnDev.Tests
 
             Assert.That(list.Capacity() == 0,  $"{nameof(RemoveAtBegin)}.Dealloc");
         }
+
+        [TestCase(16)]
+        [TestCase(17)]
+        [TestCase(18)]
+        public void Iterate(int count)
+        {
+            var list = NativeRefList.Empty<int>();
+            try
+            {
+                list.AppendDefault(count);
+                var value = 0;
+
+                foreach (ref var item in list.RefIter())
+                    item = value++;
+
+                foreach (ref readonly var item in list.RefReadonlyIterReversed())
+                    Assert.That(item == --value, $" {nameof(Iterate)}.RefReadonlyIterReversed: {item} != {value}");
+            }
+            finally
+            {
+                list.Dealloc();
+            }
+
+            Assert.That(list.Capacity() == 0,  $"{nameof(RemoveAtBegin)}.Dealloc");
+        }
     }
 }
