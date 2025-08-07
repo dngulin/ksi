@@ -8,7 +8,7 @@ namespace RefListRoslyn
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DeallocAnalyzer : DiagnosticAnalyzer
     {
-        private static int _ruleId = 0;
+        private static int _ruleId;
 
         private static DiagnosticDescriptor Rule(string title, string msg)
         {
