@@ -178,7 +178,7 @@ namespace DnDev
             _curr = -1;
         }}
 
-        public ref readonly T Current => ref _span[_curr];
+        public ref T Current => ref _span[_curr];
         public bool MoveNext() => ++_curr < _span.Length;
         public void Reset() => _curr = -1;
         public void Dispose() {{}}
@@ -226,7 +226,7 @@ namespace DnDev
             _curr = span.Length;
         }}
 
-        public ref readonly T Current => ref _span[_curr];
+        public ref T Current => ref _span[_curr];
         public bool MoveNext() => --_curr >= 0;
         public void Reset() => _curr = -1;
         public void Dispose() {{}}
