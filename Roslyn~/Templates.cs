@@ -169,7 +169,7 @@ namespace DnDev
 
     public ref struct {0}Enumerator<T> where T : {1}
     {{
-        private readonly ReadOnlySpan<T> _span;
+        private Span<T> _span;
         private int _curr;
 
         public {0}Enumerator(in Span<T> span)
@@ -217,7 +217,7 @@ namespace DnDev
 
     public ref struct {0}EnumeratorReversed<T> where T : {1}
     {{
-        private readonly ReadOnlySpan<T> _span;
+        private Span<T> _span;
         private int _curr;
 
         public {0}EnumeratorReversed(in Span<T> span)
