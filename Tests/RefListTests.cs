@@ -122,5 +122,36 @@ namespace DnDev.Tests
             foreach (ref readonly var item in list.RefReadonlyIterReversed())
                 Assert.That(item == --value, $" {nameof(Iterate)}.RefReadonlyIterReversed: {item} != {value}");
         }
+
+        [Test]
+        public void Copy()
+        {
+            var listA = RefList.Empty<int>();
+            listA.RefAdd() = 42;
+
+            var listB = RefList.Copy(listA);
+
+            Assert.That(
+                listA.Count() == listB.Count(),
+                $"{nameof(Copy)}.Count: {listA.Count()} != {listB.Count()}"
+            );
+            Assert.That(
+                listA.RefReadonlyAt(0) == listB.RefReadonlyAt(0),
+                $"{nameof(Copy)}.Index: {listA.RefReadonlyAt(0)} != {listB.RefReadonlyAt(0)}"
+            );
+        }
+
+        [Test]
+        public void Move()
+        {
+            var listA = RefList.Empty<int>();
+            listA.RefAdd() = 42;
+
+            var listB = RefList.Move(ref listA);
+
+            Assert.That(listA.Capacity() == 0, $"{nameof(Move)}.Capacity: {listA.Capacity()}");
+            Assert.That(listB.Count() == 1, $"{nameof(Move)}.Count: {listB.Count()}");
+            Assert.That(listB.RefReadonlyAt(0) == 42, $"{nameof(Move)}.Index: {listB.RefReadonlyAt(0)}");
+        }
     }
 }
