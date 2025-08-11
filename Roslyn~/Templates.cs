@@ -33,19 +33,6 @@ namespace DnDev
             other = default;
             return list;
         }}
-
-        [NoCopyReturn]
-        public static {0}<T> Copy<T>(in {0}<T> other) where T : {1}
-        {{
-            if (other.Count == 0)
-                return default;
-
-            var list = WithCapacity<T>(other.Count);
-            list.CopyBufferItemsFrom(other);
-            list.Count = other.Count;
-
-            return list;
-        }}
     }}
 }}";
 

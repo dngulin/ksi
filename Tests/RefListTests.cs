@@ -124,24 +124,6 @@ namespace DnDev.Tests
         }
 
         [Test]
-        public void Copy()
-        {
-            var listA = RefList.Empty<int>();
-            listA.RefAdd() = 42;
-
-            var listB = RefList.Copy(listA);
-
-            Assert.That(
-                listA.Count() == listB.Count(),
-                $"{nameof(Copy)}.Count: {listA.Count()} != {listB.Count()}"
-            );
-            Assert.That(
-                listA.RefReadonlyAt(0) == listB.RefReadonlyAt(0),
-                $"{nameof(Copy)}.Index: {listA.RefReadonlyAt(0)} != {listB.RefReadonlyAt(0)}"
-            );
-        }
-
-        [Test]
         public void Move()
         {
             var listA = RefList.Empty<int>();
