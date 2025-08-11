@@ -1,8 +1,8 @@
 {
-    "name": "DnDev.RefList.Tests",
-    "rootNamespace": "DnDev.Tests",
+    "name": "DnDev.Collections.Tests",
+    "rootNamespace": "DnDev.Collections.Tests",
     "references": [
-      "DnDev.RefList"
+      "DnDev.Collections"
     ],
     "includePlatforms": [
         "Editor"

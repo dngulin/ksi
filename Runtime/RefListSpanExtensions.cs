@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev
+namespace DnDev.Collections
 {
     public static class RefListSpanExtensions
     {

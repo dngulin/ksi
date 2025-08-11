@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
-namespace DnDev
+namespace DnDev.Collections
 {
     internal static class RefListBufferSizeExtensions
     {

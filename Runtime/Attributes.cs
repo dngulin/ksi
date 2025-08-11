@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev
+namespace DnDev.Collections
 {
     [AttributeUsage(AttributeTargets.Struct)]
     public class DeallocApiAttribute : Attribute

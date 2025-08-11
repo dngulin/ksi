@@ -1,8 +1,8 @@
 {
-  "name": "dev.dngulin.reflist",
+  "name": "dev.dngulin.collections",
   "version": "0.0.1",
-  "displayName": "RefList",
-  "description": "This package provides the RefList C# structure",
+  "displayName": "[DnDev] Collections",
+  "description": "This package provides RefList collections (managed, unmanaged and temp allocator based)",
   "dependencies": {
     "dev.dngulin.nocopy": "0.0.1"
   }
