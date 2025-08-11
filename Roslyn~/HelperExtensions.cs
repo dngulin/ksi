@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace RefListRoslyn
+namespace DnDev.Collections.Roslyn
 {
     public static class HelperExtensions
     {

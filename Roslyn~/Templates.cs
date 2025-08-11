@@ -1,4 +1,4 @@
-namespace RefListRoslyn
+namespace DnDev.Collections.Roslyn
 {
     public static class Templates
     {

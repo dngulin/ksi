@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace RefListRoslyn
+namespace DnDev.Collections.Roslyn
 {
     [Generator(LanguageNames.CSharp)]
     public class DeallocGenerator : IIncrementalGenerator

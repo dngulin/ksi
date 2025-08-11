@@ -2,10 +2,10 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace RefListRoslyn
+namespace DnDev.Collections.Roslyn
 {
     [Generator(LanguageNames.CSharp)]
-    public class PublicApiGenerator : IIncrementalGenerator
+    public class RefListApiGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
         {
