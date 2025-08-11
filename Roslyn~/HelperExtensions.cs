@@ -35,15 +35,24 @@ namespace DnDev.Collections.Roslyn
             return false;
         }
 
-        public static bool IsGenericOver(this INamedTypeSymbol self, string attributeName)
+        public static bool IsGenericOver(this INamedTypeSymbol self, string attributeName, out INamedTypeSymbol genericType)
         {
+            genericType = null;
+
             if (!self.IsGenericType)
                 return false;
 
             if (self.TypeParameters.Length != 1)
                 return false;
 
-            return self.TypeArguments[0].GetAttributes().Contains(attributeName);
+            if (!(self.TypeArguments[0] is INamedTypeSymbol gta))
+                return false;
+
+            if (!gta.GetAttributes().Contains(attributeName))
+                return false;
+
+            genericType = gta;
+            return true;
         }
     }
 }
