@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev.Collections
+namespace DnDev
 {
     [AttributeUsage(AttributeTargets.Struct)]
     public class DeallocApiAttribute : Attribute
@@ -8,12 +8,12 @@ namespace DnDev.Collections
     }
 
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class UnmanagedRefListAttribute : Attribute
+    internal class RefListApiAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class RefListApiAttribute : Attribute
+    internal class UnmanagedRefListAttribute : Attribute
     {
     }
 }

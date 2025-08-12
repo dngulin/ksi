@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace DnDev.Collections.Tests
+namespace DnDev.Tests
 {
     [TestFixture]
     public class RefListTests

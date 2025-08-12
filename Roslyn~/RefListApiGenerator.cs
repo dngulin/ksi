@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace DnDev.Collections.Roslyn
+namespace DnDev.Roslyn
 {
     [Generator(LanguageNames.CSharp)]
     public class RefListApiGenerator : IIncrementalGenerator

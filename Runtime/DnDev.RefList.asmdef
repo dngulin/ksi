@@ -1,6 +1,6 @@
 {
-    "name": "DnDev.Collections",
-    "rootNamespace": "DnDev.Collections",
+    "name": "DnDev.RefList",
+    "rootNamespace": "DnDev",
     "references": [
         "DnDev.NoCopy"
     ],

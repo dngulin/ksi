@@ -1,5 +1,5 @@
 {
-  "name": "dev.dngulin.collections",
+  "name": "dev.dngulin.reflist",
   "version": "0.0.1",
   "displayName": "[DnDev] Collections",
   "description": "This package provides RefList collections (managed, unmanaged and temp allocator based)",

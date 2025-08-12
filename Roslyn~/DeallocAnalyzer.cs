@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace DnDev.Collections.Roslyn
+namespace DnDev.Roslyn
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DeallocAnalyzer : DiagnosticAnalyzer

@@ -1,4 +1,4 @@
-namespace DnDev.Collections
+namespace DnDev
 {
     [NoCopy, RefListApi]
     public struct RefList<T> where T : struct

@@ -1,14 +1,15 @@
 {
-    "name": "DnDev.Collections.Tests",
-    "rootNamespace": "DnDev.Collections.Tests",
+    "name": "DnDev.RefList.Tests",
+    "rootNamespace": "DnDev.Tests",
     "references": [
-      "DnDev.Collections"
+      "DnDev.RefList",
+      "DnDev.NoCopy"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll"
