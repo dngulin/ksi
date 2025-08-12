@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -47,12 +48,29 @@ namespace DnDev.Roslyn
 
             initCtx.RegisterSourceOutput(collected, (ctx, entries) =>
             {
+                var sb = new StringBuilder();
+
                 foreach (var (t, c) in entries)
                 {
                     ctx.AddSource($"{t}.g.cs", string.Format(Templates.StaticApi, t, c));
                     ctx.AddSource($"{t}Impl.g.cs", string.Format(Templates.Extensions, t, c));
                     ctx.AddSource($"{t}Iterators.g.cs", string.Format(Templates.Iterators, t, c));
                     ctx.AddSource($"{t}StringExt.g.cs", string.Format(Templates.StringExt, t));
+
+
+                    sb.AppendLine("namespace DnDev");
+                    sb.AppendLine("{");
+                    sb.AppendLine($"    public static class {t}CopyToExtensions");
+                    sb.Append("    {");
+
+                    foreach (var tp in Templates.PrimitiveTypes)
+                        sb.AppendLine(string.Format(Templates.RefListCopyToMethod, t, tp));
+
+                    sb.AppendLine("    }");
+                    sb.AppendLine("}");
+
+                    ctx.AddSource($"{t}CopyToExt.g.cs", sb.ToString());
+                    sb.Clear();
                 }
             });
         }
