@@ -113,7 +113,7 @@ namespace DnDev.Roslyn
                         sb.AppendLine("        }");
 
                         foreach (var listType in Templates.RefListTypes)
-                            sb.AppendLine(string.Format(Templates.RefListDeallocMethod, listType, entry.TypeName));
+                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, listType, entry.TypeName));
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
