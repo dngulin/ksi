@@ -19,7 +19,7 @@ namespace DnDev.Roslyn
             public string TypeName;
             public string Namespace;
             public string[] Usings = Array.Empty<string>();
-            public readonly List<(string Name, bool DeallocItems)> Fields = new List<(string, bool)>();
+            public readonly List<string> Fields = new List<string>();
         }
 
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
@@ -58,20 +58,20 @@ namespace DnDev.Roslyn
 
                         if (ft.GetAttributes().Contains(DeallocApi))
                         {
-                            result.Fields.Add((f.Name, false));
+                            result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
                         else if (ft.GetAttributes().Contains(UnmanagedList))
                         {
-                            var deallocItems = ft.IsGenericOver(DeallocApi, out var genericType);
-                            result.Fields.Add((f.Name, deallocItems));
+                            result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (deallocItems)
+                            if (ft.IsGenericOver(DeallocApi, out var genericType))
                                 usings.Add(genericType.ContainingNamespace.ToDisplayString());
                         }
                     }
 
+                    usings.Add("DnDev");
                     usings.Remove(result.Namespace);
                     result.Usings = usings.ToArray();
 
@@ -105,18 +105,16 @@ namespace DnDev.Roslyn
                         sb.AppendLine("{");
                         sb.AppendLine($"    public static class {entry.TypeName}Dealloc");
                         sb.AppendLine("    {");
+
                         sb.AppendLine($"        public static void Dealloc(this ref {entry.TypeName} self)");
                         sb.AppendLine("        {");
-
-                        foreach (var (f, deallocItems) in entry.Fields)
-                        {
-                            if (deallocItems)
-                                sb.AppendLine($"            foreach (ref var i in self.{f}.RefIter()) i.Dealloc();");
-
+                        foreach (var f in entry.Fields)
                             sb.AppendLine($"            self.{f}.Dealloc();");
-                        }
-
                         sb.AppendLine("        }");
+
+                        foreach (var listType in Templates.RefListTypes)
+                            sb.AppendLine(string.Format(Templates.RefListDeallocMethod, listType, entry.TypeName));
+
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
                     }
