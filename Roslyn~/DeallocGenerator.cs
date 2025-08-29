@@ -134,8 +134,6 @@ namespace DnDev.Roslyn
                 sb.AppendLine($"            self.{f}.Dealloc();");
 
             sb.AppendLine("        }");
-
-
         }
 
         private static void EmitRefListDeallocMethods(StringBuilder sb, DeallocInfo entry)
