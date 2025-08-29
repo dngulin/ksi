@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace DnDev.Roslyn
 {
@@ -36,9 +37,16 @@ namespace DnDev.Roslyn
             "Structure `{0}` is marked with `DeallocApi` attribute but doesn't have any fields to deallocate"
         );
 
+        private static readonly DiagnosticDescriptor AssignmentRule = Rule(
+            DiagnosticSeverity.Error,
+            "Dealloc Type Assignment",
+            "Assigning a new value to a dealloc type can cause memory leaks and forbidden"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             FieldRule,
-            RedundantRule
+            RedundantRule,
+            AssignmentRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -50,6 +58,7 @@ namespace DnDev.Roslyn
 
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+            context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -75,6 +84,20 @@ namespace DnDev.Roslyn
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
+        }
+
+        private static void AnalyzeAssignment(OperationAnalysisContext ctx)
+        {
+            var assignment = (ISimpleAssignmentOperation)ctx.Operation;
+            if (assignment.IsRef)
+                return;
+
+            var t = assignment.Target.Type ?? assignment.Value.Type;
+            if (t == null || !t.IsValueType)
+                return;
+
+            if (IsUnmanagedRefList(t) || IsDeallocType(t))
+                ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
         }
 
         private static bool IsDeallocType(ITypeSymbol type)
