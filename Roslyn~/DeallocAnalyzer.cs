@@ -12,7 +12,7 @@ namespace DnDev.Roslyn
     {
         private static int _ruleId;
 
-        private static DiagnosticDescriptor Rule(string title, string msg, DiagnosticSeverity severity)
+        private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
         {
             return new DiagnosticDescriptor(
                 id: $"DLC{_ruleId++:D2}",
@@ -25,15 +25,15 @@ namespace DnDev.Roslyn
         }
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
+            DiagnosticSeverity.Error,
             "Field of Non-Dealloc Type",
-            "Structure `{0}` can be a field only of a structure marked with `DeallocApi`",
-            DiagnosticSeverity.Error
+            "Structure `{0}` can be a field only of a structure marked with `DeallocApi`"
         );
 
         private static readonly DiagnosticDescriptor RedundantRule = Rule(
+            DiagnosticSeverity.Warning,
             "Redundant DeallocApi Attribute",
-            "Structure `{0}` is marked with `DeallocApi` attribute but doesn't have any fields to deallocate",
-            DiagnosticSeverity.Warning
+            "Structure `{0}` is marked with `DeallocApi` attribute but doesn't have any fields to deallocate"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
