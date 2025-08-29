@@ -39,14 +39,6 @@ namespace DnDev
             list.Count = count;
             return list;
         }}
-
-        [NoCopyReturn]
-        public static {0}<T> Move<T>(ref {0}<T> other) where T : {1}
-        {{
-            var list = new {0}<T>(other);
-            other = default;
-            return list;
-        }}
     }}
 }}";
 

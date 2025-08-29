@@ -168,31 +168,5 @@ namespace DnDev.Tests
 
             Assert.That(list.Capacity() == 0,  $"{nameof(RemoveAtBegin)}.Dealloc");
         }
-
-        [Test]
-        public void Move()
-        {
-            var listA = NativeRefList.Empty<int>();
-            try
-            {
-                listA.RefAdd() = 42;
-
-                var listB = NativeRefList.Move(ref listA);
-                try
-                {
-                    Assert.That(listA.Capacity() == 0, $"{nameof(Move)}.Capacity: {listA.Capacity()}");
-                    Assert.That(listB.Count() == 1, $"{nameof(Move)}.Count: {listB.Count()}");
-                    Assert.That(listB.RefReadonlyAt(0) == 42, $"{nameof(Move)}.Index: {listB.RefReadonlyAt(0)}");
-                }
-                finally
-                {
-                    listB.Dealloc();
-                }
-            }
-            finally
-            {
-                listA.Dealloc();
-            }
-        }
     }
 }
