@@ -77,7 +77,6 @@ namespace DnDev.Roslyn
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
         }
 
-
         private static bool IsDeallocType(ITypeSymbol type)
         {
             return type.TypeKind == TypeKind.Struct && type.GetAttributes().Contains("DeallocApiAttribute");
