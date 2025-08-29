@@ -18,6 +18,7 @@ namespace DnDev.Roslyn
         {
             public string TypeName;
             public string Namespace;
+            public bool IsUnmanged;
             public string[] Usings = Array.Empty<string>();
             public readonly List<string> Fields = new List<string>();
         }
@@ -46,6 +47,8 @@ namespace DnDev.Roslyn
                         return result;
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
+                    result.IsUnmanged = t.IsUnmanagedType;
+
                     var usings = new HashSet<string>();
 
                     foreach (var m in t.GetMembers())
@@ -112,8 +115,13 @@ namespace DnDev.Roslyn
                             sb.AppendLine($"            self.{f}.Dealloc();");
                         sb.AppendLine("        }");
 
-                        foreach (var listType in Templates.RefListTypes)
-                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, listType, entry.TypeName));
+                        sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "RefList", entry.TypeName));
+
+                        if (entry.IsUnmanged)
+                        {
+                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "NativeRefList", entry.TypeName));
+                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "TempRefList", entry.TypeName));
+                        }
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
