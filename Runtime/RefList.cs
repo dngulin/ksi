@@ -5,12 +5,6 @@ namespace DnDev
     {
         internal T[] Buffer;
         internal int Count;
-
-        internal RefList(in RefList<T> other)
-        {
-            Buffer = other.Buffer;
-            Count = other.Count;
-        }
     }
 
     [NoCopy, RefListApi, UnmanagedRefList]
@@ -19,13 +13,6 @@ namespace DnDev
         internal T* Buffer;
         internal int Capacity;
         internal int Count;
-
-        internal TempRefList(in TempRefList<T> other)
-        {
-            Buffer = other.Buffer;
-            Capacity = other.Capacity;
-            Count = other.Count;
-        }
     }
 
     [NoCopy, RefListApi, UnmanagedRefList]
@@ -34,12 +21,5 @@ namespace DnDev
         internal T* Buffer;
         internal int Capacity;
         internal int Count;
-
-        internal NativeRefList(in NativeRefList<T> other)
-        {
-            Buffer = other.Buffer;
-            Capacity = other.Capacity;
-            Count = other.Count;
-        }
     }
 }
