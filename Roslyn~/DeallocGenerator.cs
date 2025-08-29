@@ -127,6 +127,9 @@ namespace DnDev.Roslyn
             sb.AppendLine($"        public static void Dealloc(this ref {entry.TypeName} self)");
             sb.AppendLine("        {");
 
+            if (entry.Fields.Count == 0)
+                sb.AppendLine($"            #warning Empty Dealloc implementation for {entry.TypeName}");
+
             foreach (var f in entry.Fields)
                 sb.AppendLine($"            self.{f}.Dealloc();");
 
