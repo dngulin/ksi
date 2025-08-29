@@ -109,19 +109,8 @@ namespace DnDev.Roslyn
                         sb.AppendLine($"    public static class {entry.TypeName}Dealloc");
                         sb.AppendLine("    {");
 
-                        sb.AppendLine($"        public static void Dealloc(this ref {entry.TypeName} self)");
-                        sb.AppendLine("        {");
-                        foreach (var f in entry.Fields)
-                            sb.AppendLine($"            self.{f}.Dealloc();");
-                        sb.AppendLine("        }");
-
-                        sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "RefList", entry.TypeName));
-
-                        if (entry.IsUnmanged)
-                        {
-                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "NativeRefList", entry.TypeName));
-                            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "TempRefList", entry.TypeName));
-                        }
+                        EmitDeallocMethod(sb, entry);
+                        EmitRefListDeallocMethods(sb, entry);
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
@@ -131,6 +120,29 @@ namespace DnDev.Roslyn
                     sb.Clear();
                 }
             });
+        }
+
+        private static void EmitDeallocMethod(StringBuilder sb, DeallocInfo entry)
+        {
+            sb.AppendLine($"        public static void Dealloc(this ref {entry.TypeName} self)");
+            sb.AppendLine("        {");
+
+            foreach (var f in entry.Fields)
+                sb.AppendLine($"            self.{f}.Dealloc();");
+
+            sb.AppendLine("        }");
+
+
+        }
+
+        private static void EmitRefListDeallocMethods(StringBuilder sb, DeallocInfo entry)
+        {
+            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "RefList", entry.TypeName));
+            if (!entry.IsUnmanged)
+                return;
+
+            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "NativeRefList", entry.TypeName));
+            sb.AppendLine(string.Format(Templates.RefListDeallocMethods, "TempRefList", entry.TypeName));
         }
     }
 }
