@@ -9,18 +9,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace DnDev.Roslyn
 {
     [Generator(LanguageNames.CSharp)]
-    public class DeallocGenerator : IIncrementalGenerator
+    public class ExplicitCopyGenerator : IIncrementalGenerator
     {
-        private const string DeallocApi = "DeallocApiAttribute";
+        private const string ExplicitCopyApi = "ExplicitCopyApiAttribute";
         private const string UnmanagedList = "UnmanagedRefListAttribute";
 
-        private class DeallocInfo
+        private class TypeInfo
         {
             public string TypeName;
             public string Namespace;
             public bool IsUnmanged;
             public string[] Usings = Array.Empty<string>();
-            public readonly List<string> Fields = new List<string>();
+            public readonly List<(string, bool)> Fields = new List<(string, bool)>();
         }
 
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
@@ -31,14 +31,14 @@ namespace DnDev.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    return structDecl.AttributeLists.Contains("DeallocApi");
+                    return structDecl.AttributeLists.Contains("ExplicitCopyApi");
                 },
                 transform: (ctx, _) =>
                 {
                     var c = (StructDeclarationSyntax)ctx.Node;
 
                     var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-                    var result = new DeallocInfo
+                    var result = new TypeInfo
                     {
                         TypeName = c.Identifier.ValueText,
                     };
@@ -53,24 +53,28 @@ namespace DnDev.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (!(m is IFieldSymbol f) || f.Type.TypeKind != TypeKind.Struct)
+                        if (!(m is IFieldSymbol f) || f.IsStatic)
                             continue;
 
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Contains(DeallocApi))
+                        if (ft.GetAttributes().Contains(ExplicitCopyApi))
                         {
-                            result.Fields.Add(f.Name);
+                            result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
                         else if (ft.GetAttributes().Contains(UnmanagedList))
                         {
-                            result.Fields.Add(f.Name);
+                            result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.IsGenericOver(DeallocApi, out var genericType))
+                            if (ft.IsGenericOver(ExplicitCopyApi, out var genericType))
                                 usings.Add(genericType.ContainingNamespace.ToDisplayString());
+                        }
+                        else
+                        {
+                            result.Fields.Add((f.Name, false));
                         }
                     }
 
@@ -106,30 +110,39 @@ namespace DnDev.Roslyn
                         sb.AppendLine();
                         sb.AppendLine($"namespace {entry.Namespace}");
                         sb.AppendLine("{");
-                        sb.AppendLine($"    public static class {entry.TypeName}Dealloc");
+                        sb.AppendLine($"    public static class {entry.TypeName}ExplicitCopy");
                         sb.AppendLine("    {");
 
-                        EmitDeallocMethod(sb, entry);
-                        EmitUtils.EmitRefListMethods(Templates.RefListDeallocMethods, sb, entry.TypeName, entry.IsUnmanged);
+                        EmitExplicitCopyMethods(sb, entry);
+                        EmitUtils.EmitRefListMethods(Templates.RefListExplicitCopyMethods, sb, entry.TypeName, entry.IsUnmanged);
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
                     }
 
-                    ctx.AddSource($"{entry.TypeName}Dealloc.g.cs", sb.ToString());
+                    ctx.AddSource($"{entry.TypeName}ExplicitCopy.g.cs", sb.ToString());
                     sb.Clear();
                 }
             });
         }
 
-        private static void EmitDeallocMethod(StringBuilder sb, DeallocInfo entry)
+        private static void EmitExplicitCopyMethods(StringBuilder sb, TypeInfo entry)
         {
-            sb.AppendLine($"        public static void Dealloc(this ref {entry.TypeName} self)");
+            sb.AppendLine($"        public static void CopyFrom(this ref {entry.TypeName} self, in {entry.TypeName} other)");
             sb.AppendLine("        {");
 
-            foreach (var f in entry.Fields)
-                sb.AppendLine($"            self.{f}.Dealloc();");
+            foreach (var (fn, expCopy) in entry.Fields)
+                sb.AppendLine(expCopy
+                    ? $"            self.{fn}.CopyFrom(other.{fn});"
+                    : $"            self.{fn} = other.{fn};");
 
+            sb.AppendLine("        }");
+
+            sb.AppendLine();
+
+            sb.AppendLine($"        public static void CopyTo(this in {entry.TypeName} self, ref {entry.TypeName} other)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            other.CopyFrom(self);");
             sb.AppendLine("        }");
         }
     }
