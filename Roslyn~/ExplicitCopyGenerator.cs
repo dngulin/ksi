@@ -13,12 +13,14 @@ namespace DnDev.Roslyn
     {
         private const string ExplicitCopyApi = "ExplicitCopyApiAttribute";
         private const string UnmanagedList = "UnmanagedRefListAttribute";
+        private const string DeallocApi = "DeallocApiAttribute";
 
         private class TypeInfo
         {
             public string TypeName;
             public string Namespace;
             public bool IsUnmanged;
+            public bool HasDeallocAttribute;
             public string[] Usings = Array.Empty<string>();
             public readonly List<(string, bool)> Fields = new List<(string, bool)>();
         }
@@ -48,6 +50,7 @@ namespace DnDev.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanged = t.IsUnmanagedType;
+                    result.HasDeallocAttribute = t.GetAttributes().Contains(DeallocApi);
 
                     var usings = new HashSet<string>();
 
@@ -114,7 +117,14 @@ namespace DnDev.Roslyn
                         sb.AppendLine("    {");
 
                         EmitExplicitCopyMethods(sb, entry);
-                        EmitUtils.EmitRefListMethods(Templates.RefListExplicitCopyMethods, sb, entry.TypeName, entry.IsUnmanged);
+                        EmitUtils.EmitRefListMethods(
+                            entry.HasDeallocAttribute ?
+                                ExplicitCopyTemplates.RefListExtensionsDealloc :
+                                ExplicitCopyTemplates.RefListExtensions,
+                            sb,
+                            entry.TypeName,
+                            entry.IsUnmanged
+                        );
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
