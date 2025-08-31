@@ -1,9 +1,7 @@
 {
     "name": "DnDev.RefList",
     "rootNamespace": "DnDev",
-    "references": [
-        "DnDev.NoCopy"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,

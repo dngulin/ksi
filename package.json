@@ -4,6 +4,5 @@
   "displayName": "[DnDev] RefList",
   "description": "This package provides RefList collections (managed, unmanaged and temp allocator based)",
   "dependencies": {
-    "dev.dngulin.nocopy": "0.0.1"
   }
 }
