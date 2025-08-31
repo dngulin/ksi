@@ -11,7 +11,7 @@ namespace DnDev.Roslyn
             return self.IsKind(SyntaxKind.TypeConstraint) && self is TypeConstraintSyntax tcs && tcs.Type.IsUnmanaged;
         }
 
-        public static bool TryGetGenericArg(this INamedTypeSymbol self, out INamedTypeSymbol genericType)
+        public static bool TryGetGenericArg(this INamedTypeSymbol self, out INamedTypeSymbol? genericType)
         {
             genericType = null;
 

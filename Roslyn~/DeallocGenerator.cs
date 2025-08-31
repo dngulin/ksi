@@ -11,12 +11,12 @@ namespace DnDev.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class DeallocGenerator : IIncrementalGenerator
     {
-        private class DeallocInfo
+        private class DeallocInfo(string typeName)
         {
-            public string TypeName;
-            public string Namespace;
-            public bool IsUnmanged;
-            public string[] Usings = Array.Empty<string>();
+            public readonly string TypeName = typeName;
+            public string? Namespace;
+            public bool IsUnmanaged;
+            public string[] Usings = [];
             public readonly List<string> Fields = new List<string>();
         }
 
@@ -35,16 +35,13 @@ namespace DnDev.Roslyn
                     var c = (StructDeclarationSyntax)ctx.Node;
 
                     var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-                    var result = new DeallocInfo
-                    {
-                        TypeName = c.Identifier.ValueText,
-                    };
+                    var result = new DeallocInfo(c.Identifier.ValueText);
 
                     if (t == null)
                         return result;
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
-                    result.IsUnmanged = t.IsUnmanagedType;
+                    result.IsUnmanaged = t.IsUnmanagedType;
 
                     var usings = new HashSet<string>();
 
@@ -66,7 +63,7 @@ namespace DnDev.Roslyn
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt.GetAttributes().Any(AttributeUtil.IsDealloc))
+                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsDealloc))
                                 usings.Add(gt.ContainingNamespace.ToDisplayString());
                         }
                     }
@@ -111,7 +108,7 @@ namespace DnDev.Roslyn
                             DeallocTemplates.RefListDeallocMethods,
                             sb,
                             entry.TypeName,
-                            entry.IsUnmanged
+                            entry.IsUnmanaged
                         );
 
                         sb.AppendLine("    }");

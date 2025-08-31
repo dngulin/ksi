@@ -11,13 +11,13 @@ namespace DnDev.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class ExplicitCopyGenerator : IIncrementalGenerator
     {
-        private class TypeInfo
+        private class TypeInfo(string typeName)
         {
-            public string TypeName;
-            public string Namespace;
-            public bool IsUnmanged;
+            public string TypeName = typeName;
+            public string? Namespace;
+            public bool IsUnmanaged;
             public bool HasDeallocAttribute;
-            public string[] Usings = Array.Empty<string>();
+            public string[] Usings = [];
             public readonly List<(string, bool)> Fields = new List<(string, bool)>();
         }
 
@@ -36,16 +36,13 @@ namespace DnDev.Roslyn
                     var c = (StructDeclarationSyntax)ctx.Node;
 
                     var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-                    var result = new TypeInfo
-                    {
-                        TypeName = c.Identifier.ValueText,
-                    };
+                    var result = new TypeInfo(c.Identifier.ValueText);
 
                     if (t == null)
                         return result;
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
-                    result.IsUnmanged = t.IsUnmanagedType;
+                    result.IsUnmanaged = t.IsUnmanagedType;
                     result.HasDeallocAttribute = t.GetAttributes().Any(AttributeUtil.IsDealloc);
 
                     var usings = new HashSet<string>();
@@ -68,7 +65,7 @@ namespace DnDev.Roslyn
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
+                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
                                 usings.Add(gt.ContainingNamespace.ToDisplayString());
                         }
                         else
@@ -119,7 +116,7 @@ namespace DnDev.Roslyn
                                 ExplicitCopyTemplates.RefListExtensions,
                             sb,
                             entry.TypeName,
-                            entry.IsUnmanged
+                            entry.IsUnmanaged
                         );
 
                         sb.AppendLine("    }");
