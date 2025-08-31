@@ -102,12 +102,12 @@ namespace DnDev.Roslyn
 
         private static bool IsDeallocType(ITypeSymbol type)
         {
-            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Contains("DeallocApiAttribute");
+            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Any(AttributeUtil.IsDealloc);
         }
 
         private static bool IsUnmanagedRefList(ITypeSymbol type)
         {
-            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Contains("UnmanagedRefListAttribute");
+            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Any(AttributeUtil.IsUnmanagedRefList);
         }
     }
 }

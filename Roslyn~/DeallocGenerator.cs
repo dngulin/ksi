@@ -11,9 +11,6 @@ namespace DnDev.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class DeallocGenerator : IIncrementalGenerator
     {
-        private const string DeallocApi = "DeallocApiAttribute";
-        private const string UnmanagedList = "UnmanagedRefListAttribute";
-
         private class DeallocInfo
         {
             public string TypeName;
@@ -31,7 +28,7 @@ namespace DnDev.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    return structDecl.AttributeLists.Contains("DeallocApi");
+                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsDealloc);
                 },
                 transform: (ctx, _) =>
                 {
@@ -59,18 +56,18 @@ namespace DnDev.Roslyn
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Contains(DeallocApi))
+                        if (ft.GetAttributes().Any(AttributeUtil.IsDealloc))
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.GetAttributes().Contains(UnmanagedList))
+                        else if (ft.GetAttributes().Any(AttributeUtil.IsUnmanagedRefList))
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.IsGenericOver(DeallocApi, out var genericType))
-                                usings.Add(genericType.ContainingNamespace.ToDisplayString());
+                            if (ft.TryGetGenericArg(out var gt) && gt.GetAttributes().Any(AttributeUtil.IsDealloc))
+                                usings.Add(gt.ContainingNamespace.ToDisplayString());
                         }
                     }
 

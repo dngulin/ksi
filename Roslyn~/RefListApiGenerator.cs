@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +31,7 @@ namespace DnDev.Roslyn
                     if (!(c.IsKind(SyntaxKind.StructConstraint) || c.IsUnmanagedConstraint()))
                         return false;
 
-                    return structDecl.AttributeLists.Contains("RefListApi");
+                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsRefList);
                 },
                 transform: (ctx, _) =>
                 {

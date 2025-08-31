@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,35 +6,12 @@ namespace DnDev.Roslyn
 {
     public static class HelperExtensions
     {
-        public static bool Contains(this in SyntaxList<AttributeListSyntax> self, string attributeName)
-        {
-            foreach (var attrList in self)
-            foreach (var attr in attrList.Attributes)
-            {
-                if (attr.Name.ToString() == attributeName)
-                    return true;
-            }
-
-            return false;
-        }
-
         public static bool IsUnmanagedConstraint(this TypeParameterConstraintSyntax self)
         {
             return self.IsKind(SyntaxKind.TypeConstraint) && self is TypeConstraintSyntax tcs && tcs.Type.IsUnmanaged;
         }
 
-        public static bool Contains(this in ImmutableArray<AttributeData> self, string attributeName)
-        {
-            foreach (var attr in self)
-            {
-                if (attr.AttributeClass != null && attr.AttributeClass.Name == attributeName)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsGenericOver(this INamedTypeSymbol self, string attributeName, out INamedTypeSymbol genericType)
+        public static bool TryGetGenericArg(this INamedTypeSymbol self, out INamedTypeSymbol genericType)
         {
             genericType = null;
 
@@ -46,9 +22,6 @@ namespace DnDev.Roslyn
                 return false;
 
             if (!(self.TypeArguments[0] is INamedTypeSymbol gta))
-                return false;
-
-            if (!gta.GetAttributes().Contains(attributeName))
                 return false;
 
             genericType = gta;

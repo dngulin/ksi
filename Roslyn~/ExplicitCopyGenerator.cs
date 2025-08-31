@@ -11,10 +11,6 @@ namespace DnDev.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class ExplicitCopyGenerator : IIncrementalGenerator
     {
-        private const string ExplicitCopyApi = "ExplicitCopyApiAttribute";
-        private const string UnmanagedList = "UnmanagedRefListAttribute";
-        private const string DeallocApi = "DeallocApiAttribute";
-
         private class TypeInfo
         {
             public string TypeName;
@@ -33,7 +29,7 @@ namespace DnDev.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    return structDecl.AttributeLists.Contains("ExplicitCopyApi");
+                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsExplicitCopy);
                 },
                 transform: (ctx, _) =>
                 {
@@ -50,7 +46,7 @@ namespace DnDev.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanged = t.IsUnmanagedType;
-                    result.HasDeallocAttribute = t.GetAttributes().Contains(DeallocApi);
+                    result.HasDeallocAttribute = t.GetAttributes().Any(AttributeUtil.IsDealloc);
 
                     var usings = new HashSet<string>();
 
@@ -62,18 +58,18 @@ namespace DnDev.Roslyn
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Contains(ExplicitCopyApi))
+                        if (ft.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.GetAttributes().Contains(UnmanagedList))
+                        else if (ft.GetAttributes().Any(AttributeUtil.IsUnmanagedRefList))
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.IsGenericOver(ExplicitCopyApi, out var genericType))
-                                usings.Add(genericType.ContainingNamespace.ToDisplayString());
+                            if (ft.TryGetGenericArg(out var gt) && gt.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
+                                usings.Add(gt.ContainingNamespace.ToDisplayString());
                         }
                         else
                         {
