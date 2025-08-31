@@ -68,7 +68,7 @@ namespace DnDev.Roslyn
                         }
                     }
 
-                    usings.Add("DnDev");
+                    usings.Add(EmitUtils.RootNamespace);
                     usings.Remove(result.Namespace);
                     result.Usings = usings.ToArray();
 

@@ -4,6 +4,8 @@ namespace DnDev.Roslyn
 {
     public static class EmitUtils
     {
+        public const string RootNamespace = "DnDev";
+
         public static void EmitRefListMethods(string tpl, StringBuilder sb, string typeName, bool unmanaged)
         {
             sb.AppendLine(string.Format(tpl, "RefList", typeName));
