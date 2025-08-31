@@ -4,7 +4,7 @@ namespace DnDev.Roslyn
     {
         public const string RefListDeallocMethods = @"
         /// <summary>
-        /// Specialized implemenation for Dealloc types
+        /// Specialized implementation for Dealloc types
         /// </summary>
         public static void Dealloc(this ref {0}<{1}> self)
         {{
@@ -15,7 +15,7 @@ namespace DnDev.Roslyn
         }}
 
         /// <summary>
-        /// Specialized implemenation for Dealloc types
+        /// Specialized implementation for Dealloc types
         /// </summary>
         public static void Clear(this ref {0}<{1}> self)
         {{
@@ -26,7 +26,7 @@ namespace DnDev.Roslyn
         }}
 
         /// <summary>
-        /// Specialized implemenation for Dealloc types
+        /// Specialized implementation for Dealloc types
         /// </summary>
         public static void RemoveAt(this ref {0}<{1}> self, int index)
         {{
