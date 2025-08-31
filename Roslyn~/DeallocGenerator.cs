@@ -110,7 +110,12 @@ namespace DnDev.Roslyn
                         sb.AppendLine("    {");
 
                         EmitDeallocMethod(sb, entry);
-                        EmitUtils.EmitRefListMethods(Templates.RefListDeallocMethods, sb, entry.TypeName, entry.IsUnmanged);
+                        EmitUtils.EmitRefListMethods(
+                            DeallocTemplates.RefListDeallocMethods,
+                            sb,
+                            entry.TypeName,
+                            entry.IsUnmanged
+                        );
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");
