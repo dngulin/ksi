@@ -25,3 +25,4 @@
 ### Changed
 - All `RefList` variants provide unified internal extension methods
 - Public API extension methods are provided by source generators
+- NoCopyAnalyzer is embedded to the package
