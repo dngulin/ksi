@@ -8,11 +8,6 @@ namespace DnDev
     }
 
     [AttributeUsage(AttributeTargets.Struct)]
-    public class ExplicitCopyApiAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Struct)]
     internal class RefListApiAttribute : Attribute
     {
     }

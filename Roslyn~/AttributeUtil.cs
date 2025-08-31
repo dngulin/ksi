@@ -7,7 +7,7 @@ namespace DnDev.Roslyn
     public static class AttributeUtil
     {
         private const string DeallocApi = "DeallocApi";
-        private const string ExplicitCopyApi = "ExplicitCopyApi";
+        private const string NoCopy = "NoCopy";
 
         private const string RefListApi = "RefListApi";
         private const string UnmanagedList = "UnmanagedRefList";
@@ -17,16 +17,6 @@ namespace DnDev.Roslyn
         public static bool ContainsDealloc(AttributeListSyntax attributeList)
         {
             return attributeList.Attributes.Any(IsDealloc);
-        }
-
-        public static bool ContainsExplicitCopy(AttributeListSyntax attributeList)
-        {
-            return attributeList.Attributes.Any(IsExplicitCopy);
-        }
-
-        public static bool ContainsRefList(AttributeListSyntax attributeList)
-        {
-            return attributeList.Attributes.Any(IsRefList);
         }
 
         private static bool IsDealloc(AttributeSyntax attribute)
@@ -40,15 +30,27 @@ namespace DnDev.Roslyn
             return attribute.AttributeClass != null && attribute.AttributeClass.Name == DeallocApi + Suffix;
         }
 
-        private static bool IsExplicitCopy(AttributeSyntax attribute)
+
+
+        public static bool ContainsNoCopy(AttributeListSyntax attributeList)
         {
-            var name = attribute.Name.ToString();
-            return name == ExplicitCopyApi || name == ExplicitCopyApi + Suffix;
+            return attributeList.Attributes.Any(IsNoCopy);
         }
 
-        public static bool IsExplicitCopy(AttributeData attribute)
+        private static bool IsNoCopy(AttributeSyntax attribute)
         {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == ExplicitCopyApi + Suffix;
+            var name = attribute.Name.ToString();
+            return name == NoCopy || name == NoCopy + Suffix;
+        }
+
+        public static bool IsNoCopy(AttributeData attribute)
+        {
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NoCopy + Suffix;
+        }
+
+        public static bool ContainsRefList(AttributeListSyntax attributeList)
+        {
+            return attributeList.Attributes.Any(IsRefList);
         }
 
         private static bool IsRefList(AttributeSyntax attribute)

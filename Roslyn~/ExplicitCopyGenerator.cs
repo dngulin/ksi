@@ -29,7 +29,10 @@ namespace DnDev.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsExplicitCopy);
+                    if (structDecl.AttributeLists.Any(AttributeUtil.ContainsRefList))
+                        return false;
+
+                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsNoCopy);
                 },
                 transform: (ctx, _) =>
                 {
@@ -55,7 +58,7 @@ namespace DnDev.Roslyn
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
+                        if (ft.GetAttributes().Any(AttributeUtil.IsNoCopy))
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
@@ -65,7 +68,7 @@ namespace DnDev.Roslyn
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsExplicitCopy))
+                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsNoCopy))
                                 usings.Add(gt.ContainingNamespace.ToDisplayString());
                         }
                         else
