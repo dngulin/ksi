@@ -1,3 +1,4 @@
 /Roslyn~/.idea/
 /Roslyn~/bin/
 /Roslyn~/obj/
+*.DotSettings.user
