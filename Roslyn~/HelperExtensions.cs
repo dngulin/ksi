@@ -27,5 +27,47 @@ namespace DnDev.Roslyn
             genericType = gta;
             return true;
         }
+
+        public static bool IsUnmanagedRefList(this ITypeSymbol self)
+        {
+            if (self.TypeKind != TypeKind.Struct || !self.IsUnmanagedType)
+                return false;
+
+            foreach (var attribute in self.GetAttributes())
+            {
+                if (AttributeUtil.IsRefList(attribute))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool HasDeallocAttribute(this ITypeSymbol self)
+        {
+            if (self.TypeKind != TypeKind.Struct)
+                return false;
+
+            foreach (var attribute in self.GetAttributes())
+            {
+                if (AttributeUtil.IsDealloc(attribute))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool HasDeallocOrRefListAttribute(this ITypeSymbol self)
+        {
+            if (self.TypeKind != TypeKind.Struct)
+                return false;
+
+            foreach (var attribute in self.GetAttributes())
+            {
+                if (AttributeUtil.IsDealloc(attribute) || AttributeUtil.IsRefList(attribute))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

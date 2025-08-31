@@ -67,20 +67,20 @@ namespace DnDev.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            if (IsDeallocType(sym.ContainingType))
+            if (sym.ContainingType.HasDeallocAttribute())
                 return;
 
-            if (IsDeallocType(sym.Type) || IsUnmanagedRefList(sym.Type))
+            if (sym.Type.HasDeallocOrRefListAttribute())
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
         {
             var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-            if (sym == null || !IsDeallocType(sym))
+            if (sym == null || !sym.HasDeallocAttribute())
                 return;
 
-            if (sym.GetMembers().Where(m => m.Kind == SymbolKind.Field).Cast<IFieldSymbol>().Any(field => IsDeallocType(field.Type) || IsUnmanagedRefList(field.Type)))
+            if (sym.GetMembers().Where(m => m.Kind == SymbolKind.Field).Cast<IFieldSymbol>().Any(field => field.Type.HasDeallocOrRefListAttribute()))
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
@@ -96,18 +96,8 @@ namespace DnDev.Roslyn
             if (t == null || !t.IsValueType)
                 return;
 
-            if (IsUnmanagedRefList(t) || IsDeallocType(t))
+            if (t.HasDeallocOrRefListAttribute())
                 ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
-        }
-
-        private static bool IsDeallocType(ITypeSymbol type)
-        {
-            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Any(AttributeUtil.IsDealloc);
-        }
-
-        private static bool IsUnmanagedRefList(ITypeSymbol type)
-        {
-            return type.TypeKind == TypeKind.Struct && type.GetAttributes().Any(AttributeUtil.IsUnmanagedRefList);
         }
     }
 }

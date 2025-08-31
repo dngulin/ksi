@@ -7,7 +7,7 @@ namespace DnDev
         internal int Count;
     }
 
-    [NoCopy, RefList, UnmanagedRefList]
+    [NoCopy, RefList]
     public unsafe ref struct TempRefList<T> where T : unmanaged
     {
         internal T* Buffer;
@@ -15,7 +15,7 @@ namespace DnDev
         internal int Count;
     }
 
-    [NoCopy, RefList, UnmanagedRefList]
+    [NoCopy, RefList]
     public unsafe struct NativeRefList<T> where T : unmanaged
     {
         internal T* Buffer;

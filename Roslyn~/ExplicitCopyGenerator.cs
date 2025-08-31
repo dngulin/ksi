@@ -63,7 +63,7 @@ namespace DnDev.Roslyn
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.GetAttributes().Any(AttributeUtil.IsUnmanagedRefList))
+                        else if (ft.IsUnmanagedRefList())
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());

@@ -8,9 +8,7 @@ namespace DnDev.Roslyn
     {
         private const string NoCopy = "NoCopy";
         private const string Dealloc = "Dealloc";
-
         private const string RefList = "RefList";
-        private const string UnmanagedList = "UnmanagedRefList";
 
         private const string Suffix = "Attribute";
 
@@ -57,9 +55,9 @@ namespace DnDev.Roslyn
             return name == RefList || name == RefList + Suffix;
         }
 
-        public static bool IsUnmanagedRefList(AttributeData attribute)
+        public static bool IsRefList(AttributeData attribute)
         {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == UnmanagedList + Suffix;
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == RefList + Suffix;
         }
     }
 }
