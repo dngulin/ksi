@@ -6,10 +6,10 @@ namespace DnDev.Roslyn
 {
     public static class AttributeUtil
     {
-        private const string DeallocApi = "DeallocApi";
         private const string NoCopy = "NoCopy";
+        private const string Dealloc = "Dealloc";
 
-        private const string RefListApi = "RefListApi";
+        private const string RefList = "RefList";
         private const string UnmanagedList = "UnmanagedRefList";
 
         private const string Suffix = "Attribute";
@@ -22,15 +22,13 @@ namespace DnDev.Roslyn
         private static bool IsDealloc(AttributeSyntax attribute)
         {
             var name = attribute.Name.ToString();
-            return name == DeallocApi || name == DeallocApi + Suffix;
+            return name == Dealloc || name == Dealloc + Suffix;
         }
 
         public static bool IsDealloc(AttributeData attribute)
         {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == DeallocApi + Suffix;
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == Dealloc + Suffix;
         }
-
-
 
         public static bool ContainsNoCopy(AttributeListSyntax attributeList)
         {
@@ -56,7 +54,7 @@ namespace DnDev.Roslyn
         private static bool IsRefList(AttributeSyntax attribute)
         {
             var name = attribute.Name.ToString();
-            return name == RefListApi || name == RefListApi + Suffix;
+            return name == RefList || name == RefList + Suffix;
         }
 
         public static bool IsUnmanagedRefList(AttributeData attribute)

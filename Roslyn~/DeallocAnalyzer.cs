@@ -28,13 +28,13 @@ namespace DnDev.Roslyn
         private static readonly DiagnosticDescriptor FieldRule = Rule(
             DiagnosticSeverity.Error,
             "Field of Non-Dealloc Type",
-            "Structure `{0}` can be a field only of a structure marked with `DeallocApi`"
+            "Structure `{0}` can be a field only of a structure marked with `Dealloc`"
         );
 
         private static readonly DiagnosticDescriptor RedundantRule = Rule(
             DiagnosticSeverity.Warning,
-            "Redundant DeallocApi Attribute",
-            "Structure `{0}` is marked with `DeallocApi` attribute but doesn't have any fields to deallocate"
+            "Redundant Dealloc Attribute",
+            "Structure `{0}` is marked with `Dealloc` attribute but doesn't have any fields to deallocate"
         );
 
         private static readonly DiagnosticDescriptor AssignmentRule = Rule(

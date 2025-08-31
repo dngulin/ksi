@@ -3,12 +3,12 @@ using System;
 namespace DnDev
 {
     [AttributeUsage(AttributeTargets.Struct)]
-    public class DeallocApiAttribute : Attribute
+    public class DeallocAttribute : Attribute
     {
     }
 
     [AttributeUsage(AttributeTargets.Struct)]
-    internal class RefListApiAttribute : Attribute
+    internal class RefListAttribute : Attribute
     {
     }
 
