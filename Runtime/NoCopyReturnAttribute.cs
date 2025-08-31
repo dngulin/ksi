@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev
+namespace Ksi
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class NoCopyReturnAttribute : Attribute

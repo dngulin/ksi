@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace DnDev.Roslyn
+namespace Ksi.Roslyn
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DeallocAnalyzer : DiagnosticAnalyzer

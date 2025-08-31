@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace DnDev.Tests
+namespace Ksi.Tests
 {
     [TestFixture]
     public class NativeRefListTests

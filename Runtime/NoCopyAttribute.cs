@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev
+namespace Ksi
 {
     [AttributeUsage(AttributeTargets.Struct)]
     public class NoCopyAttribute : Attribute

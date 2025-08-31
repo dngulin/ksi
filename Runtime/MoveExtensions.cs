@@ -1,4 +1,4 @@
-namespace DnDev
+namespace Ksi
 {
     public static class MoveExtensions
     {

@@ -1,6 +1,6 @@
 {
-    "name": "DnDev.RefList",
-    "rootNamespace": "DnDev",
+    "name": "Ksi",
+    "rootNamespace": "Ksi",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

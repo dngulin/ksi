@@ -1,4 +1,4 @@
-namespace DnDev.Roslyn
+namespace Ksi.Roslyn
 {
     public static class ExplicitCopyTemplates
     {

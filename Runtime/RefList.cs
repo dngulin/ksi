@@ -1,4 +1,4 @@
-namespace DnDev
+namespace Ksi
 {
     [NoCopy, RefList]
     public struct RefList<T> where T : struct

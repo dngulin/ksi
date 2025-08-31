@@ -1,9 +1,8 @@
 {
-    "name": "DnDev.RefList.Tests",
-    "rootNamespace": "DnDev.Tests",
+    "name": "Ksi.Tests",
+    "rootNamespace": "Ksi.Tests",
     "references": [
-      "DnDev.RefList",
-      "DnDev.NoCopy"
+        "Ksi"
     ],
     "includePlatforms": [
         "Editor"

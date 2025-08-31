@@ -1,10 +1,10 @@
 using System.Text;
 
-namespace DnDev.Roslyn
+namespace Ksi.Roslyn
 {
     public static class EmitUtils
     {
-        public const string RootNamespace = "DnDev";
+        public const string RootNamespace = "Ksi";
 
         public static void EmitRefListMethods(string tpl, StringBuilder sb, string typeName, bool unmanaged)
         {

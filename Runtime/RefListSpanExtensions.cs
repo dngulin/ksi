@@ -1,6 +1,6 @@
 using System;
 
-namespace DnDev
+namespace Ksi
 {
     public static class RefListSpanExtensions
     {

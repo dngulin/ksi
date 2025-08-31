@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace DnDev.Roslyn
+namespace Ksi.Roslyn
 {
     public static class HelperExtensions
     {
