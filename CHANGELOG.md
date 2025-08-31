@@ -16,9 +16,11 @@
 [package](https://github.com/dngulin/frogalicious-project/tree/main/Frogalicious/Packages/frog.collections).
 - Initial `CHANGELOG.md` file
 - `TempRefLsit` and `NativeRefList` types
-- `DeallocApi` pattern to generate hierarchical dealloc methods for structs containing `NativeRefList`
+- CodeGenerator for hierarchial deallcoation
+- CodeGenerator for explicit copy
 - `AsSpan` and `AsreadonlySpan` extensions
-- `README.md` file
+- Move semantics extensions
+- README and LICENSE files
 
 ### Changed
 - All `RefList` variants provide unified internal extension methods
