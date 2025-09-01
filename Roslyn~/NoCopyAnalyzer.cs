@@ -136,7 +136,7 @@ namespace Ksi.Roslyn
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
 
             if (isNoCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
-                ctx.ReportDiagnostic(Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.Type.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.ContainingType.Name));
         }
 
         private static void AnalyzeBoxing(OperationAnalysisContext ctx)
