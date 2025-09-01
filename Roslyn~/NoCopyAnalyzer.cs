@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -64,6 +65,11 @@ namespace Ksi.Roslyn
             "Type `{0}` is marked as `NoCopy` and shouldn't have any private fields"
         );
 
+        private static readonly DiagnosticDescriptor GenericTypeRule = Rule(
+            "Generic NoCopy Type",
+            "Type `{0}` is marked as `NoCopy` and cannot be a generic type"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             ParameterRule,
             ArgumentRule,
@@ -72,7 +78,8 @@ namespace Ksi.Roslyn
             CaptureRule,
             ReturnRule,
             AssignmentRule,
-            PrivateFieldRule
+            PrivateFieldRule,
+            GenericTypeRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -97,6 +104,7 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeFieldInitializer, OperationKind.FieldInitializer);
             context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
+            context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         }
 
         private static void AnalyzeParameter(SymbolAnalysisContext ctx)
@@ -229,6 +237,16 @@ namespace Ksi.Roslyn
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation(), v.Type.Name));
+        }
+
+        private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
+        {
+            var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
+            if (sym == null)
+                return;
+
+            if (sym.IsGenericType && sym.IsNoCopyType() && !sym.IsRefListType())
+                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeRule, sym.Locations.First(), sym.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)

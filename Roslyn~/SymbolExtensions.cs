@@ -61,6 +61,20 @@ namespace Ksi.Roslyn
             return false;
         }
 
+        public static bool IsRefListType(this ITypeSymbol self)
+        {
+            if (self.TypeKind != TypeKind.Struct)
+                return false;
+
+            foreach (var attribute in self.GetAttributes())
+            {
+                if (attribute.IsRefList())
+                    return true;
+            }
+
+            return false;
+        }
+
         public static bool IsDeallocType(this ITypeSymbol self)
         {
             if (self.TypeKind != TypeKind.Struct)
