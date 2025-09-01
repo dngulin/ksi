@@ -67,20 +67,17 @@ namespace Ksi.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            if (sym.ContainingType.HasDeallocAttribute())
-                return;
-
-            if (sym.Type.HasDeallocOrRefListAttribute())
+            if (sym.Type.IsDeallocOrRefListType() && !sym.ContainingType.IsDeallocType())
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
         {
             var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-            if (sym == null || !sym.HasDeallocAttribute())
+            if (sym == null || !sym.IsDeallocType())
                 return;
 
-            if (sym.GetMembers().Where(m => m.Kind == SymbolKind.Field).Cast<IFieldSymbol>().Any(field => field.Type.HasDeallocOrRefListAttribute()))
+            if (sym.GetMembers().Where(m => m.Kind == SymbolKind.Field).Cast<IFieldSymbol>().Any(field => field.Type.IsDeallocOrRefListType()))
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
@@ -96,7 +93,7 @@ namespace Ksi.Roslyn
             if (t == null || !t.IsValueType)
                 return;
 
-            if (t.HasDeallocOrRefListAttribute())
+            if (t.IsDeallocOrRefListType())
                 ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
         }
     }

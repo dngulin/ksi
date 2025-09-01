@@ -29,10 +29,10 @@ namespace Ksi.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    if (structDecl.AttributeLists.Any(AttributeUtil.ContainsRefList))
+                    if (structDecl.AttributeLists.ContainsRefList())
                         return false;
 
-                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsNoCopy);
+                    return structDecl.AttributeLists.ContainsNoCopy();
                 },
                 transform: (ctx, _) =>
                 {
@@ -46,7 +46,7 @@ namespace Ksi.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
-                    result.HasDeallocAttribute = t.GetAttributes().Any(AttributeUtil.IsDealloc);
+                    result.HasDeallocAttribute = t.IsDeallocType();
 
                     var usings = new HashSet<string>();
 
@@ -58,18 +58,18 @@ namespace Ksi.Roslyn
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Any(AttributeUtil.IsNoCopy))
+                        if (ft.IsNoCopyType())
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.IsUnmanagedRefList())
+                        else if (ft.IsUnmanagedRefListType())
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsNoCopy))
-                                usings.Add(gt.ContainingNamespace.ToDisplayString());
+                            if (ft.TryGetGenericArg(out var gt) && gt!.IsNoCopyType())
+                                usings.Add(gt!.ContainingNamespace.ToDisplayString());
                         }
                         else
                         {

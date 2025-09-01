@@ -28,7 +28,7 @@ namespace Ksi.Roslyn
                     if (!(node is StructDeclarationSyntax structDecl))
                         return false;
 
-                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsDealloc);
+                    return structDecl.AttributeLists.ContainsDealloc();
                 },
                 transform: (ctx, _) =>
                 {
@@ -53,18 +53,18 @@ namespace Ksi.Roslyn
                         if (!(f.Type is INamedTypeSymbol ft))
                             continue;
 
-                        if (ft.GetAttributes().Any(AttributeUtil.IsDealloc))
+                        if (ft.IsDeallocType())
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.IsUnmanagedRefList())
+                        else if (ft.IsUnmanagedRefListType())
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.GetAttributes().Any(AttributeUtil.IsDealloc))
-                                usings.Add(gt.ContainingNamespace.ToDisplayString());
+                            if (ft.TryGetGenericArg(out var gt) && gt!.IsDeallocType())
+                                usings.Add(gt!.ContainingNamespace.ToDisplayString());
                         }
                     }
 

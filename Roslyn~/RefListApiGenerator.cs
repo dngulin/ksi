@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,7 +30,7 @@ namespace Ksi.Roslyn
                     if (!(c.IsKind(SyntaxKind.StructConstraint) || c.IsUnmanagedConstraint()))
                         return false;
 
-                    return structDecl.AttributeLists.Any(AttributeUtil.ContainsRefList);
+                    return structDecl.AttributeLists.ContainsRefList();
                 },
                 transform: (ctx, _) =>
                 {
