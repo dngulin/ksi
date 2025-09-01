@@ -36,6 +36,17 @@ namespace Ksi.Roslyn
             return false;
         }
 
+        public static bool IsNoCopyReturnMethod(this IMethodSymbol method)
+        {
+            foreach (var attribute in method.GetAttributes())
+            {
+                if (attribute.IsNoCopyReturn())
+                    return true;
+            }
+
+            return false;
+        }
+
         public static bool IsUnmanagedRefListType(this ITypeSymbol self)
         {
             if (self.TypeKind != TypeKind.Struct || !self.IsUnmanagedType)
@@ -81,6 +92,11 @@ namespace Ksi.Roslyn
         private static bool IsNoCopy(this AttributeData attribute)
         {
             return attribute.AttributeClass != null && attribute.AttributeClass.Name == NoCopy + Suffix;
+        }
+
+        private static bool IsNoCopyReturn(this AttributeData attribute)
+        {
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NoCopyReturn + Suffix;
         }
 
         private static bool IsDealloc(this AttributeData attribute)

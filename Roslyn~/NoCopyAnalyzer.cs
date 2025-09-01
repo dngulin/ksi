@@ -99,7 +99,7 @@ namespace Ksi.Roslyn
             if (sym.RefKind != RefKind.None)
                 return;
 
-            if (!IsNoCopyType(sym.Type))
+            if (!sym.Type.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ParameterRule, sym.Locations.First(), sym.Type.Name));
@@ -112,7 +112,7 @@ namespace Ksi.Roslyn
                 return;
 
             var t = op.Value.Type;
-            if (t == null || !IsNoCopyType(t))
+            if (t == null || !t.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, op.Value.Syntax.GetLocation(), t.Name));
@@ -124,7 +124,7 @@ namespace Ksi.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            if (!IsNoCopyType(sym.Type) || IsNoCopyType(sym.ContainingType))
+            if (!sym.Type.IsNoCopyType() || sym.ContainingType.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
@@ -140,13 +140,13 @@ namespace Ksi.Roslyn
                 return;
 
             var boxing = typeFrom.IsValueType && typeTo.IsReferenceType;
-            if (boxing && IsNoCopyType(typeFrom))
+            if (boxing && typeFrom.IsNoCopyType())
             {
                 ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
             }
 
             var unboxing = typeFrom.IsReferenceType && typeTo.IsValueType;
-            if (unboxing && IsNoCopyType(typeTo))
+            if (unboxing && typeTo.IsNoCopyType())
             {
                 ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
             }
@@ -160,7 +160,7 @@ namespace Ksi.Roslyn
             foreach (var capture in capturedVariables)
             {
                 var t = GetCaptureSymbolType(capture);
-                if (t != null && IsNoCopyType(t))
+                if (t != null && t.IsNoCopyType())
                     ctx.ReportDiagnostic(Diagnostic.Create(CaptureRule, capture.Locations.First(), t.Name));
             }
         }
@@ -171,10 +171,10 @@ namespace Ksi.Roslyn
             if (method.ReturnsByRef || method.ReturnsByRefReadonly)
                 return;
 
-            if (!IsNoCopyType(method.ReturnType))
+            if (!method.ReturnType.IsNoCopyType())
                 return;
 
-            if (IsNoCopyReturnMethod(method))
+            if (method.IsNoCopyReturnMethod())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ReturnRule, method.Locations.First(), method.ReturnType.Name));
@@ -185,7 +185,7 @@ namespace Ksi.Roslyn
             var initializer = (IFieldInitializerOperation)ctx.Operation;
             var v = initializer.Value;
 
-            if (IsNotExistingValue(v) || v.Type == null || !IsNoCopyType(v.Type))
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, initializer.Syntax.GetLocation(), v.Type.Name));
@@ -202,7 +202,7 @@ namespace Ksi.Roslyn
                 return;
 
             var v = initializer.Value;
-            if (IsNotExistingValue(v) || v.Type == null || !IsNoCopyType(v.Type))
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, declarator.Syntax.GetLocation(), v.Type.Name));
@@ -216,24 +216,10 @@ namespace Ksi.Roslyn
             if (assignment.IsRef)
                 return;
 
-            if (IsNotExistingValue(v) || v.Type == null || !IsNoCopyType(v.Type))
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation(), v.Type.Name));
-        }
-
-        private static bool IsNoCopyType(ITypeSymbol t)
-        {
-            return t.TypeKind == TypeKind.Struct && t.GetAttributes().Any(IsNoCopyAttribute);
-        }
-
-        private static bool IsNoCopyAttribute(AttributeData a)
-        {
-            var name = a.AttributeClass?.Name;
-            if (name == null)
-                return false;
-
-            return name.EndsWith("NoCopyAttribute") || name.EndsWith("NoCopy");
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)
@@ -266,27 +252,13 @@ namespace Ksi.Roslyn
                     case OperationKind.Invocation:
                     {
                         var invocation = (IInvocationOperation)operation;
-                        return IsNoCopyReturnMethod(invocation.TargetMethod);
+                        return invocation.TargetMethod.IsNoCopyReturnMethod();
                     }
 
                     default:
                         return false;
                 }
             }
-        }
-
-        private static bool IsNoCopyReturnMethod(IMethodSymbol method)
-        {
-            return method.GetAttributes().Any(IsNoCopyReturnAttribute);
-        }
-
-        private static bool IsNoCopyReturnAttribute(AttributeData a)
-        {
-            var name = a.AttributeClass?.Name;
-            if (name == null)
-                return false;
-
-            return name.EndsWith("NoCopyReturnAttribute") || name.EndsWith("NoCopyReturn");
         }
     }
 }
