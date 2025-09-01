@@ -59,6 +59,11 @@ namespace Ksi.Roslyn
             "Type `{0}` is marked as `NoCopy` and shouldn't be assigned by copying other value"
         );
 
+        private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(
+            "Private Field",
+            "Type `{0}` is marked as `NoCopy` and shouldn't have any private fields"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             ParameterRule,
             ArgumentRule,
@@ -66,7 +71,8 @@ namespace Ksi.Roslyn
             BoxingRule,
             CaptureRule,
             ReturnRule,
-            AssignmentRule
+            AssignmentRule,
+            PrivateFieldRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -124,10 +130,13 @@ namespace Ksi.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            if (!sym.Type.IsNoCopyType() || sym.ContainingType.IsNoCopyType())
-                return;
+            var isNoCopyStruct = sym.ContainingType.IsNoCopyType();
 
-            ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+            if (!isNoCopyStruct && sym.Type.IsNoCopyType())
+                ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+
+            if (isNoCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
+                ctx.ReportDiagnostic(Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeBoxing(OperationAnalysisContext ctx)
