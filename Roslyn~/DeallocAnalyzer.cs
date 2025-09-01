@@ -16,7 +16,7 @@ namespace Ksi.Roslyn
         private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"DLC{_ruleId++:D2}",
+                id: $"DEALLOC{++_ruleId:D2}",
                 title: title,
                 messageFormat: msg,
                 category: "Dealloc",

@@ -10,10 +10,12 @@ namespace Ksi.Roslyn
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NoCopyAnalyzer : DiagnosticAnalyzer
     {
-        private static DiagnosticDescriptor Rule(int id, string title, string msg)
+        private static int _ruleId;
+
+        private static DiagnosticDescriptor Rule(string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"NCP{id:D2}",
+                id: $"NOCOPY{++_ruleId:D2}",
                 title: title,
                 messageFormat: msg,
                 category: "NoCopy",
@@ -23,31 +25,38 @@ namespace Ksi.Roslyn
         }
 
         private static readonly DiagnosticDescriptor ParameterRule = Rule(
-            1, "Passed by Value", "Type `{0}` is marked as `NoCopy` and should be received only by reference"
+            "Passed by Value",
+            "Type `{0}` is marked as `NoCopy` and should be received only by reference"
         );
 
         private static readonly DiagnosticDescriptor ArgumentRule = Rule(
-            2, "Received by Value", "Type `{0}` is marked as `NoCopy` and should be passed only by reference"
+            "Received by Value",
+            "Type `{0}` is marked as `NoCopy` and should be passed only by reference"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
-            3, "Field of Copy Type", "Type `{0}` is marked as `NoCopy` and can be a field only of a `NoCopy` type"
+            "Field of Copy Type",
+            "Type `{0}` is marked as `NoCopy` and can be a field only of a `NoCopy` type"
         );
 
         private static readonly DiagnosticDescriptor BoxingRule = Rule(
-            4, "Boxed", "Type `{0}` is marked as `NoCopy` and shouldn't be boxed"
+            "Boxed",
+            "Type `{0}` is marked as `NoCopy` and shouldn't be boxed"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(
-            5, "Captured by Closure", "Type `{0}` is marked as `NoCopy` and shouldn't be captured by a closure"
+            "Captured by Closure",
+            "Type `{0}` is marked as `NoCopy` and shouldn't be captured by a closure"
         );
 
         private static readonly DiagnosticDescriptor ReturnRule = Rule(
-            6, "Returned by Value", "Type `{0}` is marked as `NoCopy` and shouldn't be returned by value"
+            "Returned by Value",
+            "Type `{0}` is marked as `NoCopy` and shouldn't be returned by value"
         );
 
         private static readonly DiagnosticDescriptor AssignmentRule = Rule(
-            6, "Copied by Assignment", "Type `{0}` is marked as `NoCopy` and shouldn't be assigned by copying other value"
+            "Copied by Assignment",
+            "Type `{0}` is marked as `NoCopy` and shouldn't be assigned by copying other value"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
