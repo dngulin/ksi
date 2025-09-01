@@ -25,7 +25,7 @@ namespace Ksi.Roslyn
             var query = initCtx.SyntaxProvider.CreateSyntaxProvider(
                 predicate: (node, _) =>
                 {
-                    if (!(node is StructDeclarationSyntax structDecl))
+                    if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
                     return structDecl.AttributeLists.ContainsDealloc();
@@ -47,10 +47,10 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (!(m is IFieldSymbol f) || f.Type.TypeKind != TypeKind.Struct)
+                        if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct)
                             continue;
 
-                        if (!(f.Type is INamedTypeSymbol ft))
+                        if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
                         if (ft.IsDeallocType())

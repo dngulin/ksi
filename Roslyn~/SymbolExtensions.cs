@@ -15,7 +15,7 @@ namespace Ksi.Roslyn
             if (self.TypeParameters.Length != 1)
                 return false;
 
-            if (!(self.TypeArguments[0] is INamedTypeSymbol gta))
+            if (self.TypeArguments[0] is not INamedTypeSymbol gta)
                 return false;
 
             genericType = gta;

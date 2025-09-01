@@ -13,7 +13,7 @@ namespace Ksi.Roslyn
     {
         private class TypeInfo(string typeName)
         {
-            public string TypeName = typeName;
+            public readonly string TypeName = typeName;
             public string? Namespace;
             public bool IsUnmanaged;
             public bool HasDeallocAttribute;
@@ -26,7 +26,7 @@ namespace Ksi.Roslyn
             var query = initCtx.SyntaxProvider.CreateSyntaxProvider(
                 predicate: (node, _) =>
                 {
-                    if (!(node is StructDeclarationSyntax structDecl))
+                    if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
                     if (structDecl.AttributeLists.ContainsRefList())
@@ -52,10 +52,10 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (!(m is IFieldSymbol f) || f.IsStatic)
+                        if (m is not IFieldSymbol f || f.IsStatic)
                             continue;
 
-                        if (!(f.Type is INamedTypeSymbol ft))
+                        if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
                         if (ft.IsNoCopyType())

@@ -13,7 +13,7 @@ namespace Ksi.Roslyn
             var query = initCtx.SyntaxProvider.CreateSyntaxProvider(
                 predicate: (node, _) =>
                 {
-                    if (!(node is StructDeclarationSyntax structDecl))
+                    if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
                     if (structDecl.TypeParameterList?.Parameters.Count != 1)
