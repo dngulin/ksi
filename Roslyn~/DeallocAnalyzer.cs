@@ -25,6 +25,12 @@ namespace Ksi.Roslyn
             );
         }
 
+        private static readonly DiagnosticDescriptor NoCopyRule = Rule(
+            DiagnosticSeverity.Error,
+            "NoCopy Attribute Required",
+            "Structure `{0}` is `Dealloc` and should be marked with `NoCopy`"
+        );
+
         private static readonly DiagnosticDescriptor FieldRule = Rule(
             DiagnosticSeverity.Error,
             "Field of Non-Dealloc Type",
@@ -44,6 +50,7 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            NoCopyRule,
             FieldRule,
             RedundantRule,
             AssignmentRule
@@ -77,10 +84,17 @@ namespace Ksi.Roslyn
             if (sym == null || !sym.IsDeallocType())
                 return;
 
-            if (sym.GetMembers().Where(m => m.Kind == SymbolKind.Field).Cast<IFieldSymbol>().Any(field => field.Type.IsDeallocOrRefListType()))
-                return;
+            var hasDeallocFields = sym
+                .GetMembers()
+                .Where(m => m.Kind == SymbolKind.Field)
+                .Cast<IFieldSymbol>()
+                .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefListType());
 
-            ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
+            if (!hasDeallocFields)
+                ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
+
+            if (!sym.IsNoCopyType())
+                ctx.ReportDiagnostic(Diagnostic.Create(NoCopyRule, sym.Locations.First(), sym.Name));
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)
