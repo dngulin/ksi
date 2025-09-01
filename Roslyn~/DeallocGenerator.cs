@@ -47,7 +47,7 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct)
+                        if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct || f.IsStatic)
                             continue;
 
                         if (f.Type is not INamedTypeSymbol ft)
