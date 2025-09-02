@@ -2,6 +2,8 @@ namespace Ksi.Roslyn
 {
     public static class DeallocTemplates
     {
+        public static readonly string[] RefListExtensionNames = ["Dealloc", "Clear", "RemoveAt"];
+
         public const string RefListDeallocMethods = @"
         /// <summary>
         /// Specialized implementation for Dealloc types
@@ -11,7 +13,9 @@ namespace Ksi.Roslyn
             foreach(ref var item in self.RefIter())
                 item.Dealloc();
 
+            #pragma warning disable REFLIST03
             self.Dealloc<{1}>();
+            #pragma warning restore REFLIST03
         }}
 
         /// <summary>
@@ -22,7 +26,9 @@ namespace Ksi.Roslyn
             foreach(ref var item in self.RefIter())
                 item.Dealloc();
 
+            #pragma warning disable REFLIST03
             self.Clear<{1}>();
+            #pragma warning restore REFLIST03
         }}
 
         /// <summary>
@@ -31,7 +37,10 @@ namespace Ksi.Roslyn
         public static void RemoveAt(this ref {0}<{1}> self, int index)
         {{
             self.RefAt(index).Dealloc();
+
+            #pragma warning disable REFLIST03
             self.RemoveAt<{1}>(index);
+            #pragma warning restore REFLIST03
         }}";
     }
 }

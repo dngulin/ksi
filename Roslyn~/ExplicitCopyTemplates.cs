@@ -2,6 +2,7 @@ namespace Ksi.Roslyn
 {
     public static class ExplicitCopyTemplates
     {
+        public static readonly string[] RefListExtensionNames = ["CopyFrom", "CopyTo"];
 
         public const string RefListExtensions = @"
         /// <summary>

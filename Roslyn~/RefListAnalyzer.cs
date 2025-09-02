@@ -35,9 +35,16 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         "RefList API is unsafe for generic item types"
     );
 
+    private static readonly DiagnosticDescriptor SpecializedApiRule = Rule(
+        DiagnosticSeverity.Error,
+        "Non Specialized Call",
+        "Using non-specialized RefList API for NoCopy or Dealloc types is unsafe"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         GenericItemTypeRule,
-        UnknownItemTypeRule
+        UnknownItemTypeRule,
+        SpecializedApiRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -47,12 +54,13 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         );
         context.EnableConcurrentExecution();
 
-        context.RegisterOperationAction(AnalyzeOperation, OperationKind.VariableDeclaration);
+        context.RegisterOperationAction(AnalyzeVariableDeclaration, OperationKind.VariableDeclaration);
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
+        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
     }
 
-    private static void AnalyzeOperation(OperationAnalysisContext ctx)
+    private static void AnalyzeVariableDeclaration(OperationAnalysisContext ctx)
     {
         var declaration = (IVariableDeclarationOperation)ctx.Operation;
         var declarator = declaration.Declarators.First();
@@ -116,5 +124,45 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
         if (gt.IsGenericType)
             ctx.ReportDiagnostic(Diagnostic.Create(GenericItemTypeRule, loc));
+    }
+
+    private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+        if (i.IsVirtual)
+            return;
+
+        var m = i.TargetMethod;
+        if (m.IsAsync || !m.IsExtensionMethod || !m.IsGenericMethod || m.TypeArguments.Length != 1)
+            return;
+
+        var p = m.Parameters;
+        if (p.Length == 0 || p[0].Type is not INamedTypeSymbol t)
+            return;
+
+        var isRefList = t.IsGenericType && t.IsRefListType();
+        if (!isRefList)
+            return;
+
+        if (t.TypeArguments[0] is not INamedTypeSymbol gt)
+            return;
+
+        var loc = i.Syntax.GetLocation();
+
+        if (gt.IsDeallocType())
+        {
+            ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
+            ReportCalls(ctx, m, loc, DeallocTemplates.RefListExtensionNames);
+        }
+        else if (gt.IsNoCopyType())
+        {
+            ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
+        }
+    }
+
+    private static void ReportCalls(OperationAnalysisContext ctx, IMethodSymbol m, Location loc, string[] names)
+    {
+        if (names.Contains(m.Name))
+            ctx.ReportDiagnostic(Diagnostic.Create(SpecializedApiRule, loc));
     }
 }
