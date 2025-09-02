@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
+#pragma warning disable REFLIST01
+
 namespace Ksi
 {
     internal static class RefListSetBufferSizeExtensions

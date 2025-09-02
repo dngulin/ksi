@@ -1,5 +1,7 @@
 using System;
 
+#pragma warning disable REFLIST01
+
 namespace Ksi
 {
     public static class RefListSpanExtensions

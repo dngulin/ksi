@@ -1,3 +1,5 @@
+#pragma warning disable REFLIST01
+
 namespace Ksi
 {
     internal static class RefListBufferSizeExtensions

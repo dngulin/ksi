@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Ksi.Roslyn;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class RefListAnalyzer  : DiagnosticAnalyzer
+public class RefListAnalyzer : DiagnosticAnalyzer
 {
     private static int _ruleId;
 
@@ -42,11 +42,14 @@ public class RefListAnalyzer  : DiagnosticAnalyzer
 
     public override void Initialize(AnalysisContext context)
     {
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.ConfigureGeneratedCodeAnalysis(
+            GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics
+        );
         context.EnableConcurrentExecution();
 
         context.RegisterOperationAction(AnalyzeOperation, OperationKind.VariableDeclaration);
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
+        context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
     }
 
     private static void AnalyzeOperation(OperationAnalysisContext ctx)
@@ -76,18 +79,34 @@ public class RefListAnalyzer  : DiagnosticAnalyzer
     private static void AnalyzeField(SymbolAnalysisContext ctx)
     {
         var f = (IFieldSymbol)ctx.Symbol;
-        if (f.IsStatic || f.Type.TypeKind != TypeKind.Struct)
+        if (f.IsStatic || f.Type.TypeKind != TypeKind.Struct || f.Type is not INamedTypeSymbol t)
             return;
 
-        if (f.Type is not INamedTypeSymbol t)
+        var loc = f.DeclaringSyntaxReferences.First()
+                      .GetSyntax(ctx.CancellationToken).Parent?.ChildNodes().First().GetLocation()
+                  ?? f.Locations.First();
+
+        AnalyzeSymbolTypeAppearance(ctx, t, loc);
+    }
+
+    private static void AnalyzeParameter(SymbolAnalysisContext ctx)
+    {
+        var p = (IParameterSymbol)ctx.Symbol;
+        if (p.Type.TypeKind != TypeKind.Struct || p.Type is not INamedTypeSymbol t)
             return;
 
+        var loc = p.DeclaringSyntaxReferences
+            .First().GetSyntax(ctx.CancellationToken).ChildNodes()
+            .First().GetLocation();
+
+        AnalyzeSymbolTypeAppearance(ctx, t, loc);
+    }
+
+    private static void AnalyzeSymbolTypeAppearance(SymbolAnalysisContext ctx, INamedTypeSymbol t, Location loc)
+    {
         var isRefList = t.IsGenericType && t.IsRefListType();
         if (!isRefList)
             return;
-
-        var loc = f.DeclaringSyntaxReferences.First().GetSyntax(ctx.CancellationToken).Parent?.ChildNodes().First().GetLocation()
-                  ?? f.Locations.First();
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
         {

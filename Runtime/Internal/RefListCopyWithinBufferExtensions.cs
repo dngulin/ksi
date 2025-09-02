@@ -1,6 +1,8 @@
 using System;
 using Unity.Collections.LowLevel.Unsafe;
 
+#pragma warning disable REFLIST01
+
 namespace Ksi
 {
     internal static class RefListCopyWithinBufferExtensions
