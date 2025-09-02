@@ -49,16 +49,7 @@ namespace Ksi.Roslyn
 
         public static bool IsUnmanagedRefListType(this ITypeSymbol self)
         {
-            if (self.TypeKind != TypeKind.Struct || !self.IsUnmanagedType)
-                return false;
-
-            foreach (var attribute in self.GetAttributes())
-            {
-                if (attribute.IsRefList())
-                    return true;
-            }
-
-            return false;
+            return self.IsUnmanagedType && self.IsRefListType();
         }
 
         public static bool IsRefListType(this ITypeSymbol self)
