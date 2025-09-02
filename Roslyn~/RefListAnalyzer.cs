@@ -31,7 +31,7 @@ public class RefListAnalyzer  : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor GenericItemTypeRule = Rule(
         DiagnosticSeverity.Error,
-        "Generic Item",
+        "Generic Item Type",
         "RefList API is unsafe for generic item types"
     );
 
@@ -46,6 +46,7 @@ public class RefListAnalyzer  : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
 
         context.RegisterOperationAction(AnalyzeOperation, OperationKind.VariableDeclaration);
+        context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
     }
 
     private static void AnalyzeOperation(OperationAnalysisContext ctx)
@@ -62,7 +63,33 @@ public class RefListAnalyzer  : DiagnosticAnalyzer
 
         var loc = declaration.Syntax.GetLocation();
 
-        if (t.TypeArguments[0] is not INamedTypeSymbol gt || gt.IsGenericType)
+        if (t.TypeArguments[0] is not INamedTypeSymbol gt)
+        {
+            ctx.ReportDiagnostic(Diagnostic.Create(UnknownItemTypeRule, loc));
+            return;
+        }
+
+        if (gt.IsGenericType)
+            ctx.ReportDiagnostic(Diagnostic.Create(GenericItemTypeRule, loc));
+    }
+
+    private static void AnalyzeField(SymbolAnalysisContext ctx)
+    {
+        var f = (IFieldSymbol)ctx.Symbol;
+        if (f.IsStatic || f.Type.TypeKind != TypeKind.Struct)
+            return;
+
+        if (f.Type is not INamedTypeSymbol t)
+            return;
+
+        var isRefList = t.IsGenericType && t.IsRefListType();
+        if (!isRefList)
+            return;
+
+        var loc = f.DeclaringSyntaxReferences.First().GetSyntax(ctx.CancellationToken).Parent?.ChildNodes().First().GetLocation()
+                  ?? f.Locations.First();
+
+        if (t.TypeArguments[0] is not INamedTypeSymbol gt)
         {
             ctx.ReportDiagnostic(Diagnostic.Create(UnknownItemTypeRule, loc));
             return;
