@@ -68,7 +68,7 @@ namespace Ksi
             return ref self.IndexBufferMut(index);
         }}
 
-        public static void Add<T>(this ref {0}<T> self, in T item) where T : {1}
+        public static void Add<T>(this ref {0}<T> self, T item) where T : {1}
         {{
             self.EnsureCanAdd();
             self.IndexBufferMut(self.Count++) = item;
