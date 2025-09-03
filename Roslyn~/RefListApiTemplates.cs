@@ -45,6 +45,13 @@ namespace Ksi
 
         public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
+        [NonAllocatedResult]
+        public static ref {0}<T> Deallocated<T>(this ref {0}<T> self) where T : {1}
+        {{
+            self.Dealloc();
+            return ref self;
+        }}
+
         public static ref readonly T RefReadonlyAt<T>(this in {0}<T> self, int index) where T : {1}
         {{
             if (index < 0 || index >= self.Count)
@@ -67,6 +74,7 @@ namespace Ksi
             self.IndexBufferMut(self.Count++) = item;
         }}
 
+        [NonAllocatedResult]
         public static ref T RefAdd<T>(this ref {0}<T> self) where T : {1}
         {{
             self.EnsureCanAdd();

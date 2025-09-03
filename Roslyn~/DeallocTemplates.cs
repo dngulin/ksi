@@ -2,7 +2,7 @@ namespace Ksi.Roslyn
 {
     public static class DeallocTemplates
     {
-        public static readonly string[] RefListExtensionNames = ["Dealloc", "Clear", "RemoveAt"];
+        public static readonly string[] RefListExtensionNames = ["Dealloc", "Deallocated", "Clear", "RemoveAt"];
 
         public const string RefListDeallocMethods = @"
         /// <summary>
@@ -16,6 +16,16 @@ namespace Ksi.Roslyn
             #pragma warning disable REFLIST03
             self.Dealloc<{1}>();
             #pragma warning restore REFLIST03
+        }}
+
+        /// <summary>
+        /// Specialized implementation for Dealloc types
+        /// </summary>
+        [NonAllocatedResult]
+        public static ref {0}<{1}> Deallocated(this ref {0}<{1}> self)
+        {{
+            self.Dealloc();
+            return ref self;
         }}
 
         /// <summary>
@@ -41,6 +51,14 @@ namespace Ksi.Roslyn
             #pragma warning disable REFLIST03
             self.RemoveAt<{1}>(index);
             #pragma warning restore REFLIST03
+        }}";
+
+        public const string DeallocatedExtension = @"
+        [NonAllocatedResult]
+        public static ref {0} Deallocated(this ref {0} self)
+        {{
+            self.Dealloc();
+            return ref self;
         }}";
     }
 }

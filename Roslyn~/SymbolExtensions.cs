@@ -47,6 +47,20 @@ namespace Ksi.Roslyn
             return false;
         }
 
+        public static bool IsNonAllocatedResultRef(this IMethodSymbol method)
+        {
+            if (!method.ReturnsByRef)
+                return false;
+
+            foreach (var attribute in method.GetAttributes())
+            {
+                if (attribute.IsNonAllocatedResult())
+                    return true;
+            }
+
+            return false;
+        }
+
         public static bool IsUnmanagedRefListType(this ITypeSymbol self)
         {
             return self.IsUnmanagedType && self.IsRefListType();
@@ -112,6 +126,11 @@ namespace Ksi.Roslyn
         private static bool IsRefList(this AttributeData attribute)
         {
             return attribute.AttributeClass != null && attribute.AttributeClass.Name == RefList + Suffix;
+        }
+
+        private static bool IsNonAllocatedResult(this AttributeData attribute)
+        {
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NonAllocatedResult + Suffix;
         }
     }
 }

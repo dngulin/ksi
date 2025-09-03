@@ -107,8 +107,13 @@ namespace Ksi.Roslyn
             if (t == null || !t.IsValueType)
                 return;
 
-            if (t.IsDeallocOrRefListType())
-                ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
+            if (!t.IsDeallocOrRefListType())
+                return;
+
+            if (assignment.Target is IInvocationOperation i && i.TargetMethod.IsNonAllocatedResultRef())
+                return;
+
+            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
         }
     }
 }

@@ -104,6 +104,8 @@ namespace Ksi.Roslyn
                         sb.AppendLine("    {");
 
                         EmitDeallocMethod(sb, entry);
+                        sb.AppendLine(string.Format(DeallocTemplates.DeallocatedExtension, entry.TypeName));
+
                         EmitUtils.EmitRefListMethods(
                             DeallocTemplates.RefListDeallocMethods,
                             sb,
