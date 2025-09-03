@@ -43,17 +43,24 @@ namespace Ksi.Roslyn
             "Structure `{0}` is marked with `Dealloc` attribute but doesn't have any fields to deallocate"
         );
 
-        private static readonly DiagnosticDescriptor AssignmentRule = Rule(
+        private static readonly DiagnosticDescriptor OverwriteRule = Rule(
             DiagnosticSeverity.Error,
-            "Dealloc Type Assignment",
-            "Assigning a new value to a dealloc type can cause memory leaks and forbidden"
+            "Dealloc Instance Overwrite",
+            "Overwriting a Dealloc type instance can cause memory leak due to missing deallocation call"
+        );
+
+        private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(
+            DiagnosticSeverity.Error,
+            "Not Assigned Value",
+            "Dealloc instance is not assigned | {0}"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             NoCopyRule,
             FieldRule,
             RedundantRule,
-            AssignmentRule
+            OverwriteRule,
+            NotAssignedValueRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -66,6 +73,7 @@ namespace Ksi.Roslyn
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
+            context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -113,7 +121,34 @@ namespace Ksi.Roslyn
             if (assignment.Target is IInvocationOperation i && i.TargetMethod.IsNonAllocatedResultRef())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, assignment.Syntax.GetLocation()));
+        }
+
+        private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+        {
+            var i = (IInvocationOperation)ctx.Operation;
+            var m = i.TargetMethod;
+            if (m.ReturnsByRef || m.ReturnsByRefReadonly)
+                return;
+
+            if (m.ReturnType.TypeKind != TypeKind.Struct || m.ReturnType is not INamedTypeSymbol t)
+                return;
+
+            if (!t.IsDeallocOrRefListType())
+                return;
+
+            switch (i.Parent?.Kind)
+            {
+                case OperationKind.SimpleAssignment:
+                case OperationKind.FieldInitializer:
+                case OperationKind.MemberInitializer:
+                case OperationKind.VariableInitializer:
+                    break;
+
+                default:
+                    ctx.ReportDiagnostic(Diagnostic.Create(NotAssignedValueRule, i.Syntax.GetLocation(), i.Parent?.Kind));
+                    break;
+            }
         }
     }
 }
