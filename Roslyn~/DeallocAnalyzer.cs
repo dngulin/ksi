@@ -52,7 +52,7 @@ namespace Ksi.Roslyn
         private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(
             DiagnosticSeverity.Error,
             "Not Assigned Value",
-            "Dealloc instance is not assigned | {0}"
+            "Dealloc instance is not assigned"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
@@ -146,7 +146,7 @@ namespace Ksi.Roslyn
                     break;
 
                 default:
-                    ctx.ReportDiagnostic(Diagnostic.Create(NotAssignedValueRule, i.Syntax.GetLocation(), i.Parent?.Kind));
+                    ctx.ReportDiagnostic(Diagnostic.Create(NotAssignedValueRule, i.Syntax.GetLocation()));
                     break;
             }
         }
