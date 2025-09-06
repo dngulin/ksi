@@ -82,21 +82,21 @@ namespace Ksi.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            if (sym.Type.IsDeallocOrRefListType() && !sym.ContainingType.IsDeallocType())
+            if (sym.Type.IsDeallocOrRefList() && !sym.ContainingType.IsDealloc())
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
         {
             var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
-            if (sym == null || !sym.IsDeallocType())
+            if (sym == null || !sym.IsDealloc())
                 return;
 
             var hasDeallocFields = sym
                 .GetMembers()
                 .Where(m => m.Kind == SymbolKind.Field)
                 .Cast<IFieldSymbol>()
-                .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefListType());
+                .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefList());
 
             if (!hasDeallocFields)
                 ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
@@ -115,7 +115,7 @@ namespace Ksi.Roslyn
             if (t == null || !t.IsValueType)
                 return;
 
-            if (!t.IsDeallocOrRefListType())
+            if (!t.IsDeallocOrRefList())
                 return;
 
             if (assignment.Target is IInvocationOperation i && i.TargetMethod.IsNonAllocatedResultRef())
@@ -134,7 +134,7 @@ namespace Ksi.Roslyn
             if (m.ReturnType.TypeKind != TypeKind.Struct || m.ReturnType is not INamedTypeSymbol t)
                 return;
 
-            if (!t.IsDeallocOrRefListType())
+            if (!t.IsDeallocOrRefList())
                 return;
 
             switch (i.Parent?.Kind)

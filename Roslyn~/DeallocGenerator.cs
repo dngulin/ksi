@@ -53,17 +53,17 @@ namespace Ksi.Roslyn
                         if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
-                        if (ft.IsDeallocType())
+                        if (ft.IsDealloc())
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.IsUnmanagedRefListType())
+                        else if (ft.IsUnmanagedRefList())
                         {
                             result.Fields.Add(f.Name);
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.IsDeallocType())
+                            if (ft.TryGetGenericArg(out var gt) && gt!.IsDealloc())
                                 usings.Add(gt!.ContainingNamespace.ToDisplayString());
                         }
                     }

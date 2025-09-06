@@ -54,7 +54,7 @@ namespace Ksi.Roslyn
         }}";
 
         public const string DeallocatedExtension = @"
-        [NonAllocatedResult]
+        [NonAllocatedResult, DynReturnsSelf]
         public static ref {0} Deallocated(this ref {0} self)
         {{
             self.Dealloc();

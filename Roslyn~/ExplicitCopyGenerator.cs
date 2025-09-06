@@ -46,7 +46,7 @@ namespace Ksi.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
-                    result.HasDeallocAttribute = t.IsDeallocType();
+                    result.HasDeallocAttribute = t.IsDealloc();
 
                     var usings = new HashSet<string>();
 
@@ -63,7 +63,7 @@ namespace Ksi.Roslyn
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
                         }
-                        else if (ft.IsUnmanagedRefListType())
+                        else if (ft.IsUnmanagedRefList())
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());

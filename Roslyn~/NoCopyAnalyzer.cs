@@ -191,7 +191,7 @@ namespace Ksi.Roslyn
             if (!method.ReturnType.IsNoCopyType())
                 return;
 
-            if (method.IsNoCopyReturnMethod())
+            if (method.IsNoCopyReturn())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ReturnRule, method.Locations.First(), method.ReturnType.Name));
@@ -245,7 +245,7 @@ namespace Ksi.Roslyn
             if (sym == null)
                 return;
 
-            if (sym.IsGenericType && sym.IsNoCopyType() && !sym.IsRefListType())
+            if (sym.IsGenericType && sym.IsNoCopyType() && !sym.IsRefList())
                 ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeRule, sym.Locations.First(), sym.Name));
         }
 
@@ -279,7 +279,7 @@ namespace Ksi.Roslyn
                     case OperationKind.Invocation:
                     {
                         var invocation = (IInvocationOperation)operation;
-                        return invocation.TargetMethod.IsNoCopyReturnMethod();
+                        return invocation.TargetMethod.IsNoCopyReturn();
                     }
 
                     default:

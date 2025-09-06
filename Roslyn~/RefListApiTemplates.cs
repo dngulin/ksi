@@ -45,13 +45,14 @@ namespace Ksi
 
         public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
-        [NonAllocatedResult]
+        [NonAllocatedResult, DynReturnsSelf]
         public static ref {0}<T> Deallocated<T>(this ref {0}<T> self) where T : {1}
         {{
             self.Dealloc();
             return ref self;
         }}
 
+        [RefListIndexer]
         public static ref readonly T RefReadonlyAt<T>(this in {0}<T> self, int index) where T : {1}
         {{
             if (index < 0 || index >= self.Count)
@@ -60,7 +61,8 @@ namespace Ksi
             return ref self.IndexBuffer(index);
         }}
 
-        public static ref T RefAt<T>(this ref {0}<T> self, int index) where T : {1}
+        [RefListIndexer]
+        public static ref T RefAt<T>([DynNoResize] this ref {0}<T> self, int index) where T : {1}
         {{
             if (index < 0 || index >= self.Count)
                 throw new IndexOutOfRangeException();
@@ -74,7 +76,7 @@ namespace Ksi
             self.IndexBufferMut(self.Count++) = item;
         }}
 
-        [NonAllocatedResult]
+        [NonAllocatedResult, RefListIndexer]
         public static ref T RefAdd<T>(this ref {0}<T> self) where T : {1}
         {{
             self.EnsureCanAdd();

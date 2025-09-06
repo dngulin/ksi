@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Ksi.Roslyn;
 
@@ -41,10 +42,18 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         "Using non-specialized RefList API for NoCopy or Dealloc types is unsafe"
     );
 
+    private static readonly DiagnosticDescriptor DebugRule = Rule(
+        DiagnosticSeverity.Warning,
+        "Debug",
+        "{0}"
+    );
+
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         GenericItemTypeRule,
         UnknownItemTypeRule,
-        SpecializedApiRule
+        SpecializedApiRule,
+        DebugRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -57,7 +66,8 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeVariableDeclaration, OperationKind.VariableDeclaration);
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
-        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeExtensionInvocation, OperationKind.Invocation);
+        //context.RegisterOperationAction(AnalyzeRefBreakingInvocation, OperationKind.Invocation);
     }
 
     private static void AnalyzeVariableDeclaration(OperationAnalysisContext ctx)
@@ -68,7 +78,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         if (declarator.Symbol.Type is not INamedTypeSymbol t)
             return;
 
-        var isRefList = t.IsGenericType && t.IsRefListType();
+        var isRefList = t.IsGenericType && t.IsRefList();
         if (!isRefList)
             return;
 
@@ -112,7 +122,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeSymbolTypeAppearance(SymbolAnalysisContext ctx, INamedTypeSymbol t, Location loc)
     {
-        var isRefList = t.IsGenericType && t.IsRefListType();
+        var isRefList = t.IsGenericType && t.IsRefList();
         if (!isRefList)
             return;
 
@@ -126,7 +136,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
             ctx.ReportDiagnostic(Diagnostic.Create(GenericItemTypeRule, loc));
     }
 
-    private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+    private static void AnalyzeExtensionInvocation(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
         if (i.IsVirtual)
@@ -140,7 +150,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         if (p.Length == 0 || p[0].Type is not INamedTypeSymbol t)
             return;
 
-        var isRefList = t.IsGenericType && t.IsRefListType();
+        var isRefList = t.IsGenericType && t.IsRefList();
         if (!isRefList)
             return;
 
@@ -149,7 +159,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
         var loc = i.Syntax.GetLocation();
 
-        if (gt.IsDeallocType())
+        if (gt.IsDealloc())
         {
             ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
             ReportCalls(ctx, m, loc, DeallocTemplates.RefListExtensionNames);
@@ -164,5 +174,36 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     {
         if (names.Contains(m.Name))
             ctx.ReportDiagnostic(Diagnostic.Create(SpecializedApiRule, loc));
+    }
+
+    private static void AnalyzeRefBreakingInvocation(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+
+        var checkArgs = i.GetMutableRefListArgs();
+        if (checkArgs.Length == 0)
+            return;
+
+        var body = i.GetEnclosingBody();
+        if (body == null)
+            return;
+
+        var declarators = body.FindLocalRefDeclaratorsBeforePos(i.Syntax.SpanStart);
+        if (declarators.Length == 0)
+            return;
+
+        var lifetimes = body.EstimateLifetimes(declarators);
+
+        foreach (var pair in lifetimes)
+        {
+            var name = pair.Key;
+            var lifetime = pair.Value;
+
+            if (lifetime.IntersectsWith(i.Syntax.Span.End))
+            {
+                var msg = $"Invocation invalidates memory safety guaranties for the `{name}` reference";
+                ctx.ReportDiagnostic(Diagnostic.Create(DebugRule, i.Syntax.GetLocation(), msg));
+            }
+        }
     }
 }

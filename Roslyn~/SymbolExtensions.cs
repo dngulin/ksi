@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using static Ksi.Roslyn.SymbolNames;
 
@@ -22,115 +23,46 @@ namespace Ksi.Roslyn
             return true;
         }
 
-        public static bool IsNoCopyType(this ITypeSymbol self)
+        public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(NoCopyReturn);
+        public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(NonAllocatedResult);
+        public static bool ProducesExplicitReference(this IMethodSymbol self) => self.Is(RefListIndexer, DynReturnsSelf);
+
+        private static bool Is(this IMethodSymbol self, string attributeName)
+        {
+            return self.GetAttributes().Any(a => a.Is(attributeName));
+        }
+
+        private static bool Is(this IMethodSymbol self, string a1, string a2)
+        {
+            return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2));
+        }
+
+        public static bool IsNoCopyType(this ITypeSymbol self) => self.Is(NoCopy);
+        public static bool IsDealloc(this ITypeSymbol self) => self.Is(Dealloc);
+        public static bool IsRefList(this ITypeSymbol self) => self.Is(RefList);
+        public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
+        public static bool IsDeallocOrRefList(this ITypeSymbol self) => self.Is(Dealloc, RefList);
+        public static bool IsDynSized(this ITypeSymbol self) => self.Is(DynSized);
+
+        private static bool Is(this ITypeSymbol self, string attributeName)
         {
             if (self.TypeKind != TypeKind.Struct)
                 return false;
 
-            foreach (var attribute in self.GetAttributes())
-            {
-                if (attribute.IsNoCopy())
-                    return true;
-            }
-
-            return false;
+            return Enumerable.Any(self.GetAttributes(), attribute => attribute.Is(attributeName));
         }
 
-        public static bool IsNoCopyReturnMethod(this IMethodSymbol method)
-        {
-            foreach (var attribute in method.GetAttributes())
-            {
-                if (attribute.IsNoCopyReturn())
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsNonAllocatedResultRef(this IMethodSymbol method)
-        {
-            if (!method.ReturnsByRef)
-                return false;
-
-            foreach (var attribute in method.GetAttributes())
-            {
-                if (attribute.IsNonAllocatedResult())
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsUnmanagedRefListType(this ITypeSymbol self)
-        {
-            return self.IsUnmanagedType && self.IsRefListType();
-        }
-
-        public static bool IsRefListType(this ITypeSymbol self)
+        private static bool Is(this ITypeSymbol self, string a1, string a2)
         {
             if (self.TypeKind != TypeKind.Struct)
                 return false;
 
-            foreach (var attribute in self.GetAttributes())
-            {
-                if (attribute.IsRefList())
-                    return true;
-            }
-
-            return false;
+            return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2));
         }
 
-        public static bool IsDeallocType(this ITypeSymbol self)
+        private static bool Is(this AttributeData attribute, string attributeName)
         {
-            if (self.TypeKind != TypeKind.Struct)
-                return false;
-
-            foreach (var attribute in self.GetAttributes())
-            {
-                if (attribute.IsDealloc())
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsDeallocOrRefListType(this ITypeSymbol self)
-        {
-            if (self.TypeKind != TypeKind.Struct)
-                return false;
-
-            foreach (var attribute in self.GetAttributes())
-            {
-                if (attribute.IsDealloc() || attribute.IsRefList())
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsNoCopy(this AttributeData attribute)
-        {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NoCopy + Suffix;
-        }
-
-        private static bool IsNoCopyReturn(this AttributeData attribute)
-        {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NoCopyReturn + Suffix;
-        }
-
-        private static bool IsDealloc(this AttributeData attribute)
-        {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == Dealloc + Suffix;
-        }
-
-        private static bool IsRefList(this AttributeData attribute)
-        {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == RefList + Suffix;
-        }
-
-        private static bool IsNonAllocatedResult(this AttributeData attribute)
-        {
-            return attribute.AttributeClass != null && attribute.AttributeClass.Name == NonAllocatedResult + Suffix;
+            return attribute.AttributeClass != null && attribute.AttributeClass.Name == attributeName + Suffix;
         }
     }
 }

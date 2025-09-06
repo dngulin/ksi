@@ -38,4 +38,24 @@ namespace Ksi
     public class NonAllocatedResultAttribute : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class DynSizedAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public class DynNoResizeAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class DynReturnsSelfAttribute : Attribute
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RefListIndexerAttribute : Attribute
+    {
+    }
 }
