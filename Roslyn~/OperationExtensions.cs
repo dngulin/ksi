@@ -102,7 +102,7 @@ public static class OperationExtensions
         }
     }
 
-    public static bool ReferencesDynSizeInstance(this IOperation self)
+    public static bool ReferencesDynSizeInstance(this IOperation self, bool analyzeArguments = true)
     {
         switch (self)
         {
@@ -115,7 +115,7 @@ public static class OperationExtensions
 
                 var declarator = lr.FindDeclarator();
                 if (declarator.Initializer != null)
-                    return declarator.Initializer.Value.ReferencesDynSizeInstance();
+                    return declarator.Initializer.Value.ReferencesDynSizeInstance(analyzeArguments);
 
                 return false;
 
@@ -128,7 +128,7 @@ public static class OperationExtensions
                     return true;
 
                 if (f.Instance != null)
-                    return f.Instance.ReferencesDynSizeInstance();
+                    return f.Instance.ReferencesDynSizeInstance(analyzeArguments);
 
                 return false;
 
@@ -140,20 +140,15 @@ public static class OperationExtensions
                 if (m.ReturnType.IsDynSized())
                     return true;
 
-                foreach (var a in i.Arguments)
+                if (m.Parameters.Where(p => p.RefKind != RefKind.None).Any(p => p.Type.IsDynSized()))
                 {
-                    var p = a.Parameter;
-                    if (p == null || p.RefKind == RefKind.None)
-                        continue;
-
-                    if (p.Type.IsDynSized())
-                        return true;
-
-                    if (a.Value.ReferencesDynSizeInstance())
-                        return true;
+                    return true;
                 }
 
-                return false;
+                if (!analyzeArguments)
+                    return false;
+
+                return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
 
             default:
                 return false;

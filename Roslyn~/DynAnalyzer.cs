@@ -37,6 +37,13 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Structure `{0}` is marked with the `DynSized` attribute but doesn't have any `DynSized` fields"
     );
 
+    private static readonly DiagnosticDescriptor NonExplicitRefenceRule = Rule(
+        DiagnosticSeverity.Error,
+        "Non-Explicit reference to DynSized data",
+        "Non-Explicit reference to DynSized data breaks reference lifetime analysis"
+    );
+
+
     private static readonly DiagnosticDescriptor DebugRule = Rule(
         DiagnosticSeverity.Warning,
         "Debug",
@@ -46,6 +53,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         FieldRule,
         RedundantRule,
+        RedundantRule,
+        NonExplicitRefenceRule,
         DebugRule
     );
 
@@ -59,6 +68,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
+        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -100,8 +110,28 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (!i.Value.ReferencesDynSizeInstance())
             return;
 
-        var track = "";
-        var isExplicit = i.Value.IsExplicitReference();
-        ctx.ReportDiagnostic(Diagnostic.Create(DebugRule, i.Syntax.GetLocation(), $"Is explicit ref: {isExplicit}: {track}"));
+        if (!i.Value.IsExplicitReference())
+            ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, i.Syntax.GetLocation()));
+    }
+
+    private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+        if (i.TargetMethod.ProducesExplicitReference())
+            return;
+
+        foreach (var a in i.Arguments)
+        {
+            var p = a.Parameter;
+            if (p == null || p.RefKind == RefKind.None)
+                continue;
+
+            var v = a.Value;
+            if (!v.ReferencesDynSizeInstance(false))
+                continue;
+
+            if (!v.IsExplicitReference())
+                ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, v.Syntax.GetLocation()));
+        }
     }
 }
