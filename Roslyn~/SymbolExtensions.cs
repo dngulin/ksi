@@ -25,6 +25,8 @@ namespace Ksi.Roslyn
 
         public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(NoCopyReturn);
         public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(NonAllocatedResult);
+        public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(RefListIndexer);
+        public static bool IsDynReturnsSelf(this IMethodSymbol self) => self.Is(DynReturnsSelf);
         public static bool ProducesExplicitReference(this IMethodSymbol self) => self.Is(RefListIndexer, DynReturnsSelf);
 
         private static bool Is(this IMethodSymbol self, string attributeName)
@@ -49,7 +51,7 @@ namespace Ksi.Roslyn
             if (self.TypeKind != TypeKind.Struct)
                 return false;
 
-            return Enumerable.Any(self.GetAttributes(), attribute => attribute.Is(attributeName));
+            return self.GetAttributes().Any(attribute => attribute.Is(attributeName));
         }
 
         private static bool Is(this ITypeSymbol self, string a1, string a2)
@@ -63,6 +65,13 @@ namespace Ksi.Roslyn
         private static bool Is(this AttributeData attribute, string attributeName)
         {
             return attribute.AttributeClass != null && attribute.AttributeClass.Name == attributeName + Suffix;
+        }
+
+        public static bool IsDynNoResize(this IParameterSymbol self) => self.Is(DynNoResize);
+
+        private static bool Is(this IParameterSymbol self, string attributeName)
+        {
+            return self.GetAttributes().Any(attribute => attribute.Is(attributeName));
         }
     }
 }

@@ -58,4 +58,9 @@ namespace Ksi
     public class RefListIndexerAttribute : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RefListIteratorAttribute : Attribute
+    {
+    }
 }

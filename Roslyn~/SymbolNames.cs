@@ -9,7 +9,7 @@ namespace Ksi.Roslyn
         public const string NonAllocatedResult = "NonAllocatedResult";
 
         public const string DynSized = "DynSized";
-        public const string DynNoResize = "DyNoResize";
+        public const string DynNoResize = "DynNoResize";
         public const string DynReturnsSelf = "DynReturnsSelf";
 
         public const string RefList = "RefList";

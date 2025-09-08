@@ -147,21 +147,25 @@ namespace Ksi
 {{
     public static class {0}IteratorExtensions
     {{
+        [RefListIterator]
         public static {0}ReadOnlyIterator<T> RefReadonlyIter<T>(this in {0}<T> self) where T : {1}
         {{
             return new {0}ReadOnlyIterator<T>(self.AsReadonlySpan());
         }}
 
+        [RefListIterator]
         public static {0}Iterator<T> RefIter<T>(this ref {0}<T> self) where T : {1}
         {{
             return new {0}Iterator<T>(self.AsSpan());
         }}
 
+        [RefListIterator]
         public static {0}ReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in {0}<T> self) where T : {1}
         {{
             return new {0}ReadOnlyIteratorReversed<T>(self.AsReadonlySpan());
         }}
 
+        [RefListIterator]
         public static {0}IteratorReversed<T> RefIterReversed<T>(this ref {0}<T> self) where T : {1}
         {{
             return new {0}IteratorReversed<T>(self.AsSpan());

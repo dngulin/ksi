@@ -19,55 +19,27 @@ public static class OperationExtensions
         return null;
     }
 
-    public static ImmutableArray<IArgumentOperation> GetMutableRefListArgs(this IInvocationOperation invocation)
+    public static IEnumerable<IArgumentOperation> GetMutableDynSizedArgs(this IInvocationOperation invocation)
     {
         return invocation.Arguments
             .Where(a =>
             {
                 var p = a.Parameter;
-                if (p is null)
+                if (p is null || p.RefKind != RefKind.Ref || p.IsDynNoResize())
                     return false;
 
-                return p.RefKind == RefKind.Ref && p.Type.IsRefList();
-            })
-            .ToImmutableArray();
+                return p.Type.IsDynSized();
+            });
     }
 
-    public static ImmutableArray<IVariableDeclaratorOperation> FindLocalRefDeclaratorsBeforePos(this IOperation self, int pos)
+    public static IEnumerable<IVariableDeclaratorOperation> FindLocalRefDeclaratorsBeforePos(this IOperation self, int pos)
     {
         return self.Descendants()
             .OfType<IVariableDeclaratorOperation>()
-            .Where(op => op.Symbol.IsRef && (op.Initializer != null ? op.Initializer.Syntax.Span.End < pos : op.Syntax.Span.End < pos))
-            .ToImmutableArray();
-    }
-
-    public static ImmutableDictionary<string, TextSpan> EstimateLifetimes(this IOperation self, ImmutableArray<IVariableDeclaratorOperation> declarators)
-    {
-        var result = new Dictionary<string, TextSpan>();
-
-        foreach (var d in declarators)
-        {
-            if (d.Parent is IForEachLoopOperation loop)
-            {
-                result.Add(d.Symbol.Name, loop.Body.Syntax.Span);
-            }
-            else
-            {
-                result.Add(d.Symbol.Name, d.Syntax.Span);
-            }
-        }
-
-        foreach (var op in self.Descendants().OfType<ILocalReferenceOperation>())
-        {
-            if (!result.TryGetValue(op.Local.Name, out var lifetime))
-                continue;
-
-            var span = op.Syntax.Span;
-            if (span.End > lifetime.End)
-                result[op.Local.Name] = TextSpan.FromBounds(lifetime.Start, span.End);
-        }
-
-        return result.ToImmutableDictionary();
+            .Where(op =>
+                op.Symbol.IsRef && (op.Initializer != null
+                    ? op.Initializer.Syntax.Span.End < pos
+                    : op.Syntax.Span.End < pos));
     }
 
     public static bool IsExplicitReference(this IOperation self)
@@ -113,9 +85,9 @@ public static class OperationExtensions
                 if (!lr.Local.IsRef)
                     return false;
 
-                var declarator = lr.FindDeclarator();
-                if (declarator.Initializer != null)
-                    return declarator.Initializer.Value.ReferencesDynSizeInstance(analyzeArguments);
+                var v = lr.FindDeclarator().GetValueProducerRef();
+                if (v != null)
+                    return v.ReferencesDynSizeInstance(analyzeArguments);
 
                 return false;
 
@@ -162,5 +134,143 @@ public static class OperationExtensions
             .Descendants()
             .OfType<IVariableDeclaratorOperation>()
             .First(d => SymbolEqualityComparer.Default.Equals(d.Symbol, self.Local));
+    }
+
+    public static RefVarInfo? GetRefVarInfo(this IVariableDeclaratorOperation self)
+    {
+        if (!self.Symbol.IsRef)
+            return null;
+
+        if (self.Initializer != null)
+            return new RefVarInfo(self, RefVarKind.LocalRef, self.Initializer.Value);
+
+        if (self.Parent is IForEachLoopOperation loop)
+            return new RefVarInfo(self, RefVarKind.IteratorRef, loop.Collection.WithoutConversionOp());
+
+        return null;
+    }
+
+    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self)
+    {
+        if (self.Initializer != null)
+            return self.Initializer.Value;
+
+        if (self.Parent is IForEachLoopOperation l && l.Collection.WithoutConversionOp().IsRefListIterator(out var op))
+            return op;
+
+        return null;
+    }
+
+    public static IOperation WithoutConversionOp(this IOperation self)
+    {
+        if (self is IConversionOperation conv)
+            return conv.Operand;
+
+        return self;
+    }
+
+    public static bool IsRefListIterator(this IOperation self, out IOperation? collection)
+    {
+        collection = null;
+        if (self is not IInvocationOperation i)
+            return false;
+
+        var m = i.TargetMethod;
+        if (!m.IsExtensionMethod || !m.ReturnType.IsRefLikeType)
+            return false;
+
+        var p = m.Parameters.First();
+        if (p.RefKind == RefKind.None || !p.Type.IsRefList())
+            return false;
+
+        collection = i.Arguments.First().Value;
+        return true;
+    }
+
+    public static RefPath ToRefPath(this IOperation self)
+    {
+        var path = new List<string>(16);
+        if (self.AppendNodePath(path))
+            return new RefPath(path.ToImmutableArray());
+
+        return new RefPath(ImmutableArray<string>.Empty);
+    }
+
+    private static bool AppendNodePath(this IOperation self, List<string> path)
+    {
+        while (true)
+        {
+            switch (self)
+            {
+                case ILocalReferenceOperation lr:
+                    if (!lr.Local.IsRef)
+                    {
+                        path.Insert(0, lr.Local.Name);
+                        return true;
+                    }
+
+                    var v = lr.FindDeclarator().GetValueProducerRef();
+                    if (v == null)
+                        return false;
+
+                    self = v;
+                    continue;
+
+                case IParameterReferenceOperation pr:
+                    path.Insert(0, pr.Parameter.Name);
+                    return true;
+
+                case IFieldReferenceOperation f:
+                    path.Insert(0, f.Field.Name);
+
+                    if (f.Instance == null)
+                        return true;
+
+                    self = f.Instance;
+                    continue;
+
+                case IInvocationOperation i:
+                    var m = i.TargetMethod;
+                    if (!m.ReturnsByRef || !m.IsExtensionMethod)
+                        return false;
+
+                    if (m.IsRefListIndexer())
+                    {
+                        path.Insert(0, RefPath.IndexerName);
+                    }
+                    else if (!m.IsDynReturnsSelf())
+                    {
+                        return false;
+                    }
+
+                    self = i.Arguments.First().Value;
+                    continue;
+
+                default:
+                    return false;
+            }
+        }
+    }
+
+    public static TextSpan EstimateLifetimeOf(this IOperation self, IVariableDeclaratorOperation d)
+    {
+        if (d.Parent is IForEachLoopOperation l)
+        {
+            return l.Body.Syntax.Span;
+        }
+
+        var lifetime = d.Syntax.Span;
+
+        foreach (var op in self.Descendants().OfType<ILocalReferenceOperation>())
+        {
+            if (op.Local.Name != d.Symbol.Name)
+                continue;
+
+            var span = op.Syntax.Span;
+            if (span.End > lifetime.End)
+                lifetime = TextSpan.FromBounds(lifetime.Start, span.End);
+        }
+
+        return lifetime;
     }
 }

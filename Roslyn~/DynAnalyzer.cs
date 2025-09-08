@@ -43,6 +43,13 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Non-Explicit reference to DynSized data breaks reference lifetime analysis"
     );
 
+    private static readonly DiagnosticDescriptor RefenceInvalidationRule = Rule(
+        DiagnosticSeverity.Error,
+        "Reference Invalidation",
+        "Invocation invalidates memory safety guaranties for the `{0}` reference. " +
+        "Mutating `{1}` can invalidate reference to `{2}`"
+    );
+
 
     private static readonly DiagnosticDescriptor DebugRule = Rule(
         DiagnosticSeverity.Warning,
@@ -55,6 +62,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         RedundantRule,
         RedundantRule,
         NonExplicitRefenceRule,
+        RefenceInvalidationRule,
         DebugRule
     );
 
@@ -68,7 +76,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
-        context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeRefBreakingInvocation, OperationKind.Invocation);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -104,17 +113,29 @@ public class DynAnalyzer : DiagnosticAnalyzer
             return;
 
         var i = d.Initializer;
-        if (i == null)
-            return; // TODO: analyze foreach expressions
+        if (i != null)
+        {
+            AnalyzeReferenceOp(ctx, i.Value);
+            return;
+        }
 
-        if (!i.Value.ReferencesDynSizeInstance())
+        if (d.Parent is not IForEachLoopOperation loop)
             return;
 
-        if (!i.Value.IsExplicitReference())
-            ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, i.Syntax.GetLocation()));
+        if (loop.Collection.WithoutConversionOp().IsRefListIterator(out var collParent))
+            AnalyzeReferenceOp(ctx, collParent!);
     }
 
-    private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+    private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
+    {
+        if (!op.ReferencesDynSizeInstance())
+            return;
+
+        if (!op.IsExplicitReference())
+            ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, op.Syntax.GetLocation()));
+    }
+
+    private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
         if (i.TargetMethod.ProducesExplicitReference())
@@ -132,6 +153,51 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
             if (!v.IsExplicitReference())
                 ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, v.Syntax.GetLocation()));
+        }
+    }
+
+    private static void AnalyzeRefBreakingInvocation(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+
+        var args = i.GetMutableDynSizedArgs()
+            .Select(a => a.Value.ToRefPath())
+            .Where(p => !p.IsEmpty)
+            .ToImmutableArray();
+
+        if (args.Length == 0)
+            return;
+
+        var body = i.GetEnclosingBody();
+        if (body == null)
+            return;
+
+        var vars = body
+            .FindLocalRefDeclaratorsBeforePos(i.Syntax.SpanStart)
+            .Select(d => d.GetRefVarInfo())
+            .SelectNonNull()
+            .Where(v => v.ReferencesDynSizeInstance())
+            .Select(v => (v.Declarator, RefPath: v.GetRefPath()))
+            .Where(dp => !dp.RefPath.IsEmpty)
+            .Select(dp => (dp.Declarator.Symbol.Name, dp.RefPath, Lifetime: body.EstimateLifetimeOf(dp.Declarator)))
+            .ToImmutableArray();
+
+        if (vars.Length == 0)
+            return;
+
+        var l = i.Syntax.GetLocation();
+
+        foreach (var argRefPath in args)
+        foreach (var (refName, refPath, refLifetime) in vars)
+        {
+            if (!refLifetime.IntersectsWith(i.Syntax.Span.End))
+                continue;
+
+            var rel = argRefPath.GetRelationTo(refPath);
+            if (rel == RefRelation.Parent)
+            {
+                ctx.ReportDiagnostic(Diagnostic.Create(RefenceInvalidationRule, l, refName, argRefPath, refPath));
+            }
         }
     }
 }

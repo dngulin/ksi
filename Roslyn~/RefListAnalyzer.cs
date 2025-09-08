@@ -42,18 +42,10 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         "Using non-specialized RefList API for NoCopy or Dealloc types is unsafe"
     );
 
-    private static readonly DiagnosticDescriptor DebugRule = Rule(
-        DiagnosticSeverity.Warning,
-        "Debug",
-        "{0}"
-    );
-
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         GenericItemTypeRule,
         UnknownItemTypeRule,
-        SpecializedApiRule,
-        DebugRule
+        SpecializedApiRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -67,7 +59,6 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
         context.RegisterOperationAction(AnalyzeExtensionInvocation, OperationKind.Invocation);
-        //context.RegisterOperationAction(AnalyzeRefBreakingInvocation, OperationKind.Invocation);
     }
 
     private static void AnalyzeVariableDeclaration(OperationAnalysisContext ctx)
@@ -174,36 +165,5 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     {
         if (names.Contains(m.Name))
             ctx.ReportDiagnostic(Diagnostic.Create(SpecializedApiRule, loc));
-    }
-
-    private static void AnalyzeRefBreakingInvocation(OperationAnalysisContext ctx)
-    {
-        var i = (IInvocationOperation)ctx.Operation;
-
-        var checkArgs = i.GetMutableRefListArgs();
-        if (checkArgs.Length == 0)
-            return;
-
-        var body = i.GetEnclosingBody();
-        if (body == null)
-            return;
-
-        var declarators = body.FindLocalRefDeclaratorsBeforePos(i.Syntax.SpanStart);
-        if (declarators.Length == 0)
-            return;
-
-        var lifetimes = body.EstimateLifetimes(declarators);
-
-        foreach (var pair in lifetimes)
-        {
-            var name = pair.Key;
-            var lifetime = pair.Value;
-
-            if (lifetime.IntersectsWith(i.Syntax.Span.End))
-            {
-                var msg = $"Invocation invalidates memory safety guaranties for the `{name}` reference";
-                ctx.ReportDiagnostic(Diagnostic.Create(DebugRule, i.Syntax.GetLocation(), msg));
-            }
-        }
     }
 }
