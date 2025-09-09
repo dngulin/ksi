@@ -85,7 +85,7 @@ public static class OperationExtensions
                 if (!lr.Local.IsRef)
                     return false;
 
-                var v = lr.FindDeclarator().GetValueProducerRef();
+                var v = lr.FindDeclarator().GetValueProducerRef(out _);
                 if (v != null)
                     return v.ReferencesDynSizeInstance(analyzeArguments);
 
@@ -142,21 +142,26 @@ public static class OperationExtensions
             return null;
 
         if (self.Initializer != null)
-            return new RefVarInfo(self, RefVarKind.LocalRef, self.Initializer.Value);
+            return new RefVarInfo(self, RefVarKind.LocalSymbolRef, self.Initializer.Value);
 
         if (self.Parent is IForEachLoopOperation loop)
-            return new RefVarInfo(self, RefVarKind.IteratorRef, loop.Collection.WithoutConversionOp());
+            return new RefVarInfo(self, RefVarKind.IteratorItemRef, loop.Collection.WithoutConversionOp());
 
         return null;
     }
 
-    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self)
+    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self, out bool isRefIterator)
     {
+        isRefIterator = false;
+
         if (self.Initializer != null)
             return self.Initializer.Value;
 
         if (self.Parent is IForEachLoopOperation l && l.Collection.WithoutConversionOp().IsRefListIterator(out var op))
+        {
+            isRefIterator = true;
             return op;
+        }
 
         return null;
     }
@@ -187,16 +192,19 @@ public static class OperationExtensions
         return true;
     }
 
-    public static RefPath ToRefPath(this IOperation self)
+    public static RefPath ToRefPath(this IOperation self, bool addImplicitIndexer = false)
     {
         var path = new List<string>(16);
-        if (self.AppendNodePath(path))
-            return new RefPath(path.ToImmutableArray());
 
-        return new RefPath(ImmutableArray<string>.Empty);
+        if (addImplicitIndexer)
+            path.Add(RefPath.IndexerName);
+
+        return self.PrependNodePath(path) ?
+            new RefPath(path.ToImmutableArray()) :
+            new RefPath(ImmutableArray<string>.Empty);
     }
 
-    private static bool AppendNodePath(this IOperation self, List<string> path)
+    private static bool PrependNodePath(this IOperation self, List<string> path)
     {
         while (true)
         {
@@ -209,9 +217,12 @@ public static class OperationExtensions
                         return true;
                     }
 
-                    var v = lr.FindDeclarator().GetValueProducerRef();
+                    var v = lr.FindDeclarator().GetValueProducerRef(out var implicitIndexer);
                     if (v == null)
                         return false;
+
+                    if (implicitIndexer)
+                        path.Insert(0, RefPath.IndexerName);
 
                     self = v;
                     continue;

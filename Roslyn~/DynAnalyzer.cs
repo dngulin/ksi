@@ -178,8 +178,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
             .SelectNonNull()
             .Where(v => v.ReferencesDynSizeInstance())
             .Select(v => (v.Declarator, RefPath: v.GetRefPath()))
-            .Where(dp => !dp.RefPath.IsEmpty)
-            .Select(dp => (dp.Declarator.Symbol.Name, dp.RefPath, Lifetime: body.EstimateLifetimeOf(dp.Declarator)))
+            .Where(t => !t.RefPath.IsEmpty)
+            .Select(t => (t.Declarator.Symbol.Name, t.RefPath, Lifetime: body.EstimateLifetimeOf(t.Declarator)))
             .ToImmutableArray();
 
         if (vars.Length == 0)

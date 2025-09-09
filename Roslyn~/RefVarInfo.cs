@@ -12,8 +12,8 @@ public readonly struct RefVarInfo(IVariableDeclaratorOperation declarator, RefVa
 
 public enum RefVarKind
 {
-    LocalRef,
-    IteratorRef
+    LocalSymbolRef,
+    IteratorItemRef
 }
 
 public static class RefVarInfoExtensions
@@ -24,18 +24,20 @@ public static class RefVarInfoExtensions
 
         return self.Kind switch
         {
-            RefVarKind.LocalRef => p.ReferencesDynSizeInstance(),
-            RefVarKind.IteratorRef => p.IsRefListIterator(out _),
+            RefVarKind.LocalSymbolRef => p.ReferencesDynSizeInstance(),
+            RefVarKind.IteratorItemRef => p.IsRefListIterator(out _),
             _ => false
         };
     }
 
     public static RefPath GetRefPath(this in RefVarInfo self)
     {
+        var p = self.Producer;
+
         return self.Kind switch
         {
-            RefVarKind.LocalRef => self.Producer.ToRefPath(),
-            RefVarKind.IteratorRef => self.Producer.IsRefListIterator(out var src) ? src!.ToRefPath() : RefPath.Empty,
+            RefVarKind.LocalSymbolRef => p.ToRefPath(),
+            RefVarKind.IteratorItemRef => p.IsRefListIterator(out var src) ? src!.ToRefPath(true) : RefPath.Empty,
             _ => RefPath.Empty
         };
     }
