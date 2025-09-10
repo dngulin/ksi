@@ -284,4 +284,24 @@ public static class OperationExtensions
 
         return lifetime;
     }
+
+    public static void FindInnerLocalRefsActiveAtPos(this IOperation self, int pos)
+    {
+        var lifetimes = new Dictionary<string, TextSpan>();
+
+        foreach (var op in self.Descendants())
+        {
+            switch (op)
+            {
+                case IVariableDeclaratorOperation d:
+                    if (d.Syntax.Span.Start > pos)
+                        continue;
+
+                    break;
+
+                case ILocalReferenceOperation lr:
+                    break;
+            }
+        }
+    }
 }

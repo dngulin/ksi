@@ -58,4 +58,9 @@ public static class RefExtensions {
 
         return RefRelation.Same;
     }
+
+    public static bool Invalidates(in this RefPath self, in RefPath other)
+    {
+        return self.GetRelationTo(other) == RefRelation.Parent;
+    }
 }

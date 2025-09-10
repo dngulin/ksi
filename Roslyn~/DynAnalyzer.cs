@@ -43,13 +43,19 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Non-Explicit reference to DynSized data breaks reference lifetime analysis"
     );
 
-    private static readonly DiagnosticDescriptor RefenceInvalidationRule = Rule(
+    private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
         DiagnosticSeverity.Error,
-        "Reference Invalidation",
+        "Local Reference Invalidation",
         "Invocation invalidates memory safety guaranties for the `{0}` reference. " +
-        "Mutating `{1}` can invalidate reference to `{2}`"
+        "Mutable access to `{1}` can invalidate reference to `{2}`"
     );
 
+    private static readonly DiagnosticDescriptor ArgumentRefInvalidationRule = Rule(
+        DiagnosticSeverity.Error,
+        "Argument Reference Invalidation",
+        "Invocation invalidates memory safety guaranties. " +
+        "Mutable access to `{0}` can invalidate reference to `{1}`"
+    );
 
     private static readonly DiagnosticDescriptor DebugRule = Rule(
         DiagnosticSeverity.Warning,
@@ -62,7 +68,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
         RedundantRule,
         RedundantRule,
         NonExplicitRefenceRule,
-        RefenceInvalidationRule,
+        LocalRefInvalidationRule,
+        ArgumentRefInvalidationRule,
         DebugRule
     );
 
@@ -77,7 +84,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
-        context.RegisterOperationAction(AnalyzeRefBreakingInvocation, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -156,24 +163,42 @@ public class DynAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeRefBreakingInvocation(OperationAnalysisContext ctx)
+    private static void AnalyzeInvocationRefBreaking(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
 
-        var args = i.GetMutableDynSizedArgs()
-            .Select(a => a.Value.ToRefPath())
-            .Where(p => !p.IsEmpty)
+        var args = i.Arguments
+            .Where(a => a.Parameter != null && a.Parameter.RefKind != RefKind.None)
+            .Select(a =>
+            {
+                var p = a.Parameter!;
+                var v = a.Value;
+                return (
+                    IsMut: p.RefKind == RefKind.Ref && !p.IsDynNoResize(),
+                    RefPath: v.ReferencesDynSizeInstance() ? v.ToRefPath() : RefPath.Empty
+                );
+            })
+            .Where(t => !t.RefPath.IsEmpty)
             .ToImmutableArray();
 
+        if (args.All(a => !a.IsMut))
+            return;
+
+        AnalyzeBreakingRefs(ctx, i, args.Where(t => t.IsMut).Select(t => t.RefPath).ToImmutableArray());
+        AnalyzeArgClashes(ctx, i, args);
+    }
+
+    private static void AnalyzeBreakingRefs(OperationAnalysisContext ctx, IInvocationOperation op, ImmutableArray<RefPath> args)
+    {
         if (args.Length == 0)
             return;
 
-        var body = i.GetEnclosingBody();
+        var body = op.GetEnclosingBody();
         if (body == null)
             return;
 
         var vars = body
-            .FindLocalRefDeclaratorsBeforePos(i.Syntax.SpanStart)
+            .FindLocalRefDeclaratorsBeforePos(op.Syntax.SpanStart)
             .Select(d => d.GetRefVarInfo())
             .SelectNonNull()
             .Where(v => v.ReferencesDynSizeInstance())
@@ -185,19 +210,34 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (vars.Length == 0)
             return;
 
-        var l = i.Syntax.GetLocation();
+        var l = op.Syntax.GetLocation();
 
         foreach (var argRefPath in args)
         foreach (var (refName, refPath, refLifetime) in vars)
         {
-            if (!refLifetime.IntersectsWith(i.Syntax.Span.End))
+            if (!refLifetime.IntersectsWith(op.Syntax.Span.End))
                 continue;
 
-            var rel = argRefPath.GetRelationTo(refPath);
-            if (rel == RefRelation.Parent)
-            {
-                ctx.ReportDiagnostic(Diagnostic.Create(RefenceInvalidationRule, l, refName, argRefPath, refPath));
-            }
+            if (argRefPath.Invalidates(refPath))
+                ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, l, refName, argRefPath, refPath));
+        }
+    }
+
+    private static void AnalyzeArgClashes(OperationAnalysisContext ctx, IInvocationOperation op, ImmutableArray<(bool IsMut, RefPath RefPath)> args)
+    {
+        var l = op.Syntax.GetLocation();
+
+        for (var i = 0; i < args.Length; i++)
+        for (var j = 0; j < args.Length; j++)
+        {
+            if (i == j || !args[i].IsMut)
+                continue;
+
+            var a = args[i].RefPath;
+            var b = args[j].RefPath;
+
+            if (a.Invalidates(b))
+                ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefInvalidationRule, l, a, b));
         }
     }
 }
