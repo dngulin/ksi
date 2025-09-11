@@ -33,11 +33,12 @@ public static class RefVarInfoExtensions
     public static RefPath GetRefPath(this in RefVarInfo self)
     {
         var p = self.Producer;
+        var t = self.Declarator.Symbol.Type;
 
         return self.Kind switch
         {
             RefVarKind.LocalSymbolRef => p.ToRefPath(),
-            RefVarKind.IteratorItemRef => p.IsRefListIterator(out var src) ? src!.ToRefPath(true) : RefPath.Empty,
+            RefVarKind.IteratorItemRef => p.IsRefListIterator(out var src) ? src!.ToRefPath(t) : RefPath.Empty,
             _ => RefPath.Empty
         };
     }

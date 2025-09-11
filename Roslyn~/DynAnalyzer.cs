@@ -245,6 +245,9 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var a = args[i].RefPath;
             var b = args[j].RefPath;
 
+            if (!a.PointsToDynSizedInstance)
+                continue;
+
             switch (a.GetRelationTo(b))
             {
                 case RefRelation.Parent:

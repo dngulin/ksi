@@ -4,14 +4,17 @@ using System.Text;
 
 namespace Ksi.Roslyn;
 
-public readonly struct RefPath(ImmutableArray<string> path)
+public readonly struct RefPath(ImmutableArray<string> path, int dynSizedLength)
 {
     public const string IndexerName = "[n]";
 
-    public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty);
+    public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0);
 
     public readonly ImmutableArray<string> Path = path;
+    private readonly int _dynSizedLength = dynSizedLength;
+
     public bool IsEmpty => Path.IsEmpty;
+    public bool PointsToDynSizedInstance => Path.Length == _dynSizedLength;
 
     public override string ToString()
     {
@@ -22,6 +25,9 @@ public readonly struct RefPath(ImmutableArray<string> path)
                 sb.Append('.');
 
             sb.Append(Path[i]);
+
+            if (i == _dynSizedLength - 1)
+                sb.Append('!');
         }
 
         return sb.ToString();
@@ -61,6 +67,6 @@ public static class RefExtensions {
 
     public static bool Invalidates(in this RefPath self, in RefPath other)
     {
-        return self.GetRelationTo(other) == RefRelation.Parent;
+        return self.PointsToDynSizedInstance && self.GetRelationTo(other) == RefRelation.Parent;
     }
 }

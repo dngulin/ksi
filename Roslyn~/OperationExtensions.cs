@@ -192,19 +192,29 @@ public static class OperationExtensions
         return true;
     }
 
-    public static RefPath ToRefPath(this IOperation self, bool addImplicitIndexer = false)
+    /// <summary>
+    /// To measure path ending that contains only `Sized` types
+    /// </summary>
+    private struct RefPathSuffix
     {
-        var path = new List<string>(16);
-
-        if (addImplicitIndexer)
-            path.Add(RefPath.IndexerName);
-
-        return self.PrependNodePath(path) ?
-            new RefPath(path.ToImmutableArray()) :
-            new RefPath(ImmutableArray<string>.Empty);
+        public bool Finished;
+        public int Length;
     }
 
-    private static bool PrependNodePath(this IOperation self, List<string> path)
+    public static RefPath ToRefPath(this IOperation self, ITypeSymbol? implicitIndexingType = null)
+    {
+        var path = new List<string>(16);
+        var suffix = new RefPathSuffix();
+
+        if (implicitIndexingType != null)
+            path.PrependRefSeg(RefPath.IndexerName, implicitIndexingType, ref suffix);
+
+        return self.PrependNodePath(path, ref suffix) ?
+            new RefPath(path.ToImmutableArray(), path.Count - suffix.Length) :
+            RefPath.Empty;
+    }
+
+    private static bool PrependNodePath(this IOperation self, List<string> path, ref RefPathSuffix suffix)
     {
         while (true)
         {
@@ -213,26 +223,27 @@ public static class OperationExtensions
                 case ILocalReferenceOperation lr:
                     if (!lr.Local.IsRef)
                     {
-                        path.Insert(0, lr.Local.Name);
+                        path.PrependRefSeg(lr.Local.Name, lr.Local.Type, ref suffix);
                         return true;
                     }
 
-                    var v = lr.FindDeclarator().GetValueProducerRef(out var implicitIndexer);
+                    var d = lr.FindDeclarator();
+                    var v = d.GetValueProducerRef(out var implicitIndexer);
                     if (v == null)
                         return false;
 
                     if (implicitIndexer)
-                        path.Insert(0, RefPath.IndexerName);
+                        path.PrependRefSeg(RefPath.IndexerName, d.Symbol.Type, ref suffix);
 
                     self = v;
                     continue;
 
                 case IParameterReferenceOperation pr:
-                    path.Insert(0, pr.Parameter.Name);
+                    path.PrependRefSeg(pr.Parameter.Name, pr.Parameter.Type, ref suffix);
                     return true;
 
                 case IFieldReferenceOperation f:
-                    path.Insert(0, f.Field.Name);
+                    path.PrependRefSeg(f.Field.Name, f.Field.Type, ref suffix);
 
                     if (f.Instance == null)
                         return true;
@@ -247,7 +258,7 @@ public static class OperationExtensions
 
                     if (m.IsRefListIndexer())
                     {
-                        path.Insert(0, RefPath.IndexerName);
+                        path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref suffix);
                     }
                     else if (!m.IsDynReturnsSelf())
                     {
@@ -261,6 +272,22 @@ public static class OperationExtensions
                     return false;
             }
         }
+    }
+
+    private static void PrependRefSeg(this List<string> self, string seg, ITypeSymbol t, ref RefPathSuffix suffix)
+    {
+        self.Insert(0, seg);
+
+        if (suffix.Finished)
+            return;
+
+        if (t.IsDynSized())
+        {
+            suffix.Finished = true;
+            return;
+        }
+
+        suffix.Length++;
     }
 
     public static TextSpan EstimateLifetimeOf(this IOperation self, IVariableDeclaratorOperation d)
