@@ -57,6 +57,14 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Mutable access to `{0}` can invalidate reference to `{1}`"
     );
 
+    private static readonly DiagnosticDescriptor ArgumentRefDuplicationRule = Rule(
+        DiagnosticSeverity.Error,
+        "Argument Reference Duplication",
+        "Invocation invalidates memory safety guaranties. " +
+        "Passing the same mutable reference to `{0}` breaks memory safety checks inside the method. " +
+        "Consider to pass readonly/`DynNoResize` references to avoid the problem"
+    );
+
     private static readonly DiagnosticDescriptor DebugRule = Rule(
         DiagnosticSeverity.Warning,
         "Debug",
@@ -70,6 +78,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         NonExplicitRefenceRule,
         LocalRefInvalidationRule,
         ArgumentRefInvalidationRule,
+        ArgumentRefDuplicationRule,
         DebugRule
     );
 
@@ -236,8 +245,15 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var a = args[i].RefPath;
             var b = args[j].RefPath;
 
-            if (a.Invalidates(b))
-                ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefInvalidationRule, l, a, b));
+            switch (a.GetRelationTo(b))
+            {
+                case RefRelation.Parent:
+                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefInvalidationRule, l, a, b));
+                    break;
+                case RefRelation.Same:
+                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefDuplicationRule, l, a));
+                    break;
+            }
         }
     }
 }
