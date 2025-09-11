@@ -70,6 +70,11 @@ namespace Ksi.Roslyn
             "Type `{0}` is marked as `NoCopy` and cannot be a generic type"
         );
 
+        private static readonly DiagnosticDescriptor TupleRule = Rule(
+            "Generic NoCopy Type",
+            "Type `{0}` is marked as `NoCopy` and cannot be used in tuples"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             ParameterRule,
             ArgumentRule,
@@ -79,7 +84,8 @@ namespace Ksi.Roslyn
             ReturnRule,
             AssignmentRule,
             PrivateFieldRule,
-            GenericTypeRule
+            GenericTypeRule,
+            TupleRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -105,6 +111,7 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+            context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
         }
 
         private static void AnalyzeParameter(SymbolAnalysisContext ctx)
@@ -247,6 +254,19 @@ namespace Ksi.Roslyn
 
             if (sym.IsGenericType && sym.IsNoCopyType() && !sym.IsRefList())
                 ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeRule, sym.Locations.First(), sym.Name));
+        }
+
+        private static void AnalyzeTuple(OperationAnalysisContext ctx)
+        {
+            var tuple = (ITupleOperation)ctx.Operation;
+            foreach (var e in tuple.Elements)
+            {
+                if (e.Type == null)
+                    continue;
+
+                if (e.Type.IsNoCopyType())
+                    ctx.ReportDiagnostic(Diagnostic.Create(TupleRule, e.Syntax.GetLocation(), e.Type.Name));
+            }
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)
