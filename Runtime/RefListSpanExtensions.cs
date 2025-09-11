@@ -25,19 +25,19 @@ namespace Ksi
         }
 
         [RefListIterator]
-        public static Span<T> AsSpan<T>(this ref RefList<T> self) where T : struct
+        public static Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : struct
         {
             return new Span<T>(self.Buffer, 0, self.Count);
         }
 
         [RefListIterator]
-        public static unsafe Span<T> AsSpan<T>(this ref TempRefList<T> self) where T : unmanaged
+        public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> self) where T : unmanaged
         {
             return new Span<T>(self.Buffer, self.Count);
         }
 
         [RefListIterator]
-        public static unsafe Span<T> AsSpan<T>(this ref NativeRefList<T> self) where T : unmanaged
+        public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref NativeRefList<T> self) where T : unmanaged
         {
             return new Span<T>(self.Buffer, self.Count);
         }
