@@ -46,23 +46,17 @@ public class DynAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
         DiagnosticSeverity.Error,
         "Local Reference Invalidation",
-        "Invocation invalidates memory safety guaranties for the `{0}` reference. " +
-        "Mutable access to `{1}` can invalidate reference to `{2}`"
+        "Passing a mutable reference argument to `{0}` " +
+        "invalidates memory safety guaranties for the local reference `{1}` pointing to `{2}`. " +
+        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
     );
 
-    private static readonly DiagnosticDescriptor ArgumentRefInvalidationRule = Rule(
+    private static readonly DiagnosticDescriptor ArgumentRefAliasingRule = Rule(
         DiagnosticSeverity.Error,
-        "Argument Reference Invalidation",
-        "Invocation invalidates memory safety guaranties. " +
-        "Mutable access to `{0}` can invalidate reference to `{1}`"
-    );
-
-    private static readonly DiagnosticDescriptor ArgumentRefDuplicationRule = Rule(
-        DiagnosticSeverity.Error,
-        "Argument Reference Duplication",
-        "Invocation invalidates memory safety guaranties. " +
-        "Passing the same mutable reference to `{0}` breaks memory safety checks inside the method. " +
-        "Consider to pass readonly/`DynNoResize` references to avoid the problem"
+        "Argument Reference Aliasing",
+        "Passing a mutable reference argument to `{0}` alongside with a reference to `{1}` " +
+        "invalidates memory safety rules within the calling method. " +
+        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
     );
 
     private static readonly DiagnosticDescriptor DebugRule = Rule(
@@ -77,8 +71,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         RedundantRule,
         NonExplicitRefenceRule,
         LocalRefInvalidationRule,
-        ArgumentRefInvalidationRule,
-        ArgumentRefDuplicationRule,
+        ArgumentRefAliasingRule,
         DebugRule
     );
 
@@ -184,7 +177,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
                 var v = a.Value;
                 return (
                     IsMut: p.RefKind == RefKind.Ref && !p.IsDynNoResize(),
-                    RefPath: v.ReferencesDynSizeInstance() ? v.ToRefPath() : RefPath.Empty
+                    RefPath: v.ReferencesDynSizeInstance() ? v.ToRefPath() : RefPath.Empty,
+                    Location: v.Syntax.GetLocation()
                 );
             })
             .Where(t => !t.RefPath.IsEmpty)
@@ -193,11 +187,11 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (args.All(a => !a.IsMut))
             return;
 
-        AnalyzeBreakingRefs(ctx, i, args.Where(t => t.IsMut).Select(t => t.RefPath).ToImmutableArray());
-        AnalyzeArgClashes(ctx, i, args);
+        AnalyzeBreakingRefs(ctx, i, args.Where(t => t.IsMut).Select(t => (t.RefPath, t.Location)).ToImmutableArray());
+        AnalyzeArgAliases(ctx, args);
     }
 
-    private static void AnalyzeBreakingRefs(OperationAnalysisContext ctx, IInvocationOperation op, ImmutableArray<RefPath> args)
+    private static void AnalyzeBreakingRefs(OperationAnalysisContext ctx, IInvocationOperation op, ImmutableArray<(RefPath RefPath, Location Location)> args)
     {
         if (args.Length == 0)
             return;
@@ -219,23 +213,19 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (vars.Length == 0)
             return;
 
-        var l = op.Syntax.GetLocation();
-
-        foreach (var argRefPath in args)
-        foreach (var (refName, refPath, refLifetime) in vars)
+        foreach (var (argRefPath, argLocation) in args)
+        foreach (var (localRefName, localRefPath, localRefLifetime) in vars)
         {
-            if (!refLifetime.IntersectsWith(op.Syntax.Span.End))
+            if (!localRefLifetime.IntersectsWith(op.Syntax.Span.End))
                 continue;
 
-            if (argRefPath.Invalidates(refPath))
-                ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, l, refName, argRefPath, refPath));
+            if (argRefPath.ClashesWithLocalRef(localRefPath))
+                ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, argLocation, argRefPath, localRefName, localRefPath));
         }
     }
 
-    private static void AnalyzeArgClashes(OperationAnalysisContext ctx, IInvocationOperation op, ImmutableArray<(bool IsMut, RefPath RefPath)> args)
+    private static void AnalyzeArgAliases(OperationAnalysisContext ctx, ImmutableArray<(bool IsMut, RefPath RefPath, Location Location)> args)
     {
-        var l = op.Syntax.GetLocation();
-
         for (var i = 0; i < args.Length; i++)
         for (var j = 0; j < args.Length; j++)
         {
@@ -245,18 +235,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var a = args[i].RefPath;
             var b = args[j].RefPath;
 
-            if (!a.PointsToDynSizedInstance)
-                continue;
-
-            switch (a.GetRelationTo(b))
-            {
-                case RefRelation.Parent:
-                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefInvalidationRule, l, a, b));
-                    break;
-                case RefRelation.Same:
-                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefDuplicationRule, l, a));
-                    break;
-            }
+            if (a.ClashesWithAnotherArg(b))
+                ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefAliasingRule, args[i].Location, a, b));
         }
     }
 }

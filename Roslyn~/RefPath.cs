@@ -65,8 +65,21 @@ public static class RefExtensions {
         return RefRelation.Same;
     }
 
-    public static bool Invalidates(in this RefPath self, in RefPath other)
+    public static bool ClashesWithLocalRef(in this RefPath self, in RefPath other)
     {
         return self.PointsToDynSizedInstance && self.GetRelationTo(other) == RefRelation.Parent;
+    }
+
+    public static bool ClashesWithAnotherArg(in this RefPath self, in RefPath other)
+    {
+        return self.GetRelationTo(other) switch
+        {
+            RefRelation.Unrelated => false,
+            RefRelation.Parent => self.PointsToDynSizedInstance,
+            RefRelation.Sibling => false,
+            RefRelation.Same => self.PointsToDynSizedInstance,
+            RefRelation.Child => other.PointsToDynSizedInstance,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
