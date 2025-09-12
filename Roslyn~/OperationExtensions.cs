@@ -60,10 +60,8 @@ public static class OperationExtensions
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsReference() || !m.IsExtensionMethod || !m.ProducesExplicitReference())
-                    {
+                    if (!m.ReturnsExplicitReference())
                         return false;
-                    }
 
                     self = i.Arguments.First().Value;
                     continue;

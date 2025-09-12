@@ -25,11 +25,17 @@ namespace Ksi.Roslyn
 
         public static bool ReturnsReference(this IMethodSymbol self) => self.RefKind != RefKind.None;
 
+        public static bool ReturnsExplicitReference(this IMethodSymbol self)
+        {
+            return self.IsExtensionMethod &&
+                   self.ReturnsReference() &&
+                   self.Is(RefListIndexer, DynReturnsSelf);
+        }
+
         public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(NoCopyReturn);
         public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(NonAllocatedResult);
         public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(RefListIndexer);
         public static bool IsDynReturnsSelf(this IMethodSymbol self) => self.Is(DynReturnsSelf);
-        public static bool ProducesExplicitReference(this IMethodSymbol self) => self.Is(RefListIndexer, DynReturnsSelf);
 
         private static bool Is(this IMethodSymbol self, string attributeName)
         {

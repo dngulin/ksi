@@ -147,7 +147,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
-        if (i.TargetMethod.ProducesExplicitReference())
+        if (i.TargetMethod.ReturnsExplicitReference())
             return;
 
         foreach (var a in i.Arguments)
