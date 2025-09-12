@@ -23,6 +23,8 @@ namespace Ksi.Roslyn
             return true;
         }
 
+        public static bool ReturnsReference(this IMethodSymbol self) => self.RefKind != RefKind.None;
+
         public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(NoCopyReturn);
         public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(NonAllocatedResult);
         public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(RefListIndexer);

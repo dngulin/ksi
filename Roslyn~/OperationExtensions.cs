@@ -60,7 +60,7 @@ public static class OperationExtensions
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsByRef || !m.IsExtensionMethod || !m.ProducesExplicitReference())
+                    if (!m.ReturnsReference() || !m.IsExtensionMethod || !m.ProducesExplicitReference())
                     {
                         return false;
                     }
@@ -106,7 +106,7 @@ public static class OperationExtensions
 
             case IInvocationOperation i:
                 var m = i.TargetMethod;
-                if (!m.ReturnsByRef)
+                if (!m.ReturnsReference())
                     return false;
 
                 if (m.ReturnType.IsDynSized())
@@ -253,7 +253,7 @@ public static class OperationExtensions
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsByRef || !m.IsExtensionMethod)
+                    if (!m.ReturnsReference() || !m.IsExtensionMethod)
                         return false;
 
                     if (m.IsRefListIndexer())
