@@ -39,28 +39,41 @@ namespace Ksi
     {
     }
 
+    /// <summary>
+    /// Attribute to indicate a "dynamically sized" type.
+    /// Should be added to a struct that contains any [DynSized] field.
+    /// Enables reference lifetime and aliasing diagnostics.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public class DynSizedAttribute : Attribute
     {
     }
 
+    /// <summary>
+    /// Attribute that disallows any resizing operations on a [DynSized] type instance.
+    /// Allows getting mutable references to collection items but disallows collection resizing.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public class DynNoResizeAttribute : Attribute
     {
     }
 
+    /// <summary>
+    /// A hint attribute for the reference path analyzer.
+    /// Indicates that the extension method returns `this` parameter.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class DynReturnsSelfAttribute : Attribute
     {
     }
 
+    /// <summary>
+    /// A hint attribute for the reference path analyzer.
+    /// Indicates that the extension method returns a RefList item reference.
+    /// Can be added only for the RefList extension method that returns a RefList's item.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class RefListIndexerAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public class RefListIteratorAttribute : Attribute
     {
     }
 }
