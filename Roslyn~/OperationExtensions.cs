@@ -42,7 +42,7 @@ public static class OperationExtensions
                     : op.Syntax.Span.End < pos));
     }
 
-    public static bool IsExplicitReference(this IOperation self)
+    public static bool ProducesRefPath(this IOperation self)
     {
         while (true)
         {
@@ -60,7 +60,7 @@ public static class OperationExtensions
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsExplicitReference())
+                    if (!m.ReturnsRefPath())
                         return false;
 
                     self = i.Arguments.First().Value;
@@ -258,7 +258,7 @@ public static class OperationExtensions
                     {
                         path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref suffix);
                     }
-                    else if (!m.IsDynReturnsSelf())
+                    else if (!m.IsRefPathSkip())
                     {
                         return false;
                     }

@@ -37,10 +37,10 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Structure `{0}` is marked with the `DynSized` attribute but doesn't have any `DynSized` fields"
     );
 
-    private static readonly DiagnosticDescriptor NonExplicitRefenceRule = Rule(
+    private static readonly DiagnosticDescriptor NonRefPathRefenceRule = Rule(
         DiagnosticSeverity.Error,
-        "Non-Explicit reference to DynSized data",
-        "Non-Explicit reference to DynSized data breaks reference lifetime analysis"
+        "Non RefPath reference to DynSized data",
+        "Non RefPath reference to DynSized data breaks reference lifetime analysis"
     );
 
     private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
@@ -69,7 +69,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         FieldRule,
         RedundantRule,
         RedundantRule,
-        NonExplicitRefenceRule,
+        NonRefPathRefenceRule,
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
         DebugRule
@@ -137,17 +137,14 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
     {
-        if (!op.ReferencesDynSizeInstance())
-            return;
-
-        if (!op.IsExplicitReference())
-            ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, op.Syntax.GetLocation()));
+        if (op.ReferencesDynSizeInstance() && !op.ProducesRefPath())
+            ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, op.Syntax.GetLocation()));
     }
 
     private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
-        if (i.TargetMethod.ReturnsExplicitReference())
+        if (i.TargetMethod.ReturnsRefPath())
             return;
 
         foreach (var a in i.Arguments)
@@ -157,11 +154,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
                 continue;
 
             var v = a.Value;
-            if (!v.ReferencesDynSizeInstance(false))
-                continue;
-
-            if (!v.IsExplicitReference())
-                ctx.ReportDiagnostic(Diagnostic.Create(NonExplicitRefenceRule, v.Syntax.GetLocation()));
+            if (v.ReferencesDynSizeInstance(false) && !v.ProducesRefPath())
+                ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, v.Syntax.GetLocation()));
         }
     }
 

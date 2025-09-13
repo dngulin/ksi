@@ -45,7 +45,7 @@ namespace Ksi
 
         public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
-        [NonAllocatedResult, DynReturnsSelf]
+        [NonAllocatedResult, RefPathSkip]
         public static ref {0}<T> Deallocated<T>(this ref {0}<T> self) where T : {1}
         {{
             self.Dealloc();

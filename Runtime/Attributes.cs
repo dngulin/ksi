@@ -60,10 +60,19 @@ namespace Ksi
 
     /// <summary>
     /// A hint attribute for the reference path analyzer.
+    /// Indicates that the extension method returns any inner reference of `this` parameter.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class RefPathItemAttribute : Attribute
+    {
+    }
+
+    /// <summary>
+    /// A hint attribute for the reference path analyzer.
     /// Indicates that the extension method returns `this` parameter.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class DynReturnsSelfAttribute : Attribute
+    public class RefPathSkipAttribute : Attribute
     {
     }
 
