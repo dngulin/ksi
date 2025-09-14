@@ -133,7 +133,7 @@ public static class RefExtensions {
                 return self.ExplicitLength <= self.DynSizedLength || other.ExplicitLength <= other.DynSizedLength;
 
             case RefRelation.Child:
-                return self.PointsToDynSized || self.HasResizableItemsSince(other.ExplicitLength);
+                return self.PointsToDynSized;
 
             default:
                 throw new ArgumentOutOfRangeException();
