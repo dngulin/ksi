@@ -213,7 +213,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             if (!localRefLifetime.IntersectsWith(op.Syntax.Span.End))
                 continue;
 
-            if (argRefPath.ClashesWithLocalRef(localRefPath))
+            if (argRefPath.CanBeUsedToInvalidate(localRefPath))
                 ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, argLocation, argRefPath, localRefName, localRefPath));
         }
     }
@@ -229,7 +229,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var a = args[i].RefPath;
             var b = args[j].RefPath;
 
-            if (a.ClashesWithAnotherArg(b))
+            if (a.CanAlisWith(b))
                 ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefAliasingRule, args[i].Location, a, b));
         }
     }

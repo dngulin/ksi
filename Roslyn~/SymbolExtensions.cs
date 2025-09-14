@@ -29,7 +29,7 @@ namespace Ksi.Roslyn
         {
             return self.IsExtensionMethod &&
                    self.ReturnsReference() &&
-                   self.Is(RefListIndexer, RefPathSkip);
+                   self.Is(RefListIndexer, RefPathItem, RefPathSkip);
         }
 
         public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(NoCopyReturn);
@@ -43,9 +43,9 @@ namespace Ksi.Roslyn
             return self.GetAttributes().Any(a => a.Is(attributeName));
         }
 
-        private static bool Is(this IMethodSymbol self, string a1, string a2)
+        private static bool Is(this IMethodSymbol self, string a1, string a2, string a3)
         {
-            return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2));
+            return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2) || a.Is(a3));
         }
 
         public static bool IsNoCopyType(this ITypeSymbol self) => self.Is(NoCopy);

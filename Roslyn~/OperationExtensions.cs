@@ -72,7 +72,7 @@ public static class OperationExtensions
         }
     }
 
-    public static bool ReferencesDynSizeInstance(this IOperation self, bool analyzeArguments = true)
+    public static bool ReferencesDynSizeInstance(this IOperation self, bool fullGraph = true)
     {
         switch (self)
         {
@@ -85,7 +85,7 @@ public static class OperationExtensions
 
                 var v = lr.FindDeclarator().GetValueProducerRef(out _);
                 if (v != null)
-                    return v.ReferencesDynSizeInstance(analyzeArguments);
+                    return v.ReferencesDynSizeInstance(fullGraph);
 
                 return false;
 
@@ -98,7 +98,7 @@ public static class OperationExtensions
                     return true;
 
                 if (f.Instance != null)
-                    return f.Instance.ReferencesDynSizeInstance(analyzeArguments);
+                    return f.Instance.ReferencesDynSizeInstance(fullGraph);
 
                 return false;
 
@@ -111,11 +111,12 @@ public static class OperationExtensions
                     return true;
 
                 if (m.Parameters.Where(p => p.RefKind != RefKind.None).Any(p => p.Type.IsDynSized()))
-                {
                     return true;
-                }
 
-                if (!analyzeArguments)
+                if (m.ReturnsRefPath())
+                    return i.Arguments.First().Value.ReferencesDynSizeInstance();
+
+                if (!fullGraph)
                     return false;
 
                 return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
@@ -257,6 +258,10 @@ public static class OperationExtensions
                     if (m.IsRefListIndexer())
                     {
                         path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref suffix);
+                    }
+                    else if (m.IsRefPathItem())
+                    {
+                        path.PrependRefSeg(m.Name + RefPath.ItemSuffix, m.ReturnType, ref suffix);
                     }
                     else if (!m.IsRefPathSkip())
                     {
