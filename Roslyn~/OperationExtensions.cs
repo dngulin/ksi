@@ -19,19 +19,6 @@ public static class OperationExtensions
         return null;
     }
 
-    public static IEnumerable<IArgumentOperation> GetMutableDynSizedArgs(this IInvocationOperation invocation)
-    {
-        return invocation.Arguments
-            .Where(a =>
-            {
-                var p = a.Parameter;
-                if (p is null || p.RefKind != RefKind.Ref || p.IsDynNoResize())
-                    return false;
-
-                return p.Type.IsDynSized();
-            });
-    }
-
     public static IEnumerable<IVariableDeclaratorOperation> FindLocalRefDeclaratorsBeforePos(this IOperation self, int pos)
     {
         return self.Descendants()
