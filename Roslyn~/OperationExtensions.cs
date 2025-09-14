@@ -74,55 +74,69 @@ public static class OperationExtensions
 
     public static bool ReferencesDynSizeInstance(this IOperation self, bool fullGraph = true)
     {
-        switch (self)
+        while (true)
         {
-            case ILocalReferenceOperation lr:
-                if (lr.Local.Type.IsDynSized())
-                    return true;
+            switch (self)
+            {
+                case ILocalReferenceOperation lr:
+                    if (lr.Local.Type.IsDynSized())
+                        return true;
 
-                if (!lr.Local.IsRef)
+                    if (!lr.Local.IsRef)
+                        return false;
+
+                    var v = lr.FindDeclarator().GetValueProducerRef(out _);
+                    if (v != null)
+                    {
+                        self = v;
+                        continue;
+                    }
+
                     return false;
 
-                var v = lr.FindDeclarator().GetValueProducerRef(out _);
-                if (v != null)
-                    return v.ReferencesDynSizeInstance(fullGraph);
 
-                return false;
+                case IParameterReferenceOperation pr:
+                    return pr.Parameter.RefKind != RefKind.None && pr.Parameter.Type.IsDynSized();
 
+                case IFieldReferenceOperation f:
+                    if (f.Type != null && f.Type.IsDynSized()) return true;
 
-            case IParameterReferenceOperation pr:
-                return pr.Parameter.RefKind != RefKind.None && pr.Parameter.Type.IsDynSized();
+                    if (f.Instance != null)
+                    {
+                        self = f.Instance;
+                        continue;
+                    }
 
-            case IFieldReferenceOperation f:
-                if (f.Type != null && f.Type.IsDynSized())
-                    return true;
-
-                if (f.Instance != null)
-                    return f.Instance.ReferencesDynSizeInstance(fullGraph);
-
-                return false;
-
-            case IInvocationOperation i:
-                var m = i.TargetMethod;
-                if (!m.ReturnsReference())
                     return false;
 
-                if (m.ReturnType.IsDynSized())
-                    return true;
+                case IInvocationOperation i:
+                    var m = i.TargetMethod;
+                    if (!m.ReturnsReference())
+                        return false;
 
-                if (m.Parameters.Where(p => p.RefKind != RefKind.None).Any(p => p.Type.IsDynSized()))
-                    return true;
+                    if (m.ReturnType.IsDynSized())
+                        return true;
 
-                if (m.ReturnsRefPath())
-                    return i.Arguments.First().Value.ReferencesDynSizeInstance();
+                    if (m.Parameters.Where(p => p.RefKind != RefKind.None).Any(p => p.Type.IsDynSized()))
+                        return true;
 
-                if (!fullGraph)
+                    if (m.ReturnsRefPath())
+                    {
+                        self = i.Arguments.First().Value;
+                        fullGraph = true;
+                        continue;
+                    }
+
+                    if (!fullGraph)
+                        return false;
+
+                    return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
+
+                default:
                     return false;
+            }
 
-                return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
-
-            default:
-                return false;
+            break;
         }
     }
 
