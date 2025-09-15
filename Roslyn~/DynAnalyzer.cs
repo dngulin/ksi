@@ -67,9 +67,9 @@ public class DynAnalyzer : DiagnosticAnalyzer
     );
 
     private static readonly DiagnosticDescriptor DynNoResizeAnnotationRule = Rule(
-        DiagnosticSeverity.Error,
-        "Invalid DynNoResize Annotation",
-        "DynNoResize parameter should be added to a DynSized parameter received by `ref`."
+        DiagnosticSeverity.Warning,
+        "Redundant DynNoResize Annotation",
+        "DynNoResize attribute is added to non-compatible parameter and has no effect."
     );
 
     private static readonly DiagnosticDescriptor DebugRule = Rule(
@@ -80,7 +80,6 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         FieldRule,
-        RedundantRule,
         RedundantRule,
         NonRefPathRefenceRule,
         LocalRefInvalidationRule,
@@ -103,6 +102,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
+        context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -287,6 +287,20 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var root = refPath.Path[0];
             if (noResizeParams.Contains(root))
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeRule, location, refPath));
+        }
+    }
+
+    private static void AnalyzeMethod(SymbolAnalysisContext ctx)
+    {
+        var m = (IMethodSymbol)ctx.Symbol;
+
+        foreach (var p in m.Parameters)
+        {
+            if (!p.IsDynNoResize())
+                continue;
+
+            if (p.RefKind != RefKind.Ref || !p.Type.IsDynSized())
+                ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeAnnotationRule, p.Locations.First()));
         }
     }
 }
