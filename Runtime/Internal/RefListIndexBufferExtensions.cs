@@ -11,7 +11,7 @@ namespace Ksi
         }
 
         [RefListIndexer]
-        public static ref T IndexBufferMut<T>(this ref RefList<T> self, int index) where T : struct
+        public static ref T IndexBufferMut<T>([DynNoResize] this ref RefList<T> self, int index) where T : struct
         {
             return ref self.Buffer[index];
         }
@@ -23,7 +23,7 @@ namespace Ksi
         }
 
         [RefListIndexer]
-        public static unsafe ref T IndexBufferMut<T>(this ref TempRefList<T> self, int index) where T : unmanaged
+        public static unsafe ref T IndexBufferMut<T>([DynNoResize] this ref TempRefList<T> self, int index) where T : unmanaged
         {
             return ref self.Buffer[index];
         }
@@ -35,7 +35,7 @@ namespace Ksi
         }
 
         [RefListIndexer]
-        public static unsafe ref T IndexBufferMut<T>(this ref NativeRefList<T> self, int index) where T : unmanaged
+        public static unsafe ref T IndexBufferMut<T>([DynNoResize] this ref NativeRefList<T> self, int index) where T : unmanaged
         {
             return ref self.Buffer[index];
         }

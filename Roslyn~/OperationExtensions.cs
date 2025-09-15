@@ -317,7 +317,7 @@ public static class OperationExtensions
         return lifetime;
     }
 
-    public static IMethodSymbol? GetMethod(this IReturnOperation self, CancellationToken ct)
+    public static IMethodSymbol? GetEnclosingMethod(this IOperation self, CancellationToken ct)
     {
         var model = self.SemanticModel;
 

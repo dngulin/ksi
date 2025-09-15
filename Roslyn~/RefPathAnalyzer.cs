@@ -87,7 +87,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         if (v == null || v.Type == null || v.Type.IsReferenceType)
             return;
 
-        var m = r.GetMethod(ctx.CancellationToken);
+        var m = r.GetEnclosingMethod(ctx.CancellationToken);
         if (m == null)
             return;
 

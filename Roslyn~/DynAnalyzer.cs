@@ -59,6 +59,19 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
     );
 
+    private static readonly DiagnosticDescriptor DynNoResizeRule = Rule(
+        DiagnosticSeverity.Error,
+        "DynNoResize Violation",
+        "Passing as an argument a mutable reference to `{0}` that is derived from the `DynNoResize` parameter. " +
+        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
+    );
+
+    private static readonly DiagnosticDescriptor DynNoResizeAnnotationRule = Rule(
+        DiagnosticSeverity.Error,
+        "Invalid DynNoResize Annotation",
+        "DynNoResize parameter should be added to a DynSized parameter received by `ref`."
+    );
+
     private static readonly DiagnosticDescriptor DebugRule = Rule(
         DiagnosticSeverity.Warning,
         "Debug",
@@ -72,6 +85,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
         NonRefPathRefenceRule,
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
+        DynNoResizeRule,
+        DynNoResizeAnnotationRule,
         DebugRule
     );
 
@@ -87,6 +102,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -231,6 +247,46 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
             if (a.CanAlisWith(b))
                 ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRefAliasingRule, args[i].Location, a, b));
+        }
+    }
+
+    private static void AnalyzeDynNoResizeArgs(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+
+        var resizableDynArgs = i.Arguments
+            .Where(a =>
+            {
+                var p = a.Parameter;
+                if (p is not { RefKind: RefKind.Ref })
+                    return false;
+
+                return p.Type.IsDynSized() && !p.IsDynNoResize();
+            })
+            .Select(a => (RefPath: a.Value.ToRefPath(), Arg: a.Syntax.GetLocation()))
+            .Where(x => !x.RefPath.IsEmpty)
+            .ToImmutableArray();
+
+        if (resizableDynArgs.IsEmpty)
+            return;
+
+        var m = i.GetEnclosingMethod(ctx.CancellationToken);
+        if (m == null)
+            return;
+
+        var noResizeParams = m.Parameters
+            .Where(p => p is { RefKind: RefKind.Ref } && p.Type.IsDynSized() && p.IsDynNoResize())
+            .Select(p => p.Name)
+            .ToImmutableArray();
+
+        if (noResizeParams.IsEmpty)
+            return;
+
+        foreach (var (refPath, location) in resizableDynArgs)
+        {
+            var root = refPath.Path[0];
+            if (noResizeParams.Contains(root))
+                ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeRule, location, refPath));
         }
     }
 }
