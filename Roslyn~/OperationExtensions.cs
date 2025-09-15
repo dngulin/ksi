@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
@@ -314,5 +315,17 @@ public static class OperationExtensions
         }
 
         return lifetime;
+    }
+
+    public static IMethodSymbol? GetMethod(this IReturnOperation self, CancellationToken ct)
+    {
+        var model = self.SemanticModel;
+
+        var enclosing = model?.GetEnclosingSymbol(self.Syntax.SpanStart, ct);
+        if (enclosing is IMethodSymbol method)
+            return method;
+
+        return null;
+
     }
 }
