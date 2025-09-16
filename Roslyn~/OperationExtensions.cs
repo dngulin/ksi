@@ -58,7 +58,7 @@ public static class OperationExtensions
                             new TextSpan(newValue.Syntax.Span.End, v.Lifetime.End) :
                             new TextSpan(newValue.Syntax.Span.End, 0);
 
-                        var info = new RefVarInfo(v.Info.Symbol, v.Info.Kind, newValue);
+                        var info = new RefVarInfo(v.Info.Symbol, RefVarKind.LocalSymbolRef, newValue);
                         variables[r.Local.Name] = (info, newLifeTime);
                     }
                     else if (!isIterItem)
