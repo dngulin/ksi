@@ -211,24 +211,19 @@ public class DynAnalyzer : DiagnosticAnalyzer
             return;
 
         var vars = body
-            .FindLocalRefDeclaratorsBeforePos(op.Syntax.SpanStart)
-            .Select(d => d.GetRefVarInfo())
-            .SelectNonNull()
+            .FindLocalRefsWitsLifetimeIntersectingPos(op.Syntax.SpanStart)
             .Where(v => v.ReferencesDynSizeInstance())
-            .Select(v => (v.Declarator, RefPath: v.GetRefPath()))
+            .Select(v => (v.Symbol, RefPath: v.GetRefPath()))
             .Where(t => !t.RefPath.IsEmpty)
-            .Select(t => (t.Declarator.Symbol.Name, t.RefPath, Lifetime: body.EstimateLifetimeOf(t.Declarator)))
+            .Select(t => (t.Symbol.Name, t.RefPath))
             .ToImmutableArray();
 
         if (vars.Length == 0)
             return;
 
         foreach (var (argRefPath, argLocation) in args)
-        foreach (var (localRefName, localRefPath, localRefLifetime) in vars)
+        foreach (var (localRefName, localRefPath) in vars)
         {
-            if (!localRefLifetime.IntersectsWith(op.Syntax.Span.End))
-                continue;
-
             if (argRefPath.CanBeUsedToInvalidate(localRefPath))
                 ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, argLocation, argRefPath, localRefName, localRefPath));
         }

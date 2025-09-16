@@ -1,11 +1,10 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace Ksi.Roslyn;
 
-public readonly struct RefVarInfo(IVariableDeclaratorOperation declarator, RefVarKind kind, IOperation producer)
+public readonly struct RefVarInfo(ILocalSymbol symbol, RefVarKind kind, IOperation producer)
 {
-    public readonly IVariableDeclaratorOperation Declarator = declarator;
+    public readonly ILocalSymbol Symbol = symbol;
     public readonly RefVarKind Kind = kind;
     public readonly IOperation Producer = producer;
 }
@@ -33,7 +32,7 @@ public static class RefVarInfoExtensions
     public static RefPath GetRefPath(this in RefVarInfo self)
     {
         var p = self.Producer;
-        var t = self.Declarator.Symbol.Type;
+        var t = self.Symbol.Type;
 
         return self.Kind switch
         {

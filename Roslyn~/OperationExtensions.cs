@@ -20,14 +20,109 @@ public static class OperationExtensions
         return null;
     }
 
-    public static IEnumerable<IVariableDeclaratorOperation> FindLocalRefDeclaratorsBeforePos(this IOperation self, int pos)
+    public static IEnumerable<RefVarInfo> FindLocalRefsWitsLifetimeIntersectingPos(this IOperation self, int pos)
     {
-        return self.Descendants()
-            .OfType<IVariableDeclaratorOperation>()
-            .Where(op =>
-                op.Symbol.IsRef && (op.Initializer != null
-                    ? op.Initializer.Syntax.Span.End < pos
-                    : op.Syntax.Span.End < pos));
+        var variables = new Dictionary<string, (RefVarInfo Info, TextSpan Lifetime)>(17);
+
+        foreach (var op in self.Descendants())
+        {
+            switch (op)
+            {
+                case IVariableDeclaratorOperation d:
+                    if (!d.Symbol.IsRef || d.Syntax.Span.End > pos)
+                        continue;
+
+                    variables[d.Symbol.Name] = d.GetVarInfoWithLifetime();
+                    break;
+
+                case ILocalReferenceOperation r:
+                    if (!variables.TryGetValue(r.Local.Name, out var v))
+                        continue;
+
+                    var isIterItem = v.Info.Kind == RefVarKind.IteratorItemRef;
+
+                    if (r.IsReassignedRef(out var newValue) && newValue != null)
+                    {
+                        var oldLifeTime = isIterItem ?
+                            TextSpan.FromBounds(v.Lifetime.Start, newValue.Syntax.Span.End) :
+                            v.Lifetime;
+
+                        if (oldLifeTime.IntersectsWith(pos))
+                        {
+                            variables.Remove(r.Local.Name);
+                            yield return v.Info;
+                            continue;
+                        }
+
+                        var newLifeTime = isIterItem ?
+                            new TextSpan(newValue.Syntax.Span.End, v.Lifetime.End) :
+                            new TextSpan(newValue.Syntax.Span.End, 0);
+
+                        var info = new RefVarInfo(v.Info.Symbol, v.Info.Kind, newValue);
+                        variables[r.Local.Name] = (info, newLifeTime);
+                    }
+                    else if (!isIterItem)
+                    {
+                        var extendedLifetime = TextSpan.FromBounds(v.Lifetime.Start, r.Syntax.Span.End);
+                        if (extendedLifetime.IntersectsWith(pos))
+                        {
+                            variables.Remove(r.Local.Name);
+                            yield return v.Info;
+                            continue;
+                        }
+
+                        variables[r.Local.Name] = (v.Info, extendedLifetime);
+                    }
+                    break;
+            }
+        }
+
+        foreach (var (varInfo, lifetime) in variables.Values)
+        {
+            if (lifetime.IntersectsWith(pos))
+                yield return varInfo;
+        }
+    }
+
+    private static (RefVarInfo Info, TextSpan Lifetime) GetVarInfoWithLifetime(this IVariableDeclaratorOperation d)
+    {
+        if (d.Parent is IForEachLoopOperation l)
+        {
+            var producer = l.Collection.WithoutConversionOp();
+            var iterInfo = new RefVarInfo(d.Symbol, RefVarKind.IteratorItemRef, producer);
+            return (iterInfo, l.Body.Syntax.Span);
+        }
+
+        var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!);
+        var lifetime = new TextSpan(d.Initializer!.Syntax.SpanStart, 0);
+
+        return (varInfo, lifetime);
+    }
+
+    private static bool IsReassignedRef(this ILocalReferenceOperation self, out IOperation? value)
+    {
+        if (self.Parent.IsRefAssignmentOf(self.Local, out value))
+            return true;
+
+        value = null;
+        return false;
+    }
+
+    private static bool IsRefAssignmentOf(this IOperation? self, ILocalSymbol local, out IOperation? value)
+    {
+        value = null;
+
+        if (self is not ISimpleAssignmentOperation { IsRef: true } a)
+            return false;
+
+        if (a.Target is not ILocalReferenceOperation r)
+            return false;
+
+        if (r.Local.Name != local.Name)
+            return false;
+
+        value = a.Value;
+        return true;
     }
 
     public static bool ProducesRefPath(this IOperation self)
@@ -73,10 +168,10 @@ public static class OperationExtensions
                     if (!lr.Local.IsRef)
                         return false;
 
-                    var v = lr.FindDeclarator().GetValueProducerRef(out _);
-                    if (v != null)
+                    var optVar = lr.FindRefVar();
+                    if (optVar != null)
                     {
-                        self = v;
+                        self = optVar.Value.Producer;
                         continue;
                     }
 
@@ -123,32 +218,44 @@ public static class OperationExtensions
                 default:
                     return false;
             }
-
-            break;
         }
     }
 
-    public static IVariableDeclaratorOperation FindDeclarator(this ILocalReferenceOperation self)
+    public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
     {
         return self
             .GetEnclosingBody()
             .Descendants()
-            .OfType<IVariableDeclaratorOperation>()
-            .First(d => SymbolEqualityComparer.Default.Equals(d.Symbol, self.Local));
-    }
+            .Select(op =>
+            {
+                if (op.Syntax.SpanStart >= self.Syntax.SpanStart)
+                    return null;
 
-    public static RefVarInfo? GetRefVarInfo(this IVariableDeclaratorOperation self)
-    {
-        if (!self.Symbol.IsRef)
-            return null;
+                switch (op)
+                {
+                    case IVariableDeclaratorOperation d:
+                        if (d.Symbol.Name != self.Local.Name)
+                            return null;
 
-        if (self.Initializer != null)
-            return new RefVarInfo(self, RefVarKind.LocalSymbolRef, self.Initializer.Value);
+                        var p = d.GetValueProducerRef(out var isRefIter);
+                        if (p == null)
+                            return null;
 
-        if (self.Parent is IForEachLoopOperation loop)
-            return new RefVarInfo(self, RefVarKind.IteratorItemRef, loop.Collection.WithoutConversionOp());
+                        var k = isRefIter ? RefVarKind.IteratorItemRef : RefVarKind.LocalSymbolRef;
+                        return new RefVarInfo(d.Symbol, k, p);
 
-        return null;
+                    case ISimpleAssignmentOperation { IsRef: true, Target: ILocalReferenceOperation r } a:
+                        if (r.Local.Name != self.Local.Name)
+                            return null;
+
+                        return new RefVarInfo(r.Local, RefVarKind.LocalSymbolRef, a.Value);
+
+                    default:
+                        return null as RefVarInfo?;
+                }
+            })
+            .LastOrDefault(v => v != null);
+
     }
 
     private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self, out bool isRefIterator)
@@ -228,15 +335,14 @@ public static class OperationExtensions
                         return true;
                     }
 
-                    var d = lr.FindDeclarator();
-                    var v = d.GetValueProducerRef(out var implicitIndexer);
-                    if (v == null)
+                    var optVar = lr.FindRefVar();
+                    if (optVar == null)
                         return false;
 
-                    if (implicitIndexer)
-                        path.PrependRefSeg(RefPath.IndexerName, d.Symbol.Type, ref suffix);
+                    if (optVar.Value.Kind == RefVarKind.IteratorItemRef)
+                        path.PrependRefSeg(RefPath.IndexerName, optVar.Value.Symbol.Type, ref suffix);
 
-                    self = v;
+                    self = optVar.Value.Producer;
                     continue;
 
                 case IParameterReferenceOperation pr:
@@ -293,28 +399,6 @@ public static class OperationExtensions
         }
 
         suffix.Length++;
-    }
-
-    public static TextSpan EstimateLifetimeOf(this IOperation self, IVariableDeclaratorOperation d)
-    {
-        if (d.Parent is IForEachLoopOperation l)
-        {
-            return l.Body.Syntax.Span;
-        }
-
-        var lifetime = d.Syntax.Span;
-
-        foreach (var op in self.Descendants().OfType<ILocalReferenceOperation>())
-        {
-            if (op.Local.Name != d.Symbol.Name)
-                continue;
-
-            var span = op.Syntax.Span;
-            if (span.End > lifetime.End)
-                lifetime = TextSpan.FromBounds(lifetime.Start, span.End);
-        }
-
-        return lifetime;
     }
 
     public static IMethodSymbol? GetEnclosingMethod(this IOperation self, CancellationToken ct)
