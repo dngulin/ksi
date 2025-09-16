@@ -93,7 +93,7 @@ public static class OperationExtensions
             return (iterInfo, l.Body.Syntax.Span);
         }
 
-        var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!);
+        var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!.Value);
         var lifetime = new TextSpan(d.Initializer!.Syntax.SpanStart, 0);
 
         return (varInfo, lifetime);
