@@ -71,7 +71,7 @@ namespace Ksi.Roslyn
         );
 
         private static readonly DiagnosticDescriptor TupleRule = Rule(
-            "Generic NoCopy Type",
+            "NoCopy Type Within Tuple",
             "Type `{0}` is marked as `NoCopy` and cannot be used in tuples"
         );
 

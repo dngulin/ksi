@@ -72,12 +72,6 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "DynNoResize attribute is added to non-compatible parameter and has no effect."
     );
 
-    private static readonly DiagnosticDescriptor DebugRule = Rule(
-        DiagnosticSeverity.Warning,
-        "Debug",
-        "{0}"
-    );
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         FieldRule,
         RedundantRule,
@@ -85,8 +79,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
         DynNoResizeRule,
-        DynNoResizeAnnotationRule,
-        DebugRule
+        DynNoResizeAnnotationRule
     );
 
     public override void Initialize(AnalysisContext context)
