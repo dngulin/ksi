@@ -221,15 +221,15 @@ public static class OperationExtensions
         }
     }
 
-    public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
+    private static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
     {
         return self
             .GetEnclosingBody()
             .Descendants()
             .Select(op =>
             {
-                if (op.Syntax.SpanStart >= self.Syntax.SpanStart)
-                    return null;
+                if (op.Syntax.Span.End >= self.Syntax.SpanStart)
+                    return null as RefVarInfo?;
 
                 switch (op)
                 {
@@ -237,12 +237,11 @@ public static class OperationExtensions
                         if (d.Symbol.Name != self.Local.Name)
                             return null;
 
-                        var p = d.GetValueProducerRef(out var isRefIter);
+                        var p = d.GetValueProducerRef(out var varKind);
                         if (p == null)
                             return null;
 
-                        var k = isRefIter ? RefVarKind.IteratorItemRef : RefVarKind.LocalSymbolRef;
-                        return new RefVarInfo(d.Symbol, k, p);
+                        return new RefVarInfo(d.Symbol, varKind, p);
 
                     case ISimpleAssignmentOperation { IsRef: true, Target: ILocalReferenceOperation r } a:
                         if (r.Local.Name != self.Local.Name)
@@ -251,23 +250,23 @@ public static class OperationExtensions
                         return new RefVarInfo(r.Local, RefVarKind.LocalSymbolRef, a.Value);
 
                     default:
-                        return null as RefVarInfo?;
+                        return null;
                 }
             })
             .LastOrDefault(v => v != null);
 
     }
 
-    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self, out bool isRefIterator)
+    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self, out RefVarKind kind)
     {
-        isRefIterator = false;
+        kind = RefVarKind.LocalSymbolRef;
 
         if (self.Initializer != null)
             return self.Initializer.Value;
 
         if (self.Parent is IForEachLoopOperation l && l.Collection.WithoutConversionOp().IsRefListIterator(out var op))
         {
-            isRefIterator = true;
+            kind = RefVarKind.IteratorItemRef;
             return op;
         }
 
