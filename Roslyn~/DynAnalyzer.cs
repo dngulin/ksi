@@ -114,13 +114,13 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (sym == null || !sym.IsDynSized())
             return;
 
-        var hasDeallocFields = sym
+        var hasDynSizedFields = sym
             .GetMembers()
             .Where(m => m.Kind == SymbolKind.Field)
             .Cast<IFieldSymbol>()
             .Any(field => !field.IsStatic && field.Type.IsDynSized());
 
-        if (!hasDeallocFields)
+        if (!hasDynSizedFields)
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
     }
 
