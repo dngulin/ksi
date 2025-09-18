@@ -29,10 +29,14 @@ public static class OperationExtensions
             switch (op)
             {
                 case IVariableDeclaratorOperation d:
-                    if (!d.Symbol.IsRef || d.Syntax.Span.End > pos)
+                    if (!d.Symbol.IsRefOrWrappedRef() || d.Syntax.Span.End > pos)
                         continue;
 
-                    variables[d.Symbol.Name] = d.GetVarInfoWithLifetime();
+                    var optVar = d.GetVarInfoWithLifetime();
+                    if (optVar == null)
+                        continue;
+
+                    variables[d.Symbol.Name] = optVar.Value;
                     break;
 
                 case ILocalReferenceOperation r:
@@ -41,7 +45,7 @@ public static class OperationExtensions
 
                     var isIterItem = v.Info.Kind == RefVarKind.IteratorItemRef;
 
-                    if (r.IsReassignedRef(out var newValue) && newValue != null)
+                    if (r.IsReassigned(out var newValue) && newValue != null)
                     {
                         var oldLifeTime = isIterItem ?
                             TextSpan.FromBounds(v.Lifetime.Start, newValue.Syntax.Span.End) :
@@ -84,8 +88,16 @@ public static class OperationExtensions
         }
     }
 
-    private static (RefVarInfo Info, TextSpan Lifetime) GetVarInfoWithLifetime(this IVariableDeclaratorOperation d)
+    private static (RefVarInfo Info, TextSpan Lifetime)? GetVarInfoWithLifetime(this IVariableDeclaratorOperation d)
     {
+        if (d.Initializer != null)
+        {
+            var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!.Value);
+            var lifetime = new TextSpan(d.Initializer!.Syntax.SpanStart, 0);
+
+            return (varInfo, lifetime);
+        }
+
         if (d.Parent is IForEachLoopOperation l)
         {
             var producer = l.Collection.WithoutConversionOp();
@@ -93,32 +105,26 @@ public static class OperationExtensions
             return (iterInfo, l.Body.Syntax.Span);
         }
 
-        var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!.Value);
-        var lifetime = new TextSpan(d.Initializer!.Syntax.SpanStart, 0);
-
-        return (varInfo, lifetime);
+        return null;
     }
 
-    private static bool IsReassignedRef(this ILocalReferenceOperation self, out IOperation? value)
+    private static bool IsReassigned(this ILocalReferenceOperation self, out IOperation? value)
     {
-        if (self.Parent.IsRefAssignmentOf(self.Local, out value))
+        if (self.Parent.IsAssignmentOf(self.Local, out value))
             return true;
 
         value = null;
         return false;
     }
 
-    private static bool IsRefAssignmentOf(this IOperation? self, ILocalSymbol local, out IOperation? value)
+    private static bool IsAssignmentOf(this IOperation? self, ILocalSymbol local, out IOperation? value)
     {
         value = null;
 
-        if (self is not ISimpleAssignmentOperation { IsRef: true } a)
+        if (self is not ISimpleAssignmentOperation { Target: ILocalReferenceOperation r } a)
             return false;
 
-        if (a.Target is not ILocalReferenceOperation r)
-            return false;
-
-        if (r.Local.Name != local.Name)
+        if (!a.AssignsRefOrRefLike(r) || r.Local.Name != local.Name)
             return false;
 
         value = a.Value;
@@ -131,15 +137,37 @@ public static class OperationExtensions
         {
             switch (self)
             {
-                case ILocalReferenceOperation:
+                case ILocalReferenceOperation lr:
+                    if (lr.Local.IsRefOrWrappedRef())
+                    {
+                        var optVar = lr.FindRefVar();
+                        if (optVar != null)
+                        {
+                            self = optVar.Value.Producer;
+                            continue;
+                        }
+
+                        return false;
+                    }
+
+                    return true;
+
                 case IParameterReferenceOperation:
                     return true;
 
                 case IFieldReferenceOperation f:
-                    if (f.Instance == null) return true;
+                    if (f.Instance == null) return true; // TODO: verify
 
                     self = f.Instance;
                     continue;
+
+                case IPropertyReferenceOperation pr:
+                    if (pr.IsSpanIndexer())
+                    {
+                        self = pr.Instance!;
+                        continue;
+                    }
+                    return false;
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
@@ -165,7 +193,7 @@ public static class OperationExtensions
                     if (lr.Local.Type.IsDynSized())
                         return true;
 
-                    if (!lr.Local.IsRef)
+                    if (!lr.Local.IsRefOrWrappedRef())
                         return false;
 
                     var optVar = lr.FindRefVar();
@@ -179,7 +207,7 @@ public static class OperationExtensions
 
 
                 case IParameterReferenceOperation pr:
-                    return pr.Parameter.RefKind != RefKind.None && pr.Parameter.Type.IsDynSized();
+                    return pr.Parameter.IsRefOrWrappedRef() && pr.Parameter.Type.IsDynSized();
 
                 case IFieldReferenceOperation f:
                     if (f.Type != null && f.Type.IsDynSized()) return true;
@@ -192,21 +220,35 @@ public static class OperationExtensions
 
                     return false;
 
+                case IPropertyReferenceOperation pr:
+                    if (pr.IsSpanIndexer())
+                    {
+                        self = pr.Instance!;
+                        continue;
+                    }
+
+                    return false;
+
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsReference())
+                    if (!m.ReturnsRefOrWrappedRef())
                         return false;
 
                     if (m.ReturnType.IsDynSized())
                         return true;
 
-                    if (m.Parameters.Where(p => p.RefKind != RefKind.None).Any(p => p.Type.IsDynSized()))
+                    if (m.Parameters.Where(p => p.IsRefOrWrappedRef()).Any(p => p.Type.IsDynSized()))
                         return true;
 
-                    if (m.ReturnsRefPath())
+                    if (m.IsRefPathExtension())
                     {
                         self = i.Arguments.First().Value;
-                        fullGraph = true;
+                        continue;
+                    }
+
+                    if (m.IsSpanSlice())
+                    {
+                        self = i.Instance!;
                         continue;
                     }
 
@@ -219,6 +261,17 @@ public static class OperationExtensions
                     return false;
             }
         }
+    }
+
+    private static bool IsSpanIndexer(this IPropertyReferenceOperation self)
+    {
+        if (!self.Property.IsIndexer || self.Property.RefKind == RefKind.None)
+            return false;
+
+        if (self.Instance?.Type == null)
+            return false;
+
+        return self.Instance.Type.IsSpan(out _);
     }
 
     private static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
@@ -237,14 +290,14 @@ public static class OperationExtensions
                         if (d.Symbol.Name != self.Local.Name)
                             return null;
 
-                        var p = d.GetValueProducerRef(out var varKind);
+                        var p = d.GetRefVarProducerOp(out var varKind);
                         if (p == null)
                             return null;
 
                         return new RefVarInfo(d.Symbol, varKind, p);
 
-                    case ISimpleAssignmentOperation { IsRef: true, Target: ILocalReferenceOperation r } a:
-                        if (r.Local.Name != self.Local.Name)
+                    case ISimpleAssignmentOperation { Target: ILocalReferenceOperation r } a:
+                        if (!a.AssignsRefOrRefLike(r) || r.Local.Name != self.Local.Name)
                             return null;
 
                         return new RefVarInfo(r.Local, RefVarKind.LocalSymbolRef, a.Value);
@@ -254,10 +307,14 @@ public static class OperationExtensions
                 }
             })
             .LastOrDefault(v => v != null);
-
     }
 
-    private static IOperation? GetValueProducerRef(this IVariableDeclaratorOperation self, out RefVarKind kind)
+    private static bool AssignsRefOrRefLike(this ISimpleAssignmentOperation self, ILocalReferenceOperation target)
+    {
+        return self.IsRef || target.Local.Type.IsRefLikeType;
+    }
+
+    private static IOperation? GetRefVarProducerOp(this IVariableDeclaratorOperation self, out RefVarKind kind)
     {
         kind = RefVarKind.LocalSymbolRef;
 
@@ -328,7 +385,7 @@ public static class OperationExtensions
             switch (self)
             {
                 case ILocalReferenceOperation lr:
-                    if (!lr.Local.IsRef)
+                    if (!lr.Local.IsRefOrWrappedRef())
                     {
                         path.PrependRefSeg(lr.Local.Name, lr.Local.Type, ref suffix);
                         return true;
@@ -357,26 +414,47 @@ public static class OperationExtensions
                     self = f.Instance;
                     continue;
 
+                case IPropertyReferenceOperation pr:
+                    if (pr.IsSpanIndexer())
+                    {
+                        path.PrependRefSeg(RefPath.IndexerName, pr.Property.Type, ref suffix);
+                        self = pr.Instance!;
+                        continue;
+                    }
+
+                    return false;
+
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsReference() || !m.IsExtensionMethod)
-                        return false;
+                    if (m.IsExtensionMethod)
+                    {
+                        if (!m.ReturnsRefOrWrappedRef())
+                            return false;
 
-                    if (m.IsRefListIndexer())
-                    {
-                        path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref suffix);
-                    }
-                    else if (m.IsRefPathItem())
-                    {
-                        path.PrependRefSeg(m.Name + RefPath.ItemSuffix, m.ReturnType, ref suffix);
-                    }
-                    else if (!m.IsRefPathSkip())
-                    {
-                        return false;
+                        if (m.IsRefListIndexer())
+                        {
+                            path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref suffix);
+                        }
+                        else if (m.IsRefPathItem() || m.IsRefListAsSpan())
+                        {
+                            path.PrependRefSeg(m.Name + RefPath.ItemSuffix, m.ReturnType, ref suffix);
+                        }
+                        else if (!m.IsRefPathSkip())
+                        {
+                            return false;
+                        }
+
+                        self = i.Arguments.First().Value;
+                        continue;
                     }
 
-                    self = i.Arguments.First().Value;
-                    continue;
+                    if (m.IsSpanSlice())
+                    {
+                        self = i.Instance!;
+                        continue;
+                    }
+
+                    return false;
 
                 default:
                     return false;
@@ -409,6 +487,5 @@ public static class OperationExtensions
             return method;
 
         return null;
-
     }
 }

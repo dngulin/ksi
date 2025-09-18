@@ -7,19 +7,19 @@ namespace Ksi
     public static class RefListSpanExtensions
     {
         [RefListIterator]
-        public static ReadOnlySpan<T> AsReadonlySpan<T>(this in RefList<T> self) where T : struct
+        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : struct
         {
             return new ReadOnlySpan<T>(self.Buffer, 0, self.Count);
         }
 
         [RefListIterator]
-        public static unsafe ReadOnlySpan<T> AsReadonlySpan<T>(this in TempRefList<T> self) where T : unmanaged
+        public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> self) where T : unmanaged
         {
             return new ReadOnlySpan<T>(self.Buffer, self.Count);
         }
 
         [RefListIterator]
-        public static unsafe ReadOnlySpan<T> AsReadonlySpan<T>(this in NativeRefList<T> self) where T : unmanaged
+        public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in NativeRefList<T> self) where T : unmanaged
         {
             return new ReadOnlySpan<T>(self.Buffer, self.Count);
         }

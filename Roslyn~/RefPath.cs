@@ -8,7 +8,7 @@ namespace Ksi.Roslyn;
 public readonly struct RefPath
 {
     public const string IndexerName = "[n]";
-    public const string ItemSuffix = "(x)";
+    public const string ItemSuffix = "()";
 
     public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0);
 

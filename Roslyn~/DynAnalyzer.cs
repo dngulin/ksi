@@ -47,7 +47,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         "Local Reference Invalidation",
         "Passing a mutable reference argument to `{0}` " +
-        "invalidates memory safety guaranties for the local reference `{1}` pointing to `{2}`. " +
+        "invalidates memory safety guaranties for the local variable `{1}` pointing to `{2}`. " +
         "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
     );
 
@@ -127,8 +127,10 @@ public class DynAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
     {
         var d = (IVariableDeclaratorOperation)ctx.Operation;
-        if (!d.Symbol.IsRef)
+        if (!d.Symbol.IsRefOrWrappedRef())
             return;
+
+        // TODO: use RefVarInfo here & gracefully handle all cases
 
         var i = d.Initializer;
         if (i != null)
@@ -143,6 +145,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (loop.Collection.WithoutConversionOp().IsRefListIterator(out var collParent))
             AnalyzeReferenceOp(ctx, collParent!);
     }
+
+    // TODO: Assignment checks
 
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
     {
@@ -159,7 +163,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         foreach (var a in i.Arguments)
         {
             var p = a.Parameter;
-            if (p == null || p.RefKind == RefKind.None)
+            if (p == null || !p.IsRefOrWrappedRef())
                 continue;
 
             var v = a.Value;
@@ -173,14 +177,14 @@ public class DynAnalyzer : DiagnosticAnalyzer
         var i = (IInvocationOperation)ctx.Operation;
 
         var args = i.Arguments
-            .Where(a => a.Parameter != null && a.Parameter.RefKind != RefKind.None)
+            .Where(a => a.Parameter != null && a.Parameter.IsRefOrWrappedRef() && a.Value.ReferencesDynSizeInstance())
             .Select(a =>
             {
                 var p = a.Parameter!;
                 var v = a.Value;
                 return (
-                    IsMut: p.RefKind == RefKind.Ref && !p.IsDynNoResize(),
-                    RefPath: v.ReferencesDynSizeInstance() ? v.ToRefPath() : RefPath.Empty,
+                    IsMut: p.IsMut() && !p.IsDynNoResize(),
+                    RefPath: v.ToRefPath(),
                     Location: v.Syntax.GetLocation()
                 );
             })
@@ -246,7 +250,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             .Where(a =>
             {
                 var p = a.Parameter;
-                if (p is not { RefKind: RefKind.Ref })
+                if (p == null || !p.IsMut())
                     return false;
 
                 return p.Type.IsDynSized() && !p.IsDynNoResize();
@@ -263,7 +267,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             return;
 
         var noResizeParams = m.Parameters
-            .Where(p => p is { RefKind: RefKind.Ref } && p.Type.IsDynSized() && p.IsDynNoResize())
+            .Where(p => p.IsMut() && p.Type.IsDynSized() && p.IsDynNoResize())
             .Select(p => p.Name)
             .ToImmutableArray();
 
@@ -287,7 +291,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             if (!p.IsDynNoResize())
                 continue;
 
-            if (p.RefKind != RefKind.Ref || !p.Type.IsDynSized())
+            if (!p.IsMut() || !p.Type.IsDynSized())
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeAnnotationRule, p.Locations.First()));
         }
     }

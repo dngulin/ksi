@@ -150,7 +150,7 @@ namespace Ksi
         [RefListIterator]
         public static {0}ReadOnlyIterator<T> RefReadonlyIter<T>(this in {0}<T> self) where T : {1}
         {{
-            return new {0}ReadOnlyIterator<T>(self.AsReadonlySpan());
+            return new {0}ReadOnlyIterator<T>(self.AsReadOnlySpan());
         }}
 
         [RefListIterator]
@@ -162,7 +162,7 @@ namespace Ksi
         [RefListIterator]
         public static {0}ReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in {0}<T> self) where T : {1}
         {{
-            return new {0}ReadOnlyIteratorReversed<T>(self.AsReadonlySpan());
+            return new {0}ReadOnlyIteratorReversed<T>(self.AsReadOnlySpan());
         }}
 
         [RefListIterator]
@@ -303,12 +303,12 @@ namespace Ksi
 
         public static string ToStringUtf8(this in {0}<byte> list)
         {{
-            return list.Count == 0 ? """" : Encoding.UTF8.GetString(list.AsReadonlySpan());
+            return list.Count == 0 ? """" : Encoding.UTF8.GetString(list.AsReadOnlySpan());
         }}
 
         public static string ToStringAscii(this in {0}<byte> list)
         {{
-            return list.Count == 0 ? """" : Encoding.ASCII.GetString(list.AsReadonlySpan());
+            return list.Count == 0 ? """" : Encoding.ASCII.GetString(list.AsReadOnlySpan());
         }}
     }}
 }}";
