@@ -276,7 +276,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
         foreach (var (refPath, location) in resizableDynArgs)
         {
-            var root = refPath.Path[0];
+            var root = refPath.Segments[0];
             if (noResizeParams.Contains(root))
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeRule, location, refPath));
         }

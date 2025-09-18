@@ -12,29 +12,29 @@ public readonly struct RefPath
 
     public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0);
 
-    public readonly ImmutableArray<string> Path;
+    public readonly ImmutableArray<string> Segments;
     public readonly int DynSizedLength;
     public readonly int ExplicitLength;
 
-    public RefPath(ImmutableArray<string> path, int dynSizedLength)
+    public RefPath(ImmutableArray<string> segments, int dynSizedLength)
     {
-        Path = path;
+        Segments = segments;
         DynSizedLength = dynSizedLength;
-        ExplicitLength = path.TakeWhile(i => !i.EndsWith(ItemSuffix)).Count();
+        ExplicitLength = segments.TakeWhile(i => !i.EndsWith(ItemSuffix)).Count();
     }
 
-    public bool IsEmpty => Path.IsEmpty;
-    public bool PointsToDynSized => Path.Length == DynSizedLength;
+    public bool IsEmpty => Segments.IsEmpty;
+    public bool PointsToDynSized => Segments.Length == DynSizedLength;
 
     public override string ToString()
     {
         var sb = new StringBuilder();
-        for (var i = 0; i < Path.Length; i++)
+        for (var i = 0; i < Segments.Length; i++)
         {
-            if (i != 0 && Path[i] != IndexerName)
+            if (i != 0 && Segments[i] != IndexerName)
                 sb.Append('.');
 
-            sb.Append(Path[i]);
+            sb.Append(Segments[i]);
 
             if (i == DynSizedLength - 1)
                 sb.Append('!');
@@ -56,13 +56,13 @@ public enum RefRelation
 public static class RefExtensions {
     public static RefRelation GetExplicitPathRelationTo(in this RefPath self, in RefPath other)
     {
-        if (self.Path.Length == 0 || other.Path.Length == 0 || self.Path[0] != other.Path[0])
+        if (self.Segments.Length == 0 || other.Segments.Length == 0 || self.Segments[0] != other.Segments[0])
             return RefRelation.Unrelated;
 
         var len = Math.Min(self.ExplicitLength, other.ExplicitLength);
         for (var i = 0; i < len; i++)
         {
-            if (self.Path[i] != other.Path[i])
+            if (self.Segments[i] != other.Segments[i])
                 return RefRelation.Sibling;
         }
 
@@ -77,11 +77,11 @@ public static class RefExtensions {
 
     private static bool HasResizableItemsSince(in this RefPath self, int start)
     {
-        var end = Math.Min(self.DynSizedLength + 1, self.Path.Length);
+        var end = Math.Min(self.DynSizedLength + 1, self.Segments.Length);
 
         for (var i = start; i < end; i++)
         {
-            var item = self.Path[i];
+            var item = self.Segments[i];
             if (item == RefPath.IndexerName || item.EndsWith(RefPath.ItemSuffix))
                 return true;
         }

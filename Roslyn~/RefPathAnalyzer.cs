@@ -123,13 +123,13 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
 
         if (isRefPathSkip)
         {
-            if (rp.Path.Length != 1 || rp.Path[0] != p.Name)
+            if (rp.Segments.Length != 1 || rp.Segments[0] != p.Name)
                 ctx.ReportDiagnostic(Diagnostic.Create(RefPathSkipValueRule, v.Syntax.GetLocation()));
         }
 
         if (isRefPathItem)
         {
-            if (rp.Path[0] != p.Name)
+            if (rp.Segments[0] != p.Name)
                 ctx.ReportDiagnostic(Diagnostic.Create(RefPathItemValueRule, v.Syntax.GetLocation()));
         }
 
@@ -138,7 +138,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
             if (!p.Type.IsRefList())
                 ctx.ReportDiagnostic(Diagnostic.Create(RefListIndexerTypeRule, p.Locations.First()));
 
-            if (rp.Path.Length != 2 || rp.Path[0] != p.Name || rp.Path[1] != RefPath.IndexerName)
+            if (rp.Segments.Length != 2 || rp.Segments[0] != p.Name || rp.Segments[1] != RefPath.IndexerName)
                 ctx.ReportDiagnostic(Diagnostic.Create(RefListIndexerValueRule, v.Syntax.GetLocation()));
         }
     }
