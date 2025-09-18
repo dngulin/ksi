@@ -92,6 +92,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
+        context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
@@ -130,8 +131,6 @@ public class DynAnalyzer : DiagnosticAnalyzer
         if (!d.Symbol.IsRefOrWrappedRef())
             return;
 
-        // TODO: use RefVarInfo here & gracefully handle all cases
-
         var i = d.Initializer;
         if (i != null)
         {
@@ -146,7 +145,26 @@ public class DynAnalyzer : DiagnosticAnalyzer
             AnalyzeReferenceOp(ctx, collParent!);
     }
 
-    // TODO: Assignment checks
+    private static void AnalyzeAssignment(OperationAnalysisContext ctx)
+    {
+        var a = (ISimpleAssignmentOperation)ctx.Operation;
+
+        switch (a.Target)
+        {
+            case ILocalReferenceOperation lr:
+                if (lr.Local.Type.IsRefLikeType || lr.Local.IsRef && a.IsRef)
+                    AnalyzeReferenceOp(ctx, a.Target);
+                break;
+
+            case IParameterReferenceOperation pr:
+                var p = pr.Parameter;
+                if (p.Type.IsRefLikeType && p.RefKind is RefKind.None or RefKind.In)
+                    AnalyzeReferenceOp(ctx, a.Target);
+                break;
+        }
+
+        AnalyzeReferenceOp(ctx, a.Target);
+    }
 
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
     {

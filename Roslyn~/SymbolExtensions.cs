@@ -150,7 +150,9 @@ namespace Ksi.Roslyn
 
         public static bool IsRefOrWrappedRef(this IParameterSymbol self)
         {
-            return self.RefKind != RefKind.None || self.Type.IsSpan(out _);
+            return self.RefKind == RefKind.Ref ||
+                   self.RefKind == RefKind.In ||
+                   self.Type.IsSpan(out _);
         }
 
         public static bool IsMut(this IParameterSymbol self)
