@@ -192,7 +192,7 @@ namespace Ksi.Roslyn
         private static void AnalyzeReturn(SymbolAnalysisContext ctx)
         {
             var method = (IMethodSymbol)ctx.Symbol;
-            if (method.ReturnsReference())
+            if (method.ReturnsRef())
                 return;
 
             if (!method.ReturnType.IsNoCopyType())

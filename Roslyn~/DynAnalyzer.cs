@@ -91,8 +91,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
-        context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
-        context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
+        context.RegisterOperationAction(AnalyzeVariableDeclaratorRef, OperationKind.VariableDeclarator);
+        context.RegisterOperationAction(AnalyzeVariableAssignmentRef, OperationKind.SimpleAssignment);
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
@@ -125,7 +125,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
     }
 
-    private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
+    private static void AnalyzeVariableDeclaratorRef(OperationAnalysisContext ctx)
     {
         var d = (IVariableDeclaratorOperation)ctx.Operation;
         if (!d.Symbol.IsRefOrWrappedRef())
@@ -145,25 +145,15 @@ public class DynAnalyzer : DiagnosticAnalyzer
             AnalyzeReferenceOp(ctx, collParent!);
     }
 
-    private static void AnalyzeAssignment(OperationAnalysisContext ctx)
+    private static void AnalyzeVariableAssignmentRef(OperationAnalysisContext ctx)
     {
         var a = (ISimpleAssignmentOperation)ctx.Operation;
 
-        switch (a.Target)
-        {
-            case ILocalReferenceOperation lr:
-                if (lr.Local.Type.IsRefLikeType || lr.Local.IsRef && a.IsRef)
-                    AnalyzeReferenceOp(ctx, a.Target);
-                break;
+        if (a.Target is not ILocalReferenceOperation lr)
+            return;
 
-            case IParameterReferenceOperation pr:
-                var p = pr.Parameter;
-                if (p.Type.IsRefLikeType && p.RefKind is RefKind.None or RefKind.In)
-                    AnalyzeReferenceOp(ctx, a.Target);
-                break;
-        }
-
-        AnalyzeReferenceOp(ctx, a.Target);
+        if (lr.Local.IsRef && a.IsRef || lr.Local.Type.IsWrappedRef())
+            AnalyzeReferenceOp(ctx, a.Target);
     }
 
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)

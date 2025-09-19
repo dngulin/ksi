@@ -101,7 +101,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         if (!isRefPath)
             return;
 
-        if (!m.IsExtensionMethod || !m.ReturnsReference())
+        if (!m.IsExtensionMethod || !m.ReturnsRef())
         {
             ctx.ReportDiagnostic(Diagnostic.Create(SignatureRule, m.Locations.First()));
             return;

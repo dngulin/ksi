@@ -128,7 +128,7 @@ namespace Ksi.Roslyn
         {
             var i = (IInvocationOperation)ctx.Operation;
             var m = i.TargetMethod;
-            if (m.ReturnsReference())
+            if (m.ReturnsRef())
                 return;
 
             if (m.ReturnType.TypeKind != TypeKind.Struct || m.ReturnType is not INamedTypeSymbol t)

@@ -23,11 +23,11 @@ namespace Ksi.Roslyn
             return true;
         }
 
-        public static bool ReturnsReference(this IMethodSymbol self) => self.RefKind != RefKind.None;
+        public static bool ReturnsRef(this IMethodSymbol self) => self.RefKind is RefKind.Ref or RefKind.RefReadOnly;
 
         public static bool ReturnsRefOrWrappedRef(this IMethodSymbol self)
         {
-            return self.RefKind != RefKind.None || self.ReturnType.IsSpan(out _);
+            return self.ReturnsRef() || self.ReturnType.IsWrappedRef();
         }
 
         public static bool ReturnsRefPath(this IMethodSymbol self)
@@ -40,7 +40,7 @@ namespace Ksi.Roslyn
             if (!self.IsExtensionMethod)
                 return false;
 
-            return self.ReturnsReference() ?
+            return self.ReturnsRef() ?
                 self.Is(RefListIndexer, RefPathItem, RefPathSkip) :
                 self.IsRefListAsSpan();
         }
@@ -92,10 +92,10 @@ namespace Ksi.Roslyn
             if (self.Is(DynSized))
                 return true;
 
-            if (!self.IsSpan(out _))
-                return false;
+            if (self.IsSpan(out _))
+                return self is INamedTypeSymbol nt && nt.TryGetGenericArg(out var gt) && gt!.IsDynSized();
 
-            return self is INamedTypeSymbol nt && nt.TryGetGenericArg(out var gt) && gt!.IsDynSized();
+            return false;
         }
 
         public static bool IsSpan(this ITypeSymbol self, out bool isReadOnly)
@@ -124,7 +124,9 @@ namespace Ksi.Roslyn
             }
         }
 
-        public static bool IsRefOrWrappedRef(this ILocalSymbol self) => self.IsRef || self.Type.IsSpan(out _);
+        public static bool IsWrappedRef(this ITypeSymbol self) => self.IsSpan(out _);
+
+        public static bool IsRefOrWrappedRef(this ILocalSymbol self) => self.IsRef || self.Type.IsWrappedRef();
 
         private static bool Is(this ITypeSymbol self, string attributeName)
         {
@@ -150,9 +152,8 @@ namespace Ksi.Roslyn
 
         public static bool IsRefOrWrappedRef(this IParameterSymbol self)
         {
-            return self.RefKind == RefKind.Ref ||
-                   self.RefKind == RefKind.In ||
-                   self.Type.IsSpan(out _);
+            return self.RefKind is RefKind.Ref or RefKind.In ||
+                   self.Type.IsWrappedRef();
         }
 
         public static bool IsMut(this IParameterSymbol self)
