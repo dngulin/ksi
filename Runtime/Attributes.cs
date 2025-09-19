@@ -5,25 +5,25 @@ namespace Ksi
     /// <summary>
     /// Attribute that forbids structure implicit copying and provides explicit copy extension methods.
     /// Can be applied only to POD types without any methods and private fields.
-    /// Should be added to a struct that contains fields of NoCopy type.
+    /// Should be added to a struct that contains fields of ExplicitCopy type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
-    public class NoCopyAttribute : Attribute
+    public class ExplicitCopyAttribute : Attribute
     {
     }
 
     /// <summary>
-    /// Attribute to indicate a method that returns a new instance of the [NoCopy] type.
+    /// Attribute to indicate a method that returns a new instance of the ExplicitCopy type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class NoCopyReturnAttribute : Attribute
+    public class ExplicitCopyReturnAttribute : Attribute
     {
     }
 
     /// <summary>
     /// Attribute to provide Dealloc extension methods.
     /// Should be added to a struct that contains fields of Dealloc or RefList types.
-    /// Also requires a NoCopy attribute.
+    /// Also requires an ExplicitCopy attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public class DeallocAttribute : Attribute

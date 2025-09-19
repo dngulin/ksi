@@ -10,17 +10,17 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Ksi.Roslyn
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class NoCopyAnalyzer : DiagnosticAnalyzer
+    public class ExplicitCopyAnalyzer : DiagnosticAnalyzer
     {
         private static int _ruleId;
 
         private static DiagnosticDescriptor Rule(string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"NOCOPY{++_ruleId:D2}",
+                id: $"COPY{++_ruleId:D2}",
                 title: title,
                 messageFormat: msg,
-                category: "NoCopy",
+                category: "ExplicitCopy",
                 defaultSeverity: DiagnosticSeverity.Error,
                 isEnabledByDefault: true
             );
@@ -28,52 +28,52 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor ParameterRule = Rule(
             "Passed by Value",
-            "Type `{0}` is marked as `NoCopy` and should be received only by reference"
+            "Type `{0}` is marked as `ExplicitCopy` and should be received only by reference"
         );
 
         private static readonly DiagnosticDescriptor ArgumentRule = Rule(
             "Received by Value",
-            "Type `{0}` is marked as `NoCopy` and should be passed only by reference"
+            "Type `{0}` is marked as `ExplicitCopy` and should be passed only by reference"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
             "Field of Copy Type",
-            "Type `{0}` is marked as `NoCopy` and can be a field only of a `NoCopy` type"
+            "Type `{0}` is marked as `ExplicitCopy` and can be a field only of a `ExplicitCopy` type"
         );
 
         private static readonly DiagnosticDescriptor BoxingRule = Rule(
             "Boxed",
-            "Type `{0}` is marked as `NoCopy` and shouldn't be boxed"
+            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be boxed"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(
             "Captured by Closure",
-            "Type `{0}` is marked as `NoCopy` and shouldn't be captured by a closure"
+            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be captured by a closure"
         );
 
         private static readonly DiagnosticDescriptor ReturnRule = Rule(
             "Returned by Value",
-            "Type `{0}` is marked as `NoCopy` and shouldn't be returned by value"
+            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be returned by value"
         );
 
         private static readonly DiagnosticDescriptor AssignmentRule = Rule(
             "Copied by Assignment",
-            "Type `{0}` is marked as `NoCopy` and shouldn't be assigned by copying other value"
+            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be assigned by copying other value"
         );
 
         private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(
             "Private Field",
-            "Type `{0}` is marked as `NoCopy` and shouldn't have any private fields"
+            "Type `{0}` is marked as `ExplicitCopy` and shouldn't have any private fields"
         );
 
         private static readonly DiagnosticDescriptor GenericTypeRule = Rule(
-            "Generic NoCopy Type",
-            "Type `{0}` is marked as `NoCopy` and cannot be a generic type"
+            "Generic ExplicitCopy Type",
+            "Type `{0}` is marked as `ExplicitCopy` and cannot be a generic type"
         );
 
         private static readonly DiagnosticDescriptor TupleRule = Rule(
-            "NoCopy Type Within Tuple",
-            "Type `{0}` is marked as `NoCopy` and cannot be used in tuples"
+            "ExplicitCopy Type Within Tuple",
+            "Type `{0}` is marked as `ExplicitCopy` and cannot be used in tuples"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
@@ -121,7 +121,7 @@ namespace Ksi.Roslyn
             if (sym.RefKind != RefKind.None)
                 return;
 
-            if (!sym.Type.IsNoCopyType())
+            if (!sym.Type.IsExplicitCopy())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ParameterRule, sym.Locations.First(), sym.Type.Name));
@@ -134,7 +134,7 @@ namespace Ksi.Roslyn
                 return;
 
             var t = op.Value.Type;
-            if (t == null || !t.IsNoCopyType())
+            if (t == null || !t.IsExplicitCopy())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, op.Value.Syntax.GetLocation(), t.Name));
@@ -146,12 +146,12 @@ namespace Ksi.Roslyn
             if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
                 return;
 
-            var isNoCopyStruct = sym.ContainingType.IsNoCopyType();
+            var isExplicitCopyStruct = sym.ContainingType.IsExplicitCopy();
 
-            if (!isNoCopyStruct && sym.Type.IsNoCopyType())
+            if (!isExplicitCopyStruct && sym.Type.IsExplicitCopy())
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
 
-            if (isNoCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
+            if (isExplicitCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
                 ctx.ReportDiagnostic(Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.ContainingType.Name));
         }
 
@@ -165,13 +165,13 @@ namespace Ksi.Roslyn
                 return;
 
             var boxing = typeFrom.IsValueType && typeTo.IsReferenceType;
-            if (boxing && typeFrom.IsNoCopyType())
+            if (boxing && typeFrom.IsExplicitCopy())
             {
                 ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
             }
 
             var unboxing = typeFrom.IsReferenceType && typeTo.IsValueType;
-            if (unboxing && typeTo.IsNoCopyType())
+            if (unboxing && typeTo.IsExplicitCopy())
             {
                 ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
             }
@@ -185,7 +185,7 @@ namespace Ksi.Roslyn
             foreach (var capture in capturedVariables)
             {
                 var t = GetCaptureSymbolType(capture);
-                if (t != null && t.IsNoCopyType())
+                if (t != null && t.IsExplicitCopy())
                     ctx.ReportDiagnostic(Diagnostic.Create(CaptureRule, capture.Locations.First(), t.Name));
             }
         }
@@ -196,10 +196,10 @@ namespace Ksi.Roslyn
             if (method.ReturnsRef())
                 return;
 
-            if (!method.ReturnType.IsNoCopyType())
+            if (!method.ReturnType.IsExplicitCopy())
                 return;
 
-            if (method.IsNoCopyReturn())
+            if (method.IsExplicitCopyReturn())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(ReturnRule, method.Locations.First(), method.ReturnType.Name));
@@ -210,7 +210,7 @@ namespace Ksi.Roslyn
             var initializer = (IFieldInitializerOperation)ctx.Operation;
             var v = initializer.Value;
 
-            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, initializer.Syntax.GetLocation(), v.Type.Name));
@@ -227,7 +227,7 @@ namespace Ksi.Roslyn
                 return;
 
             var v = initializer.Value;
-            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, declarator.Syntax.GetLocation(), v.Type.Name));
@@ -241,7 +241,7 @@ namespace Ksi.Roslyn
             if (assignment.IsRef)
                 return;
 
-            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsNoCopyType())
+            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
             ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation(), v.Type.Name));
@@ -253,7 +253,7 @@ namespace Ksi.Roslyn
             if (sym == null)
                 return;
 
-            if (sym.IsGenericType && sym.IsNoCopyType() && !sym.IsRefList())
+            if (sym.IsGenericType && sym.IsExplicitCopy() && !sym.IsRefList())
                 ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeRule, sym.Locations.First(), sym.Name));
         }
 
@@ -265,7 +265,7 @@ namespace Ksi.Roslyn
                 if (e.Type == null)
                     continue;
 
-                if (e.Type.IsNoCopyType())
+                if (e.Type.IsExplicitCopy())
                     ctx.ReportDiagnostic(Diagnostic.Create(TupleRule, e.Syntax.GetLocation(), e.Type.Name));
             }
         }
@@ -300,7 +300,7 @@ namespace Ksi.Roslyn
                     case OperationKind.Invocation:
                     {
                         var invocation = (IInvocationOperation)operation;
-                        return invocation.TargetMethod.IsNoCopyReturn();
+                        return invocation.TargetMethod.IsExplicitCopyReturn();
                     }
 
                     default:

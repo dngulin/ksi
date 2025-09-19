@@ -9,10 +9,10 @@ namespace Ksi
 {{
     public static class {0}
     {{
-        [NoCopyReturn]
+        [ExplicitCopyReturn]
         public static {0}<T> Empty<T>() where T : {1} => default;
 
-        [NoCopyReturn]
+        [ExplicitCopyReturn]
         public static {0}<T> WithCapacity<T>(int capacity) where T : {1}
         {{
             var list = Empty<T>();
@@ -20,7 +20,7 @@ namespace Ksi
             return list;
         }}
 
-        [NoCopyReturn]
+        [ExplicitCopyReturn]
         public static {0}<T> WithDefaultItems<T>(int count) where T : {1}
         {{
             var list = WithCapacity<T>(count);

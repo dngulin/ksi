@@ -2,21 +2,21 @@
 
 namespace Ksi
 {
-    [NoCopy, DynSized, RefList]
+    [ExplicitCopy, DynSized, RefList]
     public struct RefList<T> where T : struct
     {
         internal T[] Array;
         internal int Count;
     }
 
-    [NoCopy, DynSized, RefList]
+    [ExplicitCopy, DynSized, RefList]
     public ref struct TempRefList<T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;
         internal int Count;
     }
 
-    [NoCopy, DynSized, RefList]
+    [ExplicitCopy, DynSized, RefList]
     public struct NativeRefList<T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;

@@ -39,7 +39,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor SpecializedApiRule = Rule(
         DiagnosticSeverity.Error,
         "Non Specialized Call",
-        "Using non-specialized RefList API for NoCopy or Dealloc types is unsafe"
+        "Using non-specialized RefList API for ExplicitCopy or Dealloc types is unsafe"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
@@ -155,7 +155,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
             ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
             ReportCalls(ctx, m, loc, DeallocTemplates.RefListExtensionNames);
         }
-        else if (gt.IsNoCopyType())
+        else if (gt.IsExplicitCopy())
         {
             ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
         }

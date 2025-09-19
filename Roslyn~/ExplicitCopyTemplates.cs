@@ -6,7 +6,7 @@ namespace Ksi.Roslyn
 
         public const string RefListExtensions = @"
         /// <summary>
-        /// Specialized implementation for NoCopy types
+        /// Specialized implementation for ExplicitCopy types
         /// </summary>
         public static void CopyFrom(this ref {0}<{1}> self, in {0}<{1}> other)
         {{
@@ -18,7 +18,7 @@ namespace Ksi.Roslyn
         }}
 
         /// <summary>
-        /// Specialized implementation for NoCopy types
+        /// Specialized implementation for ExplicitCopy types
         /// </summary>
         public static void CopyTo(this in {0}<{1}> self, ref {0}<{1}> other)
         {{
@@ -27,7 +27,7 @@ namespace Ksi.Roslyn
 
         public const string RefListExtensionsDealloc = @"
         /// <summary>
-        /// Specialized implementation for NoCopy+Dealloc types
+        /// Specialized implementation for ExplicitCopy+Dealloc types
         /// </summary>
         public static void CopyFrom(this ref {0}<{1}> self, in {0}<{1}> other)
         {{
@@ -42,7 +42,7 @@ namespace Ksi.Roslyn
         }}
 
         /// <summary>
-        /// Specialized implementation for NoCopy+Dealloc types
+        /// Specialized implementation for ExplicitCopy+Dealloc types
         /// </summary>
         public static void CopyTo(this in {0}<{1}> self, ref {0}<{1}> other)
         {{

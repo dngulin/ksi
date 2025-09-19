@@ -30,22 +30,22 @@ public static class SyntaxExtensions
         return name == Dealloc || name == Dealloc + Suffix;
     }
 
-    public static bool ContainsNoCopy(this SyntaxList<AttributeListSyntax> lists)
+    public static bool ContainsExplicitCopy(this SyntaxList<AttributeListSyntax> lists)
     {
         foreach (var l in lists)
         foreach (var a in l.Attributes)
         {
-            if (a.IsNoCopy())
+            if (a.IsExplicitCopy())
                 return true;
         }
 
         return false;
     }
 
-    private static bool IsNoCopy(this AttributeSyntax attribute)
+    private static bool IsExplicitCopy(this AttributeSyntax attribute)
     {
         var name = attribute.Name.ToString();
-        return name == NoCopy || name == NoCopy + Suffix;
+        return name == ExplicitCopy || name == ExplicitCopy + Suffix;
     }
 
     public static bool ContainsRefList(this SyntaxList<AttributeListSyntax> lists)

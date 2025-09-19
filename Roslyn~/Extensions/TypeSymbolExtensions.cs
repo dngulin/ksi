@@ -61,7 +61,7 @@ public static class TypeSymbolExtensions
 
     public static bool IsWrappedRef(this ITypeSymbol self) => self.IsSpan(out _);
 
-    public static bool IsNoCopyType(this ITypeSymbol self) => self.Is(SymbolNames.NoCopy);
+    public static bool IsExplicitCopy(this ITypeSymbol self) => self.Is(SymbolNames.ExplicitCopy);
     public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);
     public static bool IsRefList(this ITypeSymbol self) => self.Is(SymbolNames.RefList);
     public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();

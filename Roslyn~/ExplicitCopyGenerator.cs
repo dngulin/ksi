@@ -33,7 +33,7 @@ namespace Ksi.Roslyn
                     if (structDecl.AttributeLists.ContainsRefList())
                         return false;
 
-                    return structDecl.AttributeLists.ContainsNoCopy();
+                    return structDecl.AttributeLists.ContainsExplicitCopy();
                 },
                 transform: (ctx, _) =>
                 {
@@ -59,7 +59,7 @@ namespace Ksi.Roslyn
                         if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
-                        if (ft.IsNoCopyType())
+                        if (ft.IsExplicitCopy())
                         {
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
@@ -69,7 +69,7 @@ namespace Ksi.Roslyn
                             result.Fields.Add((f.Name, true));
                             usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.IsNoCopyType())
+                            if (ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
                                 usings.Add(gt!.ContainingNamespace.ToDisplayString());
                         }
                         else

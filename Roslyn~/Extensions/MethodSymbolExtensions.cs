@@ -48,7 +48,7 @@ public static class MethodSymbolExtensions
         return self.ReturnType.IsRefLikeType && self.Name == "Slice" && self.ContainingType.IsSpan(out _);
     }
 
-    public static bool IsNoCopyReturn(this IMethodSymbol self) => self.Is(SymbolNames.NoCopyReturn);
+    public static bool IsExplicitCopyReturn(this IMethodSymbol self) => self.Is(SymbolNames.ExplicitCopyReturn);
     public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(SymbolNames.NonAllocatedResult);
     public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(SymbolNames.RefListIndexer);
     public static bool IsRefPathItem(this IMethodSymbol self) => self.Is(SymbolNames.RefPathItem);

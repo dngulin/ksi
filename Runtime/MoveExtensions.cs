@@ -2,7 +2,7 @@ namespace Ksi
 {
     public static class MoveExtensions
     {
-        [NoCopyReturn]
+        [ExplicitCopyReturn]
         public static T Move<T>(this ref T self) where T : struct
         {
             var moved = self;
