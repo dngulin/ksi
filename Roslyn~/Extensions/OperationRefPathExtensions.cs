@@ -30,6 +30,8 @@ public static class OperationRefPathExtensions
             RefPath.Empty;
     }
 
+    public static bool ProducesRefPath(this IOperation self) => !self.ToRefPath().IsEmpty;
+
     private static bool PrependNodePath(this IOperation self, List<string> path, ref RefPathSuffix suffix)
     {
         while (true)
@@ -203,58 +205,6 @@ public static class OperationRefPathExtensions
                         return false;
 
                     return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
-
-                default:
-                    return false;
-            }
-        }
-    }
-
-    public static bool ProducesRefPath(this IOperation self)
-    {
-        while (true)
-        {
-            switch (self)
-            {
-                case ILocalReferenceOperation lr:
-                    if (lr.Local.IsRefOrWrappedRef())
-                    {
-                        var optVar = lr.FindRefVar();
-                        if (optVar != null)
-                        {
-                            self = optVar.Value.Producer;
-                            continue;
-                        }
-
-                        return false;
-                    }
-
-                    return true;
-
-                case IParameterReferenceOperation:
-                    return true;
-
-                case IFieldReferenceOperation f:
-                    if (f.Instance == null) return true; // TODO: verify
-
-                    self = f.Instance;
-                    continue;
-
-                case IPropertyReferenceOperation pr:
-                    if (pr.IsSpanIndexer())
-                    {
-                        self = pr.Instance!;
-                        continue;
-                    }
-                    return false;
-
-                case IInvocationOperation i:
-                    var m = i.TargetMethod;
-                    if (!m.ReturnsRefPath())
-                        return false;
-
-                    self = i.Arguments.First().Value;
-                    continue;
 
                 default:
                     return false;
