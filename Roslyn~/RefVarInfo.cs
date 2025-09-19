@@ -1,3 +1,4 @@
+using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn;

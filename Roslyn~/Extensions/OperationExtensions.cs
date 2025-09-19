@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Ksi.Roslyn;
+namespace Ksi.Roslyn.Extensions;
 
 public static class OperationExtensions
 {

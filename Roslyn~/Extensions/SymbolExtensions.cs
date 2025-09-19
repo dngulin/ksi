@@ -2,7 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using static Ksi.Roslyn.SymbolNames;
 
-namespace Ksi.Roslyn
+namespace Ksi.Roslyn.Extensions
 {
     public static class SymbolExtensions
     {

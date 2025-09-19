@@ -1,10 +1,9 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using static Ksi.Roslyn.SymbolNames;
 
-namespace Ksi.Roslyn;
+namespace Ksi.Roslyn.Extensions;
 
 public static class SyntaxExtensions
 {
