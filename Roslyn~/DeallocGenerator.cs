@@ -29,6 +29,9 @@ namespace Ksi.Roslyn
                     if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
+                    if (structDecl.AttributeLists.ContainsRefList())
+                        return false;
+
                     return structDecl.AttributeLists.ContainsDealloc();
                 },
                 transform: (ctx, _) =>

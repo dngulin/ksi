@@ -65,7 +65,6 @@ public static class TypeSymbolExtensions
     public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);
     public static bool IsRefList(this ITypeSymbol self) => self.Is(SymbolNames.RefList);
     public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
-    public static bool IsDeallocOrRefList(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc, SymbolNames.RefList);
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
@@ -73,13 +72,5 @@ public static class TypeSymbolExtensions
             return false;
 
         return self.GetAttributes().Any(attribute => attribute.Is(attributeName));
-    }
-
-    private static bool Is(this ITypeSymbol self, string a1, string a2)
-    {
-        if (self.TypeKind != TypeKind.Struct)
-            return false;
-
-        return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2));
     }
 }

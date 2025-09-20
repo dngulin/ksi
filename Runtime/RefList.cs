@@ -1,4 +1,4 @@
-#pragma warning disable DYNSIZED02
+#pragma warning disable DEALLOC03, DYNSIZED02
 
 namespace Ksi
 {
@@ -16,7 +16,7 @@ namespace Ksi
         internal int Count;
     }
 
-    [ExplicitCopy, DynSized, RefList]
+    [ExplicitCopy, DynSized, Dealloc, RefList]
     public struct NativeRefList<T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;
