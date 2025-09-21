@@ -36,16 +36,16 @@ public static class MethodSymbolExtensions
         if (p.RefKind == RefKind.None || !p.Type.IsRefList())
             return false;
 
-        if (!self.ReturnType.IsSpan(out var isReadOnly))
+        if (!self.ReturnType.IsSpanOrReadonlySpan(out var isMut))
             return false;
 
-        return (isReadOnly && p.RefKind == RefKind.In && self.Name == "AsReadOnlySpan") ||
-               (!isReadOnly && p.RefKind == RefKind.Ref && self.Name == "AsSpan");
+        return (!isMut && p.RefKind == RefKind.In && self.Name == "AsReadOnlySpan") ||
+               (isMut && p.RefKind == RefKind.Ref && self.Name == "AsSpan");
     }
 
     public static bool IsSpanSlice(this IMethodSymbol self)
     {
-        return self.ReturnType.IsRefLikeType && self.Name == "Slice" && self.ContainingType.IsSpan(out _);
+        return self.ReturnType.IsRefLikeType && self.Name == "Slice" && self.ContainingType.IsSpanOrReadonlySpan();
     }
 
     public static bool IsExplicitCopyReturn(this IMethodSymbol self) => self.Is(SymbolNames.ExplicitCopyReturn);

@@ -220,6 +220,6 @@ public static class OperationRefPathExtensions
         if (self.Instance?.Type == null)
             return false;
 
-        return self.Instance.Type.IsSpan(out _);
+        return self.Instance.Type.IsSpanOrReadonlySpan();
     }
 }

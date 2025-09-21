@@ -24,42 +24,48 @@ public static class TypeSymbolExtensions
 
     public static bool IsDynSizedOrWrapsDynSized(this ITypeSymbol self)
     {
-        if (self.Is(SymbolNames.DynSized))
-            return true;
-
-        if (self.IsSpan(out _))
-            return self is INamedTypeSymbol nt && nt.TryGetGenericArg(out var gt) && gt!.IsDynSizedOrWrapsDynSized();
-
-        return false;
+        return self.Is(SymbolNames.DynSized) || self.WrapsDynSized();
     }
 
-    public static bool IsSpan(this ITypeSymbol self, out bool isReadOnly)
+    public static bool WrapsDynSized(this ITypeSymbol self)
     {
-        isReadOnly = false;
-
-        if (!self.IsRefLikeType)
+        if (!self.IsRefLikeType || self is not INamedTypeSymbol { IsGenericType: true } nt)
             return false;
 
-        if (self is not INamedTypeSymbol nt)
+        if (nt.TypeArguments.Length != 1 || nt.TypeArguments.First() is not INamedTypeSymbol gt)
             return false;
 
-        if (nt.ContainingNamespace.Name != "System")
-            return false;
-
-        switch (nt.Name)
-        {
-            case "Span":
-                isReadOnly = false;
-                return true;
-            case "ReadOnlySpan":
-                isReadOnly = true;
-                return true;
-            default:
-                return false;
-        }
+        return nt.IsWrappedRef() && gt.IsDynSizedOrWrapsDynSized();
     }
 
-    public static bool IsWrappedRef(this ITypeSymbol self) => self.IsSpan(out _);
+    public static bool IsSpanOrReadonlySpan(this ITypeSymbol self, out bool isMut)
+    {
+        isMut = false;
+
+        if (!self.IsRefLikeType || self is not INamedTypeSymbol nt)
+            return false;
+
+        if (nt.IsSpan())
+        {
+            isMut = true;
+            return true;
+        }
+
+        return nt.IsReadOnlySpan();
+    }
+
+    public static bool IsSpanOrReadonlySpan(this ITypeSymbol self) => self.IsSpanOrReadonlySpan(out _);
+
+    private static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLike("System", "Span");
+    private static bool IsReadOnlySpan(this INamedTypeSymbol self) => self.IsRefLike("System", "ReadOnlySpan");
+
+    private static bool IsRefLike(this INamedTypeSymbol self, string ns, string name)
+    {
+        return self.IsRefLikeType && self.ContainingNamespace.Name == ns && self.Name == name;
+    }
+
+    public static bool IsWrappedRef(this ITypeSymbol self, out bool isMut) => self.IsSpanOrReadonlySpan(out isMut);
+    public static bool IsWrappedRef(this ITypeSymbol self) => self.IsWrappedRef(out _);
 
     public static bool IsExplicitCopy(this ITypeSymbol self) => self.Is(SymbolNames.ExplicitCopy);
     public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);

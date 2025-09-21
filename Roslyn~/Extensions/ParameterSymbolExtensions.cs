@@ -11,10 +11,8 @@ public static class ParameterSymbolExtensions
 
     public static bool IsMut(this IParameterSymbol self)
     {
-        if (self.Type.IsSpan(out var readOnly))
-        {
-            return !readOnly;
-        }
+        if (self.Type.IsWrappedRef(out var isMut))
+            return isMut;
 
         return self.RefKind == RefKind.Ref;
     }
