@@ -262,7 +262,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
                 if (p == null || !p.IsMut())
                     return false;
 
-                return p.Type.IsDynSized() && !p.IsDynNoResize();
+                return p.Type.IsDynSizedOrWrapsDynSized() && !p.IsDynNoResize();
             })
             .Select(a => (RefPath: a.Value.ToRefPath(), Arg: a.Syntax.GetLocation()))
             .Where(x => !x.RefPath.IsEmpty)
@@ -276,7 +276,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             return;
 
         var noResizeParams = m.Parameters
-            .Where(p => p.IsMut() && p.Type.IsDynSized() && p.IsDynNoResize())
+            .Where(p => p.IsMut() && p.Type.IsDynSizedOrWrapsDynSized() && p.IsDynNoResize())
             .Select(p => p.Name)
             .ToImmutableArray();
 
@@ -300,7 +300,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
             if (!p.IsDynNoResize())
                 continue;
 
-            if (!p.IsMut() || !p.Type.IsDynSized())
+            if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeAnnotationRule, p.Locations.First()));
         }
     }

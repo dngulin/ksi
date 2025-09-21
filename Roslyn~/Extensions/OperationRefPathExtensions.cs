@@ -123,7 +123,7 @@ public static class OperationRefPathExtensions
         if (suffix.Finished)
             return;
 
-        if (t.IsDynSized())
+        if (t.IsDynSizedOrWrapsDynSized())
         {
             suffix.Finished = true;
             return;
@@ -139,7 +139,7 @@ public static class OperationRefPathExtensions
             switch (self)
             {
                 case ILocalReferenceOperation lr:
-                    if (lr.Local.Type.IsDynSized())
+                    if (lr.Local.Type.IsDynSizedOrWrapsDynSized())
                         return true;
 
                     if (!lr.Local.IsRefOrWrappedRef())
@@ -156,10 +156,10 @@ public static class OperationRefPathExtensions
 
 
                 case IParameterReferenceOperation pr:
-                    return pr.Parameter.IsRefOrWrappedRef() && pr.Parameter.Type.IsDynSized();
+                    return pr.Parameter.IsRefOrWrappedRef() && pr.Parameter.Type.IsDynSizedOrWrapsDynSized();
 
                 case IFieldReferenceOperation f:
-                    if (f.Type != null && f.Type.IsDynSized()) return true;
+                    if (f.Type != null && f.Type.IsDynSizedOrWrapsDynSized()) return true;
 
                     if (f.Instance != null)
                     {
@@ -183,10 +183,10 @@ public static class OperationRefPathExtensions
                     if (!m.ReturnsRefOrWrappedRef())
                         return false;
 
-                    if (m.ReturnType.IsDynSized())
+                    if (m.ReturnType.IsDynSizedOrWrapsDynSized())
                         return true;
 
-                    if (m.Parameters.Where(p => p.IsRefOrWrappedRef()).Any(p => p.Type.IsDynSized()))
+                    if (m.Parameters.Where(p => p.IsRefOrWrappedRef()).Any(p => p.Type.IsDynSizedOrWrapsDynSized()))
                         return true;
 
                     if (m.IsRefPathExtension())

@@ -22,13 +22,13 @@ public static class TypeSymbolExtensions
         return true;
     }
 
-    public static bool IsDynSized(this ITypeSymbol self)
+    public static bool IsDynSizedOrWrapsDynSized(this ITypeSymbol self)
     {
         if (self.Is(SymbolNames.DynSized))
             return true;
 
         if (self.IsSpan(out _))
-            return self is INamedTypeSymbol nt && nt.TryGetGenericArg(out var gt) && gt!.IsDynSized();
+            return self is INamedTypeSymbol nt && nt.TryGetGenericArg(out var gt) && gt!.IsDynSizedOrWrapsDynSized();
 
         return false;
     }
@@ -64,6 +64,7 @@ public static class TypeSymbolExtensions
     public static bool IsExplicitCopy(this ITypeSymbol self) => self.Is(SymbolNames.ExplicitCopy);
     public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);
     public static bool IsRefList(this ITypeSymbol self) => self.Is(SymbolNames.RefList);
+    public static bool IsDynSized(this ITypeSymbol self) => self.Is(SymbolNames.DynSized);
     public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
 
     private static bool Is(this ITypeSymbol self, string attributeName)
