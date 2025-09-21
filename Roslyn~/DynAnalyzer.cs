@@ -73,6 +73,13 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "DynNoResize attribute is added to non-compatible parameter and has no effect."
     );
 
+    private static readonly DiagnosticDescriptor ReassignWrappedRefParameterRule = Rule(
+        DiagnosticSeverity.Error,
+        "Reassigning DynSized Wrapped Reference Parameter",
+        "Reassigning a parameter that wraps a DynSized reference is not supported by lifetime analyzer. " +
+        "Consider to introduce a local variable"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         FieldRule,
         RedundantRule,
@@ -80,7 +87,8 @@ public class DynAnalyzer : DiagnosticAnalyzer
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
         DynNoResizeRule,
-        DynNoResizeAnnotationRule
+        DynNoResizeAnnotationRule,
+        ReassignWrappedRefParameterRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -150,11 +158,16 @@ public class DynAnalyzer : DiagnosticAnalyzer
     {
         var a = (ISimpleAssignmentOperation)ctx.Operation;
 
-        if (a.Target is not ILocalReferenceOperation lr)
-            return;
+        switch (a.Target)
+        {
+            case ILocalReferenceOperation lr when lr.Local.IsRef && a.IsRef || lr.Local.Type.IsWrappedRef():
+                AnalyzeReferenceOp(ctx, a.Target);
+                break;
 
-        if (lr.Local.IsRef && a.IsRef || lr.Local.Type.IsWrappedRef())
-            AnalyzeReferenceOp(ctx, a.Target);
+            case IParameterReferenceOperation pr when pr.Parameter.Type.WrapsDynSized():
+                ctx.ReportDiagnostic(Diagnostic.Create(ReassignWrappedRefParameterRule, a.Syntax.GetLocation()));
+                break;
+        }
     }
 
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
