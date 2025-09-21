@@ -249,7 +249,7 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
         {
-            var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
+            var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ctx.CancellationToken);
             if (sym == null)
                 return;
 

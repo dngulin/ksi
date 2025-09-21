@@ -34,11 +34,11 @@ namespace Ksi.Roslyn
 
                     return structDecl.AttributeLists.ContainsDealloc();
                 },
-                transform: (ctx, _) =>
+                transform: (ctx, ct) =>
                 {
                     var c = (StructDeclarationSyntax)ctx.Node;
 
-                    var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
+                    var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
                     var result = new DeallocInfo(c.Identifier.ValueText);
 
                     if (t == null)

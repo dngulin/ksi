@@ -35,11 +35,11 @@ namespace Ksi.Roslyn
 
                     return structDecl.AttributeLists.ContainsExplicitCopy();
                 },
-                transform: (ctx, _) =>
+                transform: (ctx, ct) =>
                 {
                     var c = (StructDeclarationSyntax)ctx.Node;
 
-                    var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node);
+                    var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
                     var result = new TypeInfo(c.Identifier.ValueText);
 
                     if (t == null)
