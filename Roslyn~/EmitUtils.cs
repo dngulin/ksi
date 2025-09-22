@@ -6,12 +6,13 @@ namespace Ksi.Roslyn
     {
         public static void EmitRefListMethods(string tpl, StringBuilder sb, string typeName, bool unmanaged)
         {
-            sb.AppendLine(string.Format(tpl, "RefList", typeName));
-            if (!unmanaged)
-                return;
+            if (unmanaged)
+            {
+                sb.AppendLine(string.Format(tpl, "RefList", typeName));
+                sb.AppendLine(string.Format(tpl, "TempRefList", typeName));
+            }
 
-            sb.AppendLine(string.Format(tpl, "NativeRefList", typeName));
-            sb.AppendLine(string.Format(tpl, "TempRefList", typeName));
+            sb.AppendLine(string.Format(tpl, "ManagedRefList", typeName));
         }
     }
 }

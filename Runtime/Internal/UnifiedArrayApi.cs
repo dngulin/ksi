@@ -8,36 +8,17 @@ namespace Ksi
 {
     internal static class UnifiedArrayApi
     {
-        public static void Clear<T>(this T[] self, int len)
-            where T : struct => Array.Clear(self, 0, len);
         public static unsafe void Clear<T>(this ref UnsafeArray<T> self, int len)
             where T : unmanaged => MemSet(self.Buffer, 0, sizeof(T) * len);
 
-        public static void CopyFrom<T>(this T[] self, T[] other, int len)
-            where T : struct => Array.Copy(other, self, len);
         public static unsafe void CopyFrom<T>(this ref UnsafeArray<T> self, in UnsafeArray<T> other, int len)
             where T : unmanaged => MemCpy(self.Buffer, other.Buffer, sizeof(T) * len);
 
-        public static void CopyInner<T>(this T[] self, int srcIdx, int dstIdx, int count)
-            where T : struct => Array.Copy(self, srcIdx, self, dstIdx, count);
         public static unsafe void CopyInner<T>(this ref UnsafeArray<T> self, int srcIdx, int dstIdx, int count)
             where T : unmanaged => MemMove(&self.Buffer[dstIdx], &self.Buffer[srcIdx], sizeof(T) * count);
 
-        public static ref T Index<T>(this T[] self, int idx)
-            where T : struct => ref self[idx];
         public static unsafe ref T Index<T>(this in UnsafeArray<T> self, int idx)
             where T : unmanaged => ref self.Buffer[idx];
-
-        public static void Resize<T>(ref T[] self, int len) where T : struct
-        {
-            if (len == 0)
-            {
-                self = null;
-                return;
-            }
-
-            Array.Resize(ref self, len);
-        }
 
         public static unsafe void Resize<T>(this ref UnsafeArray<T> self, int len, Allocator allocator) where T : unmanaged
         {
