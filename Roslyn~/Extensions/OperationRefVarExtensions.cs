@@ -132,6 +132,7 @@ public static class OperationRefVarExtensions
                 switch (op)
                 {
                     case IVariableDeclaratorOperation d:
+                    {
                         if (d.Symbol.Name != self.Local.Name)
                             return null;
 
@@ -140,12 +141,23 @@ public static class OperationRefVarExtensions
                             return null;
 
                         return new RefVarInfo(d.Symbol, varKind, p);
+                    }
 
                     case ISimpleAssignmentOperation { Target: ILocalReferenceOperation r } a:
+                    {
                         if (!a.AssignsRefOrRefLike(r) || r.Local.Name != self.Local.Name)
                             return null;
 
                         return new RefVarInfo(r.Local, RefVarKind.LocalSymbolRef, a.Value);
+                    }
+
+                    case IArgumentOperation { Value: ILocalReferenceOperation r } a:
+                    {
+                        if (a.Parameter is not { RefKind: RefKind.Out } p || !p.Type.IsWrappedRef())
+                            return null;
+
+                        return new RefVarInfo(r.Local, RefVarKind.UnknownWrappedRef, a);
+                    }
 
                     default:
                         return null;
