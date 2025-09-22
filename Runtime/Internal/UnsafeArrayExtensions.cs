@@ -6,7 +6,7 @@ using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
 namespace Ksi
 {
-    internal static class UnifiedArrayApi
+    internal static class UnsafeArrayExtensions
     {
         public static unsafe void Clear<T>(this ref UnsafeArray<T> self, int len)
             where T : unmanaged => MemSet(self.Buffer, 0, sizeof(T) * len);
