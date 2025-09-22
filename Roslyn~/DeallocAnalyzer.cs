@@ -47,7 +47,7 @@ namespace Ksi.Roslyn
         private static readonly DiagnosticDescriptor OverwriteRule = Rule(
             DiagnosticSeverity.Error,
             "Dealloc Instance Overwrite",
-            "Overwriting a Dealloc type instance can cause memory leak due to missing deallocation call"
+            "Operation overwrites a Dealloc type instance without calling Dealloc"
         );
 
         private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(
@@ -74,7 +74,8 @@ namespace Ksi.Roslyn
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
-            context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+            context.RegisterOperationAction(AnalyzeInvocationAssignment, OperationKind.Invocation);
+            context.RegisterOperationAction(AnalyzeInvocationSafety, OperationKind.Invocation);
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -125,7 +126,7 @@ namespace Ksi.Roslyn
             ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, assignment.Syntax.GetLocation()));
         }
 
-        private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+        private static void AnalyzeInvocationAssignment(OperationAnalysisContext ctx)
         {
             var i = (IInvocationOperation)ctx.Operation;
             var m = i.TargetMethod;
@@ -150,6 +151,20 @@ namespace Ksi.Roslyn
                     ctx.ReportDiagnostic(Diagnostic.Create(NotAssignedValueRule, i.Syntax.GetLocation()));
                     break;
             }
+        }
+
+        private static void AnalyzeInvocationSafety(OperationAnalysisContext ctx)
+        {
+            var i = (IInvocationOperation)ctx.Operation;
+
+            if (i.Instance?.Type is not INamedTypeSymbol nt || !nt.IsSpan())
+                return;
+
+            if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsDealloc())
+                return;
+
+            if (i.TargetMethod.Name == "Clear")
+                ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, i.Syntax.GetLocation()));
         }
     }
 }

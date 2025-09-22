@@ -76,6 +76,11 @@ namespace Ksi.Roslyn
             "Type `{0}` is marked as `ExplicitCopy` and cannot be used in tuples"
         );
 
+        private static readonly DiagnosticDescriptor GenericCopyRule = Rule(
+            "Copied in Generic Context",
+            "Operation produces non-explicit copy of `{0}` in generic context"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             ParameterRule,
             ArgumentRule,
@@ -86,7 +91,8 @@ namespace Ksi.Roslyn
             AssignmentRule,
             PrivateFieldRule,
             GenericTypeRule,
-            TupleRule
+            TupleRule,
+            GenericCopyRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -113,6 +119,7 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
             context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
+            context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
         }
 
         private static void AnalyzeParameter(SymbolAnalysisContext ctx)
@@ -267,6 +274,27 @@ namespace Ksi.Roslyn
 
                 if (e.Type.IsExplicitCopy())
                     ctx.ReportDiagnostic(Diagnostic.Create(TupleRule, e.Syntax.GetLocation(), e.Type.Name));
+            }
+        }
+
+        private static void AnalyzeInvocation(OperationAnalysisContext ctx)
+        {
+            var i = (IInvocationOperation)ctx.Operation;
+
+            if (i.Instance?.Type is not INamedTypeSymbol nt || !nt.IsSpanOrReadonlySpan())
+                return;
+
+            if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsDynSized())
+                return;
+
+            switch (i.TargetMethod.Name)
+            {
+                case "CopyTo":
+                case "TryCopyTo":
+                case "ToArray":
+                case "Fill":
+                    ctx.ReportDiagnostic(Diagnostic.Create(GenericCopyRule, i.Syntax.GetLocation(), gt.Name));
+                    break;
             }
         }
 

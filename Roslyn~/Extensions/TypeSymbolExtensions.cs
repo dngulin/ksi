@@ -56,7 +56,7 @@ public static class TypeSymbolExtensions
 
     public static bool IsSpanOrReadonlySpan(this ITypeSymbol self) => self.IsSpanOrReadonlySpan(out _);
 
-    private static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLike("System", "Span");
+    public static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLike("System", "Span");
     private static bool IsReadOnlySpan(this INamedTypeSymbol self) => self.IsRefLike("System", "ReadOnlySpan");
 
     private static bool IsRefLike(this INamedTypeSymbol self, string ns, string name)
