@@ -41,7 +41,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor NonRefPathRefenceRule = Rule(
         DiagnosticSeverity.Error,
         "Non RefPath reference to DynSized data",
-        "Non RefPath reference to DynSized data breaks reference lifetime analysis"
+        "Operation produces non-RefPath reference to DynSized data that breaks reference lifetime analysis"
     );
 
     private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
@@ -105,6 +105,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeWrappedRefArgs, OperationKind.Invocation);
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
     }
 
@@ -301,6 +302,26 @@ public class DynAnalyzer : DiagnosticAnalyzer
             var root = refPath.Segments[0];
             if (noResizeParams.Contains(root))
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeRule, location, refPath));
+        }
+    }
+
+    private static void AnalyzeWrappedRefArgs(OperationAnalysisContext ctx)
+    {
+        var i = (IInvocationOperation)ctx.Operation;
+
+        foreach (var a in i.Arguments)
+        {
+            var p = a.Parameter;
+            if (p is not { RefKind: RefKind.Ref or RefKind.Out } || !p.Type.IsWrappedRef())
+                continue;
+
+            switch (p.RefKind)
+            {
+                case RefKind.Ref when p.Type.WrapsDynSized() || a.Value.ReferencesDynSizeInstance():
+                case RefKind.Out when p.Type.WrapsDynSized():
+                    ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, a.Syntax.GetLocation()));
+                    break;
+            }
         }
     }
 
