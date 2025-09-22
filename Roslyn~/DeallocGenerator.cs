@@ -54,25 +54,16 @@ namespace Ksi.Roslyn
                         if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct || f.IsStatic)
                             continue;
 
-                        if (f.Type is not INamedTypeSymbol ft)
+                        if (f.Type is not INamedTypeSymbol ft || !ft.IsDealloc())
                             continue;
 
-                        if (ft.IsDealloc())
-                        {
-                            result.Fields.Add(f.Name);
-                            usings.Add(ft.ContainingNamespace.ToDisplayString());
-                        }
-                        else if (ft.IsUnmanagedRefList())
-                        {
-                            result.Fields.Add(f.Name);
-                            usings.Add(ft.ContainingNamespace.ToDisplayString());
+                        result.Fields.Add(f.Name);
+                        usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.IsDealloc())
-                                usings.Add(gt!.ContainingNamespace.ToDisplayString());
-                        }
+                        if (ft.IsUnmanagedRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsDealloc())
+                            usings.Add(gt!.ContainingNamespace.ToDisplayString());
                     }
 
-                    usings.Add(EmitUtils.RootNamespace);
                     usings.Remove(result.Namespace);
                     result.Usings = usings.ToArray();
 

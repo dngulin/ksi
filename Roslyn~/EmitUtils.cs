@@ -4,8 +4,6 @@ namespace Ksi.Roslyn
 {
     public static class EmitUtils
     {
-        public const string RootNamespace = "Ksi";
-
         public static void EmitRefListMethods(string tpl, StringBuilder sb, string typeName, bool unmanaged)
         {
             sb.AppendLine(string.Format(tpl, "RefList", typeName));

@@ -59,26 +59,18 @@ namespace Ksi.Roslyn
                         if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
-                        if (ft.IsExplicitCopy())
-                        {
-                            result.Fields.Add((f.Name, true));
-                            usings.Add(ft.ContainingNamespace.ToDisplayString());
-                        }
-                        else if (ft.IsUnmanagedRefList())
-                        {
-                            result.Fields.Add((f.Name, true));
-                            usings.Add(ft.ContainingNamespace.ToDisplayString());
+                        var isExplicitCopy = ft.IsExplicitCopy();
+                        result.Fields.Add((f.Name, isExplicitCopy));
 
-                            if (ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
-                                usings.Add(gt!.ContainingNamespace.ToDisplayString());
-                        }
-                        else
-                        {
-                            result.Fields.Add((f.Name, false));
-                        }
+                        if (!isExplicitCopy)
+                            continue;
+
+                        usings.Add(ft.ContainingNamespace.ToDisplayString());
+
+                        if (ft.IsUnmanagedRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
+                            usings.Add(gt!.ContainingNamespace.ToDisplayString());
                     }
 
-                    usings.Add(EmitUtils.RootNamespace);
                     usings.Remove(result.Namespace);
                     result.Usings = usings.ToArray();
 
