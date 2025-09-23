@@ -13,7 +13,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a method that returns a new instance of the ExplicitCopy type.
+    /// Attribute to indicate a method that returns a new instance of the [ExplicitCopy] type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class ExplicitCopyReturnAttribute : Attribute
@@ -21,9 +21,28 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to provide Dealloc extension methods.
-    /// Should be added to a struct that contains fields of Dealloc or RefList types.
-    /// Also requires an ExplicitCopy attribute.
+    /// Attribute to indicate a [ExplicitCopy] type that contains a dynamically sized buffer.
+    /// Should be added to a struct that contains fields of the [DynSized] type.
+    /// Enables reference lifetime and aliasing diagnostics.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class DynSizedAttribute : Attribute
+    {
+    }
+
+    /// <summary>
+    /// Attribute that disallows any resizing operations on a [DynSized] type instance.
+    /// Allows getting mutable references to collection items but disallows collection resizing.
+    /// Hints the reference lifetime analyzer that any internal buffer cannot be resized.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public class DynNoResizeAttribute : Attribute
+    {
+    }
+
+    /// <summary>
+    /// Attribute to indicate a [DynSized] type that requires manual deallocation.
+    /// Should be added to a struct that contains fields of the [Dealloc] type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public class DeallocAttribute : Attribute
@@ -40,28 +59,9 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a "dynamically sized" type.
-    /// Should be added to a struct that contains any [DynSized] field.
-    /// Enables reference lifetime and aliasing diagnostics.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Struct)]
-    public class DynSizedAttribute : Attribute
-    {
-    }
-
-    /// <summary>
-    /// Attribute that disallows any resizing operations on a [DynSized] type instance.
-    /// Allows getting mutable references to collection items but disallows collection resizing.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter)]
-    public class DynNoResizeAttribute : Attribute
-    {
-    }
-
-    /// <summary>
-    /// Attribute to indicate a temporary type that can be crated only on stack.
-    /// Behaves similarly to ref struct but can be used as a generic parameter.
-    /// Should be added to a struct that contains any [Temp] field.
+    /// Attribute to indicate a [DynSized] type that uses temporary allocator and should be created only on stack.
+    /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
+    /// Should be added to a struct that contains fields of the [Temp] type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public class TempAttribute : Attribute
@@ -88,8 +88,8 @@ namespace Ksi
 
     /// <summary>
     /// A hint attribute for the reference path analyzer.
-    /// Indicates that the extension method returns a RefList item reference.
-    /// Can be added only for the RefList extension method that returns a RefList's item.
+    /// Indicates that the extension method returns a [RefList] type item reference.
+    /// Can be added only for the [RefList] type extension method that returns a collection item.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class RefListIndexerAttribute : Attribute
