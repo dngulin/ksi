@@ -59,6 +59,16 @@ namespace Ksi
     }
 
     /// <summary>
+    /// Attribute to indicate a temporary type that can be crated only on stack.
+    /// Behaves similarly to ref struct but can be used as a generic parameter.
+    /// Should be added to a struct that contains any [Temp] field.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class TempAttribute : Attribute
+    {
+    }
+
+    /// <summary>
     /// A hint attribute for the reference path analyzer.
     /// Indicates that the extension method returns any inner reference of `this` parameter.
     /// </summary>

@@ -71,6 +71,7 @@ public static class TypeSymbolExtensions
     public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);
     public static bool IsRefList(this ITypeSymbol self) => self.Is(SymbolNames.RefList);
     public static bool IsDynSized(this ITypeSymbol self) => self.Is(SymbolNames.DynSized);
+    public static bool IsTemp(this ITypeSymbol self) => self.Is(SymbolNames.Temp);
     public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
 
     private static bool Is(this ITypeSymbol self, string attributeName)

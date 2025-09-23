@@ -26,6 +26,12 @@ public class DynAnalyzer : DiagnosticAnalyzer
         );
     }
 
+    private static readonly DiagnosticDescriptor ExplicitCopyRule = Rule(
+        DiagnosticSeverity.Error,
+        "ExplicitCopy Attribute Required",
+        "Missing `ExplicitCopy` attribute for a struct `{0}` marked with `DynSized` attribute"
+    );
+
     private static readonly DiagnosticDescriptor FieldRule = Rule(
         DiagnosticSeverity.Error,
         "Field of Non-DynSized Structure",
@@ -81,6 +87,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        ExplicitCopyRule,
         FieldRule,
         RedundantRule,
         NonRefPathRefenceRule,
@@ -133,6 +140,9 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
         if (!hasDynSizedFields)
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
+
+        if (!sym.IsExplicitCopy())
+            ctx.ReportDiagnostic(Diagnostic.Create(ExplicitCopyRule, sym.Locations.First(), sym.Name));
     }
 
     private static void AnalyzeVariableDeclaratorRef(OperationAnalysisContext ctx)

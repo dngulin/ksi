@@ -26,10 +26,10 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor ExplicitCopyRule = Rule(
+        private static readonly DiagnosticDescriptor DynSizedRule = Rule(
             DiagnosticSeverity.Error,
-            "ExplicitCopy Attribute Required",
-            "Structure `{0}` is `Dealloc` and should be marked with `ExplicitCopy`"
+            "DynSized Attribute Required",
+            "Missing `DynSized` attribute for a struct `{0}` marked with `Dealloc` attribute"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
@@ -57,7 +57,7 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            ExplicitCopyRule,
+            DynSizedRule,
             FieldRule,
             RedundantRule,
             OverwriteRule,
@@ -103,8 +103,8 @@ namespace Ksi.Roslyn
             if (!hasDeallocFields)
                 ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
 
-            if (!sym.IsExplicitCopy())
-                ctx.ReportDiagnostic(Diagnostic.Create(ExplicitCopyRule, sym.Locations.First(), sym.Name));
+            if (!sym.IsDynSized())
+                ctx.ReportDiagnostic(Diagnostic.Create(DynSizedRule, sym.Locations.First(), sym.Name));
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)

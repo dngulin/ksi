@@ -11,6 +11,8 @@ namespace Ksi.Roslyn
         public const string DynSized = "DynSized";
         public const string DynNoResize = "DynNoResize";
 
+        public const string Temp = "Temp";
+
         public const string RefPathItem = "RefPathItem";
         public const string RefPathSkip = "RefPathSkip";
 
