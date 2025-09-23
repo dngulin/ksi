@@ -38,6 +38,34 @@ public static class TypeSymbolExtensions
         return nt.IsWrappedRef() && gt.IsDynSizedOrWrapsDynSized();
     }
 
+    public static bool IsGenericReferenceTypeOverDynSized(this INamedTypeSymbol self, out ITypeSymbol? t)
+    {
+
+        if (!self.IsGenericType || !self.IsReferenceType)
+        {
+            t = null;
+            return false;
+        }
+
+        foreach (var arg in self.TypeArguments)
+        {
+            if (arg is not INamedTypeSymbol namedArg)
+                continue;
+
+            if (namedArg.IsDynSized())
+            {
+                t = namedArg;
+                return true;
+            }
+
+            if (namedArg.IsGenericReferenceTypeOverDynSized(out t))
+                return true;
+        }
+
+        t = null;
+        return false;
+    }
+
     public static bool IsSpanOrReadonlySpan(this ITypeSymbol self, out bool isMut)
     {
         isMut = false;
@@ -62,6 +90,16 @@ public static class TypeSymbolExtensions
     private static bool IsRefLike(this INamedTypeSymbol self, string ns, string name)
     {
         return self.IsRefLikeType && self.ContainingNamespace.Name == ns && self.Name == name;
+    }
+
+    public static bool IsExclusiveAccess(this INamedTypeSymbol self)
+    {
+        return self is { IsGenericType: true, TypeArguments.Length: 1 } && self.IsClass("Ksi", "ExclusiveAccess");
+    }
+
+    private static bool IsClass(this INamedTypeSymbol self, string ns, string name)
+    {
+        return self.TypeKind == TypeKind.Class && self.ContainingNamespace.Name == ns && self.Name == name;
     }
 
     public static bool IsWrappedRef(this ITypeSymbol self, out bool isMut) => self.IsSpanOrReadonlySpan(out isMut);

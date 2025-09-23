@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 
 namespace Ksi.Roslyn.Extensions;
@@ -52,5 +53,13 @@ public static class OperationExtensions
 
         collection = i.Arguments.First().Value;
         return true;
+    }
+
+    public static Location GetDeclaredTypeLocation(this IVariableDeclaratorOperation self)
+    {
+        if (self.Syntax.Parent is VariableDeclarationSyntax vds)
+            return vds.Type.GetLocation();
+
+        return self.Syntax.GetLocation();
     }
 }

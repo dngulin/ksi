@@ -86,6 +86,18 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Consider to introduce a local variable"
     );
 
+    private static readonly DiagnosticDescriptor FieldOfReferenceTypeRule = Rule(
+        DiagnosticSeverity.Error,
+        "Field Of Reference Type",
+        "Type `{0}` cannot be a field of a reference type. Consider to wrap it with `ExclusiveAccess<{0}>`"
+    );
+
+    private static readonly DiagnosticDescriptor ReferenceTypeArgumentRule = Rule(
+        DiagnosticSeverity.Error,
+        "Type Argument Of Reference Type",
+        "Type `{0}` cannot be a type argument of a reference type. Consider to wrap it with `ExclusiveAccess<{0}>`"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         ExplicitCopyRule,
         FieldRule,
@@ -95,7 +107,9 @@ public class DynAnalyzer : DiagnosticAnalyzer
         ArgumentRefAliasingRule,
         DynNoResizeRule,
         DynNoResizeAnnotationRule,
-        ReassignWrappedRefParameterRule
+        ReassignWrappedRefParameterRule,
+        FieldOfReferenceTypeRule,
+        ReferenceTypeArgumentRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -107,23 +121,31 @@ public class DynAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
-        context.RegisterOperationAction(AnalyzeVariableDeclaratorRef, OperationKind.VariableDeclarator);
+        context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeVariableAssignmentRef, OperationKind.SimpleAssignment);
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeWrappedRefArgs, OperationKind.Invocation);
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
+        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+        context.RegisterSyntaxNodeAction(AnalyzeArrayType, SyntaxKind.ArrayType);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
     {
         var sym = (IFieldSymbol)ctx.Symbol;
-        if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
+        if (!sym.Type.IsDynSized())
             return;
 
-        if (sym.Type.IsDynSized() && !sym.ContainingType.IsDynSized())
+        if (sym.ContainingType.TypeKind == TypeKind.Struct && !sym.ContainingType.IsDynSized())
             ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+
+        if (sym.ContainingType.TypeKind == TypeKind.Class)
+        {
+            var loc = sym.GetDeclaredTypeLocation(ctx.CancellationToken);
+            ctx.ReportDiagnostic(Diagnostic.Create(FieldOfReferenceTypeRule, loc, sym.Type.Name));
+        }
     }
 
     private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -145,12 +167,28 @@ public class DynAnalyzer : DiagnosticAnalyzer
             ctx.ReportDiagnostic(Diagnostic.Create(ExplicitCopyRule, sym.Locations.First(), sym.Name));
     }
 
-    private static void AnalyzeVariableDeclaratorRef(OperationAnalysisContext ctx)
+    private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
     {
         var d = (IVariableDeclaratorOperation)ctx.Operation;
-        if (!d.Symbol.IsRefOrWrappedRef())
-            return;
+        if (d.Symbol.IsRefOrWrappedRef())
+            AnalyzeRefOrWrappedRefVar(ctx, d);
 
+        var t = d.Symbol.Type switch
+        {
+            IArrayTypeSymbol a when a.ElementType.IsDynSized() => a.ElementType,
+            INamedTypeSymbol n when n.IsGenericReferenceTypeOverDynSized(out var dyn) => dyn,
+            _ => null
+        };
+
+        if (t != null)
+        {
+            var loc = d.GetDeclaredTypeLocation();
+            ctx.ReportDiagnostic(Diagnostic.Create(ReferenceTypeArgumentRule, loc, t.Name));
+        }
+    }
+
+    private static void AnalyzeRefOrWrappedRefVar(OperationAnalysisContext ctx, IVariableDeclaratorOperation d)
+    {
         var i = d.Initializer;
         if (i != null)
         {
@@ -347,5 +385,39 @@ public class DynAnalyzer : DiagnosticAnalyzer
             if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
                 ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeAnnotationRule, p.Locations.First()));
         }
+    }
+
+    private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
+    {
+        var s = (GenericNameSyntax)ctx.Node;
+        if (s.IsUnboundGenericName || s.Parent is VariableDeclarationSyntax)
+            return;
+
+        var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
+        if (i.Type is not INamedTypeSymbol { IsReferenceType: true, IsGenericType: true } t)
+            return;
+
+        if (t.IsExclusiveAccess())
+            return;
+
+        foreach (var a in t.TypeArguments)
+        {
+            if (a is INamedTypeSymbol na && na.IsDynSized())
+                ctx.ReportDiagnostic(Diagnostic.Create(ReferenceTypeArgumentRule, s.GetLocation(), na.Name));
+        }
+    }
+
+    private static void AnalyzeArrayType(SyntaxNodeAnalysisContext ctx)
+    {
+        var a = (ArrayTypeSyntax)ctx.Node;
+        if (a.Parent is VariableDeclarationSyntax)
+            return;
+
+        var i = ctx.SemanticModel.GetTypeInfo(a.ElementType, ctx.CancellationToken);
+        if (i.Type is not INamedTypeSymbol { TypeKind: TypeKind.Struct } t)
+            return;
+
+        if (t.IsDynSized())
+            ctx.ReportDiagnostic(Diagnostic.Create(ReferenceTypeArgumentRule, a.GetLocation(), t.Name));
     }
 }
