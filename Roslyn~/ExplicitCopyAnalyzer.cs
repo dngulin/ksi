@@ -27,13 +27,13 @@ namespace Ksi.Roslyn
         }
 
         private static readonly DiagnosticDescriptor ParameterRule = Rule(
-            "Passed by Value",
-            "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
+            "Received by Value",
+            "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
         );
 
         private static readonly DiagnosticDescriptor ArgumentRule = Rule(
-            "Received by Value",
-            "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
+            "Passed by Value",
+            "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
@@ -75,8 +75,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(
             "Generic Argument",
-            "Passing an instance of the `ExplicitCopy` type `{0}` as a generic argument. " +
-            "Consider to use specialized API"
+            "Passing an instance of the `ExplicitCopy` type `{0}` as a generic argument"
         );
 
         private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(
@@ -135,14 +134,14 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeParameter(SymbolAnalysisContext ctx)
         {
-            var sym = (IParameterSymbol)ctx.Symbol;
-            if (sym.RefKind != RefKind.None)
+            var p = (IParameterSymbol)ctx.Symbol;
+            if (p.RefKind != RefKind.None)
                 return;
 
-            if (!sym.Type.IsExplicitCopy())
+            if (!p.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(ParameterRule, sym.Locations.First(), sym.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(ParameterRule, p.Locations.First(), p.Type.Name));
         }
 
         private static void AnalyzeArgument(OperationAnalysisContext ctx)
@@ -160,8 +159,10 @@ namespace Ksi.Roslyn
                 case RefKind.None:
                     ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, loc, t.Name));
                     break;
-                case RefKind.Ref or RefKind.In when p.Type is not INamedTypeSymbol:
-                    ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
+                case RefKind.Ref or RefKind.In:
+                    var ot = p.OriginalDefinition.Type;
+                    if (ot is ITypeParameterSymbol && !ot.IsExplicitCopy())
+                        ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
                     break;
             }
         }
@@ -169,7 +170,7 @@ namespace Ksi.Roslyn
         private static void AnalyzeField(SymbolAnalysisContext ctx)
         {
             var sym = (IFieldSymbol)ctx.Symbol;
-            if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
+            if (!sym.OriginalDefinition.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
                 return;
 
             var isExplicitCopyStruct = sym.ContainingType.IsExplicitCopy();

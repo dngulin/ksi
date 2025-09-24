@@ -110,18 +110,30 @@ public static class TypeSymbolExtensions
     public static bool IsWrappedRef(this ITypeSymbol self, out bool isMut) => self.IsSpanOrReadonlySpan(out isMut);
     public static bool IsWrappedRef(this ITypeSymbol self) => self.IsWrappedRef(out _);
 
-    public static bool IsExplicitCopy(this ITypeSymbol self) => self.Is(SymbolNames.ExplicitCopy);
-    public static bool IsDealloc(this ITypeSymbol self) => self.Is(SymbolNames.Dealloc);
-    public static bool IsRefList(this ITypeSymbol self) => self.Is(SymbolNames.RefList);
-    public static bool IsDynSized(this ITypeSymbol self) => self.Is(SymbolNames.DynSized);
-    public static bool IsTemp(this ITypeSymbol self) => self.Is(SymbolNames.Temp);
+    public static bool IsExplicitCopy(this ITypeSymbol self)
+    {
+        return self.IsStructOrTypeParameter() && self.Is(SymbolNames.ExplicitCopy);
+    }
+
+    public static bool IsDealloc(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.Dealloc);
+    public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
+    public static bool IsDynSized(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.DynSized);
+    public static bool IsTemp(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.Temp);
     public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
-        if (self.TypeKind != TypeKind.Struct)
-            return false;
-
         return self.GetAttributes().Any(attribute => attribute.Is(attributeName));
+    }
+
+    public static bool IsStruct(this ITypeSymbol self) => self.TypeKind == TypeKind.Struct;
+    public static bool IsStructOrTypeParameter(this ITypeSymbol self)
+    {
+        return self.TypeKind switch
+        {
+            TypeKind.Struct => true,
+            TypeKind.TypeParameter => true,
+            _ => false
+        };
     }
 }
