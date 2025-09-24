@@ -251,7 +251,7 @@ namespace Ksi.Roslyn
 
             var t = d.Symbol.Type switch
             {
-                IArrayTypeSymbol a when a.ElementType.IsDynSized() => a.ElementType,
+                IArrayTypeSymbol a when a.ElementType.IsExplicitCopy() => a.ElementType,
                 INamedTypeSymbol n when n.IsNotSupportedGenericType(out var dyn) => dyn,
                 _ => null
             };
@@ -308,7 +308,7 @@ namespace Ksi.Roslyn
             if (i.Instance?.Type is not INamedTypeSymbol nt || !nt.IsSpanOrReadonlySpan())
                 return;
 
-            if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsDynSized())
+            if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsExplicitCopy())
                 return;
 
             switch (i.TargetMethod.Name)
