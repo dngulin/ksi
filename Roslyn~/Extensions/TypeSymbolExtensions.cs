@@ -120,10 +120,20 @@ public static class TypeSymbolExtensions
         return self.IsStructOrTypeParameter() && self.Is(SymbolNames.Dealloc);
     }
 
+    public static bool IsDeallocOrRefListOverDealloc(this ITypeSymbol self)
+    {
+        if (self.IsDealloc())
+            return true;
+
+        if (!self.IsRefList())
+            return false;
+
+        return self is INamedTypeSymbol nt && nt.TypeArguments.First().IsDealloc();
+    }
+
     public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
     public static bool IsDynSized(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.DynSized);
     public static bool IsTemp(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.Temp);
-    public static bool IsUnmanagedRefList(this ITypeSymbol self) => self.IsUnmanagedType && self.IsRefList();
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {

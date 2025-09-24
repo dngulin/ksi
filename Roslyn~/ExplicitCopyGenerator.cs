@@ -69,7 +69,7 @@ namespace Ksi.Roslyn
 
                         usings.Add(ft.ContainingNamespace.ToDisplayString());
 
-                        if (ft.IsUnmanagedRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
+                        if (ft.IsRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
                             usings.Add(gt!.ContainingNamespace.ToDisplayString());
                     }
 
