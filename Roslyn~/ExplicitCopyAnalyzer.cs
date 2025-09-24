@@ -170,7 +170,7 @@ namespace Ksi.Roslyn
         private static void AnalyzeField(SymbolAnalysisContext ctx)
         {
             var sym = (IFieldSymbol)ctx.Symbol;
-            if (!sym.OriginalDefinition.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
+            if (!sym.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
                 return;
 
             var isExplicitCopyStruct = sym.ContainingType.IsExplicitCopy();

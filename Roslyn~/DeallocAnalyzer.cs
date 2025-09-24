@@ -56,12 +56,19 @@ namespace Ksi.Roslyn
             "Dealloc instance is not assigned"
         );
 
+        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(
+            DiagnosticSeverity.Error,
+            "Generic Argument",
+            "Passing an instance of the `Dealloc` type `{0}` as a generic argument"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             DynSizedRule,
             FieldRule,
             RedundantRule,
             OverwriteRule,
-            NotAssignedValueRule
+            NotAssignedValueRule,
+            GenericArgumentRule
         );
 
         public override void Initialize(AnalysisContext context)
@@ -76,12 +83,13 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterOperationAction(AnalyzeInvocationAssignment, OperationKind.Invocation);
             context.RegisterOperationAction(AnalyzeInvocationSafety, OperationKind.Invocation);
+            context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
         {
             var sym = (IFieldSymbol)ctx.Symbol;
-            if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
+            if (!sym.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
                 return;
 
             if (sym.Type.IsDealloc() && !sym.ContainingType.IsDealloc())
@@ -165,6 +173,30 @@ namespace Ksi.Roslyn
 
             if (i.TargetMethod.Name == "Clear")
                 ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, i.Syntax.GetLocation()));
+        }
+
+        private static void AnalyzeArgument(OperationAnalysisContext ctx)
+        {
+            var arg = (IArgumentOperation)ctx.Operation;
+            var p = arg.Parameter;
+            var t = arg.Value.Type;
+
+            if (p == null || t == null || !t.IsDealloc())
+                return;
+
+            if (p.RefKind is not (RefKind.Ref or RefKind.In))
+                return;
+
+            var ot = p.OriginalDefinition.Type;
+            if (ot is not ITypeParameterSymbol)
+                return;
+
+            // Handled by ExplicitCopy analyzer or already compatible
+            if (!ot.IsExplicitCopy() || ot.IsDealloc())
+                return;
+
+            var loc = arg.Value.Syntax.GetLocation();
+            ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
         }
     }
 }

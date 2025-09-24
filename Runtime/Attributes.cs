@@ -44,8 +44,9 @@ namespace Ksi
     /// <summary>
     /// Attribute to indicate a [DynSized] type that requires manual deallocation.
     /// Should be added to a struct that contains fields of the [Dealloc] type.
+    /// Can be also applied to a generic type parameter to make it compatible with [Dealloc] types.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public class DeallocAttribute : Attribute
     {
     }

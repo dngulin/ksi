@@ -6,7 +6,8 @@ namespace Ksi
     {
         [ExplicitCopyReturn]
         [SuppressMessage("ExplicitCopy", "EXPCOPY07:Copied by Assignment")]
-        public static T Move<[ExplicitCopy]T>(this ref T self) where T : struct
+        [SuppressMessage("Dealloc", "DEALLOC04:Dealloc Instance Overwrite")]
+        public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struct
         {
             var moved = self;
             self = default;
