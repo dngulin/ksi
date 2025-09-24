@@ -6,6 +6,7 @@ using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Ksi.Roslyn.ExplicitCopyTemplates;
 
 namespace Ksi.Roslyn
 {
@@ -17,8 +18,8 @@ namespace Ksi.Roslyn
             public readonly string TypeName = typeName;
             public string? Namespace;
             public bool IsUnmanaged;
-            public bool HasDeallocAttribute;
-            public bool HasTempAttribute;
+            public bool IsDealloc;
+            public bool IsTemp;
             public string[] Usings = [];
             public readonly List<(string, bool)> Fields = new List<(string, bool)>();
         }
@@ -48,8 +49,8 @@ namespace Ksi.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
-                    result.HasDeallocAttribute = t.IsDealloc();
-                    result.HasTempAttribute = t.IsTemp();
+                    result.IsDealloc = t.IsDealloc();
+                    result.IsTemp = t.IsTemp();
 
                     var usings = new HashSet<string>();
 
@@ -108,15 +109,10 @@ namespace Ksi.Roslyn
                         sb.AppendLine("    {");
 
                         EmitExplicitCopyMethods(sb, entry);
-                        EmitUtils.EmitRefListMethods(
-                            entry.HasDeallocAttribute ?
-                                ExplicitCopyTemplates.RefListExtensionsDealloc :
-                                ExplicitCopyTemplates.RefListExtensions,
-                            sb,
-                            entry.TypeName,
-                            entry.IsUnmanaged,
-                            entry.HasTempAttribute
-                        );
+
+                        var template = entry.IsDealloc ? RefListExtensionsDealloc : RefListExtensions;
+                        var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTemp);
+                        RefListUtils.Emit(kinds, template, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");

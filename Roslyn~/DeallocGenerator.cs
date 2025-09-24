@@ -6,6 +6,7 @@ using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Ksi.Roslyn.DeallocTemplates;
 
 namespace Ksi.Roslyn
 {
@@ -101,15 +102,13 @@ namespace Ksi.Roslyn
                         sb.AppendLine("    {");
 
                         EmitDeallocMethod(sb, entry);
-                        sb.AppendLine(string.Format(DeallocTemplates.DeallocatedExtension, entry.TypeName));
+                        sb.AppendLine(string.Format(DeallocatedExtension, entry.TypeName));
 
-                        EmitUtils.EmitRefListMethods(
-                            DeallocTemplates.RefListDeallocMethods,
-                            sb,
-                            entry.TypeName,
-                            entry.IsUnmanaged,
-                            entry.IsTemp
-                        );
+                        var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTemp);
+
+                        RefListUtils.Emit(kinds, RefListDeallocFull, RefListDeallocItems, sb, entry.TypeName);
+                        RefListUtils.Emit(kinds, RefListDeallocated, sb, entry.TypeName);
+                        RefListUtils.Emit(kinds, RefListSpecialized, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
                         sb.AppendLine("}");

@@ -4,9 +4,9 @@ namespace Ksi.Roslyn
     {
         public static readonly string[] RefListExtensionNames = ["Dealloc", "Deallocated", "Clear", "RemoveAt"];
 
-        public const string RefListDeallocMethods = @"
+        public const string RefListDeallocFull = @"
         /// <summary>
-        /// Specialized implementation for Dealloc types
+        /// Specialized implementation for Dealloc item types
         /// </summary>
         public static void Dealloc(this ref {0}<{1}> self)
         {{
@@ -16,20 +16,32 @@ namespace Ksi.Roslyn
             #pragma warning disable REFLIST03
             self.Dealloc<{1}>();
             #pragma warning restore REFLIST03
-        }}
+        }}";
 
+        public const string RefListDeallocItems = @"
         /// <summary>
-        /// Specialized implementation for Dealloc types
+        /// Specialized implementation for Dealloc item types
+        /// </summary>
+        public static void Dealloc(this ref {0}<{1}> self)
+        {{
+            foreach(ref var item in self.RefIter())
+                item.Dealloc();
+        }}";
+
+        public const string RefListDeallocated = @"
+        /// <summary>
+        /// Specialized implementation for Dealloc item types
         /// </summary>
         [NonAllocatedResult]
         public static ref {0}<{1}> Deallocated(this ref {0}<{1}> self)
         {{
             self.Dealloc();
             return ref self;
-        }}
+        }}";
 
+        public const string RefListSpecialized = @"
         /// <summary>
-        /// Specialized implementation for Dealloc types
+        /// Specialized implementation for Dealloc item types
         /// </summary>
         public static void Clear(this ref {0}<{1}> self)
         {{
@@ -42,7 +54,7 @@ namespace Ksi.Roslyn
         }}
 
         /// <summary>
-        /// Specialized implementation for Dealloc types
+        /// Specialized implementation for Dealloc item types
         /// </summary>
         public static void RemoveAt(this ref {0}<{1}> self, int index)
         {{

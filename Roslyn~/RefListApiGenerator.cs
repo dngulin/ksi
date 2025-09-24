@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Ksi.Roslyn.Extensions;
+﻿using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -49,15 +48,15 @@ namespace Ksi.Roslyn
 
             initCtx.RegisterSourceOutput(collected, (ctx, entries) =>
             {
-                var sb = new StringBuilder();
-
                 foreach (var (t, c) in entries)
                 {
                     ctx.AddSource($"{t}.g.cs", string.Format(RefListApiTemplates.StaticApi, t, c));
-                    ctx.AddSource($"{t}Impl.g.cs", string.Format(RefListApiTemplates.Extensions, t, c));
+                    ctx.AddSource($"{t}Impl.g.cs", string.Format(RefListApiTemplates.InstanceApi, t, c));
                     ctx.AddSource($"{t}Iterators.g.cs", string.Format(RefListApiTemplates.Iterators, t, c));
                     ctx.AddSource($"{t}StringExt.g.cs", string.Format(RefListApiTemplates.StringExt, t));
-                    sb.Clear();
+
+                    if (t == "RefList")
+                        ctx.AddSource($"{t}Dealloc.g.cs", string.Format(RefListApiTemplates.Dealloc, t, c));
                 }
             });
         }
