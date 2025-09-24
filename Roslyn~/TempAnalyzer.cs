@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Ksi.Roslyn;
 
@@ -43,10 +44,17 @@ public class TempAnalyzer : DiagnosticAnalyzer
         "Structure `{0}` is marked with the `DynSized` attribute but doesn't have any `Temp` fields"
     );
 
+    private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(
+        DiagnosticSeverity.Error,
+        "Generic Type Argument",
+        "Passing the `Temp` type `{0}` as a type argument"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         DynSizedRule,
         FieldRule,
-        RedundantRule
+        RedundantRule,
+        GenericTypeArgumentRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -58,6 +66,8 @@ public class TempAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+        context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -87,5 +97,39 @@ public class TempAnalyzer : DiagnosticAnalyzer
 
         if (!sym.IsDynSized())
             ctx.ReportDiagnostic(Diagnostic.Create(DynSizedRule, sym.Locations.First(), sym.Name));
+    }
+
+    private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
+    {
+        var s = (GenericNameSyntax)ctx.Node;
+        if (s.IsUnboundGenericName)
+            return;
+
+        var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
+        if (i.Type is not INamedTypeSymbol { IsGenericType: true } n)
+            return;
+
+        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTemp()))
+        {
+            var gt = n.TypeArguments.First();
+            if (gt.IsTemp())
+                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, s.GetLocation(), gt.Name));
+        }
+    }
+
+    private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
+    {
+        var d = (IVariableDeclaratorOperation)ctx.Operation;
+
+        if (d.Symbol.Type is not INamedTypeSymbol { IsGenericType: true } n)
+            return;
+
+        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTemp()))
+        {
+            var gt = n.TypeArguments.First();
+            var loc = d.GetDeclaredTypeLocation();
+            if (gt.IsTemp())
+                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, loc, gt.Name));
+        }
     }
 }
