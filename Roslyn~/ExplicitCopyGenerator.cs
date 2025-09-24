@@ -18,6 +18,7 @@ namespace Ksi.Roslyn
             public string? Namespace;
             public bool IsUnmanaged;
             public bool HasDeallocAttribute;
+            public bool HasTempAttribute;
             public string[] Usings = [];
             public readonly List<(string, bool)> Fields = new List<(string, bool)>();
         }
@@ -48,6 +49,7 @@ namespace Ksi.Roslyn
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
                     result.HasDeallocAttribute = t.IsDealloc();
+                    result.HasTempAttribute = t.IsTemp();
 
                     var usings = new HashSet<string>();
 
@@ -112,7 +114,8 @@ namespace Ksi.Roslyn
                                 ExplicitCopyTemplates.RefListExtensions,
                             sb,
                             entry.TypeName,
-                            entry.IsUnmanaged
+                            entry.IsUnmanaged,
+                            entry.HasTempAttribute
                         );
 
                         sb.AppendLine("    }");

@@ -17,6 +17,7 @@ namespace Ksi.Roslyn
             public readonly string TypeName = typeName;
             public string? Namespace;
             public bool IsUnmanaged;
+            public bool IsTemp;
             public string[] Usings = [];
             public readonly List<string> Fields = new List<string>();
         }
@@ -46,6 +47,7 @@ namespace Ksi.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
+                    result.IsTemp = t.IsTemp();
 
                     var usings = new HashSet<string>();
 
@@ -105,7 +107,8 @@ namespace Ksi.Roslyn
                             DeallocTemplates.RefListDeallocMethods,
                             sb,
                             entry.TypeName,
-                            entry.IsUnmanaged
+                            entry.IsUnmanaged,
+                            entry.IsTemp
                         );
 
                         sb.AppendLine("    }");
