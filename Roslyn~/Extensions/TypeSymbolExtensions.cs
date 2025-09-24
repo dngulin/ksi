@@ -38,10 +38,9 @@ public static class TypeSymbolExtensions
         return nt.IsWrappedRef() && gt.IsDynSizedOrWrapsDynSized();
     }
 
-    public static bool IsGenericReferenceTypeOverDynSized(this INamedTypeSymbol self, out ITypeSymbol? t)
+    public static bool IsNotSupportedGenericType(this INamedTypeSymbol self, out ITypeSymbol? t)
     {
-
-        if (!self.IsGenericType || !self.IsReferenceType)
+        if (!self.IsGenericType || self.IsSupportedGenericType())
         {
             t = null;
             return false;
@@ -58,12 +57,18 @@ public static class TypeSymbolExtensions
                 return true;
             }
 
-            if (namedArg.IsGenericReferenceTypeOverDynSized(out t))
+            if (namedArg.IsNotSupportedGenericType(out t))
                 return true;
         }
 
         t = null;
         return false;
+    }
+
+    public static bool IsSupportedGenericType(this INamedTypeSymbol self)
+    {
+        return self is { IsGenericType: true, TypeArguments.Length: 1 } &&
+               (self.IsWrappedRef() || self.IsRefList() || self.IsExclusiveAccess());
     }
 
     public static bool IsSpanOrReadonlySpan(this ITypeSymbol self, out bool isMut)

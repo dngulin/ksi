@@ -17,7 +17,7 @@ namespace Ksi.Roslyn
         private static DiagnosticDescriptor Rule(string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"COPY{++_ruleId:D2}",
+                id: $"EXPCOPY{++_ruleId:D2}",
                 title: title,
                 messageFormat: msg,
                 category: "ExplicitCopy",
@@ -28,52 +28,60 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor ParameterRule = Rule(
             "Passed by Value",
-            "Type `{0}` is marked as `ExplicitCopy` and should be received only by reference"
+            "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
         );
 
         private static readonly DiagnosticDescriptor ArgumentRule = Rule(
             "Received by Value",
-            "Type `{0}` is marked as `ExplicitCopy` and should be passed only by reference"
+            "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(
-            "Field of Copy Type",
-            "Type `{0}` is marked as `ExplicitCopy` and can be a field only of a `ExplicitCopy` type"
+            "Field of non-`ExplicitCopy` Struct",
+            "Declaring field of `ExplicitCopy` type `{0}` within non-`ExplicitCopy` struct. " +
+            "Consider to annotate the struct with the `ExplicitCopy` attribute"
         );
 
         private static readonly DiagnosticDescriptor BoxingRule = Rule(
             "Boxed",
-            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be boxed"
+            "Boxing of `ExplicitCopy` type `{0}`"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(
             "Captured by Closure",
-            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be captured by a closure"
+            "Capturing of `ExplicitCopy` type `{0}` by a closure"
         );
 
         private static readonly DiagnosticDescriptor ReturnRule = Rule(
             "Returned by Value",
-            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be returned by value"
+            "Returning an instance of `ExplicitCopy` type `{0}` by value. " +
+            "Consider to annotate the method with the `ExplicitCopyReturn` attribute "
         );
 
         private static readonly DiagnosticDescriptor AssignmentRule = Rule(
             "Copied by Assignment",
-            "Type `{0}` is marked as `ExplicitCopy` and shouldn't be assigned by copying other value"
+            "Copying an instance of `ExplicitCopy` type `{0}` by assignment"
         );
 
         private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(
             "Private Field",
-            "Type `{0}` is marked as `ExplicitCopy` and shouldn't have any private fields"
+            "Declaring a private field in the `ExplicitCopy` type `{0}` prevents from providing explicit copy extensions"
         );
 
         private static readonly DiagnosticDescriptor GenericTypeRule = Rule(
-            "Generic ExplicitCopy Type",
-            "Type `{0}` is marked as `ExplicitCopy` and cannot be a generic type"
+            "Generic Type",
+            "Declaring `ExplicitCopy` type `{0}` as a generic type prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor TupleRule = Rule(
-            "ExplicitCopy Type Within Tuple",
-            "Type `{0}` is marked as `ExplicitCopy` and cannot be used in tuples"
+        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(
+            "Generic Argument",
+            "Passing an instance of the `ExplicitCopy` type `{0}` as a generic argument. " +
+            "Consider to use specialized API"
+        );
+
+        private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(
+            "Generic Type Argument",
+            "Passing the `ExplicitCopy` type `{0}` as a type argument"
         );
 
         private static readonly DiagnosticDescriptor GenericCopyRule = Rule(
@@ -91,7 +99,8 @@ namespace Ksi.Roslyn
             AssignmentRule,
             PrivateFieldRule,
             GenericTypeRule,
-            TupleRule,
+            GenericArgumentRule,
+            GenericTypeArgumentRule,
             GenericCopyRule
         );
 
@@ -120,6 +129,8 @@ namespace Ksi.Roslyn
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
             context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
             context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
+            context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+            context.RegisterSyntaxNodeAction(AnalyzeArrayType, SyntaxKind.ArrayType);
         }
 
         private static void AnalyzeParameter(SymbolAnalysisContext ctx)
@@ -136,15 +147,23 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeArgument(OperationAnalysisContext ctx)
         {
-            var op = (IArgumentOperation)ctx.Operation;
-            if (op.Parameter != null && op.Parameter.RefKind != RefKind.None)
+            var arg = (IArgumentOperation)ctx.Operation;
+            var p = arg.Parameter;
+            var t = arg.Value.Type;
+
+            if (p == null || t == null || !t.IsExplicitCopy())
                 return;
 
-            var t = op.Value.Type;
-            if (t == null || !t.IsExplicitCopy())
-                return;
-
-            ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, op.Value.Syntax.GetLocation(), t.Name));
+            var loc = arg.Value.Syntax.GetLocation();
+            switch (p.RefKind)
+            {
+                case RefKind.None:
+                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, loc, t.Name));
+                    break;
+                case RefKind.Ref or RefKind.In when p.Type is not INamedTypeSymbol:
+                    ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
+                    break;
+            }
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -225,33 +244,37 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
         {
-            var declarator = (IVariableDeclaratorOperation)ctx.Operation;
-            if (declarator.Symbol.IsRef)
-                return;
+            var d = (IVariableDeclaratorOperation)ctx.Operation;
+            if (!d.Symbol.IsRef && d.Initializer != null)
+                AnalyzeAssignment(ctx, d.Initializer.Value, d.Syntax.GetLocation());
 
-            var initializer = declarator.Initializer;
-            if (initializer == null)
-                return;
+            var t = d.Symbol.Type switch
+            {
+                IArrayTypeSymbol a when a.ElementType.IsDynSized() => a.ElementType,
+                INamedTypeSymbol n when n.IsNotSupportedGenericType(out var dyn) => dyn,
+                _ => null
+            };
 
-            var v = initializer.Value;
-            if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
-                return;
-
-            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, declarator.Syntax.GetLocation(), v.Type.Name));
+            if (t != null)
+            {
+                var loc = d.GetDeclaredTypeLocation();
+                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, loc, t.Name));
+            }
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)
         {
             var assignment = (ISimpleAssignmentOperation)ctx.Operation;
-            var v = assignment.Value;
+            if (!assignment.IsRef)
+                AnalyzeAssignment(ctx, assignment.Value, assignment.Syntax.GetLocation());
+        }
 
-            if (assignment.IsRef)
-                return;
-
+        private static void AnalyzeAssignment(OperationAnalysisContext ctx, IOperation v, Location location)
+        {
             if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, assignment.Syntax.GetLocation(), v.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, location, v.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -273,7 +296,7 @@ namespace Ksi.Roslyn
                     continue;
 
                 if (e.Type.IsExplicitCopy())
-                    ctx.ReportDiagnostic(Diagnostic.Create(TupleRule, e.Syntax.GetLocation(), e.Type.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, e.Syntax.GetLocation(), e.Type.Name));
             }
         }
 
@@ -296,6 +319,38 @@ namespace Ksi.Roslyn
                     ctx.ReportDiagnostic(Diagnostic.Create(GenericCopyRule, i.Syntax.GetLocation(), gt.Name));
                     break;
             }
+        }
+
+        private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
+        {
+            var s = (GenericNameSyntax)ctx.Node;
+            if (s.IsUnboundGenericName)
+                return;
+
+            var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
+            if (i.Type is not INamedTypeSymbol { IsGenericType: true } t)
+                return;
+
+            if (t.IsSupportedGenericType())
+                return;
+
+            foreach (var a in t.TypeArguments)
+            {
+                if (a is INamedTypeSymbol na && na.IsExplicitCopy())
+                    ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, s.GetLocation(), na.Name));
+            }
+        }
+
+        private static void AnalyzeArrayType(SyntaxNodeAnalysisContext ctx)
+        {
+            var a = (ArrayTypeSyntax)ctx.Node;
+
+            var i = ctx.SemanticModel.GetTypeInfo(a.ElementType, ctx.CancellationToken);
+            if (i.Type is not INamedTypeSymbol { TypeKind: TypeKind.Struct } t)
+                return;
+
+            if (t.IsExplicitCopy())
+                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, a.GetLocation(), t.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)
