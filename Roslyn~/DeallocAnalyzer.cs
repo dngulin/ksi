@@ -92,7 +92,7 @@ namespace Ksi.Roslyn
             if (!sym.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
                 return;
 
-            if (sym.Type.IsDealloc() && !sym.ContainingType.IsDealloc())
+            if (sym.Type.IsDeallocOrRefListOverDealloc() && !sym.ContainingType.IsDealloc())
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
         }
 
@@ -106,7 +106,7 @@ namespace Ksi.Roslyn
                 .GetMembers()
                 .Where(m => m.Kind == SymbolKind.Field)
                 .Cast<IFieldSymbol>()
-                .Any(field => !field.IsStatic && field.Type.IsDealloc());
+                .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefListOverDealloc());
 
             if (!hasDeallocFields)
                 ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
@@ -125,7 +125,7 @@ namespace Ksi.Roslyn
             if (t == null || !t.IsValueType)
                 return;
 
-            if (!t.IsDealloc())
+            if (!t.IsDeallocOrRefListOverDealloc())
                 return;
 
             if (assignment.Target is IInvocationOperation i && i.TargetMethod.IsNonAllocatedResultRef())
@@ -144,7 +144,7 @@ namespace Ksi.Roslyn
             if (m.ReturnType.TypeKind != TypeKind.Struct || m.ReturnType is not INamedTypeSymbol t)
                 return;
 
-            if (!t.IsDealloc())
+            if (!t.IsDeallocOrRefListOverDealloc())
                 return;
 
             switch (i.Parent?.Kind)
@@ -181,7 +181,7 @@ namespace Ksi.Roslyn
             var p = arg.Parameter;
             var t = arg.Value.Type;
 
-            if (p == null || t == null || !t.IsDealloc())
+            if (p == null || t == null || !t.IsDeallocOrRefListOverDealloc())
                 return;
 
             if (p.RefKind is not (RefKind.Ref or RefKind.In))
