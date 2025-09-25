@@ -39,7 +39,7 @@ public static class OperationRefPathExtensions
             switch (self)
             {
                 case ILocalReferenceOperation lr:
-                    if (!lr.Local.IsRefOrWrappedRef())
+                    if (!lr.Local.IsRefOrWrappedRef() || !lr.Local.IsRef && lr.Local.Type.IsAccessScope())
                     {
                         path.PrependRefSeg(lr.Local.Name, lr.Local.Type, ref suffix);
                         return true;
@@ -88,7 +88,7 @@ public static class OperationRefPathExtensions
                     var m = i.TargetMethod;
                     if (m.IsExtensionMethod)
                     {
-                        if (!m.ReturnsRefOrWrappedRef())
+                        if (!m.ReturnsRefOrSpan())
                             return false;
 
                         if (m.IsRefListIndexer())
@@ -192,7 +192,7 @@ public static class OperationRefPathExtensions
 
                 case IInvocationOperation i:
                     var m = i.TargetMethod;
-                    if (!m.ReturnsRefOrWrappedRef())
+                    if (!m.ReturnsRefOrSpan())
                         return false;
 
                     if (m.ReturnType.IsDynSizedOrWrapsDynSized())

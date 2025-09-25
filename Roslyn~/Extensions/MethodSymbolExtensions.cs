@@ -7,9 +7,9 @@ public static class MethodSymbolExtensions
 {
     public static bool ReturnsRef(this IMethodSymbol self) => self.RefKind is RefKind.Ref or RefKind.RefReadOnly;
 
-    public static bool ReturnsRefOrWrappedRef(this IMethodSymbol self)
+    public static bool ReturnsRefOrSpan(this IMethodSymbol self)
     {
-        return self.ReturnsRef() || self.ReturnType.IsWrappedRef();
+        return self.ReturnsRef() || self.ReturnType.IsSpanOrReadonlySpan();
     }
 
     public static bool ReturnsRefPath(this IMethodSymbol self)
