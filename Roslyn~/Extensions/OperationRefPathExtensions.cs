@@ -138,7 +138,7 @@ public static class OperationRefPathExtensions
         suffix.Length++;
     }
 
-    public static bool ReferencesDynSizeInstance(this IOperation self, bool fullGraph = true)
+    public static bool ReferencesDynSized(this IOperation self, bool fullGraph = true)
     {
         while (true)
         {
@@ -216,7 +216,7 @@ public static class OperationRefPathExtensions
                     if (!fullGraph)
                         return false;
 
-                    return i.Arguments.Any(a => a.Value.ReferencesDynSizeInstance());
+                    return i.Arguments.Any(a => a.Value.ReferencesDynSized());
 
                 default:
                     return false;

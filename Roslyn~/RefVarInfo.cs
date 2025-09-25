@@ -12,7 +12,6 @@ public readonly struct RefVarInfo(ILocalSymbol symbol, RefVarKind kind, IOperati
 
 public enum RefVarKind
 {
-    UnknownWrappedRef,
     LocalSymbolRef,
     IteratorItemRef,
 }
@@ -26,8 +25,7 @@ public static class RefVarInfoExtensions
 
         return self.Kind switch
         {
-            RefVarKind.UnknownWrappedRef => t.WrapsDynSized(),
-            RefVarKind.LocalSymbolRef => p.ReferencesDynSizeInstance(),
+            RefVarKind.LocalSymbolRef => p.ReferencesDynSized(),
             RefVarKind.IteratorItemRef => p.IsRefListIterator(out _),
             _ => false
         };
@@ -40,7 +38,6 @@ public static class RefVarInfoExtensions
 
         return self.Kind switch
         {
-            RefVarKind.UnknownWrappedRef => RefPath.Empty,
             RefVarKind.LocalSymbolRef => p.ToRefPath(),
             RefVarKind.IteratorItemRef => p.IsRefListIterator(out var src) ? src!.ToRefPath(t) : RefPath.Empty,
             _ => RefPath.Empty

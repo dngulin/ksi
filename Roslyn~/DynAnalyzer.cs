@@ -50,6 +50,12 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "Operation produces non-RefPath reference to DynSized data that breaks reference lifetime analysis"
     );
 
+    private static readonly DiagnosticDescriptor AssigningDynSizedRef = Rule(
+        DiagnosticSeverity.Error,
+        "Assigning DynSized Reference",
+        "Assigning or modifying a local DynSized reference is not supported by lifetime analyzer"
+    );
+
     private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
         DiagnosticSeverity.Error,
         "Local Reference Invalidation",
@@ -79,13 +85,6 @@ public class DynAnalyzer : DiagnosticAnalyzer
         "DynNoResize attribute is added to non-compatible parameter and has no effect."
     );
 
-    private static readonly DiagnosticDescriptor ReassignWrappedRefParameterRule = Rule(
-        DiagnosticSeverity.Error,
-        "Reassigning DynSized Wrapped Reference Parameter",
-        "Reassigning a parameter that wraps a DynSized reference is not supported by lifetime analyzer. " +
-        "Consider to introduce a local variable"
-    );
-
     private static readonly DiagnosticDescriptor FieldOfReferenceTypeRule = Rule(
         DiagnosticSeverity.Error,
         "Field Of Reference Type",
@@ -97,11 +96,11 @@ public class DynAnalyzer : DiagnosticAnalyzer
         FieldRule,
         RedundantRule,
         NonRefPathRefenceRule,
+        AssigningDynSizedRef,
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
         DynNoResizeRule,
         DynNoResizeAnnotationRule,
-        ReassignWrappedRefParameterRule,
         FieldOfReferenceTypeRule
     );
 
@@ -119,7 +118,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
-        context.RegisterOperationAction(AnalyzeWrappedRefArgs, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeWrappedRefArg, OperationKind.Argument);
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
     }
 
@@ -181,6 +180,12 @@ public class DynAnalyzer : DiagnosticAnalyzer
             AnalyzeReferenceOp(ctx, collParent!);
     }
 
+    private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
+    {
+        if (op.ReferencesDynSized() && !op.ProducesRefPath())
+            ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, op.Syntax.GetLocation()));
+    }
+
     private static void AnalyzeVariableAssignmentRef(OperationAnalysisContext ctx)
     {
         var a = (ISimpleAssignmentOperation)ctx.Operation;
@@ -188,19 +193,13 @@ public class DynAnalyzer : DiagnosticAnalyzer
         switch (a.Target)
         {
             case ILocalReferenceOperation lr when lr.Local.IsRef && a.IsRef || lr.Local.Type.IsWrappedRef():
-                AnalyzeReferenceOp(ctx, a.Target);
+                if (lr.Local.Type.IsDynSizedOrWrapsDynSized() || a.Value.ReferencesDynSized() || lr.ReferencesDynSized())
+                    ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
                 break;
-
             case IParameterReferenceOperation pr when pr.Parameter.Type.WrapsDynSized():
-                ctx.ReportDiagnostic(Diagnostic.Create(ReassignWrappedRefParameterRule, a.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
                 break;
         }
-    }
-
-    private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
-    {
-        if (op.ReferencesDynSizeInstance() && !op.ProducesRefPath())
-            ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, op.Syntax.GetLocation()));
     }
 
     private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
@@ -216,7 +215,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
                 continue;
 
             var v = a.Value;
-            if (v.ReferencesDynSizeInstance(false) && !v.ProducesRefPath())
+            if (v.ReferencesDynSized(false) && !v.ProducesRefPath())
                 ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, v.Syntax.GetLocation()));
         }
     }
@@ -226,7 +225,7 @@ public class DynAnalyzer : DiagnosticAnalyzer
         var i = (IInvocationOperation)ctx.Operation;
 
         var args = i.Arguments
-            .Where(a => a.Parameter != null && a.Parameter.IsRefOrWrappedRef() && a.Value.ReferencesDynSizeInstance())
+            .Where(a => a.Parameter != null && a.Parameter.IsRefOrWrappedRef() && a.Value.ReferencesDynSized())
             .Select(a =>
             {
                 var p = a.Parameter!;
@@ -331,23 +330,27 @@ public class DynAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeWrappedRefArgs(OperationAnalysisContext ctx)
+    private static void AnalyzeWrappedRefArg(OperationAnalysisContext ctx)
     {
-        var i = (IInvocationOperation)ctx.Operation;
+        var a = (IArgumentOperation)ctx.Operation;
 
-        foreach (var a in i.Arguments)
+        var p = a.Parameter;
+        if (p is not { RefKind: RefKind.Ref or RefKind.Out } || !p.Type.IsWrappedRef())
+            return;
+
+        var t = p.Type;
+        var v = a.Value;
+
+        switch (p.RefKind)
         {
-            var p = a.Parameter;
-            if (p is not { RefKind: RefKind.Ref or RefKind.Out } || !p.Type.IsWrappedRef())
-                continue;
-
-            switch (p.RefKind)
-            {
-                case RefKind.Ref when p.Type.WrapsDynSized() || a.Value.ReferencesDynSizeInstance():
-                case RefKind.Out when p.Type.WrapsDynSized():
-                    ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, a.Syntax.GetLocation()));
-                    break;
-            }
+            case RefKind.Ref when t.WrapsDynSized() || v.ReferencesDynSized():
+            case RefKind.Out when v is ILocalReferenceOperation && (t.WrapsDynSized() || v.ReferencesDynSized()):
+            case RefKind.Out when v is IParameterReferenceOperation && t.WrapsDynSized():
+                ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
+                break;
+            case RefKind.Out when v is IDeclarationExpressionOperation && t.WrapsDynSized():
+                ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRefenceRule, a.Syntax.GetLocation()));
+                break;
         }
     }
 

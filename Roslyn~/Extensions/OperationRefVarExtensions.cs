@@ -31,29 +31,7 @@ public static class OperationRefVarExtensions
                     if (!variables.TryGetValue(r.Local.Name, out var v))
                         continue;
 
-                    var isIterItem = v.Info.Kind == RefVarKind.IteratorItemRef;
-
-                    if (r.IsReassigned(out var newValue) && newValue != null)
-                    {
-                        var oldLifeTime = isIterItem ?
-                            TextSpan.FromBounds(v.Lifetime.Start, newValue.Syntax.Span.End) :
-                            v.Lifetime;
-
-                        if (oldLifeTime.IntersectsWith(pos))
-                        {
-                            variables.Remove(r.Local.Name);
-                            yield return v.Info;
-                            continue;
-                        }
-
-                        var newLifeTime = isIterItem ?
-                            new TextSpan(newValue.Syntax.Span.End, v.Lifetime.End) :
-                            new TextSpan(newValue.Syntax.Span.End, 0);
-
-                        var info = new RefVarInfo(v.Info.Symbol, RefVarKind.LocalSymbolRef, newValue);
-                        variables[r.Local.Name] = (info, newLifeTime);
-                    }
-                    else if (!isIterItem)
+                    if (v.Info.Kind != RefVarKind.IteratorItemRef)
                     {
                         var extendedLifetime = TextSpan.FromBounds(v.Lifetime.Start, r.Syntax.Span.End);
                         if (extendedLifetime.IntersectsWith(pos))
@@ -96,29 +74,6 @@ public static class OperationRefVarExtensions
         return null;
     }
 
-    private static bool IsReassigned(this ILocalReferenceOperation self, out IOperation? value)
-    {
-        if (self.Parent.IsAssignmentOf(self.Local, out value))
-            return true;
-
-        value = null;
-        return false;
-    }
-
-    private static bool IsAssignmentOf(this IOperation? self, ILocalSymbol local, out IOperation? value)
-    {
-        value = null;
-
-        if (self is not ISimpleAssignmentOperation { Target: ILocalReferenceOperation r } a)
-            return false;
-
-        if (!a.AssignsRefOrRefLike(r) || r.Local.Name != local.Name)
-            return false;
-
-        value = a.Value;
-        return true;
-    }
-
     public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
     {
         return self
@@ -143,32 +98,11 @@ public static class OperationRefVarExtensions
                         return new RefVarInfo(d.Symbol, varKind, p);
                     }
 
-                    case ISimpleAssignmentOperation { Target: ILocalReferenceOperation r } a:
-                    {
-                        if (!a.AssignsRefOrRefLike(r) || r.Local.Name != self.Local.Name)
-                            return null;
-
-                        return new RefVarInfo(r.Local, RefVarKind.LocalSymbolRef, a.Value);
-                    }
-
-                    case IArgumentOperation { Value: ILocalReferenceOperation r } a:
-                    {
-                        if (a.Parameter is not { RefKind: RefKind.Out } p || !p.Type.IsWrappedRef())
-                            return null;
-
-                        return new RefVarInfo(r.Local, RefVarKind.UnknownWrappedRef, a);
-                    }
-
                     default:
                         return null;
                 }
             })
             .LastOrDefault(v => v != null);
-    }
-
-    private static bool AssignsRefOrRefLike(this ISimpleAssignmentOperation self, ILocalReferenceOperation target)
-    {
-        return self.IsRef || target.Local.Type.IsRefLikeType;
     }
 
     private static IOperation? GetRefVarProducerOp(this IVariableDeclaratorOperation self, out RefVarKind kind)
