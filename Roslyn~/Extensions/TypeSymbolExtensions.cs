@@ -89,25 +89,47 @@ public static class TypeSymbolExtensions
 
     public static bool IsSpanOrReadonlySpan(this ITypeSymbol self) => self.IsSpanOrReadonlySpan(out _);
 
-    public static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLike("System", "Span");
-    private static bool IsReadOnlySpan(this INamedTypeSymbol self) => self.IsRefLike("System", "ReadOnlySpan");
+    public static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLikeGeneric("System", "Span");
+    private static bool IsReadOnlySpan(this INamedTypeSymbol self) => self.IsRefLikeGeneric("System", "ReadOnlySpan");
 
-    private static bool IsRefLike(this INamedTypeSymbol self, string ns, string name)
+    public static bool IsAccessScope(this ITypeSymbol self, out bool isMut)
     {
-        return self.IsRefLikeType && self.ContainingNamespace.Name == ns && self.Name == name;
+        isMut = false;
+
+        if (!self.IsRefLikeType || self is not INamedTypeSymbol nt)
+            return false;
+
+        if (nt.IsMutableAccessScope())
+        {
+            isMut = true;
+            return true;
+        }
+
+        return nt.IsReadOnlyAccessScope();
     }
 
-    public static bool IsExclusiveAccess(this INamedTypeSymbol self)
+    public static bool IsMutableAccessScope(this INamedTypeSymbol self) => self.IsRefLikeGeneric("Ksi", "MutableAccessScope");
+    private static bool IsReadOnlyAccessScope(this INamedTypeSymbol self) => self.IsRefLikeGeneric("Ksi", "AccessScope");
+
+    private static bool IsRefLikeGeneric(this INamedTypeSymbol self, string ns, string name)
     {
-        return self is { IsGenericType: true, TypeArguments.Length: 1 } && self.IsClass("Ksi", "ExclusiveAccess");
+        return self is { IsRefLikeType: true, IsGenericType: true, TypeArguments.Length: 1 }
+               && self.ContainingNamespace.Name == ns && self.Name == name;
     }
 
-    private static bool IsClass(this INamedTypeSymbol self, string ns, string name)
+    public static bool IsExclusiveAccess(this INamedTypeSymbol self) => self.IsGenericClass("Ksi", "ExclusiveAccess");
+
+    private static bool IsGenericClass(this INamedTypeSymbol self, string ns, string name)
     {
-        return self.TypeKind == TypeKind.Class && self.ContainingNamespace.Name == ns && self.Name == name;
+        return self is { IsGenericType: true, TypeArguments.Length: 1, TypeKind: TypeKind.Class }
+               && self.ContainingNamespace.Name == ns && self.Name == name;
     }
 
-    public static bool IsWrappedRef(this ITypeSymbol self, out bool isMut) => self.IsSpanOrReadonlySpan(out isMut);
+    public static bool IsWrappedRef(this ITypeSymbol self, out bool isMut)
+    {
+        return self.IsSpanOrReadonlySpan(out isMut) || self.IsAccessScope(out isMut);
+    }
+
     public static bool IsWrappedRef(this ITypeSymbol self) => self.IsWrappedRef(out _);
 
     public static bool IsExplicitCopy(this ITypeSymbol self)

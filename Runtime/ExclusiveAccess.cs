@@ -2,7 +2,7 @@ using System;
 
 namespace Ksi
 {
-    public class ExclusiveAccess<T> where T: struct
+    public sealed class ExclusiveAccess<T> where T: struct
     {
         private T _value;
 
