@@ -92,6 +92,8 @@ public static class TypeSymbolExtensions
     public static bool IsSpan(this INamedTypeSymbol self) => self.IsRefLikeGeneric("System", "Span");
     private static bool IsReadOnlySpan(this INamedTypeSymbol self) => self.IsRefLikeGeneric("System", "ReadOnlySpan");
 
+    public static bool IsAccessScope(this ITypeSymbol self) => self.IsAccessScope(out _);
+
     public static bool IsAccessScope(this ITypeSymbol self, out bool isMut)
     {
         isMut = false;

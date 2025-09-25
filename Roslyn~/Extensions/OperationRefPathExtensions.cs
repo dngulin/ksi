@@ -76,6 +76,12 @@ public static class OperationRefPathExtensions
                         continue;
                     }
 
+                    if (pr.IsAccessScopeValue())
+                    {
+                        self = pr.Instance!;
+                        continue;
+                    }
+
                     return false;
 
                 case IInvocationOperation i:
@@ -176,6 +182,12 @@ public static class OperationRefPathExtensions
                         continue;
                     }
 
+                    if (pr.IsAccessScopeValue())
+                    {
+                        self = pr.Instance!;
+                        continue;
+                    }
+
                     return false;
 
                 case IInvocationOperation i:
@@ -221,5 +233,16 @@ public static class OperationRefPathExtensions
             return false;
 
         return self.Instance.Type.IsSpanOrReadonlySpan();
+    }
+
+    private static bool IsAccessScopeValue(this IPropertyReferenceOperation self)
+    {
+        if (self.Property.IsIndexer || self.Property.RefKind == RefKind.None)
+            return false;
+
+        if (self.Instance?.Type == null || self.Property.Name != "Value")
+            return false;
+
+        return self.Instance.Type.IsAccessScope();
     }
 }
