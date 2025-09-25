@@ -21,7 +21,6 @@ public static class RefVarInfoExtensions
     public static bool ReferencesDynSizeInstance(this in RefVarInfo self)
     {
         var p = self.Producer;
-        var t = self.Symbol.Type;
 
         return self.Kind switch
         {
