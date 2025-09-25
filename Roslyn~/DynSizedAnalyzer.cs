@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Ksi.Roslyn;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class DynAnalyzer : DiagnosticAnalyzer
+public class DynSizedAnalyzer : DiagnosticAnalyzer
 {
     private static int _ruleId;
 

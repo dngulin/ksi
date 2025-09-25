@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Ksi.Roslyn
 {
     [Generator(LanguageNames.CSharp)]
-    public class RefListApiGenerator : IIncrementalGenerator
+    public class RefListGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
         {
@@ -50,13 +50,13 @@ namespace Ksi.Roslyn
             {
                 foreach (var (t, c) in entries)
                 {
-                    ctx.AddSource($"{t}.g.cs", string.Format(RefListApiTemplates.StaticApi, t, c));
-                    ctx.AddSource($"{t}Impl.g.cs", string.Format(RefListApiTemplates.InstanceApi, t, c));
-                    ctx.AddSource($"{t}Iterators.g.cs", string.Format(RefListApiTemplates.Iterators, t, c));
-                    ctx.AddSource($"{t}StringExt.g.cs", string.Format(RefListApiTemplates.StringExt, t));
+                    ctx.AddSource($"{t}.g.cs", string.Format(RefListTemplates.StaticApi, t, c));
+                    ctx.AddSource($"{t}Impl.g.cs", string.Format(RefListTemplates.InstanceApi, t, c));
+                    ctx.AddSource($"{t}Iterators.g.cs", string.Format(RefListTemplates.Iterators, t, c));
+                    ctx.AddSource($"{t}StringExt.g.cs", string.Format(RefListTemplates.StringExt, t));
 
                     if (t == "RefList")
-                        ctx.AddSource($"{t}Dealloc.g.cs", string.Format(RefListApiTemplates.Dealloc, t, c));
+                        ctx.AddSource($"{t}Dealloc.g.cs", string.Format(RefListTemplates.Dealloc, t, c));
                 }
             });
         }
