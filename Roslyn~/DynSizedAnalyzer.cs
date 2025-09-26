@@ -79,7 +79,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
     );
 
-    private static readonly DiagnosticDescriptor DynNoResizeRedundantRule = Rule(
+    private static readonly DiagnosticDescriptor RedundantDynNoResizeRule = Rule(
         DiagnosticSeverity.Warning,
         "Redundant DynNoResize Annotation",
         "DynNoResize attribute is added to non-compatible parameter and has no effect."
@@ -100,7 +100,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         LocalRefInvalidationRule,
         ArgumentRefAliasingRule,
         DynNoResizeRule,
-        DynNoResizeRedundantRule,
+        RedundantDynNoResizeRule,
         FieldOfReferenceTypeRule
     );
 
@@ -364,7 +364,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
                 continue;
 
             if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
-                ctx.ReportDiagnostic(Diagnostic.Create(DynNoResizeRedundantRule, p.Locations.First()));
+                ctx.ReportDiagnostic(Diagnostic.Create(RedundantDynNoResizeRule, p.Locations.First()));
         }
     }
 }
