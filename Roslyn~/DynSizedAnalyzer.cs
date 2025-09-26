@@ -257,7 +257,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
         var vars = body
             .FindLocalRefsWithLifetimeIntersectingPos(op.Syntax.SpanStart)
-            .Where(v => v.ReferencesDynSizeInstance())
+            .Where(v => v.ReferencesDynSized())
             .Select(v => (v.Symbol, RefPath: v.GetRefPath()))
             .Where(t => !t.RefPath.IsEmpty)
             .Select(t => (t.Symbol.Name, t.RefPath))

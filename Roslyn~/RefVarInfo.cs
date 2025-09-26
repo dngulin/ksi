@@ -18,7 +18,7 @@ public enum RefVarKind
 
 public static class RefVarInfoExtensions
 {
-    public static bool ReferencesDynSizeInstance(this in RefVarInfo self)
+    public static bool ReferencesDynSized(this in RefVarInfo self)
     {
         var p = self.Producer;
 
