@@ -115,7 +115,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeVariableAssignmentRef, OperationKind.SimpleAssignment);
-        context.RegisterOperationAction(AnalyzeInvocationArgs, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeRefArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeInvocationRefBreaking, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeWrappedRefArg, OperationKind.Argument);
@@ -212,7 +212,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     private static bool IsDynSizedAssignment(IParameterReferenceOperation tgt, IOperation v)
         => tgt.Parameter.Type.WrapsDynSized() || v.ReferencesDynSized();
 
-    private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
+    private static void AnalyzeRefArgs(OperationAnalysisContext ctx)
     {
         var i = (IInvocationOperation)ctx.Operation;
         if (i.TargetMethod.ReturnsRefPath())
