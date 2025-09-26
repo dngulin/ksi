@@ -192,11 +192,12 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
         switch (a.Target)
         {
-            case ILocalReferenceOperation lr when lr.Local.IsRef && a.IsRef || lr.Local.Type.IsWrappedRef():
+            case ILocalReferenceOperation lr when (lr.Local.IsRef && a.IsRef) || lr.Local.Type.IsWrappedRef():
                 if (lr.Local.Type.IsDynSizedOrWrapsDynSized() || a.Value.ReferencesDynSized() || lr.ReferencesDynSized())
                     ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
                 break;
-            case IParameterReferenceOperation pr when pr.Parameter.Type.WrapsDynSized():
+            case IParameterReferenceOperation pr when pr.Parameter.Type.WrapsDynSized() ||
+                                                      (pr.Parameter.Type.IsWrappedRef() && a.Value.ReferencesDynSized()):
                 ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
                 break;
         }
