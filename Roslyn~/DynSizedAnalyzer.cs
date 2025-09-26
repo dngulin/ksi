@@ -91,6 +91,12 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         "Type `{0}` cannot be a field of a reference type. Consider to wrap it with `ExclusiveAccess<{0}>`"
     );
 
+    private static readonly DiagnosticDescriptor RedundantExclusiveAccessRule = Rule(
+        DiagnosticSeverity.Warning,
+        "Redundant ExclusiveAccess<T> Usage",
+        "Usage of the `ExclusiveAccess<{0}>` is redundant because the generic argument `{0}` is not `[DynSized]`"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         ExplicitCopyRule,
         FieldRule,
@@ -101,7 +107,8 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         ArgumentRefAliasingRule,
         DynNoResizeRule,
         RedundantDynNoResizeRule,
-        FieldOfReferenceTypeRule
+        FieldOfReferenceTypeRule,
+        RedundantExclusiveAccessRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -120,6 +127,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
         context.RegisterOperationAction(AnalyzeWrappedRefArg, OperationKind.Argument);
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
+        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -162,6 +170,24 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         var d = (IVariableDeclaratorOperation)ctx.Operation;
         if (d.Symbol.IsRefOrWrappedRef())
             AnalyzeRefOrWrappedRefVar(ctx, d);
+
+        if (IsRedundantAccessScope(d.Symbol.Type, out var gtName))
+            ctx.ReportDiagnostic(Diagnostic.Create(RedundantExclusiveAccessRule, d.GetDeclaredTypeLocation(), gtName));
+    }
+
+    private static bool IsRedundantAccessScope(ITypeSymbol t, out string genericTypeName)
+    {
+        genericTypeName = "";
+        if (t is not INamedTypeSymbol nt)
+            return false;
+
+        if (nt.IsExclusiveAccess() && nt.TypeArguments.First() is INamedTypeSymbol gt && !gt.IsDynSized())
+        {
+            genericTypeName = gt.Name;
+            return true;
+        }
+
+        return false;
     }
 
     private static void AnalyzeRefOrWrappedRefVar(OperationAnalysisContext ctx, IVariableDeclaratorOperation d)
@@ -376,5 +402,16 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
             if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
                 ctx.ReportDiagnostic(Diagnostic.Create(RedundantDynNoResizeRule, p.Locations.First()));
         }
+    }
+
+    private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
+    {
+        var s = (GenericNameSyntax)ctx.Node;
+        if (s.IsUnboundGenericName)
+            return;
+
+        var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
+        if (i.Type != null && IsRedundantAccessScope(i.Type, out var gtName))
+            ctx.ReportDiagnostic(Diagnostic.Create(RedundantExclusiveAccessRule, s.GetLocation(), gtName));
     }
 }
