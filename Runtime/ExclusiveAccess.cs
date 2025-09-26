@@ -9,9 +9,9 @@ namespace Ksi
         private ulong _nextAccessId;
         private ulong _activeAccessId;
 
-        public MutableAccessScope<T> Mutable => new(this, GetNextAccessId());
+        public MutableAccessScope<T> Mutable => new MutableAccessScope<T>(this, GetNextAccessId());
 
-        public ReadOnlyAccessScope<T> ReadOnly => new(this, GetNextAccessId());
+        public ReadOnlyAccessScope<T> ReadOnly => new ReadOnlyAccessScope<T>(this, GetNextAccessId());
 
         private ulong GetNextAccessId()
         {
