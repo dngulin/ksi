@@ -97,6 +97,12 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         "Usage of the `ExclusiveAccess<{0}>` is redundant because the generic argument `{0}` is not `[DynSized]`"
     );
 
+    private static readonly DiagnosticDescriptor RefEscapesExclusiveAccessRule = Rule(
+        DiagnosticSeverity.Error,
+        "Reference Escapes Access Scope",
+        "Reference derived from the `ExclusiveAccess<T>` escapes the access scope"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         ExplicitCopyRule,
         FieldRule,
@@ -108,7 +114,8 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         DynNoResizeRule,
         RedundantDynNoResizeRule,
         FieldOfReferenceTypeRule,
-        RedundantExclusiveAccessRule
+        RedundantExclusiveAccessRule,
+        RefEscapesExclusiveAccessRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -128,6 +135,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeWrappedRefArg, OperationKind.Argument);
         context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
         context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+        context.RegisterOperationAction(AnalyzeReturn, OperationKind.Return);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -413,5 +421,20 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
         if (i.Type != null && IsRedundantAccessScope(i.Type, out var gtName))
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantExclusiveAccessRule, s.GetLocation(), gtName));
+    }
+
+    private static void AnalyzeReturn(OperationAnalysisContext ctx)
+    {
+        var r = (IReturnOperation)ctx.Operation;
+        if (r is not { ReturnedValue: { Type: { IsReferenceType: false } t } v })
+            return;
+
+        var retByRef = t.IsSpanOrReadonlySpan() || r.ReturnsByRef(ctx.CancellationToken);
+        if (!retByRef)
+            return;
+
+        var path = v.ToRefPath();
+        if (path.IsDerivedFromLocalAccessScope)
+            ctx.ReportDiagnostic(Diagnostic.Create(RefEscapesExclusiveAccessRule, r.Syntax.GetLocation()));
     }
 }

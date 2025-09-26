@@ -10,17 +10,19 @@ public readonly struct RefPath
     public const string IndexerName = "[n]";
     public const string ItemSuffix = "()";
 
-    public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0);
+    public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0, false);
 
     public readonly ImmutableArray<string> Segments;
     public readonly int DynSizedLength;
     public readonly int ExplicitLength;
+    public readonly bool IsDerivedFromLocalAccessScope;
 
-    public RefPath(ImmutableArray<string> segments, int dynSizedLength)
+    public RefPath(ImmutableArray<string> segments, int dynSizedLength, bool isDerivedFromLocalAccessScope)
     {
         Segments = segments;
         DynSizedLength = dynSizedLength;
         ExplicitLength = segments.TakeWhile(i => !i.EndsWith(ItemSuffix)).Count();
+        IsDerivedFromLocalAccessScope = isDerivedFromLocalAccessScope;
     }
 
     public bool IsEmpty => Segments.IsEmpty;

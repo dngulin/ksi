@@ -62,4 +62,17 @@ public static class OperationExtensions
 
         return self.Syntax.GetLocation();
     }
+
+    public static bool ReturnsByRef(this IReturnOperation returnOp, CancellationToken ct)
+    {
+        var containing = returnOp.SemanticModel?.GetEnclosingSymbol(returnOp.Syntax.SpanStart, ct);
+        switch (containing)
+        {
+            case IMethodSymbol { RefKind: RefKind.Ref or RefKind.RefReadOnly }:
+            case IPropertySymbol { RefKind: RefKind.Ref or RefKind.RefReadOnly }:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
