@@ -2,8 +2,6 @@ using System;
 using Unity.Collections;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-#pragma warning disable REFLIST01
-
 namespace Ksi
 {
     internal static class UnsafeArrayExtensions
