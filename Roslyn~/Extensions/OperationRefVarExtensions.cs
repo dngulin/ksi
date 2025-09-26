@@ -10,47 +10,48 @@ public static class OperationRefVarExtensions
 {
     public static IEnumerable<RefVarInfo> FindLocalRefsWithLifetimeIntersectingPos(this IOperation self, int pos)
     {
-        var variables = new Dictionary<string, (RefVarInfo Info, TextSpan Lifetime)>(17);
+        var eqc = SymbolEqualityComparer.Default;
+        var variables = new Dictionary<ILocalSymbol, (RefVarInfo Info, int LifetimeStart)>(17, eqc);
 
         foreach (var op in self.Descendants())
         {
             switch (op)
             {
                 case IVariableDeclaratorOperation d:
-                    if (!d.Symbol.IsRefOrWrappedRef() || d.Syntax.Span.End > pos)
+                {
+                    if (d.Syntax.Span.End > pos || !d.Symbol.IsRefOrWrappedRef())
                         continue;
 
-                    var optVar = d.GetVarInfoWithLifetime();
-                    if (optVar == null)
+                    var optV = d.GetVarInfoWithLifetime();
+                    if (optV == null)
                         continue;
 
-                    variables[d.Symbol.Name] = optVar.Value;
+                    var v = optV.Value;
+                    if (v.Info.Kind == RefVarKind.IteratorItemRef)
+                    {
+                        if (v.Lifetime.IntersectsWith(pos)) yield return v.Info;
+                        continue;
+                    }
+
+                    variables[d.Symbol] = (v.Info, v.Lifetime.Start);
                     break;
+                }
 
                 case ILocalReferenceOperation r:
-                    if (!variables.TryGetValue(r.Local.Name, out var v))
+                {
+                    if (!variables.TryGetValue(r.Local, out var v))
                         continue;
 
-                    if (v.Info.Kind != RefVarKind.IteratorItemRef)
+                    var lifetime = TextSpan.FromBounds(v.LifetimeStart, r.Syntax.Span.End);
+                    if (lifetime.IntersectsWith(pos))
                     {
-                        var extendedLifetime = TextSpan.FromBounds(v.Lifetime.Start, r.Syntax.Span.End);
-                        if (extendedLifetime.IntersectsWith(pos))
-                        {
-                            variables.Remove(r.Local.Name);
-                            yield return v.Info;
-                            continue;
-                        }
-
-                        variables[r.Local.Name] = (v.Info, extendedLifetime);
+                        variables.Remove(r.Local);
+                        yield return v.Info;
                     }
-                    break;
-            }
-        }
 
-        foreach (var (varInfo, lifetime) in variables.Values)
-        {
-            if (lifetime.IntersectsWith(pos))
-                yield return varInfo;
+                    break;
+                }
+            }
         }
     }
 
@@ -88,7 +89,7 @@ public static class OperationRefVarExtensions
                 {
                     case IVariableDeclaratorOperation d:
                     {
-                        if (d.Symbol.Name != self.Local.Name)
+                        if (!SymbolEqualityComparer.Default.Equals(self.Local, d.Symbol))
                             return null;
 
                         var p = d.GetRefVarProducerOp(out var varKind);
