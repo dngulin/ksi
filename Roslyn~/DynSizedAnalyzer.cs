@@ -189,19 +189,28 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeVariableAssignmentRef(OperationAnalysisContext ctx)
     {
         var a = (ISimpleAssignmentOperation)ctx.Operation;
+        var v = a.Value;
 
         switch (a.Target)
         {
-            case ILocalReferenceOperation lr when (lr.Local.IsRef && a.IsRef) || lr.Local.Type.IsWrappedRef():
-                if (lr.Local.Type.IsDynSizedOrWrapsDynSized() || a.Value.ReferencesDynSized() || lr.ReferencesDynSized())
-                    ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
-                break;
-            case IParameterReferenceOperation pr when pr.Parameter.Type.WrapsDynSized() ||
-                                                      (pr.Parameter.Type.IsWrappedRef() && a.Value.ReferencesDynSized()):
+            case ILocalReferenceOperation lr when IsRefAssignment(a, lr) && IsDynSizedAssignment(lr, v):
+            case IParameterReferenceOperation pr when IsRefAssignment(pr) && IsDynSizedAssignment(pr, v):
+            {
                 ctx.ReportDiagnostic(Diagnostic.Create(AssigningDynSizedRef, a.Syntax.GetLocation()));
                 break;
+            }
         }
     }
+
+    private static bool IsRefAssignment(ISimpleAssignmentOperation a, ILocalReferenceOperation tgt)
+        => (a.IsRef && tgt.Local.IsRef) || tgt.Local.Type.IsWrappedRef();
+    private static bool IsRefAssignment(IParameterReferenceOperation tgt)
+        => tgt.Parameter.Type.IsWrappedRef();
+
+    private static bool IsDynSizedAssignment(ILocalReferenceOperation tgt, IOperation v)
+        => tgt.Local.Type.IsDynSizedOrWrapsDynSized() || tgt.ReferencesDynSized() || v.ReferencesDynSized();
+    private static bool IsDynSizedAssignment(IParameterReferenceOperation tgt, IOperation v)
+        => tgt.Parameter.Type.WrapsDynSized() || v.ReferencesDynSized();
 
     private static void AnalyzeInvocationArgs(OperationAnalysisContext ctx)
     {
