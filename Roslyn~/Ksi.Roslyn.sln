@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Roslyn", "Ksi.Roslyn.csproj", "{049CE590-4718-4E36-8B6B-DF13CDE5AB6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Roslyn", "Ksi.Roslyn\Ksi.Roslyn.csproj", "{049CE590-4718-4E36-8B6B-DF13CDE5AB6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
