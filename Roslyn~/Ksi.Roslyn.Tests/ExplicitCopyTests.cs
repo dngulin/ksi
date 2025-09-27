@@ -1,11 +1,13 @@
 ﻿namespace Ksi.Roslyn.Tests;
 
+using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
+
 public class ExplicitCopyTests
 {
     [Fact]
     public async Task ExpCopy01()
     {
-        await KsiAnalyzerTest.RunAsync<ExplicitCopyAnalyzer>(
+        await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
             public static class Test {
@@ -21,7 +23,7 @@ public class ExplicitCopyTests
     [Fact]
     public async Task ExpCopy02()
     {
-        await KsiAnalyzerTest.RunAsync<ExplicitCopyAnalyzer>(
+        await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
             public static class Test {

@@ -5,9 +5,9 @@ using Microsoft.CodeAnalysis.Testing;
 
 namespace Ksi.Roslyn.Tests;
 
-public static class KsiAnalyzerTest
+public static class KsiAnalyzerTest<T> where T : DiagnosticAnalyzer, new()
 {
-    public static async Task RunAsync<T>([StringSyntax("c#-test")] string code) where T : DiagnosticAnalyzer, new()
+    public static async Task RunAsync([StringSyntax("c#-test")] string code)
     {
         var test = new CSharpAnalyzerTest<T, DefaultVerifier>
         {
