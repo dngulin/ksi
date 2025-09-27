@@ -16,6 +16,7 @@ public class ExplicitCopyTests
                 AdditionalReferences = { typeof(RefList<>).Assembly }
             },
             TestCode =
+                // language=cs
                 """
                 using Ksi;
                 
