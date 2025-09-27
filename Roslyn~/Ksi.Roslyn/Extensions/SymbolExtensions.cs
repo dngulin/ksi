@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -22,5 +23,21 @@ public static class SymbolExtensions
         return s.Parent is VariableDeclarationSyntax d ?
             d.Type.GetLocation() :
             self.Locations.First();
+    }
+
+    public static string FullyQualifiedName(this INamespaceSymbol self)
+    {
+        if (self.IsGlobalNamespace || self.ContainingNamespace.IsGlobalNamespace)
+            return self.Name;
+
+        var segments = new List<string>(16);
+
+        while (!self.IsGlobalNamespace)
+        {
+            segments.Insert(0, self.Name);
+            self = self.ContainingNamespace;
+        }
+
+        return string.Join(".", segments);
     }
 }

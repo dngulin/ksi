@@ -47,7 +47,7 @@ namespace Ksi.Roslyn
                     if (t == null)
                         return result;
 
-                    result.Namespace = t.ContainingNamespace.Name;
+                    result.Namespace = t.ContainingNamespace.FullyQualifiedName();
                     result.IsUnmanaged = t.IsUnmanagedType;
                     result.IsDealloc = t.IsDealloc();
                     result.IsTemp = t.IsTemp();
@@ -65,10 +65,10 @@ namespace Ksi.Roslyn
                         if (!isExplicitCopy)
                             continue;
 
-                        usings.Add(ft.ContainingNamespace.ToDisplayString());
+                        usings.Add(ft.ContainingNamespace.FullyQualifiedName());
 
                         if (ft.IsRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
-                            usings.Add(gt!.ContainingNamespace.ToDisplayString());
+                            usings.Add(gt!.ContainingNamespace.FullyQualifiedName());
                     }
 
                     var kinds = RefListUtils.GetKinds(result.IsUnmanaged, result.IsTemp);
