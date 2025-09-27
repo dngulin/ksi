@@ -78,4 +78,26 @@ public class ExplicitCopyTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy05CaptureByClosure()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            
+            public static class Test {
+                public static void Method(in MyStruct value) {}
+            
+                public static void Caller()
+                {
+                    var {|EXPCOPY05:x|} = new MyStruct();
+                    System.Action f = () => { Method(x); };
+                }
+            }
+            """
+        );
+    }
 }
