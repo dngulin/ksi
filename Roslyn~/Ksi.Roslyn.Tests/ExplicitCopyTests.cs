@@ -100,4 +100,23 @@ public class ExplicitCopyTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy06ReturnByValue()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+
+            public static class Test {
+                public static MyStruct {|EXPCOPY06:NonMarkedReturn|}() => default;
+                
+                [Ksi.ExplicitCopyReturn]
+                public static MyStruct MarkedReturn() => default;
+            }
+            """
+        );
+    }
 }
