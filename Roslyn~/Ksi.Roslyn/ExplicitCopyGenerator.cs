@@ -32,7 +32,7 @@ namespace Ksi.Roslyn
                     if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
-                    if (structDecl.AttributeLists.ContainsRefList())
+                    if (structDecl.TypeParameterList != null)
                         return false;
 
                     return structDecl.AttributeLists.ContainsExplicitCopy();
