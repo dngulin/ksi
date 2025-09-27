@@ -12,7 +12,7 @@ public static class SymbolExtensions
 
     public static bool Is(this AttributeData attribute, string attributeName)
     {
-        return attribute.AttributeClass != null && attribute.AttributeClass.Name == attributeName + Suffix;
+        return attribute.AttributeClass != null && attribute.AttributeClass.Name == attributeName + Attribute;
     }
 
     public static Location GetDeclaredTypeLocation(this IFieldSymbol self, CancellationToken ct)

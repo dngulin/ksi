@@ -21,6 +21,6 @@ namespace Ksi.Roslyn
         public const string RefList = "RefList";
         public const string RefListIndexer = "RefListIndexer";
 
-        public const string Suffix = "Attribute";
+        public const string Attribute = "Attribute";
     }
 }
