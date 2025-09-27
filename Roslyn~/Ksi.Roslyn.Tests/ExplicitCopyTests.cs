@@ -38,4 +38,21 @@ public class ExplicitCopyTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy03FieldOfNonExplicitCopy()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            
+            [Ksi.ExplicitCopy]
+            public struct MarkedStruct { public MyStruct Field; }
+            
+            public struct NonMarkedStruct { public MyStruct {|EXPCOPY03:Field|}; }
+            """
+        );
+    }
 }
