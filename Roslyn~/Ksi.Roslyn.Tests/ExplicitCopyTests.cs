@@ -5,7 +5,7 @@ using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
 public class ExplicitCopyTests
 {
     [Fact]
-    public async Task ExpCopy01()
+    public async Task ExpCopy01ReceivedByValue()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -21,7 +21,7 @@ public class ExplicitCopyTests
     }
 
     [Fact]
-    public async Task ExpCopy02()
+    public async Task ExpCopy02PassedByValue()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
