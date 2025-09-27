@@ -1,38 +1,39 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
-
-namespace Ksi.Roslyn.Tests;
+﻿namespace Ksi.Roslyn.Tests;
 
 public class ExplicitCopyTests
 {
     [Fact]
-    public async Task ExpCopy01IsTriggeredByMethodArg()
+    public async Task ExpCopy01()
     {
-        var test = new CSharpAnalyzerTest<ExplicitCopyAnalyzer, DefaultVerifier>
-        {
-            ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard21,
-            TestState =
-            {
-                AdditionalReferences = { typeof(RefList<>).Assembly }
-            },
-            TestCode =
-                // language=cs
-                """
-                using Ksi;
+        await KsiAnalyzerTest.RunAsync<ExplicitCopyAnalyzer>(
+            // language=cs
+            """
+            public static class Test {
+                [Ksi.ExplicitCopy]
+                public struct MyStruct { public int Field; }
                 
-                [ExplicitCopy]
-                public struct TestStruct
-                {
-                    public int Field;
-                }
-                
-                public static class Test
-                {
-                    public static void Method(TestStruct {|EXPCOPY01:arg|}) {}
-                }
-                """
-        };
+                public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
+            }
+            """
+        );
+    }
 
-        await test.RunAsync();
+    [Fact]
+    public async Task ExpCopy02()
+    {
+        await KsiAnalyzerTest.RunAsync<ExplicitCopyAnalyzer>(
+            // language=cs
+            """
+            public static class Test {
+                [Ksi.ExplicitCopy]
+                public struct MyStruct { public int Field; }
+                
+                public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
+                
+                public static void Caller() => Method({|EXPCOPY02:new MyStruct()|});
+                public static void Caller(in MyStruct value) => Method({|EXPCOPY02:value|});
+            }
+            """
+        );
     }
 }
