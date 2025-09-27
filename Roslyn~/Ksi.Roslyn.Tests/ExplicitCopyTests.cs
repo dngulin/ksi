@@ -10,10 +10,10 @@ public class ExplicitCopyTests
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            
             public static class Test {
-                [Ksi.ExplicitCopy]
-                public struct MyStruct { public int Field; }
-                
                 public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
             }
             """
@@ -26,10 +26,10 @@ public class ExplicitCopyTests
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            
             public static class Test {
-                [Ksi.ExplicitCopy]
-                public struct MyStruct { public int Field; }
-                
                 public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
                 
                 public static void Caller() => Method({|EXPCOPY02:new MyStruct()|});
@@ -62,10 +62,10 @@ public class ExplicitCopyTests
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            
             public static class Test {
-                [Ksi.ExplicitCopy]
-                public struct MyStruct { public int Field; }
-                
                 public static void Box(object arg) {}
                 
                 public static void Method(in MyStruct value)
