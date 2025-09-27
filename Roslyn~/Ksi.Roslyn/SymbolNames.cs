@@ -2,6 +2,8 @@ namespace Ksi.Roslyn
 {
     public static class SymbolNames
     {
+        public const string Ksi = "Ksi";
+
         public const string ExplicitCopy = "ExplicitCopy";
         public const string ExplicitCopyReturn = "ExplicitCopyReturn";
 

@@ -47,7 +47,7 @@ namespace Ksi.Roslyn
                     if (t == null)
                         return result;
 
-                    result.Namespace = t.ContainingNamespace.ToDisplayString();
+                    result.Namespace = t.ContainingNamespace.Name;
                     result.IsUnmanaged = t.IsUnmanagedType;
                     result.IsDealloc = t.IsDealloc();
                     result.IsTemp = t.IsTemp();
@@ -56,10 +56,7 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (m is not IFieldSymbol f || f.IsStatic)
-                            continue;
-
-                        if (f.Type is not INamedTypeSymbol ft)
+                        if (m is not IFieldSymbol f || f.IsStatic || f.Type is not INamedTypeSymbol ft)
                             continue;
 
                         var isExplicitCopy = ft.IsExplicitCopy();
@@ -74,8 +71,12 @@ namespace Ksi.Roslyn
                             usings.Add(gt!.ContainingNamespace.ToDisplayString());
                     }
 
+                    var kinds = RefListUtils.GetKinds(result.IsUnmanaged, result.IsTemp);
+                    if (kinds != RefListKinds.None)
+                        usings.Add(SymbolNames.Ksi);
+
                     usings.Remove(result.Namespace);
-                    result.Usings = usings.ToArray();
+                    result.Usings = usings.Where(u => u != "").ToArray();
 
                     Array.Sort(result.Usings);
 
@@ -99,12 +100,19 @@ namespace Ksi.Roslyn
                     }
                     else
                     {
+                        var outputNs = entry.Namespace != "";
+
                         foreach (var u in entry.Usings)
                             sb.AppendLine($"using {u};");
 
                         sb.AppendLine();
-                        sb.AppendLine($"namespace {entry.Namespace}");
-                        sb.AppendLine("{");
+
+                        if (outputNs)
+                        {
+                            sb.AppendLine($"namespace {entry.Namespace}");
+                            sb.AppendLine("{");
+                        }
+
                         sb.AppendLine($"    public static class {entry.TypeName}ExplicitCopy");
                         sb.AppendLine("    {");
 
@@ -115,7 +123,9 @@ namespace Ksi.Roslyn
                         RefListUtils.Emit(kinds, template, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
-                        sb.AppendLine("}");
+
+                        if (outputNs)
+                            sb.AppendLine("}");
                     }
 
                     ctx.AddSource($"{entry.TypeName}ExplicitCopy.g.cs", sb.ToString());
