@@ -55,4 +55,27 @@ public class ExplicitCopyTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy04Boxing()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public static class Test {
+                [Ksi.ExplicitCopy]
+                public struct MyStruct { public int Field; }
+                
+                public static void Box(object arg) {}
+                
+                public static void Method(in MyStruct value)
+                {
+                    Box({|EXPCOPY04:new MyStruct()|});
+                    Box({|EXPCOPY04:value|});
+                    var x = {|EXPCOPY04:(object)value|};
+                }
+            }
+            """
+        );
+    }
 }
