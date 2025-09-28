@@ -119,4 +119,24 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy07CopiedByAssignment()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+
+            public static class Test {
+                public static void Method(ref MyStruct value) {
+                    var {|EXPCOPY07:a = value|};
+                    var b = new MyStruct();
+                    {|EXPCOPY07:value = b|};
+                }
+            }
+            """
+        );
+    }
 }
