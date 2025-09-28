@@ -13,7 +13,8 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
             
-            public static class Test {
+            public static class Test
+            {
                 public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
             }
             """
@@ -29,7 +30,8 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
             
-            public static class Test {
+            public static class Test
+            {
                 public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
                 
                 public static void Caller() => Method({|EXPCOPY02:new MyStruct()|});
@@ -65,7 +67,8 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
             
-            public static class Test {
+            public static class Test
+            {
                 public static void Box(object arg) {}
                 
                 public static void Method(in MyStruct value)
@@ -88,7 +91,8 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
             
-            public static class Test {
+            public static class Test
+            {
                 public static void Method(in MyStruct value) {}
             
                 public static void Caller()
@@ -110,7 +114,8 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
 
-            public static class Test {
+            public static class Test
+            {
                 public static MyStruct {|EXPCOPY06:NonMarkedReturn|}() => default;
                 
                 [Ksi.ExplicitCopyReturn]
@@ -129,8 +134,10 @@ public class ExplicitCopyAnalyzerTests
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
 
-            public static class Test {
-                public static void Method(ref MyStruct value) {
+            public static class Test
+            {
+                public static void Method(ref MyStruct value)
+                {
                     var {|EXPCOPY07:a = value|};
                     var b = new MyStruct();
                     {|EXPCOPY07:value = b|};
