@@ -1,8 +1,8 @@
 /Roslyn~/.idea/
+/Roslyn~/Ksi/bin/
+/Roslyn~/Ksi/obj/
 /Roslyn~/Ksi.Roslyn/bin/
 /Roslyn~/Ksi.Roslyn/obj/
 /Roslyn~/Ksi.Roslyn.Tests/bin/
 /Roslyn~/Ksi.Roslyn.Tests/obj/
-/Roslyn~/Ksi.LinkedUnityPackage/bin/
-/Roslyn~/Ksi.LinkedUnityPackage/obj/
 *.DotSettings.user

@@ -22,7 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Ksi.Roslyn\Ksi.Roslyn.csproj" />
-      <ProjectReference Include="..\Ksi.LinkedUnityPackage\Ksi.LinkedUnityPackage.csproj" />
+      <ProjectReference Include="..\Ksi\Ksi.csproj" />
     </ItemGroup>
 
 </Project>

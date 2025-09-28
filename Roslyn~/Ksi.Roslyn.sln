@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Roslyn", "Ksi.Roslyn\Ks
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Roslyn.Tests", "Ksi.Roslyn.Tests\Ksi.Roslyn.Tests.csproj", "{EDE5B4C8-B20B-4F7D-9D98-7B306DDCC0BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.LinkedUnityPackage", "Ksi.LinkedUnityPackage\Ksi.LinkedUnityPackage.csproj", "{0539EB2A-03F0-4AAC-8F0C-33823F8A1C60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi", "Ksi\Ksi.csproj", "{0539EB2A-03F0-4AAC-8F0C-33823F8A1C60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
