@@ -181,7 +181,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy10PassedToGenericMethodParameter()
+    public async Task ExpCopy10PassedAsGenericMethodArgument()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
