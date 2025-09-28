@@ -164,4 +164,19 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy09DeclaredAsAGenericType()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct {|EXPCOPY09:MyStruct|}<T>
+            {
+                public T Field;
+            }
+            """
+        );
+    }
 }
