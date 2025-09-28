@@ -21,7 +21,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy02PassedByValue()
+    public async Task ExpCopy02CopiedByPassingByValue()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -40,7 +40,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy03FieldOfNonExplicitCopy()
+    public async Task ExpCopy03UsedAsFieldOfNonExplicitCopy()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -57,7 +57,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy04Boxing()
+    public async Task ExpCopy04CopiedByBoxing()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -80,7 +80,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy05CaptureByClosure()
+    public async Task ExpCopy05CopiedByClosureCapture()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -102,7 +102,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy06ReturnByValue()
+    public async Task ExpCopy06ReturnedByValue()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
