@@ -148,4 +148,20 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy08HasPrivateField()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct
+            {
+                public int A;
+                private int {|EXPCOPY08:B|};
+            }
+            """
+        );
+    }
 }
