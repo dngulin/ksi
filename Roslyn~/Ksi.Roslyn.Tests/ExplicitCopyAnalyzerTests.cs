@@ -2,7 +2,7 @@
 
 using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
 
-public class ExplicitCopyTests
+public class ExplicitCopyAnalyzerTests
 {
     [Fact]
     public async Task ExpCopy01ReceivedByValue()
