@@ -141,6 +141,8 @@ public class ExplicitCopyAnalyzerTests
                     var {|EXPCOPY07:a = value|};
                     var b = new MyStruct();
                     {|EXPCOPY07:value = b|};
+                    value = new MyStruct();
+                    value = default;
                 }
             }
             """
