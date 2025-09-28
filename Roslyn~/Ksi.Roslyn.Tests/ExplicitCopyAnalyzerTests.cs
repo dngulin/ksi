@@ -204,4 +204,28 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy11UsedAsGenericTypeArgument()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            public struct Generic<T> { public T Field; }
+            
+            [Ksi.ExplicitCopy]
+            public struct Test
+            {
+                public {|EXPCOPY11:Generic<MyStruct>|} Field;
+                
+                public static void Method(in {|EXPCOPY11:Generic<MyStruct>|} arg)
+                {
+                    {|EXPCOPY11:Generic<MyStruct>|} a = default;
+                }
+            }
+            """
+        );
+    }
 }
