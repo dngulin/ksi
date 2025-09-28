@@ -228,4 +228,34 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy12UsedAsGenericTypeArgument()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using System;
+            
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+
+            public static class Test
+            {
+                public static void Method(Span<MyStruct> rw, ReadOnlySpan<MyStruct> ro)
+                {
+                    {|EXPCOPY12:ro.CopyTo(rw)|};
+                    {|EXPCOPY12:ro.TryCopyTo(rw)|};
+                    
+                    var span = new Span<MyStruct>();
+                    {|EXPCOPY12:rw.CopyTo(span)|};
+                    {|EXPCOPY12:rw.TryCopyTo(span)|};
+                    
+                    {|EXPCOPY12:ro.ToArray()|};
+                    {|EXPCOPY12:rw.ToArray()|};
+                }
+            }
+            """
+        );
+    }
 }
