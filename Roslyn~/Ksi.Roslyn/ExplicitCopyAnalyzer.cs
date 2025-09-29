@@ -24,9 +24,9 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor ParameterRule = Rule(01, "Received by Value",
-            "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
-        );
+        // private static readonly DiagnosticDescriptor ParameterRule = Rule(01, "Received by Value",
+        //     "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
+        // );
 
         private static readonly DiagnosticDescriptor ArgumentRule = Rule(02, "Passed by Value",
             "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
@@ -75,7 +75,6 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            ParameterRule,
             ArgumentRule,
             FieldRule,
             BoxingRule,
@@ -96,7 +95,6 @@ namespace Ksi.Roslyn
             );
             context.EnableConcurrentExecution();
 
-            context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
             context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
             context.RegisterOperationAction(AnalyzeBoxing, OperationKind.Conversion);
@@ -118,18 +116,6 @@ namespace Ksi.Roslyn
             context.RegisterSyntaxNodeAction(AnalyzeArrayType, SyntaxKind.ArrayType);
         }
 
-        private static void AnalyzeParameter(SymbolAnalysisContext ctx)
-        {
-            var p = (IParameterSymbol)ctx.Symbol;
-            if (p.RefKind != RefKind.None)
-                return;
-
-            if (!p.Type.IsExplicitCopy())
-                return;
-
-            ctx.ReportDiagnostic(Diagnostic.Create(ParameterRule, p.Locations.First(), p.Type.Name));
-        }
-
         private static void AnalyzeArgument(OperationAnalysisContext ctx)
         {
             var arg = (IArgumentOperation)ctx.Operation;
@@ -142,7 +128,7 @@ namespace Ksi.Roslyn
             var loc = arg.Value.Syntax.GetLocation();
             switch (p.RefKind)
             {
-                case RefKind.None:
+                case RefKind.None when !IsNotExistingValue(arg.Value):
                     ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, loc, t.Name));
                     break;
                 case RefKind.Ref or RefKind.In:

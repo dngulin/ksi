@@ -5,23 +5,6 @@ using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
 public class ExplicitCopyAnalyzerTests
 {
     [Fact]
-    public async Task ExpCopy01ReceivedByValue()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            [Ksi.ExplicitCopy]
-            public struct MyStruct { public int Field; }
-            
-            public static class Test
-            {
-                public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
-            }
-            """
-        );
-    }
-
-    [Fact]
     public async Task ExpCopy02CopiedByPassingByValue()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
@@ -32,10 +15,26 @@ public class ExplicitCopyAnalyzerTests
             
             public static class Test
             {
-                public static void Method(MyStruct {|EXPCOPY01:arg|}) {}
+                public static void Method(in MyStruct refParam, MyStruct valParam)
+                {
+                    ReceiveByValue({|EXPCOPY02:refParam|});
+                    ReceiveByValue({|EXPCOPY02:valParam|});
+                    
+                    var local = new MyStruct();
+                    ReceiveByValue({|EXPCOPY02:local|});
+                    
+                    ref var localRef = ref local;
+                    ReceiveByValue({|EXPCOPY02:localRef|});
+                    
+                    ReceiveByValue(new MyStruct());
+                    ReceiveByValue(default);
+                    ReceiveByValue(CreateMyStruct());
+                }
                 
-                public static void Caller() => Method({|EXPCOPY02:new MyStruct()|});
-                public static void Caller(in MyStruct value) => Method({|EXPCOPY02:value|});
+                private static void ReceiveByValue(MyStruct arg) {}
+                
+                [Ksi.ExplicitCopyReturn]
+                private static MyStruct CreateMyStruct() => default;
             }
             """
         );
