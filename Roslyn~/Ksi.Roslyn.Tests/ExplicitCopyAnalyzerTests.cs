@@ -59,8 +59,49 @@ public class ExplicitCopyAnalyzerTests
                 
                 private static void ReceiveByValue(MyStruct arg) {}
                 
-                [ExplicitCopyReturn]
                 private static MyStruct CreateMyStruct() => new MyStruct { Field = 42 };
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task ExpCopy03ReturningCopy()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+
+            public static class Test
+            {
+                public static MyStruct Default => default;
+                
+                public static MyStruct ReturnLocal() 
+                {
+                    var value = new MyStruct();
+                    value.Field = 42;
+                    return value;
+                }
+                
+                public static MyStruct ReturnValArg(MyStruct value) 
+                {
+                    value.Field = 42;
+                    return value;
+                }
+                
+                public static MyStruct ReturnRefArg(ref MyStruct value) 
+                {
+                    value.Field = 42;
+                    {|EXPCOPY03:return value;|}
+                }
+                
+                public static MyStruct ReturnRefLocal(ref MyStruct value) 
+                {
+                    ref var refLocal = ref value;
+                    {|EXPCOPY03:return refLocal;|}
+                }
             }
             """
         );
@@ -108,26 +149,6 @@ public class ExplicitCopyAnalyzerTests
                     var {|EXPCOPY05:x|} = new MyStruct();
                     System.Action f = () => { Method(x); };
                 }
-            }
-            """
-        );
-    }
-
-    [Fact]
-    public async Task ExpCopy06ReturnedByValue()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            [Ksi.ExplicitCopy]
-            public struct MyStruct { public int Field; }
-
-            public static class Test
-            {
-                public static MyStruct {|EXPCOPY06:NonMarkedReturn|}() => default;
-                
-                [Ksi.ExplicitCopyReturn]
-                public static MyStruct MarkedReturn() => default;
             }
             """
         );

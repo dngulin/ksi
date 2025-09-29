@@ -14,14 +14,6 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a method that returns a new instance of the [ExplicitCopy] type.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class ExplicitCopyReturnAttribute : Attribute
-    {
-    }
-
-    /// <summary>
     /// Attribute to indicate a [ExplicitCopy] type that contains a dynamically sized buffer.
     /// Should be added to a struct that contains fields of the [DynSized] type.
     /// Enables reference lifetime and aliasing diagnostics.

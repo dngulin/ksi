@@ -4,7 +4,6 @@ namespace Ksi
 {
     public static class MoveExtensions
     {
-        [ExplicitCopyReturn]
         [SuppressMessage("ExplicitCopy", "EXPCOPY07:Copied by Assignment")]
         [SuppressMessage("Dealloc", "DEALLOC04:Dealloc Instance Overwrite")]
         public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struct

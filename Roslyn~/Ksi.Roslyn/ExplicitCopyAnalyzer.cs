@@ -36,17 +36,17 @@ namespace Ksi.Roslyn
             "Consider to use the `Move` extension or changing the parameter to receive a value by reference"
         );
 
+        private static readonly DiagnosticDescriptor Rule03ReturningCopy = Rule(03,
+            "Returning a copy of the [ExplicitCopy] instance",
+            "Implicit copy caused by a return operation."
+        );
+
         private static readonly DiagnosticDescriptor BoxingRule = Rule(04, "Boxed",
             "Boxing of `ExplicitCopy` type `{0}`"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(05, "Captured by Closure",
             "Capturing of `ExplicitCopy` type `{0}` by a closure"
-        );
-
-        private static readonly DiagnosticDescriptor ReturnRule = Rule(06, "Returned by Value",
-            "Returning an instance of `ExplicitCopy` type `{0}` by value. " +
-            "Consider to annotate the method with the `ExplicitCopyReturn` attribute "
         );
 
         private static readonly DiagnosticDescriptor AssignmentRule = Rule(07, "Copied by Assignment",
@@ -74,11 +74,11 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Rule02ByValueArg,
             Rule01MissingAttr,
+            Rule02ByValueArg,
+            Rule03ReturningCopy,
             BoxingRule,
             CaptureRule,
-            ReturnRule,
             AssignmentRule,
             PrivateFieldRule,
             GenericTypeRule,
@@ -104,7 +104,7 @@ namespace Ksi.Roslyn
                 SyntaxKind.ParenthesizedLambdaExpression,
                 SyntaxKind.LocalFunctionStatement
             );
-            context.RegisterSymbolAction(AnalyzeReturn, SymbolKind.Method);
+            context.RegisterOperationAction(AnalyzeReturn, OperationKind.Return);
             context.RegisterOperationAction(AnalyzeFieldInitializer, OperationKind.FieldInitializer);
             context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
@@ -192,19 +192,19 @@ namespace Ksi.Roslyn
             }
         }
 
-        private static void AnalyzeReturn(SymbolAnalysisContext ctx)
+        private static void AnalyzeReturn(OperationAnalysisContext ctx)
         {
-            var method = (IMethodSymbol)ctx.Symbol;
-            if (method.ReturnsRef())
+            var r = (IReturnOperation)ctx.Operation;
+            if (r is not { ReturnedValue: { Type: { IsReferenceType: false } t } v } || !t.IsExplicitCopy())
                 return;
 
-            if (!method.ReturnType.IsExplicitCopy())
+            if (r.ReturnsByRef(ctx.CancellationToken))
                 return;
 
-            if (method.IsExplicitCopyReturn())
+            if (IsNotExistingValue(v) || IsLocalValue(v))
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(ReturnRule, method.Locations.First(), method.ReturnType.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03ReturningCopy, r.Syntax.GetLocation()));
         }
 
         private static void AnalyzeFieldInitializer(OperationAnalysisContext ctx)
@@ -340,32 +340,45 @@ namespace Ksi.Roslyn
             };
         }
 
-        private static bool IsNotExistingValue(IOperation operation)
+        private static bool IsNotExistingValue(IOperation op)
         {
             while (true)
             {
-                switch (operation.Kind)
+                switch (op.Kind)
                 {
                     case OperationKind.DefaultValue:
                     case OperationKind.ObjectCreation:
                         return true;
 
+                    case OperationKind.Invocation:
+                        return op is IInvocationOperation { TargetMethod.RefKind: RefKind.None };
+
+                    case OperationKind.PropertyReference:
+                        return op is IPropertyReferenceOperation { Property.RefKind: RefKind.None };
+
                     case OperationKind.Conversion:
                     {
-                        var conversion = (IConversionOperation)operation;
-                        operation = conversion.Operand;
+                        var conv = (IConversionOperation)op;
+                        op = conv.Operand;
                         continue;
-                    }
-
-                    case OperationKind.Invocation:
-                    {
-                        var invocation = (IInvocationOperation)operation;
-                        return invocation.TargetMethod.IsExplicitCopyReturn();
                     }
 
                     default:
                         return false;
                 }
+            }
+        }
+
+        private static bool IsLocalValue(IOperation op)
+        {
+            switch (op)
+            {
+                case ILocalReferenceOperation { Local.RefKind: RefKind.None }:
+                case IParameterReferenceOperation { Parameter.RefKind: RefKind.None }:
+                    return true;
+
+                default:
+                    return false;
             }
         }
     }
