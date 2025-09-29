@@ -241,7 +241,7 @@ namespace Ksi.Roslyn
             var t = d.Symbol.Type switch
             {
                 IArrayTypeSymbol a when a.ElementType.IsExplicitCopy() => a.ElementType,
-                INamedTypeSymbol n when n.IsNotSupportedGenericType(out var dyn) => dyn,
+                INamedTypeSymbol n when n.IsNotSupportedGenericOverExplicitCopy(out var dyn) => dyn,
                 _ => null
             };
 

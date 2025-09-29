@@ -38,7 +38,7 @@ public static class TypeSymbolExtensions
         return nt.IsWrappedRef() && gt.IsDynSizedOrWrapsDynSized();
     }
 
-    public static bool IsNotSupportedGenericType(this INamedTypeSymbol self, out ITypeSymbol? t)
+    public static bool IsNotSupportedGenericOverExplicitCopy(this INamedTypeSymbol self, out ITypeSymbol? t)
     {
         if (!self.IsGenericType || self.IsSupportedGenericType())
         {
@@ -57,7 +57,7 @@ public static class TypeSymbolExtensions
                 return true;
             }
 
-            if (namedArg.IsNotSupportedGenericType(out t))
+            if (namedArg.IsNotSupportedGenericOverExplicitCopy(out t))
                 return true;
         }
 
