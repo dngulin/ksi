@@ -41,16 +41,16 @@ namespace Ksi.Roslyn
             "Implicit copy caused by a return operation."
         );
 
-        private static readonly DiagnosticDescriptor BoxingRule = Rule(04, "Boxed",
-            "Boxing of `ExplicitCopy` type `{0}`"
+        private static readonly DiagnosticDescriptor AssignmentRule = Rule(04, "Copied by Assignment",
+            "Copying an instance of `ExplicitCopy` type `{0}` by assignment"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(05, "Captured by Closure",
             "Capturing of `ExplicitCopy` type `{0}` by a closure"
         );
 
-        private static readonly DiagnosticDescriptor AssignmentRule = Rule(07, "Copied by Assignment",
-            "Copying an instance of `ExplicitCopy` type `{0}` by assignment"
+        private static readonly DiagnosticDescriptor BoxingRule = Rule(07, "Boxed",
+            "Boxing of `ExplicitCopy` type `{0}`"
         );
 
         private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(08, "Private Field",

@@ -108,23 +108,23 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy04CopiedByBoxing()
+    public async Task ExpCopy04CopiedByAssignment()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
             [Ksi.ExplicitCopy]
             public struct MyStruct { public int Field; }
-            
+
             public static class Test
             {
-                public static void Box(object arg) {}
-                
-                public static void Method(in MyStruct value)
+                public static void Method(ref MyStruct value)
                 {
-                    Box({|EXPCOPY04:new MyStruct()|});
-                    Box({|EXPCOPY04:value|});
-                    var x = {|EXPCOPY04:(object)value|};
+                    var {|EXPCOPY04:a = value|};
+                    var b = new MyStruct();
+                    {|EXPCOPY04:value = b|};
+                    value = new MyStruct();
+                    value = default;
                 }
             }
             """
@@ -155,7 +155,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy07CopiedByAssignment()
+    public async Task ExpCopy07CopiedByBoxing()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -165,13 +165,13 @@ public class ExplicitCopyAnalyzerTests
 
             public static class Test
             {
-                public static void Method(ref MyStruct value)
+                public static void Box(object arg) {}
+                
+                public static void Method(in MyStruct value)
                 {
-                    var {|EXPCOPY07:a = value|};
-                    var b = new MyStruct();
-                    {|EXPCOPY07:value = b|};
-                    value = new MyStruct();
-                    value = default;
+                    Box({|EXPCOPY07:new MyStruct()|});
+                    Box({|EXPCOPY07:value|});
+                    var x = {|EXPCOPY07:(object)value|};
                 }
             }
             """
