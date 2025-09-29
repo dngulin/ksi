@@ -24,19 +24,16 @@ namespace Ksi.Roslyn
             );
         }
 
-        // private static readonly DiagnosticDescriptor ParameterRule = Rule(01, "Received by Value",
-        //     "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
-        // );
+        private static readonly DiagnosticDescriptor Rule01MissingAttr = Rule(01,
+            "Missing [ExplicitCopy] attribute",
+            "Structure should be annotated with the [ExplicitCopy] attribute " +
+            "because it contains an [ExplicitCopy] field of type `{0}`"
+        );
 
         private static readonly DiagnosticDescriptor Rule02ByValueArg = Rule(02,
             "Passing [ExplicitCopy] instance by value",
             "Implicit copy caused by passing a struct by value. " +
             "Consider to use the `Move` extension or changing the parameter to receive a value by reference"
-        );
-
-        private static readonly DiagnosticDescriptor FieldRule = Rule(03, "Field of non-`ExplicitCopy` Struct",
-            "Declaring field of `ExplicitCopy` type `{0}` within non-`ExplicitCopy` struct. " +
-            "Consider to annotate the struct with the `ExplicitCopy` attribute"
         );
 
         private static readonly DiagnosticDescriptor BoxingRule = Rule(04, "Boxed",
@@ -78,7 +75,7 @@ namespace Ksi.Roslyn
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Rule02ByValueArg,
-            FieldRule,
+            Rule01MissingAttr,
             BoxingRule,
             CaptureRule,
             ReturnRule,
@@ -143,18 +140,21 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
         {
-            var sym = (IFieldSymbol)ctx.Symbol;
-            if (!sym.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
+            var f = (IFieldSymbol)ctx.Symbol;
+            var t = f.Type;
+            var ct = f.ContainingType;
+
+            if (!f.Type.IsStructOrTypeParameter() || !ct.IsStruct())
                 return;
 
-            var isExplicitCopyStruct = sym.ContainingType.IsExplicitCopy();
+            var isExplicitCopyStruct = ct.IsExplicitCopy();
 
-            if (!isExplicitCopyStruct && sym.Type.IsExplicitCopy())
-                ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+            if (!isExplicitCopyStruct && t.IsExplicitCopy())
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttr, ct.Locations.First(), t.Name));
 
-            if (isExplicitCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
+            if (isExplicitCopyStruct && f.DeclaredAccessibility == Accessibility.Private)
                 ctx.ReportDiagnostic(
-                    Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.ContainingType.Name));
+                    Diagnostic.Create(PrivateFieldRule, f.Locations.First(), ct.Name));
         }
 
         private static void AnalyzeBoxing(OperationAnalysisContext ctx)

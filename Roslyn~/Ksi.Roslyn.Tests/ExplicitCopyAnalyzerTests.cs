@@ -4,6 +4,24 @@ using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
 
 public class ExplicitCopyAnalyzerTests
 {
+
+    [Fact]
+    public async Task ExpCopy01MissingAttr()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct { public int Field; }
+
+            [Ksi.ExplicitCopy]
+            public struct MarkedStruct { public MyStruct Field; }
+
+            public struct {|EXPCOPY01:NonMarkedStruct|} { public MyStruct Field; }
+            """
+        );
+    }
+
     [Fact]
     public async Task ExpCopy02CopiedByPassingByValue()
     {
@@ -44,23 +62,6 @@ public class ExplicitCopyAnalyzerTests
                 [ExplicitCopyReturn]
                 private static MyStruct CreateMyStruct() => new MyStruct { Field = 42 };
             }
-            """
-        );
-    }
-
-    [Fact]
-    public async Task ExpCopy03UsedAsFieldOfNonExplicitCopy()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            [Ksi.ExplicitCopy]
-            public struct MyStruct { public int Field; }
-            
-            [Ksi.ExplicitCopy]
-            public struct MarkedStruct { public MyStruct Field; }
-            
-            public struct NonMarkedStruct { public MyStruct {|EXPCOPY03:Field|}; }
             """
         );
     }
