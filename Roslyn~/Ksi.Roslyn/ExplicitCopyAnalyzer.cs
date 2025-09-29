@@ -28,8 +28,10 @@ namespace Ksi.Roslyn
         //     "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
         // );
 
-        private static readonly DiagnosticDescriptor ArgumentRule = Rule(02, "Passed by Value",
-            "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
+        private static readonly DiagnosticDescriptor Rule02ByValueArg = Rule(02,
+            "Passing [ExplicitCopy] instance by value",
+            "Implicit copy caused by passing a struct by value. " +
+            "Consider to use the `Move` extension or changing the parameter to receive a value by reference"
         );
 
         private static readonly DiagnosticDescriptor FieldRule = Rule(03, "Field of non-`ExplicitCopy` Struct",
@@ -75,7 +77,7 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            ArgumentRule,
+            Rule02ByValueArg,
             FieldRule,
             BoxingRule,
             CaptureRule,
@@ -129,7 +131,7 @@ namespace Ksi.Roslyn
             switch (p.RefKind)
             {
                 case RefKind.None when !IsNotExistingValue(arg.Value):
-                    ctx.ReportDiagnostic(Diagnostic.Create(ArgumentRule, loc, t.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule02ByValueArg, loc));
                     break;
                 case RefKind.Ref or RefKind.In:
                     var ot = p.OriginalDefinition.Type;

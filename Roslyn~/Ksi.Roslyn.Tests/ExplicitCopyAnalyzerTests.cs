@@ -10,31 +10,39 @@ public class ExplicitCopyAnalyzerTests
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
-            [Ksi.ExplicitCopy]
+            using Ksi;
+            
+            [ExplicitCopy]
             public struct MyStruct { public int Field; }
             
             public static class Test
             {
-                public static void Method(in MyStruct refParam, MyStruct valParam)
+                public static void Method(ref MyStruct refParam, MyStruct valParam)
                 {
+                    var localVar = new MyStruct();
+                    ref var localRef = ref localVar;
+                    
                     ReceiveByValue({|EXPCOPY02:refParam|});
                     ReceiveByValue({|EXPCOPY02:valParam|});
-                    
-                    var local = new MyStruct();
-                    ReceiveByValue({|EXPCOPY02:local|});
-                    
-                    ref var localRef = ref local;
+                    ReceiveByValue({|EXPCOPY02:localVar|});
                     ReceiveByValue({|EXPCOPY02:localRef|});
+                    
+                    ReceiveByValue(refParam.Move());
+                    ReceiveByValue(valParam.Move());
+                    ReceiveByValue(localVar.Move());
+                    ReceiveByValue(localRef.Move());
                     
                     ReceiveByValue(new MyStruct());
                     ReceiveByValue(default);
+                    
+                    ReceiveByValue(new MyStruct { Field = 7 });
                     ReceiveByValue(CreateMyStruct());
                 }
                 
                 private static void ReceiveByValue(MyStruct arg) {}
                 
-                [Ksi.ExplicitCopyReturn]
-                private static MyStruct CreateMyStruct() => default;
+                [ExplicitCopyReturn]
+                private static MyStruct CreateMyStruct() => new MyStruct { Field = 42 };
             }
             """
         );
