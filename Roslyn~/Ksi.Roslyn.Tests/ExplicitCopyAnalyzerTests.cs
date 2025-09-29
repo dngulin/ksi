@@ -23,7 +23,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy02CopiedByPassingByValue()
+    public async Task ExpCopy02ArgumentCopy()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -108,7 +108,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy04CopiedByAssignment()
+    public async Task ExpCopy04AssignmentCopy()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -165,7 +165,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy06CopiedByClosureCapture()
+    public async Task ExpCopy06ClosureCapture()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -188,7 +188,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy07CopiedByBoxing()
+    public async Task ExpCopy07Boxing()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -228,7 +228,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy09DeclaredAsAGenericType()
+    public async Task ExpCopy09GenericDeclaration()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -243,7 +243,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy10PassedAsGenericMethodArgument()
+    public async Task ExpCopy10GenericArgument()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -268,7 +268,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy11UsedAsGenericTypeArgument()
+    public async Task ExpCopy11TypeArgument()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -292,7 +292,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy12UsedAsGenericTypeArgument()
+    public async Task ExpCopy12SpanCopy()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs

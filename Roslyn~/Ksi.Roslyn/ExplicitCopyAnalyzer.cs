@@ -51,32 +51,39 @@ namespace Ksi.Roslyn
             "Implicit copy caused by non-readonly method invocation of a readonly instance"
         );
 
-        private static readonly DiagnosticDescriptor CaptureRule = Rule(06, "Captured by Closure",
-            "Capturing of `ExplicitCopy` type `{0}` by a closure"
+        private static readonly DiagnosticDescriptor Rule06ClosureCapture = Rule(06,
+            "Capturing the [ExplicitCopy] instance by closure",
+            "Implicit copy caused by closure capturing"
         );
 
-        private static readonly DiagnosticDescriptor BoxingRule = Rule(07, "Boxed",
-            "Boxing of `ExplicitCopy` type `{0}`"
+        private static readonly DiagnosticDescriptor Rule07Boxing = Rule(07,
+            "Boxing/unboxing the [ExplicitCopy] instance",
+            "Boxing/unboxing is not allowed for [ExplicitCopy] types"
         );
 
-        private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(08, "Private Field",
-            "Declaring a private field in the `ExplicitCopy` type `{0}` prevents from providing explicit copy extensions"
+        private static readonly DiagnosticDescriptor Rule08PrivateField = Rule(08,
+            "Private filed declaration in the [ExplicitCopy] type",
+            "Declaring a private field prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor GenericTypeRule = Rule(09, "Generic Type",
-            "Declaring `ExplicitCopy` type `{0}` as a generic type prevents from providing explicit copy extensions"
+        private static readonly DiagnosticDescriptor Rule09GenericDeclaration = Rule(09,
+            "Generic [ExplicitCopy] type declaration",
+            "Custom generic [ExplicitCopy] types are not allowed. Consider to use [RefList] collections instead"
         );
 
-        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(10, "Generic Argument",
-            "Passing an instance of the `ExplicitCopy` type `{0}` as a generic argument"
+        private static readonly DiagnosticDescriptor Rule10GenericArgument = Rule(10,
+            "Passing [ExplicitCopy] instance as a generic argument",
+            "Passing an instance of the [ExplicitCopy] type as a generic argument that is not marked as [ExplicitCopy]"
         );
 
-        private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(11, "Generic Type Argument",
-            "Passing the `ExplicitCopy` type `{0}` as a type argument"
+        private static readonly DiagnosticDescriptor Rule11TypeArgument = Rule(11,
+            "Passing [ExplicitCopy] type as a type argument",
+            "Passing [ExplicitCopy] type `{0}` as a type argument. Consider to use [RefList] collections instead"
         );
 
-        private static readonly DiagnosticDescriptor GenericCopyRule = Rule(12, "Copied in Generic Context",
-            "Operation produces non-explicit copy of `{0}` in generic context"
+        private static readonly DiagnosticDescriptor Rule12SpanCopy = Rule(12,
+            "Using Span copying API with [ExplicitCopy] items",
+            "Span operation is not valid for [ExplicitCopy] types"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
@@ -85,13 +92,13 @@ namespace Ksi.Roslyn
             Rule03ReturningCopy,
             Rule04AssignmentCopy,
             Rule05DefensiveCopy,
-            BoxingRule,
-            CaptureRule,
-            PrivateFieldRule,
-            GenericTypeRule,
-            GenericArgumentRule,
-            GenericTypeArgumentRule,
-            GenericCopyRule
+            Rule06ClosureCapture,
+            Rule07Boxing,
+            Rule08PrivateField,
+            Rule09GenericDeclaration,
+            Rule10GenericArgument,
+            Rule11TypeArgument,
+            Rule12SpanCopy
         );
 
         public override void Initialize(AnalysisContext context)
@@ -140,7 +147,7 @@ namespace Ksi.Roslyn
                 case RefKind.Ref or RefKind.In:
                     var ot = p.OriginalDefinition.Type;
                     if (ot is ITypeParameterSymbol && !ot.IsExplicitCopy())
-                        ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
+                        ctx.ReportDiagnostic(Diagnostic.Create(Rule10GenericArgument, loc, t.Name));
                     break;
             }
         }
@@ -161,7 +168,7 @@ namespace Ksi.Roslyn
 
             if (isExplicitCopyStruct && f.DeclaredAccessibility == Accessibility.Private)
                 ctx.ReportDiagnostic(
-                    Diagnostic.Create(PrivateFieldRule, f.Locations.First(), ct.Name));
+                    Diagnostic.Create(Rule08PrivateField, f.Locations.First(), ct.Name));
         }
 
         private static void AnalyzeBoxing(OperationAnalysisContext ctx)
@@ -176,13 +183,13 @@ namespace Ksi.Roslyn
             var boxing = typeFrom.IsValueType && typeTo.IsReferenceType;
             if (boxing && typeFrom.IsExplicitCopy())
             {
-                ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule07Boxing, op.Syntax.GetLocation()));
             }
 
             var unboxing = typeFrom.IsReferenceType && typeTo.IsValueType;
             if (unboxing && typeTo.IsExplicitCopy())
             {
-                ctx.ReportDiagnostic(Diagnostic.Create(BoxingRule, op.Syntax.GetLocation(), typeFrom.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule07Boxing, op.Syntax.GetLocation()));
             }
         }
 
@@ -195,7 +202,7 @@ namespace Ksi.Roslyn
             {
                 var t = GetCaptureSymbolType(capture);
                 if (t != null && t.IsExplicitCopy())
-                    ctx.ReportDiagnostic(Diagnostic.Create(CaptureRule, capture.Locations.First(), t.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule06ClosureCapture, capture.Locations.First()));
             }
         }
 
@@ -241,7 +248,7 @@ namespace Ksi.Roslyn
             if (t != null)
             {
                 var loc = d.GetDeclaredTypeLocation();
-                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, loc, t.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, loc, t.Name));
             }
         }
 
@@ -267,7 +274,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (sym.IsGenericType && sym.IsExplicitCopy() && !sym.IsRefList())
-                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeRule, sym.Locations.First(), sym.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule09GenericDeclaration, sym.Locations.First(), sym.Name));
         }
 
         private static void AnalyzeTuple(OperationAnalysisContext ctx)
@@ -280,7 +287,7 @@ namespace Ksi.Roslyn
 
                 if (e.Type.IsExplicitCopy())
                     ctx.ReportDiagnostic(
-                        Diagnostic.Create(GenericTypeArgumentRule, e.Syntax.GetLocation(), e.Type.Name));
+                        Diagnostic.Create(Rule11TypeArgument, e.Syntax.GetLocation(), e.Type.Name));
             }
         }
 
@@ -313,7 +320,7 @@ namespace Ksi.Roslyn
                 case "CopyTo":
                 case "TryCopyTo":
                 case "ToArray":
-                    ctx.ReportDiagnostic(Diagnostic.Create(GenericCopyRule, op.Syntax.GetLocation(), gt.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule12SpanCopy, op.Syntax.GetLocation(), gt.Name));
                     break;
             }
         }
@@ -334,7 +341,7 @@ namespace Ksi.Roslyn
             foreach (var a in t.TypeArguments)
             {
                 if (a is INamedTypeSymbol na && na.IsExplicitCopy())
-                    ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, s.GetLocation(), na.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, s.GetLocation(), na.Name));
             }
         }
 
@@ -347,7 +354,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (t.IsExplicitCopy())
-                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, a.GetLocation(), t.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, a.GetLocation(), t.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)
