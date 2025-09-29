@@ -12,12 +12,10 @@ namespace Ksi.Roslyn
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ExplicitCopyAnalyzer : DiagnosticAnalyzer
     {
-        private static int _ruleId;
-
-        private static DiagnosticDescriptor Rule(string title, string msg)
+        private static DiagnosticDescriptor Rule(int id, string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"EXPCOPY{++_ruleId:D2}",
+                id: $"EXPCOPY{id:D2}",
                 title: title,
                 messageFormat: msg,
                 category: "ExplicitCopy",
@@ -26,65 +24,53 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor ParameterRule = Rule(
-            "Received by Value",
+        private static readonly DiagnosticDescriptor ParameterRule = Rule(01, "Received by Value",
             "Receiving by value an instance of the `ExplicitCopy` type `{0}`. Consider to receive it by reference"
         );
 
-        private static readonly DiagnosticDescriptor ArgumentRule = Rule(
-            "Passed by Value",
+        private static readonly DiagnosticDescriptor ArgumentRule = Rule(02, "Passed by Value",
             "Passing by value an instance of the `ExplicitCopy` type `{0}`. Consider to pass it by reference"
         );
 
-        private static readonly DiagnosticDescriptor FieldRule = Rule(
-            "Field of non-`ExplicitCopy` Struct",
+        private static readonly DiagnosticDescriptor FieldRule = Rule(03, "Field of non-`ExplicitCopy` Struct",
             "Declaring field of `ExplicitCopy` type `{0}` within non-`ExplicitCopy` struct. " +
             "Consider to annotate the struct with the `ExplicitCopy` attribute"
         );
 
-        private static readonly DiagnosticDescriptor BoxingRule = Rule(
-            "Boxed",
+        private static readonly DiagnosticDescriptor BoxingRule = Rule(04, "Boxed",
             "Boxing of `ExplicitCopy` type `{0}`"
         );
 
-        private static readonly DiagnosticDescriptor CaptureRule = Rule(
-            "Captured by Closure",
+        private static readonly DiagnosticDescriptor CaptureRule = Rule(05, "Captured by Closure",
             "Capturing of `ExplicitCopy` type `{0}` by a closure"
         );
 
-        private static readonly DiagnosticDescriptor ReturnRule = Rule(
-            "Returned by Value",
+        private static readonly DiagnosticDescriptor ReturnRule = Rule(06, "Returned by Value",
             "Returning an instance of `ExplicitCopy` type `{0}` by value. " +
             "Consider to annotate the method with the `ExplicitCopyReturn` attribute "
         );
 
-        private static readonly DiagnosticDescriptor AssignmentRule = Rule(
-            "Copied by Assignment",
+        private static readonly DiagnosticDescriptor AssignmentRule = Rule(07, "Copied by Assignment",
             "Copying an instance of `ExplicitCopy` type `{0}` by assignment"
         );
 
-        private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(
-            "Private Field",
+        private static readonly DiagnosticDescriptor PrivateFieldRule = Rule(08, "Private Field",
             "Declaring a private field in the `ExplicitCopy` type `{0}` prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor GenericTypeRule = Rule(
-            "Generic Type",
+        private static readonly DiagnosticDescriptor GenericTypeRule = Rule(09, "Generic Type",
             "Declaring `ExplicitCopy` type `{0}` as a generic type prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(
-            "Generic Argument",
+        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(10, "Generic Argument",
             "Passing an instance of the `ExplicitCopy` type `{0}` as a generic argument"
         );
 
-        private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(
-            "Generic Type Argument",
+        private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(11, "Generic Type Argument",
             "Passing the `ExplicitCopy` type `{0}` as a type argument"
         );
 
-        private static readonly DiagnosticDescriptor GenericCopyRule = Rule(
-            "Copied in Generic Context",
+        private static readonly DiagnosticDescriptor GenericCopyRule = Rule(12, "Copied in Generic Context",
             "Operation produces non-explicit copy of `{0}` in generic context"
         );
 
@@ -179,7 +165,8 @@ namespace Ksi.Roslyn
                 ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
 
             if (isExplicitCopyStruct && sym.DeclaredAccessibility == Accessibility.Private)
-                ctx.ReportDiagnostic(Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.ContainingType.Name));
+                ctx.ReportDiagnostic(
+                    Diagnostic.Create(PrivateFieldRule, sym.Locations.First(), sym.ContainingType.Name));
         }
 
         private static void AnalyzeBoxing(OperationAnalysisContext ctx)
@@ -297,7 +284,8 @@ namespace Ksi.Roslyn
                     continue;
 
                 if (e.Type.IsExplicitCopy())
-                    ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, e.Syntax.GetLocation(), e.Type.Name));
+                    ctx.ReportDiagnostic(
+                        Diagnostic.Create(GenericTypeArgumentRule, e.Syntax.GetLocation(), e.Type.Name));
             }
         }
 
