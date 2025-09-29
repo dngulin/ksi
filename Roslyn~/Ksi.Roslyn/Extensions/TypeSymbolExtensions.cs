@@ -51,7 +51,7 @@ public static class TypeSymbolExtensions
             if (arg is not INamedTypeSymbol namedArg)
                 continue;
 
-            if (namedArg.IsDynSized())
+            if (namedArg.IsExplicitCopy())
             {
                 t = namedArg;
                 return true;
