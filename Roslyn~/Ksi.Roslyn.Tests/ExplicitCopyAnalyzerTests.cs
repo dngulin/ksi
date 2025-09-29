@@ -121,8 +121,10 @@ public class ExplicitCopyAnalyzerTests
                 public static void Method(ref MyStruct value)
                 {
                     var {|EXPCOPY04:a = value|};
+                    
                     var b = new MyStruct();
                     {|EXPCOPY04:value = b|};
+                    
                     value = new MyStruct();
                     value = default;
                 }

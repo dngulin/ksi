@@ -38,11 +38,12 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule03ReturningCopy = Rule(03,
             "Returning a copy of the [ExplicitCopy] instance",
-            "Implicit copy caused by a return operation."
+            "Implicit copy caused by a return operation"
         );
 
-        private static readonly DiagnosticDescriptor AssignmentRule = Rule(04, "Copied by Assignment",
-            "Copying an instance of `ExplicitCopy` type `{0}` by assignment"
+        private static readonly DiagnosticDescriptor Rule04Assignment = Rule(04,
+            "Assignment copy of the [ExplicitCopy] instance",
+            "Implicit copy caused by a assignment"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(05, "Captured by Closure",
@@ -77,9 +78,9 @@ namespace Ksi.Roslyn
             Rule01MissingAttr,
             Rule02ByValueArg,
             Rule03ReturningCopy,
+            Rule04Assignment,
             BoxingRule,
             CaptureRule,
-            AssignmentRule,
             PrivateFieldRule,
             GenericTypeRule,
             GenericArgumentRule,
@@ -215,7 +216,7 @@ namespace Ksi.Roslyn
             if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, initializer.Syntax.GetLocation(), v.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04Assignment, initializer.Syntax.GetLocation()));
         }
 
         private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
@@ -250,7 +251,7 @@ namespace Ksi.Roslyn
             if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(AssignmentRule, location, v.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04Assignment, location));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
