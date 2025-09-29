@@ -285,6 +285,8 @@ public class ExplicitCopyAnalyzerTests
                 public static void Method(in {|EXPCOPY11:Generic<MyStruct>|} arg)
                 {
                     {|EXPCOPY11:Generic<MyStruct>|} a = default;
+                    {|EXPCOPY11:var|} b = new {|EXPCOPY11:Generic<MyStruct>|}();
+                    {|EXPCOPY11:var|} c = new {|EXPCOPY11:MyStruct[10]|};
                 }
             }
             """
