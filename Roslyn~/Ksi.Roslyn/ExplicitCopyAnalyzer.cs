@@ -331,7 +331,7 @@ namespace Ksi.Roslyn
             if (s.IsUnboundGenericName)
                 return;
 
-            var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
+            var i = ctx.SemanticModel.GetTypeInfo(s.GetTypeExpr(), ctx.CancellationToken);
             if (i.Type is not INamedTypeSymbol { IsGenericType: true } t)
                 return;
 

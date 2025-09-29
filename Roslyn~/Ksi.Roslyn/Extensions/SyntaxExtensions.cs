@@ -76,4 +76,13 @@ public static class SyntaxExtensions
             $"{SymbolNames.Ksi}.{SymbolNames.RefList}" or
             $"{SymbolNames.Ksi}.{SymbolNames.RefList}{SymbolNames.Attribute}";
     }
+
+    public static ExpressionSyntax GetTypeExpr(this GenericNameSyntax self)
+    {
+        return self.Parent switch
+        {
+            ObjectCreationExpressionSyntax ocs => ocs,
+            _ => self
+        };
+    }
 }
