@@ -46,7 +46,7 @@ namespace Ksi.Roslyn
             "Implicit copy caused by a assignment"
         );
 
-        private static readonly DiagnosticDescriptor CaptureRule = Rule(05, "Captured by Closure",
+        private static readonly DiagnosticDescriptor CaptureRule = Rule(06, "Captured by Closure",
             "Capturing of `ExplicitCopy` type `{0}` by a closure"
         );
 

@@ -134,7 +134,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy05CopiedByClosureCapture()
+    public async Task ExpCopy06CopiedByClosureCapture()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -148,7 +148,7 @@ public class ExplicitCopyAnalyzerTests
             
                 public static void Caller()
                 {
-                    var {|EXPCOPY05:x|} = new MyStruct();
+                    var {|EXPCOPY06:x|} = new MyStruct();
                     System.Action f = () => { Method(x); };
                 }
             }
