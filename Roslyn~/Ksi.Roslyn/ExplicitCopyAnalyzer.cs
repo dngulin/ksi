@@ -30,7 +30,7 @@ namespace Ksi.Roslyn
             "because it contains an [ExplicitCopy] field of type `{0}`"
         );
 
-        private static readonly DiagnosticDescriptor Rule02ByValueArg = Rule(02,
+        private static readonly DiagnosticDescriptor Rule02ArgumentCopy = Rule(02,
             "Passing [ExplicitCopy] instance by value",
             "Implicit copy caused by passing a struct by value. " +
             "Consider to use the `Move` extension or changing the parameter to receive a value by reference"
@@ -41,9 +41,14 @@ namespace Ksi.Roslyn
             "Implicit copy caused by a return operation"
         );
 
-        private static readonly DiagnosticDescriptor Rule04Assignment = Rule(04,
+        private static readonly DiagnosticDescriptor Rule04AssignmentCopy = Rule(04,
             "Assignment copy of the [ExplicitCopy] instance",
             "Implicit copy caused by a assignment"
+        );
+
+        private static readonly DiagnosticDescriptor Rule05DefensiveCopy = Rule(05,
+            "Defensive copy of the [ExplicitCopy] instance",
+            "Implicit copy caused by non-readonly method invocation of a readonly instance"
         );
 
         private static readonly DiagnosticDescriptor CaptureRule = Rule(06, "Captured by Closure",
@@ -76,9 +81,10 @@ namespace Ksi.Roslyn
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Rule01MissingAttr,
-            Rule02ByValueArg,
+            Rule02ArgumentCopy,
             Rule03ReturningCopy,
-            Rule04Assignment,
+            Rule04AssignmentCopy,
+            Rule05DefensiveCopy,
             BoxingRule,
             CaptureRule,
             PrivateFieldRule,
@@ -129,7 +135,7 @@ namespace Ksi.Roslyn
             switch (p.RefKind)
             {
                 case RefKind.None when !IsNotExistingValue(arg.Value):
-                    ctx.ReportDiagnostic(Diagnostic.Create(Rule02ByValueArg, loc));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule02ArgumentCopy, loc));
                     break;
                 case RefKind.Ref or RefKind.In:
                     var ot = p.OriginalDefinition.Type;
@@ -216,7 +222,7 @@ namespace Ksi.Roslyn
             if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule04Assignment, initializer.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04AssignmentCopy, initializer.Syntax.GetLocation()));
         }
 
         private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
@@ -251,7 +257,7 @@ namespace Ksi.Roslyn
             if (IsNotExistingValue(v) || v.Type == null || !v.Type.IsExplicitCopy())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule04Assignment, location));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04AssignmentCopy, location));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -281,20 +287,33 @@ namespace Ksi.Roslyn
         private static void AnalyzeInvocation(OperationAnalysisContext ctx)
         {
             var i = (IInvocationOperation)ctx.Operation;
+            AnalyzeDefensiveCopy(ctx, i);
+            AnalyzeSpanApiCall(ctx, i);
+        }
 
-            if (i.Instance?.Type is not INamedTypeSymbol nt || !nt.IsSpanOrReadonlySpan())
+        private static void AnalyzeDefensiveCopy(OperationAnalysisContext ctx, IInvocationOperation op)
+        {
+            if (op.TargetMethod.IsReadOnly || op.Instance?.Type == null || !op.Instance.Type.IsExplicitCopy())
+                return;
+
+            if (op.Instance.IsReadonlyRef())
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule05DefensiveCopy, op.Syntax.GetLocation()));
+        }
+
+        private static void AnalyzeSpanApiCall(OperationAnalysisContext ctx, IInvocationOperation op)
+        {
+            if (op.Instance?.Type is not INamedTypeSymbol nt || !nt.IsSpanOrReadonlySpan())
                 return;
 
             if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsExplicitCopy())
                 return;
 
-            switch (i.TargetMethod.Name)
+            switch (op.TargetMethod.Name)
             {
                 case "CopyTo":
                 case "TryCopyTo":
                 case "ToArray":
-                case "Fill":
-                    ctx.ReportDiagnostic(Diagnostic.Create(GenericCopyRule, i.Syntax.GetLocation(), gt.Name));
+                    ctx.ReportDiagnostic(Diagnostic.Create(GenericCopyRule, op.Syntax.GetLocation(), gt.Name));
                     break;
             }
         }

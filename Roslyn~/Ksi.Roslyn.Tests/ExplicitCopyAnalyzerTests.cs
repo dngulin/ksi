@@ -134,6 +134,37 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
+    public async Task ExpCopy05DefensiveCopy()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            [Ksi.ExplicitCopy]
+            public struct MyStruct 
+            {
+                public int Field;
+                
+                public void SetValue(int value) => Field = value;
+            }
+
+            public static class Test
+            {
+                public static void Method(in MyStruct value)
+                {
+                    {|EXPCOPY05:value.SetValue(0)|};
+                    
+                    var local = new MyStruct();
+                    local.SetValue(1);
+                    
+                    ref readonly var localRef = ref local;
+                    {|EXPCOPY05:localRef.SetValue(2)|};
+                }
+            }
+            """
+        );
+    }
+
+    [Fact]
     public async Task ExpCopy06CopiedByClosureCapture()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(

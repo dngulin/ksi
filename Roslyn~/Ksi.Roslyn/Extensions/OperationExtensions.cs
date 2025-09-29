@@ -75,4 +75,27 @@ public static class OperationExtensions
                 return false;
         }
     }
+
+    public static bool IsReadonlyRef(this IOperation op)
+    {
+        while (true)
+        {
+            switch (op)
+            {
+                case IParameterReferenceOperation { Parameter.RefKind: RefKind.In }:
+                case ILocalReferenceOperation { Local.RefKind: RefKind.RefReadOnly }:
+                case IInvocationOperation { TargetMethod.RefKind: RefKind.RefReadOnly }:
+                case IPropertyReferenceOperation { Property.RefKind: RefKind.RefReadOnly }:
+                case IFieldReferenceOperation { Field.IsReadOnly: true }:
+                    return true;
+
+                case IFieldReferenceOperation { Instance: { Type.TypeKind: TypeKind.Struct } instance }:
+                    op = instance;
+                    continue;
+
+                default:
+                    return false;
+            }
+        }
+    }
 }
