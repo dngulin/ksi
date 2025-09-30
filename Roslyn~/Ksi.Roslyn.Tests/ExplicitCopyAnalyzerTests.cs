@@ -254,12 +254,14 @@ public class ExplicitCopyAnalyzerTests
             public static class Test
             {
                 public static void GenericMethod<T>(in T value) {}
+                public static void GenericValMethod<T>(T value) {}
                 public static void SafeGenericMethod<[Ksi.ExplicitCopy] T>(in T value) {}
             
                 public static void Caller()
                 {
                     var a = new MyStruct();
                     GenericMethod({|EXPCOPY10:a|});
+                    GenericValMethod({|EXPCOPY10:default(MyStruct)|});
                     SafeGenericMethod(a);
                 }
             }

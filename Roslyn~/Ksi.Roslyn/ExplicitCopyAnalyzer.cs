@@ -144,7 +144,7 @@ namespace Ksi.Roslyn
                 case RefKind.None when !IsNotExistingValue(arg.Value):
                     ctx.ReportDiagnostic(Diagnostic.Create(Rule02ArgumentCopy, loc));
                     break;
-                case RefKind.Ref or RefKind.In:
+                case RefKind.None or RefKind.Ref or RefKind.In:
                     var ot = p.OriginalDefinition.Type;
                     if (ot is ITypeParameterSymbol && !ot.IsExplicitCopy())
                         ctx.ReportDiagnostic(Diagnostic.Create(Rule10GenericArgument, loc, t.Name));
