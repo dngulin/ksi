@@ -20,7 +20,7 @@ namespace Ksi.Roslyn
                 id: $"DEALLOC{++_ruleId:D2}",
                 title: title,
                 messageFormat: msg,
-                category: "Dealloc",
+                category: "Ksi",
                 defaultSeverity: severity,
                 isEnabledByDefault: true
             );

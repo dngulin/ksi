@@ -18,7 +18,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
             id: $"BORROW{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
-            category: "Borrow",
+            category: "Ksi",
             defaultSeverity: severity,
             isEnabledByDefault: true
         );

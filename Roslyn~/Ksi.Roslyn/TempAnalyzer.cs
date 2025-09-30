@@ -20,7 +20,7 @@ public class TempAnalyzer : DiagnosticAnalyzer
             id: $"TEMP{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
-            category: "Temp",
+            category: "Ksi",
             defaultSeverity: severity,
             isEnabledByDefault: true
         );

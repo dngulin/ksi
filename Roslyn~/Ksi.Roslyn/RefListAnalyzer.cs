@@ -18,7 +18,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
             id: $"REFLIST{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
-            category: "RefList",
+            category: "Ksi",
             defaultSeverity: severity,
             isEnabledByDefault: true
         );

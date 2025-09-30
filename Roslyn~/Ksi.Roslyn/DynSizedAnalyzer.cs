@@ -20,7 +20,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
             id: $"DYNSIZED{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
-            category: "DynSized",
+            category: "Ksi",
             defaultSeverity: severity,
             isEnabledByDefault: true
         );

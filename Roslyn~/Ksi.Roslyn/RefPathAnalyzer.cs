@@ -18,7 +18,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
             id: $"REFPATH{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
-            category: "RefPath",
+            category: "Ksi",
             defaultSeverity: severity,
             isEnabledByDefault: true
         );
