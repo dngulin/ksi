@@ -159,12 +159,17 @@ public static class OperationRefPathExtensions
         if (!RefPath.TryCreateFromSegments(segments, out var path))
             return false;
 
-        var suffixLen = path.Segments.Length - path.DynSizedLength;
+        // Path will be prepended without the first node that will be derived from the parent operation lately
+        // So, let's estimate trimmed length parameters
+        var len = path.Segments.Length - 1;
+        var dynSizedLen = path.DynSizedLength > 0 ? path.DynSizedLength - 1 : 0;
+
+        var suffixLen = len - dynSizedLen;
         if (ctx.SuffixFinished && suffixLen > 0)
             return false;
 
         ctx.SuffixLength += suffixLen;
-        ctx.SuffixFinished = path.DynSizedLength > 0;
+        ctx.SuffixFinished = dynSizedLen > 0;
 
         for (var i = path.Segments.Length - 1; i >= 1; i--)
             self.Insert(0, path.Segments[i]);

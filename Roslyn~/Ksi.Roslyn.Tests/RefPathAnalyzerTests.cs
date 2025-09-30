@@ -26,11 +26,35 @@ public class RefPathAnalyzerTests
                 [RefPath("self", "Value")]
                 public static ref int Value(this ref MyStruct self) => ref self.Value;
                 
+                
                 [RefPath("self", "!", "Single", "Value")]
                 public static ref int Value(this ref DynStruct self) => ref self.Single.Value;
                 
+                [RefPath("self", "!", "Single", "Value")]
+                public static ref int ValueCombined(this ref DynStruct self) => ref self.Single.Value();
+                
+                
                 [RefPath("self", "Multiple", "!", "[n]", "Value")]
                 public static ref int Value(this ref DynStruct self, int idx) => ref self.Multiple.RefAt(idx).Value;
+                
+                [RefPath("self", "!", "[n]", "Value")]
+                public static ref int Value(this ref RefList<MyStruct> self, int idx) => ref self.RefAt(idx).Value();
+                
+                [RefPath("self", "Multiple", "!", "[n]", "Value")]
+                public static ref int ValueCombined(this ref DynStruct self, int idx) => ref self.Multiple.Value(idx);
+                
+                
+                [RefPath]
+                public static ref int Conditional(this ref RefList<MyStruct> self, bool condition)
+                {
+                    return ref self.Value(condition ? 42 : 24);
+                }
+                
+                [RefPath("self", "Multiple", "!", "Conditional()")]
+                public static ref int Conditional(this ref DynStruct self, bool condition)
+                {
+                    return ref self.Multiple.Conditional(condition);
+                }
             }
             """
         );
