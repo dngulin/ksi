@@ -20,6 +20,9 @@ public class RefPathAnalyzerTests
                 public MyStruct Single;
                 public RefList<MyStruct> Multiple;
             }
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct RootStruct { public DynStruct Dyn; }
 
             public static class RefPathExtensions
             {
@@ -45,15 +48,18 @@ public class RefPathAnalyzerTests
                 
                 
                 [RefPath]
-                public static ref int Conditional(this ref RefList<MyStruct> self, bool condition)
-                {
-                    return ref self.Value(condition ? 42 : 24);
-                }
-                
-                [RefPath("self", "Multiple", "!", "Conditional()")]
                 public static ref int Conditional(this ref DynStruct self, bool condition)
                 {
-                    return ref self.Multiple.Conditional(condition);
+                    if (condition)
+                        return ref self.Single.Value;
+                    
+                    return ref self.Multiple.RefAt(42).Value;
+                }
+                
+                [RefPath("self", "Dyn", "!", "Conditional()")]
+                public static ref int Conditional(this ref RootStruct self, bool condition)
+                {
+                    return ref self.Dyn.Conditional(condition);
                 }
             }
             """
