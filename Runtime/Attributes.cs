@@ -79,14 +79,4 @@ namespace Ksi
     public class RefPathSkipAttribute : Attribute
     {
     }
-
-    /// <summary>
-    /// A hint attribute for the reference path analyzer.
-    /// Indicates that the extension method returns a [RefList] type item reference.
-    /// Can be added only for the [RefList] type extension method that returns a collection item.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class RefListIndexerAttribute : Attribute
-    {
-    }
 }

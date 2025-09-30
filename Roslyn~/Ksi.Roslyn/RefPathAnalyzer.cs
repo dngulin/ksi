@@ -26,7 +26,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor SignatureRule = Rule(
         DiagnosticSeverity.Error,
-        "Invalid Method Signature",
+        "Invalid [RefPath] method signature",
         "RefPath attribute should be applied to an extension method that receives `this` structure by reference " +
         "and returns a reference"
     );
@@ -39,19 +39,19 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor ReturnExprRule = Rule(
         DiagnosticSeverity.Error,
-        "Invalid Return Expression",
-        "RefPath extension method should return a RefPath-compatible reference"
+        "Invalid [RefPath] return operation",
+        "RefPath method should return a RefPath-compatible reference"
     );
 
     private static readonly DiagnosticDescriptor RefPathSkipValueRule = Rule(
         DiagnosticSeverity.Error,
-        "Invalid RefPathSkip Return Value",
+        "Invalid [RefPathSkip] return reference",
         "RefPathSkip extension method should return `this` parameter by reference"
     );
 
     private static readonly DiagnosticDescriptor RefPathItemValueRule = Rule(
         DiagnosticSeverity.Error,
-        "Invalid RefPathItem Return Value",
+        "Invalid [RefPathItem] Return Value",
         "RefPathItem extension method should return a reference derived from `this` parameter"
     );
 

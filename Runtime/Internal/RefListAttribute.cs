@@ -18,4 +18,13 @@ namespace Ksi
     internal class RefListIteratorAttribute : Attribute
     {
     }
+
+    /// <summary>
+    /// An internal hint attribute for the reference path analyzer.
+    /// Indicates that the extension method returns a RefList item by index.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    internal class RefListIndexerAttribute : Attribute
+    {
+    }
 }
