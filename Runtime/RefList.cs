@@ -1,5 +1,5 @@
 // Disable diagnostics for redundant DynSized, Dealloc & Temp attributes
-#pragma warning disable DYNSIZED03, DEALLOC03, TEMP03
+#pragma warning disable DYNSIZED03, DEALLOC03, TEMPALLOC03
 
 namespace Ksi
 {
@@ -10,7 +10,7 @@ namespace Ksi
         internal int Count;
     }
 
-    [ExplicitCopy, DynSized, Temp, RefList]
+    [ExplicitCopy, DynSized, TempAlloc, RefList]
     public struct TempRefList<T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;

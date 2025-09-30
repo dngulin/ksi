@@ -18,7 +18,7 @@ namespace Ksi.Roslyn
             public readonly string TypeName = typeName;
             public string? Namespace;
             public bool IsUnmanaged;
-            public bool IsTemp;
+            public bool IsTempAlloc;
             public string[] Usings = [];
             public readonly List<string> Fields = new List<string>();
         }
@@ -48,7 +48,7 @@ namespace Ksi.Roslyn
 
                     result.Namespace = t.ContainingNamespace.ToDisplayString();
                     result.IsUnmanaged = t.IsUnmanagedType;
-                    result.IsTemp = t.IsTemp();
+                    result.IsTempAlloc = t.IsTempAlloc();
 
                     var usings = new HashSet<string>();
 
@@ -104,7 +104,7 @@ namespace Ksi.Roslyn
                         EmitDeallocMethod(sb, entry);
                         sb.AppendLine(string.Format(DeallocatedExtension, entry.TypeName));
 
-                        var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTemp);
+                        var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTempAlloc);
 
                         RefListUtils.Emit(kinds, RefListDeallocFull, RefListDeallocItems, sb, entry.TypeName);
                         RefListUtils.Emit(kinds, RefListDeallocated, sb, entry.TypeName);

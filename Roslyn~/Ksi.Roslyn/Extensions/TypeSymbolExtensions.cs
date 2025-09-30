@@ -157,7 +157,7 @@ public static class TypeSymbolExtensions
 
     public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
     public static bool IsDynSized(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.DynSized);
-    public static bool IsTemp(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.Temp);
+    public static bool IsTempAlloc(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.TempAlloc);
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {

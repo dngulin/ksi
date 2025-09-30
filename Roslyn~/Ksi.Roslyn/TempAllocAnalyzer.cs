@@ -10,14 +10,14 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Ksi.Roslyn;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class TempAnalyzer : DiagnosticAnalyzer
+public class TempAllocAnalyzer : DiagnosticAnalyzer
 {
     private static int _ruleId;
 
     private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"TEMP{++_ruleId:D2}",
+            id: $"TEMPALLOC{++_ruleId:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
@@ -76,21 +76,21 @@ public class TempAnalyzer : DiagnosticAnalyzer
         if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
             return;
 
-        if (sym.Type.IsTemp() && !sym.ContainingType.IsTemp())
+        if (sym.Type.IsTempAlloc() && !sym.ContainingType.IsTempAlloc())
             ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
     }
 
     private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
     {
         var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ctx.CancellationToken);
-        if (sym == null || !sym.IsTemp())
+        if (sym == null || !sym.IsTempAlloc())
             return;
 
         var hasTempFields = sym
             .GetMembers()
             .Where(m => m.Kind == SymbolKind.Field)
             .Cast<IFieldSymbol>()
-            .Any(field => !field.IsStatic && field.Type.IsTemp());
+            .Any(field => !field.IsStatic && field.Type.IsTempAlloc());
 
         if (!hasTempFields)
             ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
@@ -109,10 +109,10 @@ public class TempAnalyzer : DiagnosticAnalyzer
         if (i.Type is not INamedTypeSymbol { IsGenericType: true } n)
             return;
 
-        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTemp()))
+        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTempAlloc()))
         {
             var gt = n.TypeArguments.First();
-            if (gt.IsTemp())
+            if (gt.IsTempAlloc())
                 ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, s.GetLocation(), gt.Name));
         }
     }
@@ -124,11 +124,11 @@ public class TempAnalyzer : DiagnosticAnalyzer
         if (d.Symbol.Type is not INamedTypeSymbol { IsGenericType: true } n)
             return;
 
-        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTemp()))
+        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTempAlloc()))
         {
             var gt = n.TypeArguments.First();
             var loc = d.GetDeclaredTypeLocation();
-            if (gt.IsTemp())
+            if (gt.IsTempAlloc())
                 ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, loc, gt.Name));
         }
     }
