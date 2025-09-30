@@ -66,7 +66,7 @@ namespace Ksi.Roslyn
         }}";
 
         public const string DeallocatedExtension = @"
-        [NonAllocatedResult, RefPathSkip]
+        [RefPath(""self"", ""!""), NonAllocatedResult]
         public static ref {0} Deallocated(this ref {0} self)
         {{
             self.Dealloc();

@@ -14,8 +14,7 @@ namespace Ksi.Roslyn
 
         public const string TempAlloc = "TempAlloc";
 
-        public const string RefPathItem = "RefPathItem";
-        public const string RefPathSkip = "RefPathSkip";
+        public const string RefPath = "RefPath";
 
         public const string RefList = "RefList";
         public const string RefListIndexer = "RefListIndexer";

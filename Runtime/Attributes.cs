@@ -64,19 +64,32 @@ namespace Ksi
 
     /// <summary>
     /// A hint attribute for the reference path analyzer.
-    /// Indicates that the extension method returns any inner reference of `this` parameter.
+    /// If the method returns a specific reference path, specify it with positional parameters,
+    /// otherwise omit them (that means the method can return any inner reference).
+    /// Indexers should be indicated with the "[n]" segments.
+    /// The "!" should be placed after the last [SynSized] segment.
+    /// Examples:
+    /// <list type="bullet">
+    /// <item>
+    /// <description>
+    /// [RefList] corresponds to the `MethodName()` reference path, meaning it can reference any inner data
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// [RefList("self", "!")] corresponds to the `self!` parameter reference path
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// [RefList("self", "Field", "!", "[n]")] corresponds to the `self.Field![n]` reference path
+    /// </description>
+    /// </item>
+    /// </list>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class RefPathItemAttribute : Attribute
+    public class RefPathAttribute : Attribute
     {
-    }
-
-    /// <summary>
-    /// A hint attribute for the reference path analyzer.
-    /// Indicates that the extension method returns `this` parameter.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class RefPathSkipAttribute : Attribute
-    {
+        public string[] Segments { get; }
+        public RefPathAttribute(params string[] segments) => Segments = segments;
     }
 }

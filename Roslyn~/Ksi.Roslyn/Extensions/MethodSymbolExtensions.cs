@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -23,7 +24,7 @@ public static class MethodSymbolExtensions
             return false;
 
         return self.ReturnsRef() ?
-            self.Is(SymbolNames.RefListIndexer, SymbolNames.RefPathItem, SymbolNames.RefPathSkip) :
+            self.Is(SymbolNames.RefListIndexer, SymbolNames.RefPath) :
             self.IsRefListAsSpan();
     }
 
@@ -50,16 +51,37 @@ public static class MethodSymbolExtensions
 
     public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(SymbolNames.NonAllocatedResult);
     public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(SymbolNames.RefListIndexer);
-    public static bool IsRefPathItem(this IMethodSymbol self) => self.Is(SymbolNames.RefPathItem);
-    public static bool IsRefPathSkip(this IMethodSymbol self) => self.Is(SymbolNames.RefPathSkip);
+    public static bool IsRefPath(this IMethodSymbol self, out ImmutableArray<string?> segments)
+    {
+        foreach (var attr in self.GetAttributes().Where(attr => attr.Is(SymbolNames.RefPath)))
+        {
+            segments = attr.GetRefPathSegments();
+            return true;
+        }
+
+        segments = ImmutableArray<string?>.Empty;
+        return false;
+    }
+
+    private static ImmutableArray<string?> GetRefPathSegments(this AttributeData self)
+    {
+        if (self.ConstructorArguments.Length == 0)
+            return ImmutableArray<string?>.Empty;
+
+        var first = self.ConstructorArguments.First();
+        if (first.IsNull)
+            return ImmutableArray<string?>.Empty;
+
+        return first.Values.Select(v => (string?)v.Value).ToImmutableArray();
+    }
 
     private static bool Is(this IMethodSymbol self, string attributeName)
     {
         return self.GetAttributes().Any(a => a.Is(attributeName));
     }
 
-    private static bool Is(this IMethodSymbol self, string a1, string a2, string a3)
+    private static bool Is(this IMethodSymbol self, string a1, string a2)
     {
-        return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2) || a.Is(a3));
+        return self.GetAttributes().Any(a => a.Is(a1) || a.Is(a2));
     }
 }

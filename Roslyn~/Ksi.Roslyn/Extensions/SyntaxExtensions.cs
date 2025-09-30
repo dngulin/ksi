@@ -25,12 +25,10 @@ public static class SyntaxExtensions
 
     private static bool IsDealloc(this AttributeSyntax attribute)
     {
-        var name = attribute.Name.ToString();
-        return name is
-            SymbolNames.Dealloc or
-            SymbolNames.Dealloc + SymbolNames.Attribute or
-            $"{SymbolNames.Dealloc}.{SymbolNames.Dealloc}" or
-            $"{SymbolNames.Dealloc}.{SymbolNames.Dealloc}{SymbolNames.Attribute}";
+        const string ns = SymbolNames.Ksi;
+        const string name = SymbolNames.Dealloc;
+        const string attr = SymbolNames.Attribute;
+        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
     }
 
     public static bool ContainsExplicitCopy(this SyntaxList<AttributeListSyntax> lists)
@@ -47,12 +45,10 @@ public static class SyntaxExtensions
 
     private static bool IsExplicitCopy(this AttributeSyntax attribute)
     {
-        var name = attribute.Name.ToString();
-        return name is
-            SymbolNames.ExplicitCopy or
-            SymbolNames.ExplicitCopy + SymbolNames.Attribute or
-            $"{SymbolNames.Ksi}.{SymbolNames.ExplicitCopy}" or
-            $"{SymbolNames.Ksi}.{SymbolNames.ExplicitCopy}{SymbolNames.Attribute}";
+        const string ns = SymbolNames.Ksi;
+        const string name = SymbolNames.ExplicitCopy;
+        const string attr = SymbolNames.Attribute;
+        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
     }
 
     public static bool ContainsRefList(this SyntaxList<AttributeListSyntax> lists)
@@ -69,12 +65,10 @@ public static class SyntaxExtensions
 
     private static bool IsRefList(this AttributeSyntax attribute)
     {
-        var name = attribute.Name.ToString();
-        return name is
-            SymbolNames.RefList or
-            SymbolNames.RefList + SymbolNames.Attribute or
-            $"{SymbolNames.Ksi}.{SymbolNames.RefList}" or
-            $"{SymbolNames.Ksi}.{SymbolNames.RefList}{SymbolNames.Attribute}";
+        const string ns = SymbolNames.Ksi;
+        const string name = SymbolNames.RefList;
+        const string attr = SymbolNames.Attribute;
+        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
     }
 
     public static ExpressionSyntax GetTypeExpr(this GenericNameSyntax self)

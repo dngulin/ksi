@@ -2,13 +2,14 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Ksi.Roslyn;
 
 public readonly struct RefPath
 {
     public const string IndexerName = "[n]";
-    public const string ItemSuffix = "()";
+    public const string MethodSuffix = "()";
 
     public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0, false);
 
@@ -21,7 +22,7 @@ public readonly struct RefPath
     {
         Segments = segments;
         DynSizedLength = dynSizedLength;
-        ExplicitLength = segments.TakeWhile(i => !i.EndsWith(ItemSuffix)).Count();
+        ExplicitLength = segments.TakeWhile(i => !i.EndsWith(MethodSuffix)).Count();
         IsDerivedFromLocalAccessScope = isDerivedFromLocalAccessScope;
     }
 
@@ -43,6 +44,40 @@ public readonly struct RefPath
         }
 
         return sb.ToString();
+    }
+
+    public static bool TryCreateFromSegments(ImmutableArray<string?> segments, out RefPath result)
+    {
+        result = Empty;
+
+        if (segments.IsEmpty)
+            return true;
+
+        if (segments.Any(s => !IsValidSegment(s)))
+            return false;
+
+        var dynSepCount = segments.Count(s => s == "!");
+        if (dynSepCount > 1)
+            return false;
+
+        var dynSizedLen = dynSepCount == 0 ? 0 : segments.TakeWhile(s => s != "!").Count();
+
+        result = new RefPath(segments.Where(s => s != "!").ToImmutableArray()!, dynSizedLen, false);
+        return true;
+    }
+
+    private static bool IsValidSegment(string? segment)
+    {
+        if (segment == null)
+            return false;
+
+        if (segment is IndexerName or "!")
+            return true;
+
+        if (segment.EndsWith(MethodSuffix))
+            segment = segment.Substring(0, segment.Length - MethodSuffix.Length);
+
+        return SyntaxFacts.IsValidIdentifier(segment);
     }
 }
 
@@ -84,7 +119,7 @@ public static class RefExtensions {
         for (var i = start; i < end; i++)
         {
             var item = self.Segments[i];
-            if (item == RefPath.IndexerName || item.EndsWith(RefPath.ItemSuffix))
+            if (item == RefPath.IndexerName || item.EndsWith(RefPath.MethodSuffix))
                 return true;
         }
 

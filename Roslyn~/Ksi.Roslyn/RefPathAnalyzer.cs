@@ -24,36 +24,43 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor SignatureRule = Rule(
+    private static readonly DiagnosticDescriptor Rule01InvalidMethodSignature = Rule(
         DiagnosticSeverity.Error,
         "Invalid [RefPath] method signature",
-        "RefPath attribute should be applied to an extension method that receives `this` structure by reference " +
-        "and returns a reference"
+        "Method indicated with the [RefPath] attribute has incompatible signature"
     );
 
-    private static readonly DiagnosticDescriptor ReturnExprRule = Rule(
+    private static readonly DiagnosticDescriptor Rule02InvalidRefPathDeclaration = Rule(
         DiagnosticSeverity.Error,
-        "Invalid [RefPath] return operation",
-        "RefPath method should return a RefPath-compatible reference"
+        "Invalid [RefPath] attribute arguments",
+        "RefPath attribute constructed with invalid segments sequence"
     );
 
-    private static readonly DiagnosticDescriptor RefPathSkipValueRule = Rule(
+    private static readonly DiagnosticDescriptor Rule03InvalidDeclaredRoot = Rule(
         DiagnosticSeverity.Error,
-        "Invalid [RefPathSkip] return reference",
-        "RefPathSkip extension method should return `this` parameter by reference"
+        "Invalid declared [RefPath] root",
+        "Declared [RefPath] is not derived from `this` parameter"
     );
 
-    private static readonly DiagnosticDescriptor RefPathItemValueRule = Rule(
+
+    private static readonly DiagnosticDescriptor Rule04InvalidReturnExpr = Rule(
         DiagnosticSeverity.Error,
-        "Invalid [RefPathItem] Return Value",
-        "RefPathItem extension method should return a reference derived from `this` parameter"
+        "Invalid [RefPath] return expression",
+        "Return operation is not a RefPath-compatible expression"
+    );
+
+    private static readonly DiagnosticDescriptor Rule05MismatchPaths = Rule(
+        DiagnosticSeverity.Error,
+        "Reference path mismatch",
+        "Returning reference path `{0}` doesn't match the declared reference path `{1}`"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        SignatureRule,
-        ReturnExprRule,
-        RefPathSkipValueRule,
-        RefPathItemValueRule
+        Rule02InvalidRefPathDeclaration,
+        Rule01InvalidMethodSignature,
+        Rule03InvalidDeclaredRoot,
+        Rule04InvalidReturnExpr,
+        Rule05MismatchPaths
     );
 
     public override void Initialize(AnalysisContext context)
@@ -62,7 +69,6 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
             GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics
         );
         context.EnableConcurrentExecution();
-
         context.RegisterOperationAction(AnalyzeReturn, OperationKind.Return);
     }
 
@@ -71,52 +77,47 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         var r = (IReturnOperation)ctx.Operation;
         var v = r.ReturnedValue;
 
-        if (v == null || v.Type == null || v.Type.IsReferenceType)
+        if (v?.Type == null || v.Type.IsReferenceType)
             return;
 
         var m = r.GetEnclosingMethod(ctx.CancellationToken);
-        if (m == null)
+        if (m == null || !m.IsRefPath(out var segments))
             return;
 
-        // TODO: one pass with flags enum
-        // TODO: report more than one attribute?
-        var isRefPathSkip = m.IsRefPathSkip();
-        var isRefPathItem = m.IsRefPathItem();
+        var signatureIsValid = IsValidRefPathSignature(m);
+        if (!signatureIsValid)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01InvalidMethodSignature, m.Locations.First()));
 
-        var isRefPath = isRefPathSkip || isRefPathItem;
-        if (!isRefPath)
+        var actualPath = v.ToRefPath();
+        if (actualPath.IsEmpty)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04InvalidReturnExpr, v.Syntax.GetLocation()));
+
+        if (segments.Length == 0)
             return;
 
-        if (!m.IsExtensionMethod || !m.ReturnsRef())
+        _ = RefPath.TryCreateFromSegments(segments, out var declPath);
+        switch (declPath.IsEmpty)
         {
-            ctx.ReportDiagnostic(Diagnostic.Create(SignatureRule, m.Locations.First()));
+            case true:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02InvalidRefPathDeclaration, m.Locations.First()));
+                break;
+
+            case false when signatureIsValid && declPath.Segments[0] != m.Parameters[0].Name:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDeclaredRoot, m.Locations.First()));
+                break;
+        }
+
+        if (declPath.IsEmpty || actualPath.IsEmpty)
             return;
-        }
 
-        var p = m.Parameters.First();
-        if (p.RefKind == RefKind.None)
-        {
-            ctx.ReportDiagnostic(Diagnostic.Create(SignatureRule, m.Locations.First()));
-            return;
-        }
+        var decl = declPath.ToString();
+        var actual = actualPath.ToString();
+        if (decl != actual)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule05MismatchPaths, v.Syntax.GetLocation(), actual, decl));
+    }
 
-        var rp = v.ToRefPath();
-        if (rp.IsEmpty)
-        {
-            ctx.ReportDiagnostic(Diagnostic.Create(ReturnExprRule, v.Syntax.GetLocation()));
-            return;
-        }
-
-        if (isRefPathSkip)
-        {
-            if (rp.Segments.Length != 1 || rp.Segments[0] != p.Name)
-                ctx.ReportDiagnostic(Diagnostic.Create(RefPathSkipValueRule, v.Syntax.GetLocation()));
-        }
-
-        if (isRefPathItem)
-        {
-            if (rp.Segments[0] != p.Name)
-                ctx.ReportDiagnostic(Diagnostic.Create(RefPathItemValueRule, v.Syntax.GetLocation()));
-        }
+    private static bool IsValidRefPathSignature(IMethodSymbol m)
+    {
+        return m.IsExtensionMethod && m.ReturnsRef() && m.Parameters.First().IsRef();
     }
 }

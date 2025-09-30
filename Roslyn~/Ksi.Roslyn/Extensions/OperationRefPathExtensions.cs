@@ -10,7 +10,7 @@ public static class OperationRefPathExtensions
 {
     private struct RefPathBuildCtx
     {
-        public bool Finished;
+        public bool SuffixFinished;
         public int SuffixLength;
         public bool DerivedFromLocalAccessScope;
     }
@@ -100,11 +100,16 @@ public static class OperationRefPathExtensions
                         {
                             path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref ctx);
                         }
-                        else if (m.IsRefPathItem() || m.IsRefListAsSpan())
+                        else if (m.IsRefListAsSpan())
                         {
-                            path.PrependRefSeg(m.Name + RefPath.ItemSuffix, m.ReturnType, ref ctx);
+                            path.PrependRefSeg(m.Name + RefPath.MethodSuffix, m.ReturnType, ref ctx);
                         }
-                        else if (!m.IsRefPathSkip())
+                        else if (m.IsRefPath(out var segments))
+                        {
+                            if (!path.PrependRefPath(segments, m.Name, m.ReturnType, ref ctx))
+                                return false;
+                        }
+                        else
                         {
                             return false;
                         }
@@ -131,16 +136,40 @@ public static class OperationRefPathExtensions
     {
         self.Insert(0, seg);
 
-        if (ctx.Finished)
+        if (ctx.SuffixFinished)
             return;
 
         if (t.IsDynSizedOrWrapsDynSized())
         {
-            ctx.Finished = true;
+            ctx.SuffixFinished = true;
             return;
         }
 
         ctx.SuffixLength++;
+    }
+
+    private static bool PrependRefPath(this List<string> self, ImmutableArray<string?> segments, string method, ITypeSymbol t, ref RefPathBuildCtx ctx)
+    {
+        if (segments.IsEmpty)
+        {
+            self.PrependRefSeg(method + RefPath.MethodSuffix, t, ref ctx);
+            return true;
+        }
+
+        if (!RefPath.TryCreateFromSegments(segments, out var path))
+            return false;
+
+        var suffixLen = path.Segments.Length - path.DynSizedLength;
+        if (ctx.SuffixFinished && suffixLen > 0)
+            return false;
+
+        ctx.SuffixLength += suffixLen;
+        ctx.SuffixFinished = path.DynSizedLength > 0;
+
+        for (var i = path.Segments.Length - 1; i >= 1; i--)
+            self.Insert(0, path.Segments[i]);
+
+        return true;
     }
 
     public static bool ReferencesDynSized(this IOperation self, bool fullGraph = true)
