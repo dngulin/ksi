@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Ksi.Roslyn.Tests;
+namespace Ksi.Roslyn.Tests.Util;
 
 public static class KsiAnalyzerTest<T> where T : DiagnosticAnalyzer, new()
 {

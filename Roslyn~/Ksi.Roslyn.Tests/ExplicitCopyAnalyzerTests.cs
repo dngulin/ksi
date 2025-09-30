@@ -1,6 +1,6 @@
 ﻿namespace Ksi.Roslyn.Tests;
 
-using ExplicitCopyAnalyzerTest = KsiAnalyzerTest<ExplicitCopyAnalyzer>;
+using ExplicitCopyAnalyzerTest = Util.KsiAnalyzerTest<ExplicitCopyAnalyzer>;
 
 public class ExplicitCopyAnalyzerTests
 {
