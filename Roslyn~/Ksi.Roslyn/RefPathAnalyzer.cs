@@ -31,12 +31,6 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         "and returns a reference"
     );
 
-    private static readonly DiagnosticDescriptor RefListIndexerTypeRule = Rule(
-        DiagnosticSeverity.Error,
-        "Invalid RefListIndexer Extension Type",
-        "RefListIndexer attribute should be applied to RefList extension method"
-    );
-
     private static readonly DiagnosticDescriptor ReturnExprRule = Rule(
         DiagnosticSeverity.Error,
         "Invalid [RefPath] return operation",
@@ -55,19 +49,11 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         "RefPathItem extension method should return a reference derived from `this` parameter"
     );
 
-    private static readonly DiagnosticDescriptor RefListIndexerValueRule = Rule(
-        DiagnosticSeverity.Error,
-        "Invalid RefListIndexer Return Value",
-        "RefListIndexer extension method should return other RefListIndexer result applied to `this` parameter"
-    );
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         SignatureRule,
-        RefListIndexerTypeRule,
         ReturnExprRule,
         RefPathSkipValueRule,
-        RefPathItemValueRule,
-        RefListIndexerValueRule
+        RefPathItemValueRule
     );
 
     public override void Initialize(AnalysisContext context)
@@ -96,9 +82,8 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         // TODO: report more than one attribute?
         var isRefPathSkip = m.IsRefPathSkip();
         var isRefPathItem = m.IsRefPathItem();
-        var isRefListIndexer = m.IsRefListIndexer();
 
-        var isRefPath = isRefPathSkip || isRefPathItem || isRefListIndexer;
+        var isRefPath = isRefPathSkip || isRefPathItem;
         if (!isRefPath)
             return;
 
@@ -132,15 +117,6 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         {
             if (rp.Segments[0] != p.Name)
                 ctx.ReportDiagnostic(Diagnostic.Create(RefPathItemValueRule, v.Syntax.GetLocation()));
-        }
-
-        if (isRefListIndexer)
-        {
-            if (!p.Type.IsRefList())
-                ctx.ReportDiagnostic(Diagnostic.Create(RefListIndexerTypeRule, p.Locations.First()));
-
-            if (rp.Segments.Length != 2 || rp.Segments[0] != p.Name || rp.Segments[1] != RefPath.IndexerName)
-                ctx.ReportDiagnostic(Diagnostic.Create(RefListIndexerValueRule, v.Syntax.GetLocation()));
         }
     }
 }
