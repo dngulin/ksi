@@ -163,4 +163,24 @@ public class RefPathAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task RefPath05MismatchPaths()
+    {
+        await RefPathAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public struct MyStruct { public int A; public int B; }
+
+            public static class RefPathExtensions
+            {
+                [Ksi.RefPath("self", "A")]
+                public static ref int Valid(this ref MyStruct self) => ref self.A;
+                
+                [Ksi.RefPath("self", "A")]
+                public static ref int Invalid(this ref MyStruct self) => ref {|REFPATH05:self.B|};
+            }
+            """
+        );
+    }
 }
