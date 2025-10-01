@@ -47,4 +47,24 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy04NoResize()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            public static class TestClass
+            {
+                public static void Test([DynNoResize] ref RefList<int> list)
+                {
+                    list.RefAt(0) = 42;
+                    {|DYNSIZED04:list|}.Clear();
+                }
+            }
+            """
+        );
+    }
 }
