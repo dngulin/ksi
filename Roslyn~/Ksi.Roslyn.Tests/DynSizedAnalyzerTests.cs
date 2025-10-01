@@ -33,4 +33,18 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy03RedundantAttribute()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct {|DYNSIZED03:TestStruct|} { public int Field; }
+            """
+        );
+    }
 }
