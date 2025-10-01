@@ -93,8 +93,9 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         if (!sym.Type.IsDynSized())
             return;
 
-        if (sym.ContainingType.TypeKind == TypeKind.Struct && !sym.ContainingType.IsDynSized())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, sym.Locations.First(), sym.Type.Name));
+        var ct = sym.ContainingType;
+        if (ct.TypeKind == TypeKind.Struct && !ct.IsDynSized())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, ct.Locations.First(), sym.Type.Name));
 
         if (sym.ContainingType.TypeKind == TypeKind.Class)
         {
