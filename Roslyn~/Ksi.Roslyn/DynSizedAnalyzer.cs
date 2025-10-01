@@ -40,24 +40,24 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         "Structure is marked with the [DynSized] attribute but doesn't have any [DynSized] fields"
     );
 
-    private static readonly DiagnosticDescriptor Rule03NoResize = Rule(04, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule04NoResize = Rule(04, DiagnosticSeverity.Error,
         "Resize is not allowed",
         "Passing as an argument a mutable reference to `{0}` that is derived from the [DynNoResize] parameter. " +
         "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
     );
 
-    private static readonly DiagnosticDescriptor Rule04RedundantNoResize = Rule(05, DiagnosticSeverity.Warning,
+    private static readonly DiagnosticDescriptor Rule05RedundantNoResize = Rule(05, DiagnosticSeverity.Warning,
         "Redundant [DynNoResize] attribute",
         "[DynNoResize] attribute is added to a non-resizable parameter and has no effect"
     );
 
-    private static readonly DiagnosticDescriptor Rule05FieldOfReferenceType = Rule(06, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule06FieldOfReferenceType = Rule(06, DiagnosticSeverity.Error,
         "[DynSized] field of a reference type",
         "Type `{0}` is [DynSized] and cannot be a field of a reference type. " +
         "Consider to wrap it with `ExclusiveAccess<{0}>`"
     );
 
-    private static readonly DiagnosticDescriptor Rule06RedundantExclusiveAccess = Rule(07, DiagnosticSeverity.Warning,
+    private static readonly DiagnosticDescriptor Rule07RedundantExclusiveAccess = Rule(07, DiagnosticSeverity.Warning,
         "Redundant `ExclusiveAccess<T>` usage",
         "Usage of the `ExclusiveAccess<{0}>` is redundant because the generic argument `{0}` is not [DynSized]"
     );
@@ -66,10 +66,10 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         Rule01MissingAttribute,
         Rule02MissingExplicitCopy,
         Rule03RedundantAttribute,
-        Rule03NoResize,
-        Rule04RedundantNoResize,
-        Rule05FieldOfReferenceType,
-        Rule06RedundantExclusiveAccess
+        Rule04NoResize,
+        Rule05RedundantNoResize,
+        Rule06FieldOfReferenceType,
+        Rule07RedundantExclusiveAccess
     );
 
     public override void Initialize(AnalysisContext context)
@@ -100,7 +100,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         if (sym.ContainingType.TypeKind == TypeKind.Class)
         {
             var loc = sym.GetDeclaredTypeLocation(ctx.CancellationToken);
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule05FieldOfReferenceType, loc, sym.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule06FieldOfReferenceType, loc, sym.Type.Name));
         }
     }
 
@@ -127,7 +127,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     {
         var d = (IVariableDeclaratorOperation)ctx.Operation;
         if (IsRedundantAccessScope(d.Symbol.Type, out var gtName))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule06RedundantExclusiveAccess, d.GetDeclaredTypeLocation(), gtName));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule07RedundantExclusiveAccess, d.GetDeclaredTypeLocation(), gtName));
     }
 
     private static bool IsRedundantAccessScope(ITypeSymbol t, out string genericTypeName)
@@ -181,7 +181,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         {
             var root = refPath.Segments[0];
             if (noResizeParams.Contains(root))
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule03NoResize, location, refPath));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule04NoResize, location, refPath));
         }
     }
 
@@ -195,7 +195,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
                 continue;
 
             if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule04RedundantNoResize, p.Locations.First()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule05RedundantNoResize, p.Locations.First()));
         }
     }
 
@@ -207,6 +207,6 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
         var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
         if (i.Type != null && IsRedundantAccessScope(i.Type, out var gtName))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule06RedundantExclusiveAccess, s.GetLocation(), gtName));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule07RedundantExclusiveAccess, s.GetLocation(), gtName));
     }
 }
