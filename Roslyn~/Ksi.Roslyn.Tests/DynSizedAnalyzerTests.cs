@@ -67,4 +67,18 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy05RedundantNoResize()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public static class TestClass
+            {
+                public static void Test([Ksi.DynNoResize] ref int {|DYNSIZED05:value|}) => throw null;
+            }
+            """
+        );
+    }
 }
