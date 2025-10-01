@@ -121,4 +121,24 @@ public class RefPathAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task RefPath03InvalidDeclaredRoot()
+    {
+        await RefPathAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public struct MyStruct { public int Value; }
+
+            public static class RefPathExtensions
+            {
+                [Ksi.RefPath("self", "Value")]
+                public static ref int Valid(this ref MyStruct self, ref MyStruct other) => throw null;
+                
+                [Ksi.RefPath("other", "Value")]
+                public static ref int {|REFPATH03:TInvalid|}(this ref MyStruct self, ref MyStruct other) => throw null;
+            }
+            """
+        );
+    }
 }
