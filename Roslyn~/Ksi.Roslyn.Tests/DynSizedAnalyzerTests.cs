@@ -81,4 +81,21 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy06FieldOfReferenceType()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            public class TestClass
+            {
+                private {|DYNSIZED06:RefList<int>|} _invalid;
+                private ExclusiveAccess<RefList<int>> _valid;
+            }
+            """
+        );
+    }
 }
