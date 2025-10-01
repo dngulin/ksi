@@ -5,7 +5,7 @@ using RefPathAnalyzerTest = Util.KsiAnalyzerTest<RefPathAnalyzer>;
 public class RefPathAnalyzerTests
 {
     [Fact]
-    public async Task ValidDefinitions()
+    public async Task RefPathSmoke()
     {
         await RefPathAnalyzerTest.RunAsync(
             // language=cs
