@@ -19,4 +19,18 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy02MissingExplicitCopy()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [DynSized, Dealloc]
+            public struct {|DYNSIZED02:TestStruct|} { public RefList<int> Field; }
+            """
+        );
+    }
 }
