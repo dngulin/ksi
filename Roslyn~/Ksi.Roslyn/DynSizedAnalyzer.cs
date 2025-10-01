@@ -25,44 +25,46 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(01, DiagnosticSeverity.Error,
-        "Field of Non-DynSized Structure",
-        "Structure `{0}` can be a field only of a structure marked with the `DynSized` attribute"
+        "Missing [DynSized] attribute",
+        "Structure should be annotated with the [DynSized] attribute " +
+        "because it contains a [DynSized] field of type `{0}`"
     );
 
-    private static readonly DiagnosticDescriptor Rule02ExplicitCopyRequired = Rule(02, DiagnosticSeverity.Error,
-        "ExplicitCopy Attribute Required",
-        "Missing `ExplicitCopy` attribute for a struct `{0}` marked with `DynSized` attribute"
+    private static readonly DiagnosticDescriptor Rule02MissingExplicitCopy = Rule(02, DiagnosticSeverity.Error,
+        "Missing [ExplicitCopy] attribute",
+        "Structure marked with the [DynSized] attribute should be also marked with the [ExplicitCopy] attribute"
     );
 
     private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
-        "Redundant DynSized Attribute",
-        "Structure `{0}` is marked with the `DynSized` attribute but doesn't have any `DynSized` fields"
+        "Redundant [DynSized] attribute",
+        "Structure is marked with the [DynSized] attribute but doesn't have any [DynSized] fields"
     );
 
     private static readonly DiagnosticDescriptor Rule03NoResize = Rule(04, DiagnosticSeverity.Error,
-        "DynNoResize Violation",
-        "Passing as an argument a mutable reference to `{0}` that is derived from the `DynNoResize` parameter. " +
-        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
+        "Resize is not allowed",
+        "Passing as an argument a mutable reference to `{0}` that is derived from the [DynNoResize] parameter. " +
+        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
     );
 
     private static readonly DiagnosticDescriptor Rule04RedundantNoResize = Rule(05, DiagnosticSeverity.Warning,
-        "Redundant DynNoResize Annotation",
-        "DynNoResize attribute is added to non-compatible parameter and has no effect."
+        "Redundant [DynNoResize] attribute",
+        "[DynNoResize] attribute is added to a non-resizable parameter and has no effect"
     );
 
     private static readonly DiagnosticDescriptor Rule05FieldOfReferenceType = Rule(06, DiagnosticSeverity.Error,
-        "Field Of Reference Type",
-        "Type `{0}` cannot be a field of a reference type. Consider to wrap it with `ExclusiveAccess<{0}>`"
+        "[DynSized] field of a reference type",
+        "Type `{0}` is [DynSized] and cannot be a field of a reference type. " +
+        "Consider to wrap it with `ExclusiveAccess<{0}>`"
     );
 
     private static readonly DiagnosticDescriptor Rule06RedundantExclusiveAccess = Rule(07, DiagnosticSeverity.Warning,
-        "Redundant ExclusiveAccess<T> Usage",
-        "Usage of the `ExclusiveAccess<{0}>` is redundant because the generic argument `{0}` is not `[DynSized]`"
+        "Redundant `ExclusiveAccess<T>` usage",
+        "Usage of the `ExclusiveAccess<{0}>` is redundant because the generic argument `{0}` is not [DynSized]"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01MissingAttribute,
-        Rule02ExplicitCopyRequired,
+        Rule02MissingExplicitCopy,
         Rule03RedundantAttribute,
         Rule03NoResize,
         Rule04RedundantNoResize,
@@ -114,10 +116,10 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
             .Any(field => !field.IsStatic && field.Type.IsDynSized());
 
         if (!hasDynSizedFields)
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First(), sym.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First()));
 
         if (!sym.IsExplicitCopy())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule02ExplicitCopyRequired, sym.Locations.First(), sym.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingExplicitCopy, sym.Locations.First()));
     }
 
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
