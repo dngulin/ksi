@@ -24,14 +24,14 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor Rule01ExplicitCopyRequired = Rule(01, DiagnosticSeverity.Error,
-        "ExplicitCopy Attribute Required",
-        "Missing `ExplicitCopy` attribute for a struct `{0}` marked with `DynSized` attribute"
-    );
-
-    private static readonly DiagnosticDescriptor Rule02MissingAttribute = Rule(02, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(01, DiagnosticSeverity.Error,
         "Field of Non-DynSized Structure",
         "Structure `{0}` can be a field only of a structure marked with the `DynSized` attribute"
+    );
+
+    private static readonly DiagnosticDescriptor Rule02ExplicitCopyRequired = Rule(02, DiagnosticSeverity.Error,
+        "ExplicitCopy Attribute Required",
+        "Missing `ExplicitCopy` attribute for a struct `{0}` marked with `DynSized` attribute"
     );
 
     private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
@@ -61,8 +61,8 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        Rule01ExplicitCopyRequired,
-        Rule02MissingAttribute,
+        Rule01MissingAttribute,
+        Rule02ExplicitCopyRequired,
         Rule03RedundantAttribute,
         Rule03NoResize,
         Rule04RedundantNoResize,
@@ -92,7 +92,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
             return;
 
         if (sym.ContainingType.TypeKind == TypeKind.Struct && !sym.ContainingType.IsDynSized())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingAttribute, sym.Locations.First(), sym.Type.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, sym.Locations.First(), sym.Type.Name));
 
         if (sym.ContainingType.TypeKind == TypeKind.Class)
         {
@@ -117,7 +117,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
             ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First(), sym.Name));
 
         if (!sym.IsExplicitCopy())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01ExplicitCopyRequired, sym.Locations.First(), sym.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02ExplicitCopyRequired, sym.Locations.First(), sym.Name));
     }
 
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
