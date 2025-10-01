@@ -10,12 +10,10 @@ namespace Ksi.Roslyn;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class BorrowAnalyzer: DiagnosticAnalyzer
 {
-    private static int _ruleId;
-
-    private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
+    private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"BORROW{++_ruleId:D2}",
+            id: $"BORROW{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
@@ -24,46 +22,41 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor NonRefPathRule = Rule(
-        DiagnosticSeverity.Error,
-        "Non RefPath reference to DynSized data",
-        "Operation produces non-RefPath reference to DynSized data that breaks reference lifetime analysis"
+    private static readonly DiagnosticDescriptor Rule01NonRefPath = Rule(01, DiagnosticSeverity.Error,
+        "Non-[RefPath] reference to [DynSized] data",
+        "Operation produces non-[RefPath] reference to [DynSized] data that breaks reference analysis"
     );
 
-    private static readonly DiagnosticDescriptor AssigningRule = Rule(
-        DiagnosticSeverity.Error,
-        "Assigning DynSized Reference",
-        "Assigning or modifying a local DynSized reference is not supported by lifetime analyzer"
+    private static readonly DiagnosticDescriptor Rule02AssigningRef = Rule(02, DiagnosticSeverity.Error,
+        "Changing local [DynSized] reference is not supported",
+        "Changing a local reference derived from [DynSized] data is not supported"
     );
 
-    private static readonly DiagnosticDescriptor LocalRefInvalidationRule = Rule(
-        DiagnosticSeverity.Error,
-        "Local Reference Invalidation",
+    private static readonly DiagnosticDescriptor Rule03LocalRefInvalidation = Rule(03, DiagnosticSeverity.Error,
+        "Local reference invalidation",
         "Passing a mutable reference argument to `{0}` " +
         "invalidates memory safety guaranties for the local variable `{1}` pointing to `{2}`. " +
-        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
+        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
     );
 
-    private static readonly DiagnosticDescriptor ArgumentAliasingRule = Rule(
-        DiagnosticSeverity.Error,
-        "Argument Reference Aliasing",
-        "Passing a mutable reference argument to `{0}` alongside with a reference to `{1}` " +
+    private static readonly DiagnosticDescriptor Rule04ArgumentAliasing = Rule(04, DiagnosticSeverity.Error,
+        "Reference arguments aliasing",
+        "Passing a mutable reference to `{0}` alongside with a reference to `{1}` as arguments " +
         "invalidates memory safety rules within the calling method. " +
-        "Consider to pass a readonly/`DynNoResize` reference to avoid the problem"
+        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
     );
 
-    private static readonly DiagnosticDescriptor EscapeExclusiveAccessRule = Rule(
-        DiagnosticSeverity.Error,
-        "Reference Escapes Access Scope",
+    private static readonly DiagnosticDescriptor Rule05RefEscapesAccessScope = Rule(05, DiagnosticSeverity.Error,
+        "Reference escapes the access scope",
         "Reference derived from the `ExclusiveAccess<T>` escapes the access scope"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        NonRefPathRule,
-        AssigningRule,
-        LocalRefInvalidationRule,
-        ArgumentAliasingRule,
-        EscapeExclusiveAccessRule
+        Rule01NonRefPath,
+        Rule02AssigningRef,
+        Rule03LocalRefInvalidation,
+        Rule04ArgumentAliasing,
+        Rule05RefEscapesAccessScope
     );
 
     public override void Initialize(AnalysisContext context)
@@ -107,7 +100,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
     private static void AnalyzeReferenceOp(OperationAnalysisContext ctx, IOperation op)
     {
         if (op.ReferencesDynSized() && !op.ProducesRefPath())
-            ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRule, op.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01NonRefPath, op.Syntax.GetLocation()));
     }
 
     private static void AnalyzeVariableAssignmentRef(OperationAnalysisContext ctx)
@@ -120,7 +113,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
             case ILocalReferenceOperation lr when IsRefAssignment(a, lr) && IsDynSizedAssignment(lr, v):
             case IParameterReferenceOperation pr when IsRefAssignment(pr) && IsDynSizedAssignment(pr, v):
             {
-                ctx.ReportDiagnostic(Diagnostic.Create(AssigningRule, a.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02AssigningRef, a.Syntax.GetLocation()));
                 break;
             }
         }
@@ -150,7 +143,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
 
             var v = a.Value;
             if (v.ReferencesDynSized(false) && !v.ProducesRefPath())
-                ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRule, v.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01NonRefPath, v.Syntax.GetLocation()));
         }
     }
 
@@ -204,7 +197,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
         foreach (var (localRefName, localRefPath) in vars)
         {
             if (argRefPath.CanBeUsedToInvalidate(localRefPath))
-                ctx.ReportDiagnostic(Diagnostic.Create(LocalRefInvalidationRule, argLocation, argRefPath, localRefName, localRefPath));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule03LocalRefInvalidation, argLocation, argRefPath, localRefName, localRefPath));
         }
     }
 
@@ -220,7 +213,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
             var b = args[j].RefPath;
 
             if (a.CanAlisWith(b))
-                ctx.ReportDiagnostic(Diagnostic.Create(ArgumentAliasingRule, args[i].Location, a, b));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule04ArgumentAliasing, args[i].Location, a, b));
         }
     }
 
@@ -240,10 +233,10 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
             case RefKind.Ref when t.WrapsDynSized() || v.ReferencesDynSized():
             case RefKind.Out when v is ILocalReferenceOperation && (t.WrapsDynSized() || v.ReferencesDynSized()):
             case RefKind.Out when v is IParameterReferenceOperation && t.WrapsDynSized():
-                ctx.ReportDiagnostic(Diagnostic.Create(AssigningRule, a.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02AssigningRef, a.Syntax.GetLocation()));
                 break;
             case RefKind.Out when v is IDeclarationExpressionOperation && t.WrapsDynSized():
-                ctx.ReportDiagnostic(Diagnostic.Create(NonRefPathRule, a.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01NonRefPath, a.Syntax.GetLocation()));
                 break;
         }
     }
@@ -260,6 +253,6 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
 
         var path = v.ToRefPath();
         if (path.IsDerivedFromLocalAccessScope)
-            ctx.ReportDiagnostic(Diagnostic.Create(EscapeExclusiveAccessRule, r.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule05RefEscapesAccessScope, r.Syntax.GetLocation()));
     }
 }
