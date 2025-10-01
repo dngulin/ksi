@@ -2,6 +2,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -30,7 +32,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
         "Jagged [RefList] types are not supported",
         "Jagged [RefList] types are not supported. " +
-        "Consider to wrap inner collection with non-generic data structure"
+        "Consider to wrap inner collection with a structure"
     );
 
     private static readonly DiagnosticDescriptor Rule03NonSpecializedCall = Rule(03, DiagnosticSeverity.Error,
@@ -51,76 +53,67 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         );
         context.EnableConcurrentExecution();
 
-        context.RegisterOperationAction(AnalyzeVariableDeclaration, OperationKind.VariableDeclaration);
-        context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
-        context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
+        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
+        context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeExtensionInvocation, OperationKind.Invocation);
     }
 
-    private static void AnalyzeVariableDeclaration(OperationAnalysisContext ctx)
+    private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
     {
-        var declaration = (IVariableDeclarationOperation)ctx.Operation;
-        var declarator = declaration.Declarators.First();
-
-        if (declarator.Symbol.Type is not INamedTypeSymbol t)
+        var s = (GenericNameSyntax)ctx.Node;
+        if (s.IsUnboundGenericName)
             return;
 
-        var isRefList = t.IsGenericType && t.IsRefList();
-        if (!isRefList)
+        var i = ctx.SemanticModel.GetTypeInfo(s.GetTypeExpr(), ctx.CancellationToken);
+        switch (AnalyzeGenericType(i.Type))
+        {
+            case RuleId.Rule01GenericItemType:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, s.GetLocation()));
+                break;
+
+            case RuleId.Rule02JaggedRefList:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, s.GetLocation()));
+                break;
+        }
+    }
+
+    private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
+    {
+        var d = (IVariableDeclaratorOperation)ctx.Operation;
+        if (!d.IsVar())
             return;
 
-        var loc = declaration.Syntax.GetLocation();
+        switch (AnalyzeGenericType(d.Symbol.Type))
+        {
+            case RuleId.Rule01GenericItemType:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, d.Syntax.GetLocation()));
+                break;
+
+            case RuleId.Rule02JaggedRefList:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, d.Syntax.GetLocation()));
+                break;
+        }
+    }
+
+    private enum RuleId
+    {
+        None,
+        Rule01GenericItemType,
+        Rule02JaggedRefList,
+    }
+
+    private static RuleId AnalyzeGenericType(ITypeSymbol? s)
+    {
+        if (s is not INamedTypeSymbol { IsGenericType: true, TypeKind: TypeKind.Struct } t || !t.IsRefList())
+            return RuleId.None;
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
-        {
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, loc));
-            return;
-        }
+            return RuleId.Rule01GenericItemType;
 
         if (gt.IsGenericType && gt.IsRefList())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, loc));
-    }
+            return RuleId.Rule02JaggedRefList;
 
-    private static void AnalyzeField(SymbolAnalysisContext ctx)
-    {
-        var f = (IFieldSymbol)ctx.Symbol;
-        if (f.IsStatic || f.Type.TypeKind != TypeKind.Struct || f.Type is not INamedTypeSymbol t)
-            return;
-
-        var loc = f.DeclaringSyntaxReferences.First()
-                      .GetSyntax(ctx.CancellationToken).Parent?.ChildNodes().First().GetLocation()
-                  ?? f.Locations.First();
-
-        AnalyzeSymbolTypeAppearance(ctx, t, loc);
-    }
-
-    private static void AnalyzeParameter(SymbolAnalysisContext ctx)
-    {
-        var p = (IParameterSymbol)ctx.Symbol;
-        if (p.Type.TypeKind != TypeKind.Struct || p.Type is not INamedTypeSymbol t)
-            return;
-
-        var loc = p.DeclaringSyntaxReferences
-            .First().GetSyntax(ctx.CancellationToken).ChildNodes()
-            .First().GetLocation();
-
-        AnalyzeSymbolTypeAppearance(ctx, t, loc);
-    }
-
-    private static void AnalyzeSymbolTypeAppearance(SymbolAnalysisContext ctx, INamedTypeSymbol t, Location loc)
-    {
-        var isRefList = t.IsGenericType && t.IsRefList();
-        if (!isRefList)
-            return;
-
-        if (t.TypeArguments[0] is not INamedTypeSymbol gt)
-        {
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, loc));
-            return;
-        }
-
-        if (gt.IsGenericType && gt.IsRefList())
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, loc));
+        return RuleId.None;
     }
 
     private static void AnalyzeExtensionInvocation(OperationAnalysisContext ctx)

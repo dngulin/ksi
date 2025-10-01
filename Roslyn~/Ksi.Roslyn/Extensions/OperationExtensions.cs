@@ -15,6 +15,7 @@ public static class OperationExtensions
             if (p is IMethodBodyOperation || p is IConstructorBodyOperation)
                 return p;
         }
+
         return null;
     }
 
@@ -61,6 +62,14 @@ public static class OperationExtensions
             return vds.Type.GetLocation();
 
         return self.Syntax.GetLocation();
+    }
+
+    public static bool IsVar(this IVariableDeclaratorOperation d)
+    {
+        return d.Syntax.Parent is VariableDeclarationSyntax
+        {
+            Type: IdentifierNameSyntax { IsVar: true }
+        };
     }
 
     public static bool ReturnsByRef(this IReturnOperation returnOp, CancellationToken ct)

@@ -238,15 +238,7 @@ namespace Ksi.Roslyn
             if (!d.Symbol.IsRef && d.Initializer != null)
                 AnalyzeAssignment(ctx, d.Initializer.Value, d.Syntax.GetLocation());
 
-            var isVar = d.Syntax is VariableDeclaratorSyntax
-            {
-                Parent: VariableDeclarationSyntax
-                {
-                    Type: IdentifierNameSyntax { IsVar: true }
-                }
-            };
-
-            if (!isVar)
+            if (!d.IsVar())
                 return;
 
             var t = d.Symbol.Type switch
