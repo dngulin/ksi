@@ -65,4 +65,33 @@ public class RefPathAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task RefPath01InvalidSignature()
+    {
+        await RefPathAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            using System;
+            
+            public struct MyStruct { public int Value; }
+            
+            public static class RefPathExtensions
+            {
+                [RefPath]
+                public static ref int ValidRefPath(this ref MyStruct self) => ref self.Value;
+                
+                [RefPath]
+                public static ref int {|REFPATH01:NonExtension|}(ref MyStruct self) => ref self.Value;
+                
+                [RefPath]
+                public static int {|REFPATH01:NonRefOutput|}(this ref MyStruct self) => self.Value;
+                
+                [RefPath]
+                public static int {|REFPATH01:NonRefInput|}(this MyStruct self) => self.Value;
+            }
+            """
+        );
+    }
 }
