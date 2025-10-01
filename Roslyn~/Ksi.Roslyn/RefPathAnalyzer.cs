@@ -27,7 +27,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         "Method indicated with the [RefPath] attribute has incompatible signature"
     );
 
-    private static readonly DiagnosticDescriptor Rule02InvalidRefPathDeclaration = Rule(02, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule02InvalidDeclaration = Rule(02, DiagnosticSeverity.Error,
         "Invalid [RefPath] attribute arguments",
         "RefPath attribute constructed with invalid segments sequence"
     );
@@ -49,8 +49,8 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        Rule02InvalidRefPathDeclaration,
         Rule01InvalidMethodSignature,
+        Rule02InvalidDeclaration,
         Rule03InvalidDeclaredRoot,
         Rule04InvalidReturnExpr,
         Rule05MismatchPaths
@@ -92,7 +92,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         switch (declPath.IsEmpty)
         {
             case true:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02InvalidRefPathDeclaration, m.Locations.First()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02InvalidDeclaration, m.Locations.First()));
                 break;
 
             case false when signatureIsValid && declPath.Segments[0] != m.Parameters[0].Name:

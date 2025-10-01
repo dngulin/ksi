@@ -94,4 +94,38 @@ public class RefPathAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task RefPath02InvalidDeclaration()
+    {
+        await RefPathAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public struct MyStruct { public int Value; }
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct DynStruct
+            {
+                public RefList<MyStruct> List;
+            }
+
+            public static class RefPathExtensions
+            {
+                [RefPath("self", "List", "!", "[n]", "Value")]
+                public static ref int Valid(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                
+                [RefPath("self", null, "!", "[n]", "Value")]
+                public static ref int {|REFPATH02:NullIdent|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                
+                [RefPath("self", "*List", "!", "[n]", "Value")]
+                public static ref int {|REFPATH02:WrongIdent|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                
+                [RefPath("self", "List", "!", "[n]", "!", "Value")]
+                public static ref int {|REFPATH02:TwoSeparators|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+            }
+            """
+        );
+    }
 }
