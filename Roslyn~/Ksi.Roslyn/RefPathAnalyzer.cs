@@ -37,7 +37,6 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         "Declared [RefPath] is not derived from `this` parameter"
     );
 
-
     private static readonly DiagnosticDescriptor Rule04InvalidReturnExpr = Rule(04, DiagnosticSeverity.Error,
         "Invalid [RefPath] return expression",
         "Return operation is not a RefPath-compatible expression"
@@ -62,7 +61,39 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
             GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics
         );
         context.EnableConcurrentExecution();
+        context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
         context.RegisterOperationAction(AnalyzeReturn, OperationKind.Return);
+    }
+
+    private static void AnalyzeMethod(SymbolAnalysisContext ctx)
+    {
+        var m = (IMethodSymbol)ctx.Symbol;
+        if (!m.IsRefPath(out var segments))
+            return;
+
+        var signatureIsValid = IsValidRefPathSignature(m);
+        if (!signatureIsValid)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01InvalidMethodSignature, m.Locations.First()));
+
+        if (segments.Length == 0)
+            return;
+
+        var pathIsValid = RefPath.TryCreateFromSegments(segments, out var path) && !path.IsEmpty;
+        switch (pathIsValid)
+        {
+            case false:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02InvalidDeclaration, m.Locations.First()));
+                break;
+
+            case true when signatureIsValid && path.Segments[0] != m.Parameters[0].Name:
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDeclaredRoot, m.Locations.First()));
+                break;
+        }
+    }
+
+    private static bool IsValidRefPathSignature(IMethodSymbol m)
+    {
+        return m.IsExtensionMethod && m.ReturnsRef() && m.Parameters.First().IsRef();
     }
 
     private static void AnalyzeReturn(OperationAnalysisContext ctx)
@@ -70,47 +101,26 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         var r = (IReturnOperation)ctx.Operation;
         var v = r.ReturnedValue;
 
-        if (v?.Type == null || v.Type.IsReferenceType)
+        if (v?.Type == null || v.Type.IsReferenceType || v.Type.IsRefLikeType)
             return;
 
         var m = r.GetEnclosingMethod(ctx.CancellationToken);
         if (m == null || !m.IsRefPath(out var segments))
             return;
 
-        var signatureIsValid = IsValidRefPathSignature(m);
-        if (!signatureIsValid)
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01InvalidMethodSignature, m.Locations.First()));
-
-        var actualPath = v.ToRefPath();
-        if (actualPath.IsEmpty)
+        var retPath = v.ToRefPath();
+        if (retPath.IsEmpty)
             ctx.ReportDiagnostic(Diagnostic.Create(Rule04InvalidReturnExpr, v.Syntax.GetLocation()));
 
-        if (segments.Length == 0)
+        if (segments.Length == 0 || retPath.IsEmpty)
             return;
 
-        _ = RefPath.TryCreateFromSegments(segments, out var declPath);
-        switch (declPath.IsEmpty)
-        {
-            case true:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02InvalidDeclaration, m.Locations.First()));
-                break;
-
-            case false when signatureIsValid && declPath.Segments[0] != m.Parameters[0].Name:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDeclaredRoot, m.Locations.First()));
-                break;
-        }
-
-        if (declPath.IsEmpty || actualPath.IsEmpty)
+        if (!RefPath.TryCreateFromSegments(segments, out var declPath) || declPath.IsEmpty)
             return;
 
         var decl = declPath.ToString();
-        var actual = actualPath.ToString();
+        var actual = retPath.ToString();
         if (decl != actual)
             ctx.ReportDiagnostic(Diagnostic.Create(Rule05MismatchPaths, v.Syntax.GetLocation(), actual, decl));
-    }
-
-    private static bool IsValidRefPathSignature(IMethodSymbol m)
-    {
-        return m.IsExtensionMethod && m.ReturnsRef() && m.Parameters.First().IsRef();
     }
 }
