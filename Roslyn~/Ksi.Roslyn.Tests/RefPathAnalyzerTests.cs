@@ -79,17 +79,10 @@ public class RefPathAnalyzerTests
             
             public static class RefPathExtensions
             {
-                [RefPath]
-                public static ref int ValidRefPath(this ref MyStruct self) => ref self.Value;
-                
-                [RefPath]
-                public static ref int {|REFPATH01:NonExtension|}(ref MyStruct self) => ref self.Value;
-                
-                [RefPath]
-                public static int {|REFPATH01:NonRefOutput|}(this ref MyStruct self) => self.Value;
-                
-                [RefPath]
-                public static int {|REFPATH01:NonRefInput|}(this MyStruct self) => self.Value;
+                [RefPath] public static ref int ValidRefPath(this ref MyStruct self) => throw null;
+                [RefPath] public static ref int {|REFPATH01:NonExtension|}(ref MyStruct self) => throw null;
+                [RefPath] public static int {|REFPATH01:NonRefOutput|}(this ref MyStruct self) => throw null;
+                [RefPath] public static ref int {|REFPATH01:NonRefInput|}(this MyStruct self) => throw null;
             }
             """
         );
@@ -114,16 +107,16 @@ public class RefPathAnalyzerTests
             public static class RefPathExtensions
             {
                 [RefPath("self", "List", "!", "[n]", "Value")]
-                public static ref int Valid(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                public static ref int Valid(this ref DynStruct self, int idx) => throw null;
                 
                 [RefPath("self", null, "!", "[n]", "Value")]
-                public static ref int {|REFPATH02:NullIdent|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                public static ref int {|REFPATH02:NullIdent|}(this ref DynStruct self, int idx) => throw null;
                 
                 [RefPath("self", "*List", "!", "[n]", "Value")]
-                public static ref int {|REFPATH02:WrongIdent|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                public static ref int {|REFPATH02:InvalidIdent|}(this ref DynStruct self, int idx) => throw null;
                 
                 [RefPath("self", "List", "!", "[n]", "!", "Value")]
-                public static ref int {|REFPATH02:TwoSeparators|}(this ref DynStruct self, int idx) => ref self.List.RefAt(idx).Value;
+                public static ref int {|REFPATH02:TwoSeparators|}(this ref DynStruct self, int idx) => throw null;
             }
             """
         );

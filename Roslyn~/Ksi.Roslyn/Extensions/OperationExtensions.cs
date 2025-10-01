@@ -98,4 +98,24 @@ public static class OperationExtensions
             }
         }
     }
+
+    public static IOperation Unwrapped(this IOperation op)
+    {
+        while (true)
+        {
+            switch (op)
+            {
+                case IConversionOperation { IsImplicit: true } conv:
+                    op = conv.Operand;
+                    continue;
+
+                case IParenthesizedOperation paren:
+                    op = paren.Operand;
+                    continue;
+
+                default:
+                    return op;
+            }
+        }
+    }
 }

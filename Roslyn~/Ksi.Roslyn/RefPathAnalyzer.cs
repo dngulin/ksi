@@ -99,7 +99,7 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
     private static void AnalyzeReturn(OperationAnalysisContext ctx)
     {
         var r = (IReturnOperation)ctx.Operation;
-        var v = r.ReturnedValue;
+        var v = r.ReturnedValue?.Unwrapped();
 
         if (v?.Type == null || v.Type.IsReferenceType || v.Type.IsRefLikeType)
             return;
