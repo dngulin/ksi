@@ -98,4 +98,20 @@ public class DynSizedAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy07RedundantExclusiveAccess()
+    {
+        await DynSizedAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public class TestClass
+            {
+                private {|DYNSIZED07:ExclusiveAccess<int>|} _field;
+            }
+            """
+        );
+    }
 }
