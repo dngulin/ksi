@@ -10,12 +10,10 @@ namespace Ksi.Roslyn;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class RefListAnalyzer : DiagnosticAnalyzer
 {
-    private static int _ruleId;
-
-    private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
+    private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"REFLIST{++_ruleId:D2}",
+            id: $"REFLIST{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
@@ -24,28 +22,26 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor UnknownItemTypeRule = Rule(
-        DiagnosticSeverity.Error,
-        "Unknown Item Type",
-        "RefList API is unsafe for unknown item types"
+    private static readonly DiagnosticDescriptor Rule01GenericItemType = Rule(01, DiagnosticSeverity.Error,
+        "Generic [RefList] type usage is unsafe",
+        "Usage of the [RefList] collection in generic context is not supported"
     );
 
-    private static readonly DiagnosticDescriptor GenericItemTypeRule = Rule(
-        DiagnosticSeverity.Error,
-        "Generic Item Type",
-        "RefList API is unsafe for generic item types"
+    private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
+        "Jagged [RefList] types are not supported",
+        "Jagged [RefList] types are not supported. " +
+        "Consider to wrap inner collection with non-generic data structure"
     );
 
-    private static readonly DiagnosticDescriptor SpecializedApiRule = Rule(
-        DiagnosticSeverity.Error,
-        "Non Specialized Call",
-        "Using non-specialized RefList API for ExplicitCopy or Dealloc types is unsafe"
+    private static readonly DiagnosticDescriptor Rule03NonSpecializedCall = Rule(03, DiagnosticSeverity.Error,
+        "Non-specialized [RefList] API call",
+        "Using non-specialized API for [RefList] of `{0}`. Consider to use the specialized method version"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        GenericItemTypeRule,
-        UnknownItemTypeRule,
-        SpecializedApiRule
+        Rule01GenericItemType,
+        Rule02JaggedRefList,
+        Rule03NonSpecializedCall
     );
 
     public override void Initialize(AnalysisContext context)
@@ -77,12 +73,12 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
         {
-            ctx.ReportDiagnostic(Diagnostic.Create(UnknownItemTypeRule, loc));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, loc));
             return;
         }
 
-        if (gt.IsGenericType)
-            ctx.ReportDiagnostic(Diagnostic.Create(GenericItemTypeRule, loc));
+        if (gt.IsGenericType && gt.IsRefList())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, loc));
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -119,12 +115,12 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
         {
-            ctx.ReportDiagnostic(Diagnostic.Create(UnknownItemTypeRule, loc));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, loc));
             return;
         }
 
-        if (gt.IsGenericType)
-            ctx.ReportDiagnostic(Diagnostic.Create(GenericItemTypeRule, loc));
+        if (gt.IsGenericType && gt.IsRefList())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, loc));
     }
 
     private static void AnalyzeExtensionInvocation(OperationAnalysisContext ctx)
@@ -164,6 +160,6 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     private static void ReportCalls(OperationAnalysisContext ctx, IMethodSymbol m, Location loc, string[] names)
     {
         if (names.Contains(m.Name))
-            ctx.ReportDiagnostic(Diagnostic.Create(SpecializedApiRule, loc));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03NonSpecializedCall, loc));
     }
 }
