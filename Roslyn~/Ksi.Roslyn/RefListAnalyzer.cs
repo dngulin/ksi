@@ -86,11 +86,11 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         switch (AnalyzeGenericType(d.Symbol.Type))
         {
             case RuleId.Rule01GenericItemType:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, d.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, d.GetDeclaredTypeLocation()));
                 break;
 
             case RuleId.Rule02JaggedRefList:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, d.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, d.GetDeclaredTypeLocation()));
                 break;
         }
     }
