@@ -28,4 +28,35 @@ public class RefListAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task RefList02JaggedRefList()
+    {
+        await RefListAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class Test
+            {
+                public static void Method(ref {|REFLIST02:RefList<RefList<int>>|} param)
+                {
+                    {|REFLIST02:RefList<RefList<int>>|} a = default;
+                    {|REFLIST02:var|} b = RefList.Empty<RefList<int>>();
+                }
+            }
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct
+            {
+                public {|REFLIST02:RefList<RefList<int>>|} Jagged;
+            }
+
+            public class TestClass
+            {
+                private ExclusiveAccess<{|REFLIST02:RefList<RefList<int>>|}> _listAccess;
+            }
+            """
+        );
+    }
 }
