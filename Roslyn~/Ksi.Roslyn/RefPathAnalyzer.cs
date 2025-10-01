@@ -10,12 +10,10 @@ namespace Ksi.Roslyn;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class RefPathAnalyzer: DiagnosticAnalyzer
 {
-    private static int _ruleId;
-
-    private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
+    private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"REFPATH{++_ruleId:D2}",
+            id: $"REFPATH{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
@@ -24,33 +22,28 @@ public class RefPathAnalyzer: DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor Rule01InvalidMethodSignature = Rule(
-        DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule01InvalidMethodSignature = Rule(01,  DiagnosticSeverity.Error,
         "Invalid [RefPath] method signature",
         "Method indicated with the [RefPath] attribute has incompatible signature"
     );
 
-    private static readonly DiagnosticDescriptor Rule02InvalidRefPathDeclaration = Rule(
-        DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule02InvalidRefPathDeclaration = Rule(02, DiagnosticSeverity.Error,
         "Invalid [RefPath] attribute arguments",
         "RefPath attribute constructed with invalid segments sequence"
     );
 
-    private static readonly DiagnosticDescriptor Rule03InvalidDeclaredRoot = Rule(
-        DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule03InvalidDeclaredRoot = Rule(03, DiagnosticSeverity.Error,
         "Invalid declared [RefPath] root",
         "Declared [RefPath] is not derived from `this` parameter"
     );
 
 
-    private static readonly DiagnosticDescriptor Rule04InvalidReturnExpr = Rule(
-        DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule04InvalidReturnExpr = Rule(04, DiagnosticSeverity.Error,
         "Invalid [RefPath] return expression",
         "Return operation is not a RefPath-compatible expression"
     );
 
-    private static readonly DiagnosticDescriptor Rule05MismatchPaths = Rule(
-        DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule05MismatchPaths = Rule(05, DiagnosticSeverity.Error,
         "Reference path mismatch",
         "Returning reference path `{0}` doesn't match the declared reference path `{1}`"
     );
