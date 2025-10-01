@@ -136,7 +136,29 @@ public class RefPathAnalyzerTests
                 public static ref int Valid(this ref MyStruct self, ref MyStruct other) => throw null;
                 
                 [Ksi.RefPath("other", "Value")]
-                public static ref int {|REFPATH03:TInvalid|}(this ref MyStruct self, ref MyStruct other) => throw null;
+                public static ref int {|REFPATH03:Invalid|}(this ref MyStruct self, ref MyStruct other) => throw null;
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task RefPath04InvalidReturnExpr()
+    {
+        await RefPathAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public struct MyStruct { public int Value; }
+
+            public static class RefPathExtensions
+            {
+                [Ksi.RefPath]
+                public static ref int Valid(this ref MyStruct self) => ref self.Value;
+                
+                [Ksi.RefPath]
+                public static ref int Invalid(this ref MyStruct self) => ref {|REFPATH04:NonRefPath(ref self)|};
+                
+                public static ref int NonRefPath(ref MyStruct v) => ref v.Value;
             }
             """
         );
