@@ -51,4 +51,49 @@ public class BorrowAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Borrow03LocalRefInvalidation()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class TestClass
+            {
+                public static void Test(ref RefList<int> list)
+                {
+                    foreach (ref var item in list.RefIter())
+                    {
+                        item++;
+                        // Resizing collection within iterator
+                        {|BORROW03:list|}.RemoveAt(0);
+                    }
+                    
+                    foreach (ref var item in list.AsSpan())
+                    {
+                        item++;
+                        // Resizing collection within Span-derived iterator
+                        {|BORROW03:list|}.RemoveAt(0);
+                    }
+                    
+                    ref var a = ref list.RefAt(0);
+                    
+                    // Resizing collection within item reference lifetime
+                    {|BORROW03:list|}.RefAdd() = 42;
+                    
+                    // Mutating collection without resizing it within item reference lifetime
+                    list.RefAt(1) = 42;
+                    
+                    a = 0;
+                    
+                    // Mutating collection outside of any item reference lifetime
+                    list.Clear();
+                }
+                
+            }
+            """
+        );
+    }
 }
