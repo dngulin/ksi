@@ -33,4 +33,18 @@ public class DeallocAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Dealloc03RedundantAttribute()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct {|DEALLOC03:TestStruct|} { public int Field; }
+            """
+        );
+    }
 }
