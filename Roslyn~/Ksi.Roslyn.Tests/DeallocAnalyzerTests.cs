@@ -19,4 +19,18 @@ public class DeallocAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Dealloc02MissingDynSized()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [ExplicitCopy, Dealloc]
+            public struct {|DEALLOC02:TestStruct|} { public RefList<int> Field; }
+            """
+        );
+    }
 }
