@@ -27,4 +27,28 @@ public class BorrowAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Borrow02AssigningRef()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            using System;
+
+            public static class TestClass
+            {
+                public static void Test(ref RefList<int> list)
+                {
+                    ref var a = ref list.RefAt(0);
+                    {|BORROW02:a = ref list.RefAt(1)|};
+                    
+                    var span = list.AsSpan();
+                    {|BORROW02:span = new Span<int>()|};
+                }
+            }
+            """
+        );
+    }
 }
