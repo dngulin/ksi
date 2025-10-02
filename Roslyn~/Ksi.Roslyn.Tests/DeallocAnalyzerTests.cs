@@ -67,4 +67,24 @@ public class DeallocAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Dealloc05UnusedInstance()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class TestClass
+            {
+                public static void Test()
+                {
+                    {|DEALLOC05:RefList.WithCapacity<int>(42)|};
+                    var list = RefList.WithCapacity<int>(42);
+                }
+            }
+            """
+        );
+    }
 }
