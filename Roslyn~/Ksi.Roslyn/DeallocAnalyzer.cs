@@ -24,13 +24,13 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(02, DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(01, DiagnosticSeverity.Error,
             "Missing [Dealloc] attribute",
             "Structure should be annotated with the [Dealloc] attribute " +
             "because it contains a [Dealloc] field of type `{0}`"
         );
 
-        private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(01, DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(02, DiagnosticSeverity.Error,
             "Missing [DynSized] attribute",
             "Structure marked with the [Dealloc] attribute should be also marked with the [DynSized] attribute"
         );
