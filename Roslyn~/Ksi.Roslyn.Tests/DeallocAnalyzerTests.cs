@@ -47,4 +47,24 @@ public class DeallocAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Dealloc04Overwrite()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            public static class TestClass
+            {
+                public static void Test(ref RefList<int> list)
+                {
+                    {|DEALLOC04:list = default|};
+                    list.Deallocated() = default;
+                }
+            }
+            """
+        );
+    }
 }
