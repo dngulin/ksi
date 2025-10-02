@@ -24,43 +24,45 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor FieldRule = Rule(02, DiagnosticSeverity.Error,
-            "Field of Non-Dealloc Type",
-            "Structure `{0}` can be a field only of a structure marked with `Dealloc`"
+        private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(02, DiagnosticSeverity.Error,
+            "Missing [Dealloc] attribute",
+            "Structure should be annotated with the [Dealloc] attribute " +
+            "because it contains a [Dealloc] field of type `{0}`"
         );
 
-        private static readonly DiagnosticDescriptor DynSizedRule = Rule(01, DiagnosticSeverity.Error,
-            "DynSized Attribute Required",
-            "Missing `DynSized` attribute for a struct `{0}` marked with `Dealloc` attribute"
+        private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(01, DiagnosticSeverity.Error,
+            "Missing [DynSized] attribute",
+            "Structure marked with the [Dealloc] attribute should be also marked with the [DynSized] attribute"
         );
 
-        private static readonly DiagnosticDescriptor RedundantRule = Rule(03, DiagnosticSeverity.Warning,
-            "Redundant Dealloc Attribute",
-            "Structure `{0}` is marked with `Dealloc` attribute but doesn't have any fields to deallocate"
+        private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
+            "Redundant [Dealloc] attribute",
+            "Structure is marked with the [Dealloc] attribute but doesn't have any [Dealloc] fields"
         );
 
-        private static readonly DiagnosticDescriptor OverwriteRule = Rule(04, DiagnosticSeverity.Error,
-            "Dealloc Instance Overwrite",
-            "Operation overwrites a Dealloc type instance without calling Dealloc"
+        private static readonly DiagnosticDescriptor Rule04Overwrite = Rule(04, DiagnosticSeverity.Error,
+            "Overwriting [Dealloc] instance",
+            "Operation overwrites a [Dealloc] instance without performing deallocation. " +
+            "Consider to use the `Deallocated` extension method on assignment target."
         );
 
-        private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(05, DiagnosticSeverity.Error,
-            "Not Assigned Value",
-            "Dealloc instance is not assigned"
+        private static readonly DiagnosticDescriptor Rule05UnusedInstance = Rule(05, DiagnosticSeverity.Error,
+            "Unused [Dealloc] instance",
+            "[Dealloc] instance returned by operation is not used and won't be deallocated"
         );
 
-        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(06, DiagnosticSeverity.Error,
-            "Generic Argument",
-            "Passing an instance of the `Dealloc` type `{0}` as a generic argument"
+        private static readonly DiagnosticDescriptor Rule06GenericArgument = Rule(06, DiagnosticSeverity.Error,
+            "Passing [Dealloc] instance as a generic argument",
+            "Passing an instance of the [Dealloc] type as a generic argument that is not marked as [Dealloc]"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            FieldRule,
-            DynSizedRule,
-            RedundantRule,
-            OverwriteRule,
-            NotAssignedValueRule,
-            GenericArgumentRule
+            Rule01MissingAttribute,
+            Rule02MissingDynSized,
+            Rule03RedundantAttribute,
+            Rule04Overwrite,
+            Rule05UnusedInstance,
+            Rule06GenericArgument
         );
 
         public override void Initialize(AnalysisContext context)
@@ -85,7 +87,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (sym.Type.IsDeallocOrRefListOverDealloc() && !sym.ContainingType.IsDealloc())
-                ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, sym.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -101,10 +103,10 @@ namespace Ksi.Roslyn
                 .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefListOverDealloc());
 
             if (!hasDeallocFields)
-                ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First(), sym.Name));
 
             if (!sym.IsDynSized())
-                ctx.ReportDiagnostic(Diagnostic.Create(DynSizedRule, sym.Locations.First(), sym.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingDynSized, sym.Locations.First(), sym.Name));
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)
@@ -123,7 +125,7 @@ namespace Ksi.Roslyn
             if (assignment.Target is IInvocationOperation i && i.TargetMethod.IsNonAllocatedResultRef())
                 return;
 
-            ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, assignment.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule04Overwrite, assignment.Syntax.GetLocation()));
         }
 
         private static void AnalyzeInvocationAssignment(OperationAnalysisContext ctx)
@@ -148,7 +150,7 @@ namespace Ksi.Roslyn
                     break;
 
                 default:
-                    ctx.ReportDiagnostic(Diagnostic.Create(NotAssignedValueRule, i.Syntax.GetLocation()));
+                    ctx.ReportDiagnostic(Diagnostic.Create(Rule05UnusedInstance, i.Syntax.GetLocation()));
                     break;
             }
         }
@@ -164,7 +166,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (i.TargetMethod.Name == "Clear")
-                ctx.ReportDiagnostic(Diagnostic.Create(OverwriteRule, i.Syntax.GetLocation()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule04Overwrite, i.Syntax.GetLocation()));
         }
 
         private static void AnalyzeArgument(OperationAnalysisContext ctx)
@@ -188,7 +190,7 @@ namespace Ksi.Roslyn
                 return;
 
             var loc = arg.Value.Syntax.GetLocation();
-            ctx.ReportDiagnostic(Diagnostic.Create(GenericArgumentRule, loc, t.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule06GenericArgument, loc, t.Name));
         }
     }
 }
