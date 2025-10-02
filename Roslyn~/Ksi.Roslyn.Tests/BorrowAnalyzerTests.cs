@@ -96,4 +96,59 @@ public class BorrowAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Borrow04ArgumentAliasing()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct Item { public RefList<int> List; }
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct { public RefList<Item> Items; }
+
+            public static class TestClass
+            {
+                public static void Test(ref TestStruct value, int x, int y)
+                {
+                    SameDyn(ref {|BORROW04:value.Items.RefAt(x)|}, ref {|BORROW04:value.Items.RefAt(y)|});
+                    SameDynOneReadOnly(ref {|BORROW04:value.Items.RefAt(x)|}, in value.Items.RefAt(y));
+                    SameDynOneNoResize(ref {|BORROW04:value.Items.RefAt(x)|}, ref value.Items.RefAt(y));
+                    
+                    SameDynReadOnly(in value.Items.RefAt(x), in value.Items.RefAt(y));
+                    SameDynNoResize(ref value.Items.RefAt(x), ref value.Items.RefAt(y));
+                    SameNonDyn(ref value.Items.RefAt(x).List.RefAt(x), ref value.Items.RefAt(y).List.RefAt(y));
+                    
+                    ParentChild(ref {|BORROW04:value|}, ref {|BORROW04:value.Items.RefAt(x)|});
+                    ParentReadOnlyChild(ref {|BORROW04:value|}, in value.Items.RefAt(x));
+                    ReadOnlyParentChild(in value, ref {|BORROW04:value.Items.RefAt(x)|});
+                    
+                    ReadOnlyParentReadOnlyChild(in value, in value.Items.RefAt(x));
+                    NoResizeParentNoResizeChild(ref value, ref value.Items.RefAt(x));
+                    ReadOnlyParentNoDynChild(in value, ref value.Items.RefAt(x).List.RefAt(x));
+                }
+                
+                public static void SameDyn(ref Item a, ref Item b) => throw null;
+                public static void SameDynOneReadOnly(ref Item a, in Item b) => throw null;
+                public static void SameDynOneNoResize(ref Item a, [DynNoResize] ref Item b) => throw null;
+                
+                public static void SameDynReadOnly(in Item a, in Item b) => throw null;
+                public static void SameDynNoResize([DynNoResize] ref Item a, [DynNoResize] ref Item b) => throw null;
+                public static void SameNonDyn(ref int a, ref int b) => throw null;
+                
+                public static void ParentChild(ref TestStruct a, ref Item b) => throw null;
+                public static void ParentReadOnlyChild(ref TestStruct a, in Item b) => throw null;
+                public static void ReadOnlyParentChild(in TestStruct a, ref Item b) => throw null;
+                
+                public static void ReadOnlyParentReadOnlyChild(in TestStruct a, in Item b) => throw null;
+                public static void NoResizeParentNoResizeChild([DynNoResize] ref TestStruct a, [DynNoResize] ref Item b) => throw null;
+                public static void ReadOnlyParentNoDynChild(in TestStruct a, ref int b) => throw null;
+            }
+            """
+        );
+    }
 }
