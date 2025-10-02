@@ -24,14 +24,14 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor DynSizedRule = Rule(01, DiagnosticSeverity.Error,
-            "DynSized Attribute Required",
-            "Missing `DynSized` attribute for a struct `{0}` marked with `Dealloc` attribute"
-        );
-
         private static readonly DiagnosticDescriptor FieldRule = Rule(02, DiagnosticSeverity.Error,
             "Field of Non-Dealloc Type",
             "Structure `{0}` can be a field only of a structure marked with `Dealloc`"
+        );
+
+        private static readonly DiagnosticDescriptor DynSizedRule = Rule(01, DiagnosticSeverity.Error,
+            "DynSized Attribute Required",
+            "Missing `DynSized` attribute for a struct `{0}` marked with `Dealloc` attribute"
         );
 
         private static readonly DiagnosticDescriptor RedundantRule = Rule(03, DiagnosticSeverity.Warning,
@@ -55,8 +55,8 @@ namespace Ksi.Roslyn
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            DynSizedRule,
             FieldRule,
+            DynSizedRule,
             RedundantRule,
             OverwriteRule,
             NotAssignedValueRule,
