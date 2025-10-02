@@ -83,11 +83,14 @@ namespace Ksi.Roslyn
         private static void AnalyzeField(SymbolAnalysisContext ctx)
         {
             var sym = (IFieldSymbol)ctx.Symbol;
-            if (!sym.Type.IsStructOrTypeParameter() || !sym.ContainingType.IsStruct())
+            var t = sym.Type;
+            var ct = sym.ContainingType;
+
+            if (!t.IsStructOrTypeParameter() || !ct.IsStruct())
                 return;
 
-            if (sym.Type.IsDeallocOrRefListOverDealloc() && !sym.ContainingType.IsDealloc())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, sym.Locations.First(), sym.Type.Name));
+            if (t.IsDeallocOrRefListOverDealloc() && !ct.IsDealloc())
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, ct.Locations.First(), sym.Type.Name));
         }
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -103,10 +106,10 @@ namespace Ksi.Roslyn
                 .Any(field => !field.IsStatic && field.Type.IsDeallocOrRefListOverDealloc());
 
             if (!hasDeallocFields)
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First(), sym.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First()));
 
             if (!sym.IsDynSized())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingDynSized, sym.Locations.First(), sym.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingDynSized, sym.Locations.First()));
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)
