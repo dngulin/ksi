@@ -151,4 +151,29 @@ public class BorrowAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Borrow05RefEscapesAccessScope()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct { public RefList<int> List; }
+            
+            public class TestClass
+            {
+                private readonly ExclusiveAccess<TestStruct> _test = new ExclusiveAccess<TestStruct>();
+                
+                public ref int Test()
+                {
+                    using var test = _test.Mutable;
+                    {|BORROW05:return ref test.Value.List.RefAt(0);|}
+                }
+            }
+            """
+        );
+    }
 }
