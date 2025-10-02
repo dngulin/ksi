@@ -31,7 +31,7 @@ namespace Ksi.Roslyn
                     if (node is not StructDeclarationSyntax structDecl)
                         return false;
 
-                    if (structDecl.AttributeLists.ContainsRefList())
+                    if (structDecl.TypeParameterList != null)
                         return false;
 
                     return structDecl.AttributeLists.ContainsDealloc();
@@ -46,7 +46,7 @@ namespace Ksi.Roslyn
                     if (t == null)
                         return result;
 
-                    result.Namespace = t.ContainingNamespace.ToDisplayString();
+                    result.Namespace = t.ContainingNamespace.FullyQualifiedName();
                     result.IsUnmanaged = t.IsUnmanagedType;
                     result.IsTempAlloc = t.IsTempAlloc();
 
@@ -57,18 +57,28 @@ namespace Ksi.Roslyn
                         if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct || f.IsStatic)
                             continue;
 
+                        if (f.DeclaredAccessibility == Accessibility.Private)
+                            continue;
+
                         if (f.Type is not INamedTypeSymbol ft || !ft.IsDeallocOrRefListOverDealloc())
                             continue;
 
+                        if (ft.IsJaggedRefList())
+                            continue;
+
                         result.Fields.Add(f.Name);
-                        usings.Add(ft.ContainingNamespace.ToDisplayString());
+                        usings.Add(ft.ContainingNamespace.FullyQualifiedName());
 
                         if (ft.IsRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsDealloc())
-                            usings.Add(gt!.ContainingNamespace.ToDisplayString());
+                            usings.Add(gt!.ContainingNamespace.FullyQualifiedName());
                     }
 
+                    var kinds = RefListUtils.GetKinds(result.IsUnmanaged, result.IsTempAlloc);
+                    if (kinds != RefListKinds.None)
+                        usings.Add(SymbolNames.Ksi);
+
                     usings.Remove(result.Namespace);
-                    result.Usings = usings.ToArray();
+                    result.Usings = usings.Where(u => u != "").ToArray();
 
                     Array.Sort(result.Usings);
 
@@ -92,12 +102,19 @@ namespace Ksi.Roslyn
                     }
                     else
                     {
+                        var outputNs = entry.Namespace != "";
+
                         foreach (var u in entry.Usings)
                             sb.AppendLine($"using {u};");
 
                         sb.AppendLine();
-                        sb.AppendLine($"namespace {entry.Namespace}");
-                        sb.AppendLine("{");
+
+                        if (outputNs)
+                        {
+                            sb.AppendLine($"namespace {entry.Namespace}");
+                            sb.AppendLine("{");
+                        }
+
                         sb.AppendLine($"    public static class {entry.TypeName}Dealloc");
                         sb.AppendLine("    {");
 
@@ -111,7 +128,9 @@ namespace Ksi.Roslyn
                         RefListUtils.Emit(kinds, RefListSpecialized, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
-                        sb.AppendLine("}");
+
+                        if (outputNs)
+                            sb.AppendLine("}");
                     }
 
                     ctx.AddSource($"{entry.TypeName}Dealloc.g.cs", sb.ToString());

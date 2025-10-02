@@ -56,7 +56,10 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (m is not IFieldSymbol f || f.IsStatic || f.Type is not INamedTypeSymbol ft)
+                        if (m is not IFieldSymbol f || f.IsStatic || f.DeclaredAccessibility == Accessibility.Private)
+                            continue;
+
+                        if (f.Type is not INamedTypeSymbol ft || ft.IsJaggedRefList())
                             continue;
 
                         var isExplicitCopy = ft.IsExplicitCopy();
