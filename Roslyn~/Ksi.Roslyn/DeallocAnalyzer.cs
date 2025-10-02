@@ -12,12 +12,10 @@ namespace Ksi.Roslyn
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DeallocAnalyzer : DiagnosticAnalyzer
     {
-        private static int _ruleId;
-
-        private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
+        private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
         {
             return new DiagnosticDescriptor(
-                id: $"DEALLOC{++_ruleId:D2}",
+                id: $"DEALLOC{id:D2}",
                 title: title,
                 messageFormat: msg,
                 category: "Ksi",
@@ -26,38 +24,32 @@ namespace Ksi.Roslyn
             );
         }
 
-        private static readonly DiagnosticDescriptor DynSizedRule = Rule(
-            DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor DynSizedRule = Rule(01, DiagnosticSeverity.Error,
             "DynSized Attribute Required",
             "Missing `DynSized` attribute for a struct `{0}` marked with `Dealloc` attribute"
         );
 
-        private static readonly DiagnosticDescriptor FieldRule = Rule(
-            DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor FieldRule = Rule(02, DiagnosticSeverity.Error,
             "Field of Non-Dealloc Type",
             "Structure `{0}` can be a field only of a structure marked with `Dealloc`"
         );
 
-        private static readonly DiagnosticDescriptor RedundantRule = Rule(
-            DiagnosticSeverity.Warning,
+        private static readonly DiagnosticDescriptor RedundantRule = Rule(03, DiagnosticSeverity.Warning,
             "Redundant Dealloc Attribute",
             "Structure `{0}` is marked with `Dealloc` attribute but doesn't have any fields to deallocate"
         );
 
-        private static readonly DiagnosticDescriptor OverwriteRule = Rule(
-            DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor OverwriteRule = Rule(04, DiagnosticSeverity.Error,
             "Dealloc Instance Overwrite",
             "Operation overwrites a Dealloc type instance without calling Dealloc"
         );
 
-        private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(
-            DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor NotAssignedValueRule = Rule(05, DiagnosticSeverity.Error,
             "Not Assigned Value",
             "Dealloc instance is not assigned"
         );
 
-        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(
-            DiagnosticSeverity.Error,
+        private static readonly DiagnosticDescriptor GenericArgumentRule = Rule(06, DiagnosticSeverity.Error,
             "Generic Argument",
             "Passing an instance of the `Dealloc` type `{0}` as a generic argument"
         );
