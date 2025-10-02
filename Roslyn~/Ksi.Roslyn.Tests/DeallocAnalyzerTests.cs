@@ -87,4 +87,31 @@ public class DeallocAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Dealloc06GenericArgument()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct { public RefList<int> List; }
+
+            public static class TestClass
+            {
+                public static void Incompatible<[ExplicitCopy] T>(in T value) {}
+                public static void Compatible<[ExplicitCopy, Dealloc] T>(in T value) {}
+
+                public static void Test()
+                {
+                    var test = new TestStruct();
+                    Incompatible({|DEALLOC06:test|});
+                    Compatible(test);
+                }
+            }
+            """
+        );
+    }
 }
