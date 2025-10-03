@@ -138,6 +138,6 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
         if (!gt.IsTempAlloc())
             return false;
 
-        return nt.IsSingleArgGenericStruct() && nt.IsRefList() && nt.IsTempAlloc();
+        return nt.IsSingleArgGenericStruct() && nt.IsRefList() && !nt.IsTempAlloc();
     }
 }
