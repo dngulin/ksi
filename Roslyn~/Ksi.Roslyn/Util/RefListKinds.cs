@@ -12,50 +12,31 @@ public enum RefListKinds
     ManagedRefList = 1 << 2,
 }
 
-public static class RefListUtils
-{
-    public static RefListKinds GetKinds(bool unmanaged, bool temp)
-    {
-        var result = RefListKinds.None;
-
-        if (unmanaged && !temp)
-            result |= RefListKinds.RefList;
-
-        if (unmanaged)
-            result |= RefListKinds.TempRefList;
-
-        if (!temp)
-            result |= RefListKinds.ManagedRefList;
-
-        return result;
-    }
-}
-
 public static class RefListKindsExtensions
 {
     public static void Emit(this RefListKinds self, string tpl, StringBuilder sb, string t)
     {
-        if (self.Contains(RefListKinds.RefList))
+        if (self.Has(RefListKinds.RefList))
             sb.AppendLine(string.Format(tpl, "RefList", t));
 
-        if (self.Contains(RefListKinds.TempRefList))
+        if (self.Has(RefListKinds.TempRefList))
             sb.AppendLine(string.Format(tpl, "TempRefList", t));
 
-        if (self.Contains(RefListKinds.ManagedRefList))
+        if (self.Has(RefListKinds.ManagedRefList))
             sb.AppendLine(string.Format(tpl, "ManagedRefList", t));
     }
 
     public static void Emit(this RefListKinds self, string deallocTpl, string nonDeallocTpl, StringBuilder sb, string t)
     {
-        if (self.Contains(RefListKinds.RefList))
+        if (self.Has(RefListKinds.RefList))
             sb.AppendLine(string.Format(deallocTpl, "RefList", t));
 
-        if (self.Contains(RefListKinds.TempRefList))
+        if (self.Has(RefListKinds.TempRefList))
             sb.AppendLine(string.Format(nonDeallocTpl, "TempRefList", t));
 
-        if (self.Contains(RefListKinds.ManagedRefList))
+        if (self.Has(RefListKinds.ManagedRefList))
             sb.AppendLine(string.Format(nonDeallocTpl, "ManagedRefList", t));
     }
 
-    private static bool Contains(this RefListKinds self, RefListKinds value) => (self & value) != RefListKinds.None;
+    private static bool Has(this RefListKinds self, RefListKinds value) => (self & value) != RefListKinds.None;
 }

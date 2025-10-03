@@ -4,7 +4,7 @@ namespace Ksi.Roslyn
     {
         public static readonly string[] RefListExtensionNames = ["Dealloc", "Deallocated", "Clear", "RemoveAt"];
 
-        public const string RefListDeallocFull = @"
+        public const string RefListDeallocItemsAndSelf = @"
         /// <summary>
         /// Specialized implementation for Dealloc item types
         /// </summary>
@@ -18,7 +18,7 @@ namespace Ksi.Roslyn
             #pragma warning restore REFLIST03
         }}";
 
-        public const string RefListDeallocItems = @"
+        public const string RefListDeallocOnlyItems = @"
         /// <summary>
         /// Specialized implementation for Dealloc item types
         /// </summary>

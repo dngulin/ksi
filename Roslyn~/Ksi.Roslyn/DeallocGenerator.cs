@@ -18,8 +18,7 @@ namespace Ksi.Roslyn
         {
             public readonly string TypeName = typeName;
             public string? Namespace;
-            public bool IsUnmanaged;
-            public bool IsTempAlloc;
+            public CodeGenTraits Traits;
             public string[] Usings = [];
             public readonly List<string> Fields = new List<string>();
         }
@@ -48,8 +47,7 @@ namespace Ksi.Roslyn
                         return result;
 
                     result.Namespace = t.ContainingNamespace.FullyQualifiedName();
-                    result.IsUnmanaged = t.IsUnmanagedType;
-                    result.IsTempAlloc = t.IsTempAlloc();
+                    result.Traits = t.GetCodeGenTraits();
 
                     var usings = new HashSet<string>();
 
@@ -74,7 +72,7 @@ namespace Ksi.Roslyn
                             usings.Add(gt!.ContainingNamespace.FullyQualifiedName());
                     }
 
-                    var kinds = RefListUtils.GetKinds(result.IsUnmanaged, result.IsTempAlloc);
+                    var kinds = result.Traits.ToRefListKinds();
                     if (kinds != RefListKinds.None)
                         usings.Add(SymbolNames.Ksi);
 
@@ -122,9 +120,8 @@ namespace Ksi.Roslyn
                         EmitDeallocMethod(sb, entry);
                         sb.AppendLine(string.Format(DeallocatedExtension, entry.TypeName));
 
-                        var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTempAlloc);
-
-                        kinds.Emit(RefListDeallocFull, RefListDeallocItems, sb, entry.TypeName);
+                        var kinds = entry.Traits.ToRefListKinds();
+                        kinds.Emit(RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, sb, entry.TypeName);
                         kinds.Emit(RefListDeallocated, sb, entry.TypeName);
                         kinds.Emit(RefListSpecialized, sb, entry.TypeName);
 
