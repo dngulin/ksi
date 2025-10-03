@@ -83,7 +83,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
-        context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
+        context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
         context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
     }
 
@@ -185,18 +185,15 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeMethod(SymbolAnalysisContext ctx)
+    private static void AnalyzeParameter(SymbolAnalysisContext ctx)
     {
-        var m = (IMethodSymbol)ctx.Symbol;
+        var p = (IParameterSymbol)ctx.Symbol;
 
-        foreach (var p in m.Parameters)
-        {
-            if (!p.IsDynNoResize())
-                continue;
+        if (!p.IsDynNoResize())
+            return;
 
-            if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule05RedundantNoResize, p.Locations.First()));
-        }
+        if (!p.IsMut() || !p.Type.IsDynSizedOrWrapsDynSized())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule05RedundantNoResize, p.Locations.First()));
     }
 
     private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
