@@ -1,7 +1,7 @@
 using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace Ksi.Roslyn;
+namespace Ksi.Roslyn.Util;
 
 public readonly struct RefVarInfo(ILocalSymbol symbol, RefVarKind kind, IOperation producer)
 {

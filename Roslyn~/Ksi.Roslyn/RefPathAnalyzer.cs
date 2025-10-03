@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using Ksi.Roslyn.Extensions;
+using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;

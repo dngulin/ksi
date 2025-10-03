@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace Ksi.Roslyn.Extensions;
+namespace Ksi.Roslyn.Util;
 
 public struct RefPathBuildCtx(int len)
 {

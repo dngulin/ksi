@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Ksi.Roslyn;
+namespace Ksi.Roslyn.Util;
 
 public readonly struct RefPath
 {

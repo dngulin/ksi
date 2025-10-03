@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Ksi.Roslyn.SymbolNames;
+using static Ksi.Roslyn.Util.SymbolNames;
 
 namespace Ksi.Roslyn.Extensions;
 

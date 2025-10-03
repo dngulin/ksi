@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
