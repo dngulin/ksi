@@ -12,12 +12,10 @@ namespace Ksi.Roslyn;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class TempAllocAnalyzer : DiagnosticAnalyzer
 {
-    private static int _ruleId;
-
-    private static DiagnosticDescriptor Rule(DiagnosticSeverity severity, string title, string msg)
+    private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"TEMPALLOC{++_ruleId:D2}",
+            id: $"TEMPALLOC{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
@@ -26,35 +24,32 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor DynSizedRule = Rule(
-        DiagnosticSeverity.Error,
-        "DynSized Attribute Required",
-        "Missing `DynSized` attribute for a struct `{0}` marked with `Temp` attribute"
+    private static readonly DiagnosticDescriptor Rule01MissingAttribute = Rule(01, DiagnosticSeverity.Error,
+        "Missing [TempAlloc] attribute",
+        "Structure should be annotated with the [TempAlloc] attribute " +
+        "because it contains a [TempAlloc] field of type `{0}`"
     );
 
-    private static readonly DiagnosticDescriptor FieldRule = Rule(
-        DiagnosticSeverity.Error,
-        "Field of Non-Temp Structure",
-        "Structure `{0}` can be a field only of a structure marked with the `Temp` attribute"
+    private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(02, DiagnosticSeverity.Error,
+        "Missing [DynSized] attribute",
+        "Structure marked with the [TempAlloc] attribute should be also marked with the [DynSized] attribute"
     );
 
-    private static readonly DiagnosticDescriptor RedundantRule = Rule(
-        DiagnosticSeverity.Warning,
-        "Redundant Temp Attribute",
-        "Structure `{0}` is marked with the `DynSized` attribute but doesn't have any `Temp` fields"
+    private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
+        "Redundant [TempAlloc] attribute",
+        "Structure is marked with the [TempAlloc] attribute but doesn't have any [TempAlloc] fields"
     );
 
-    private static readonly DiagnosticDescriptor GenericTypeArgumentRule = Rule(
-        DiagnosticSeverity.Error,
-        "Generic Type Argument",
-        "Passing the `Temp` type `{0}` as a type argument"
+    private static readonly DiagnosticDescriptor Rule04IncompatibleAllocator = Rule(04, DiagnosticSeverity.Error,
+        "Incompatible allocator with the [TempAlloc] type",
+        "[TempAlloc] type `{0}` can be owned only by a [TempAlloc] collection"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        DynSizedRule,
-        FieldRule,
-        RedundantRule,
-        GenericTypeArgumentRule
+        Rule01MissingAttribute,
+        Rule02MissingDynSized,
+        Rule03RedundantAttribute,
+        Rule04IncompatibleAllocator
     );
 
     public override void Initialize(AnalysisContext context)
@@ -73,11 +68,14 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeField(SymbolAnalysisContext ctx)
     {
         var sym = (IFieldSymbol)ctx.Symbol;
-        if (sym.Type.TypeKind != TypeKind.Struct || sym.ContainingType.TypeKind != TypeKind.Struct)
+        var t = sym.Type;
+        var ct = sym.ContainingType;
+
+        if (t.TypeKind != TypeKind.Struct || ct.TypeKind != TypeKind.Struct)
             return;
 
-        if (sym.Type.IsTempAlloc() && !sym.ContainingType.IsTempAlloc())
-            ctx.ReportDiagnostic(Diagnostic.Create(FieldRule, sym.Locations.First(), sym.Type.Name));
+        if (t.IsTempAlloc() && !ct.IsTempAlloc())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttribute, ct.Locations.First(), sym.Type.Name));
     }
 
     private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -86,6 +84,9 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
         if (sym == null || !sym.IsTempAlloc())
             return;
 
+        if (!sym.IsDynSized())
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingDynSized, sym.Locations.First()));
+
         var hasTempFields = sym
             .GetMembers()
             .Where(m => m.Kind == SymbolKind.Field)
@@ -93,10 +94,7 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
             .Any(field => !field.IsStatic && field.Type.IsTempAlloc());
 
         if (!hasTempFields)
-            ctx.ReportDiagnostic(Diagnostic.Create(RedundantRule, sym.Locations.First(), sym.Name));
-
-        if (!sym.IsDynSized())
-            ctx.ReportDiagnostic(Diagnostic.Create(DynSizedRule, sym.Locations.First(), sym.Name));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First()));
     }
 
     private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
@@ -106,30 +104,40 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
             return;
 
         var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
-        if (i.Type is not INamedTypeSymbol { IsGenericType: true } n)
+        if (i.Type == null || !IsInvalidTempAllocContainer(i.Type, out var gt))
             return;
 
-        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTempAlloc()))
-        {
-            var gt = n.TypeArguments.First();
-            if (gt.IsTempAlloc())
-                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, s.GetLocation(), gt.Name));
-        }
+        ctx.ReportDiagnostic(Diagnostic.Create(Rule04IncompatibleAllocator, s.GetLocation(), gt!.Name));
     }
 
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
     {
         var d = (IVariableDeclaratorOperation)ctx.Operation;
 
-        if (d.Symbol.Type is not INamedTypeSymbol { IsGenericType: true } n)
+        if (!d.IsVar())
             return;
 
-        if (n.IsExclusiveAccess() || (n.IsRefList() && !n.IsTempAlloc()))
-        {
-            var gt = n.TypeArguments.First();
-            var loc = d.GetDeclaredTypeLocation();
-            if (gt.IsTempAlloc())
-                ctx.ReportDiagnostic(Diagnostic.Create(GenericTypeArgumentRule, loc, gt.Name));
-        }
+        if (!IsInvalidTempAllocContainer(d.Symbol.Type, out var gt))
+            return;
+
+        var loc = d.GetDeclaredTypeLocation();
+        ctx.ReportDiagnostic(Diagnostic.Create(Rule04IncompatibleAllocator, loc, gt!.Name));
+    }
+
+    private static bool IsInvalidTempAllocContainer(ITypeSymbol t, out ITypeSymbol? gt)
+    {
+        gt = null;
+
+        if (t is not INamedTypeSymbol { IsGenericType: true } nt)
+            return false;
+
+        if (!nt.IsSupportedGenericType())
+            return false;
+
+        gt = nt.TypeArguments.First();
+        if (!gt.IsTempAlloc())
+            return false;
+
+        return nt.IsSingleArgGenericStruct() && nt.IsRefList() && nt.IsTempAlloc();
     }
 }

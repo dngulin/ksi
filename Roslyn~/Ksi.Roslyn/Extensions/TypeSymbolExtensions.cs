@@ -166,7 +166,7 @@ public static class TypeSymbolExtensions
         return gt.IsSingleArgGenericStruct() && gt.IsRefList();
     }
 
-    private static bool IsSingleArgGenericStruct(this INamedTypeSymbol self)
+    public static bool IsSingleArgGenericStruct(this INamedTypeSymbol self)
         => self is { TypeKind: TypeKind.Struct, IsGenericType: true, TypeArguments.Length: 1 };
 
     public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
