@@ -124,7 +124,7 @@ namespace Ksi.Roslyn
 
                         var template = entry.IsDealloc ? RefListExtensionsDealloc : RefListExtensions;
                         var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTempAlloc);
-                        RefListUtils.Emit(kinds, template, sb, entry.TypeName);
+                        kinds.Emit(template, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
 

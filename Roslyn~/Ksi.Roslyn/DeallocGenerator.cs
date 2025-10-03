@@ -124,9 +124,9 @@ namespace Ksi.Roslyn
 
                         var kinds = RefListUtils.GetKinds(entry.IsUnmanaged, entry.IsTempAlloc);
 
-                        RefListUtils.Emit(kinds, RefListDeallocFull, RefListDeallocItems, sb, entry.TypeName);
-                        RefListUtils.Emit(kinds, RefListDeallocated, sb, entry.TypeName);
-                        RefListUtils.Emit(kinds, RefListSpecialized, sb, entry.TypeName);
+                        kinds.Emit(RefListDeallocFull, RefListDeallocItems, sb, entry.TypeName);
+                        kinds.Emit(RefListDeallocated, sb, entry.TypeName);
+                        kinds.Emit(RefListSpecialized, sb, entry.TypeName);
 
                         sb.AppendLine("    }");
 
