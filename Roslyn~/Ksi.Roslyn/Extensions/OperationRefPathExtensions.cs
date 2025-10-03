@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
@@ -8,29 +6,19 @@ namespace Ksi.Roslyn.Extensions;
 
 public static class OperationRefPathExtensions
 {
-    private struct RefPathBuildCtx
-    {
-        public bool SuffixFinished;
-        public int SuffixLength;
-        public bool DerivedFromLocalAccessScope;
-    }
-
     public static RefPath ToRefPath(this IOperation self, ITypeSymbol? implicitIndexingType = null)
     {
-        var path = new List<string>(16);
-        var ctx = new RefPathBuildCtx();
+        var ctx = new RefPathBuildCtx(16);
 
         if (implicitIndexingType != null)
-            path.PrependRefSeg(RefPath.IndexerName, implicitIndexingType, ref ctx);
+            ctx.PrependIndexer(implicitIndexingType);
 
-        return self.PrependNodePath(path, ref ctx) ?
-            new RefPath(path.ToImmutableArray(), path.Count - ctx.SuffixLength, ctx.DerivedFromLocalAccessScope) :
-            RefPath.Empty;
+        return self.BuildRefPath(ref ctx) ? ctx.ToRefPath() : RefPath.Empty;
     }
 
     public static bool ProducesRefPath(this IOperation self) => !self.ToRefPath().IsEmpty;
 
-    private static bool PrependNodePath(this IOperation self, List<string> path, ref RefPathBuildCtx ctx)
+    private static bool BuildRefPath(this IOperation self, ref RefPathBuildCtx ctx)
     {
         while (true)
         {
@@ -39,14 +27,13 @@ public static class OperationRefPathExtensions
                 case ILocalReferenceOperation lr:
                     if (!lr.Local.IsRefOrWrappedRef())
                     {
-                        path.PrependRefSeg(lr.Local.Name, lr.Local.Type, ref ctx);
+                        ctx.Prepend(lr.Local.Name, lr.Local.Type);
                         return true;
                     }
 
                     if (!lr.Local.IsRef && lr.Local.Type.IsAccessScope())
                     {
-                        ctx.DerivedFromLocalAccessScope = true;
-                        path.PrependRefSeg(lr.Local.Name, lr.Local.Type, ref ctx);
+                        ctx.PrependRootAccessScope(lr.Local.Name, lr.Local.Type);
                         return true;
                     }
 
@@ -55,17 +42,17 @@ public static class OperationRefPathExtensions
                         return false;
 
                     if (optVar.Value.Kind == RefVarKind.IteratorItemRef)
-                        path.PrependRefSeg(RefPath.IndexerName, optVar.Value.Symbol.Type, ref ctx);
+                        ctx.PrependIndexer(optVar.Value.Symbol.Type);
 
                     self = optVar.Value.Producer;
                     continue;
 
                 case IParameterReferenceOperation pr:
-                    path.PrependRefSeg(pr.Parameter.Name, pr.Parameter.Type, ref ctx);
+                    ctx.Prepend(pr.Parameter.Name, pr.Parameter.Type);
                     return true;
 
                 case IFieldReferenceOperation f:
-                    path.PrependRefSeg(f.Field.Name, f.Field.Type, ref ctx);
+                    ctx.Prepend(f.Field.Name, f.Field.Type);
 
                     if (f.Instance == null)
                         return true;
@@ -76,7 +63,7 @@ public static class OperationRefPathExtensions
                 case IPropertyReferenceOperation pr:
                     if (pr.IsSpanIndexer())
                     {
-                        path.PrependRefSeg(RefPath.IndexerName, pr.Property.Type, ref ctx);
+                        ctx.PrependIndexer(pr.Property.Type);
                         self = pr.Instance!;
                         continue;
                     }
@@ -98,15 +85,15 @@ public static class OperationRefPathExtensions
 
                         if (m.IsRefListIndexer())
                         {
-                            path.PrependRefSeg(RefPath.IndexerName, m.ReturnType, ref ctx);
+                            ctx.PrependIndexer(m.ReturnType);
                         }
                         else if (m.IsRefListAsSpan())
                         {
-                            path.PrependRefSeg(m.Name + RefPath.MethodSuffix, m.ReturnType, ref ctx);
+                            ctx.PrependMethod(m.Name, m.ReturnType);
                         }
                         else if (m.IsRefPath(out var segments))
                         {
-                            if (!path.PrependRefPath(segments, m.Name, m.ReturnType, ref ctx))
+                            if (!ctx.PrependRefPath(segments, m.Name, m.ReturnType))
                                 return false;
                         }
                         else
@@ -130,51 +117,6 @@ public static class OperationRefPathExtensions
                     return false;
             }
         }
-    }
-
-    private static void PrependRefSeg(this List<string> self, string seg, ITypeSymbol t, ref RefPathBuildCtx ctx)
-    {
-        self.Insert(0, seg);
-
-        if (ctx.SuffixFinished)
-            return;
-
-        if (t.IsDynSizedOrWrapsDynSized())
-        {
-            ctx.SuffixFinished = true;
-            return;
-        }
-
-        ctx.SuffixLength++;
-    }
-
-    private static bool PrependRefPath(this List<string> self, ImmutableArray<string?> segments, string method, ITypeSymbol t, ref RefPathBuildCtx ctx)
-    {
-        if (segments.IsEmpty)
-        {
-            self.PrependRefSeg(method + RefPath.MethodSuffix, t, ref ctx);
-            return true;
-        }
-
-        if (!RefPath.TryCreateFromSegments(segments, out var path))
-            return false;
-
-        // Path will be prepended without the first node that will be derived from the parent operation lately
-        // So, let's estimate trimmed length parameters
-        var len = path.Segments.Length - 1;
-        var dynSizedLen = path.DynSizedLength > 0 ? path.DynSizedLength - 1 : 0;
-
-        var suffixLen = len - dynSizedLen;
-        if (ctx.SuffixFinished && suffixLen > 0)
-            return false;
-
-        ctx.SuffixLength += suffixLen;
-        ctx.SuffixFinished = dynSizedLen > 0;
-
-        for (var i = path.Segments.Length - 1; i >= 1; i--)
-            self.Insert(0, path.Segments[i]);
-
-        return true;
     }
 
     public static bool ReferencesDynSized(this IOperation self, bool fullGraph = true)
