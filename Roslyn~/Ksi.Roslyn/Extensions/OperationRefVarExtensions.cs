@@ -67,7 +67,7 @@ public static class OperationRefVarExtensions
 
         if (d.Parent is IForEachLoopOperation l)
         {
-            var producer = l.Collection.WithoutConversionOp();
+            var producer = l.Collection.Unwrapped();
             var iterInfo = new RefVarInfo(d.Symbol, RefVarKind.IteratorItemRef, producer);
             return (iterInfo, l.Body.Syntax.Span);
         }
@@ -113,7 +113,7 @@ public static class OperationRefVarExtensions
         if (self.Initializer != null)
             return self.Initializer.Value;
 
-        if (self.Parent is IForEachLoopOperation l && l.Collection.WithoutConversionOp().IsRefListIterator(out var op))
+        if (self.Parent is IForEachLoopOperation l && l.Collection.Unwrapped().IsRefListIterator(out var op))
         {
             kind = RefVarKind.IteratorItemRef;
             return op;

@@ -30,14 +30,6 @@ public static class OperationExtensions
         return null;
     }
 
-    public static IOperation WithoutConversionOp(this IOperation self)
-    {
-        if (self is IConversionOperation conv)
-            return conv.Operand;
-
-        return self;
-    }
-
     public static bool IsRefListIterator(this IOperation self, out IOperation? collection)
     {
         collection = null;

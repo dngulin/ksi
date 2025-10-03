@@ -93,7 +93,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
         if (d.Parent is not IForEachLoopOperation loop)
             return;
 
-        if (loop.Collection.WithoutConversionOp().IsRefListIterator(out var collParent))
+        if (loop.Collection.Unwrapped().IsRefListIterator(out var collParent))
             AnalyzeReferenceOp(ctx, collParent!);
     }
 

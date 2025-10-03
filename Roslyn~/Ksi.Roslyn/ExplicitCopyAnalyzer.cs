@@ -372,31 +372,14 @@ namespace Ksi.Roslyn
 
         private static bool IsNotExistingValue(IOperation op)
         {
-            while (true)
+            return op.Unwrapped().Kind switch
             {
-                switch (op.Kind)
-                {
-                    case OperationKind.DefaultValue:
-                    case OperationKind.ObjectCreation:
-                        return true;
-
-                    case OperationKind.Invocation:
-                        return op is IInvocationOperation { TargetMethod.RefKind: RefKind.None };
-
-                    case OperationKind.PropertyReference:
-                        return op is IPropertyReferenceOperation { Property.RefKind: RefKind.None };
-
-                    case OperationKind.Conversion:
-                    {
-                        var conv = (IConversionOperation)op;
-                        op = conv.Operand;
-                        continue;
-                    }
-
-                    default:
-                        return false;
-                }
-            }
+                OperationKind.DefaultValue => true,
+                OperationKind.ObjectCreation => true,
+                OperationKind.Invocation => op is IInvocationOperation { TargetMethod.RefKind: RefKind.None },
+                OperationKind.PropertyReference => op is IPropertyReferenceOperation { Property.RefKind: RefKind.None },
+                _ => false
+            };
         }
 
         private static bool IsLocalValue(IOperation op)
