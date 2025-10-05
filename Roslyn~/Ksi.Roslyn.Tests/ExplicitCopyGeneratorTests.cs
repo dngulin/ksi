@@ -172,4 +172,48 @@ public class ExplicitCopyGeneratorTests
             """
         );
     }
+
+    [Fact]
+    public async Task NamespaceIsUsedByExtensionsClass()
+    {
+        await ExplicitCopyGeneratorTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            namespace Test.Ns
+            {
+                [ExplicitCopy, DynSized, TempAlloc]
+                public struct MyStruct 
+                {
+                    public string ManagedPrimitive;
+                    public TempRefList<int> Collection;
+                }
+            }
+            """,
+            "MyStructExplicitCopy.g.cs",
+            // language=cs
+            """
+            using Ksi;
+
+            namespace Test.Ns
+            {
+                public static class MyStructExplicitCopy
+                {
+                    public static void CopyFrom(this ref MyStruct self, in MyStruct other)
+                    {
+                        self.ManagedPrimitive = other.ManagedPrimitive;
+                        self.Collection.CopyFrom(other.Collection);
+                    }
+                    
+                    public static void CopyTo(this in MyStruct self, ref MyStruct other)
+                    {
+                        other.CopyFrom(self);
+                    }
+                }
+            }
+
+            """
+        );
+    }
 }
