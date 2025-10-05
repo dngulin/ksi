@@ -114,7 +114,7 @@ namespace Ksi.Roslyn
                         {
                             EmitExplicitCopyMethods(cls, entry);
 
-                            var template = entry.IsDealloc ? RefListExtensionsDealloc : RefListExtensions;
+                            var template = entry.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
                             entry.Traits.ToRefListKinds().Emit(cls, template, entry.TypeName);
                         }
                     }

@@ -41,9 +41,9 @@ public class ExplicitCopyGeneratorTests
                 }
             
             """ +
-            RefListExtensionsDealloc.IndentFormat(1, "RefList", "MyStruct") +
-            RefListExtensionsDealloc.IndentFormat(1, "TempRefList", "MyStruct") +
-            RefListExtensionsDealloc.IndentFormat(1, "ManagedRefList", "MyStruct") +
+            RefListExtensionsForDeallocItems.IndentFormat(1, "RefList", "MyStruct") +
+            RefListExtensionsForDeallocItems.IndentFormat(1, "TempRefList", "MyStruct") +
+            RefListExtensionsForDeallocItems.IndentFormat(1, "ManagedRefList", "MyStruct") +
             """
             }
             

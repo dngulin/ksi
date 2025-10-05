@@ -28,7 +28,7 @@ namespace Ksi.Roslyn
             }}
             """;
 
-        public const string RefListExtensionsDealloc =
+        public const string RefListExtensionsForDeallocItems =
             """
             
             /// <summary>
