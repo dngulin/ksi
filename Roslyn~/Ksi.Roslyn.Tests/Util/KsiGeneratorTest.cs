@@ -1,10 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace Ksi.Roslyn.Tests.Util;
 
-public static class KsiGeneratorTest<T> where T : new()
+public static class KsiGeneratorTest<T> where T : IIncrementalGenerator, new()
 {
     public static async Task RunAsync(
         [StringSyntax("c#-test")] string code,
