@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 
 namespace Ksi.Roslyn.Util;
 
@@ -14,28 +13,28 @@ public enum RefListKinds
 
 public static class RefListKindsExtensions
 {
-    public static void Emit(this RefListKinds self, string tpl, StringBuilder sb, string t)
+    public static void Emit(this RefListKinds self, in AppendScope scope, string tpl, string t)
     {
         if (self.Has(RefListKinds.RefList))
-            sb.AppendLine(string.Format(tpl, "RefList", t));
+            scope.AppendLine(string.Format(tpl, "RefList", t));
 
         if (self.Has(RefListKinds.TempRefList))
-            sb.AppendLine(string.Format(tpl, "TempRefList", t));
+            scope.AppendLine(string.Format(tpl, "TempRefList", t));
 
         if (self.Has(RefListKinds.ManagedRefList))
-            sb.AppendLine(string.Format(tpl, "ManagedRefList", t));
+            scope.AppendLine(string.Format(tpl, "ManagedRefList", t));
     }
 
-    public static void Emit(this RefListKinds self, string deallocTpl, string nonDeallocTpl, StringBuilder sb, string t)
+    public static void Emit(this RefListKinds self, in AppendScope scope, string mainTpl, string otherTpl, string t)
     {
         if (self.Has(RefListKinds.RefList))
-            sb.AppendLine(string.Format(deallocTpl, "RefList", t));
+            scope.AppendLine(string.Format(mainTpl, "RefList", t));
 
         if (self.Has(RefListKinds.TempRefList))
-            sb.AppendLine(string.Format(nonDeallocTpl, "TempRefList", t));
+            scope.AppendLine(string.Format(otherTpl, "TempRefList", t));
 
         if (self.Has(RefListKinds.ManagedRefList))
-            sb.AppendLine(string.Format(nonDeallocTpl, "ManagedRefList", t));
+            scope.AppendLine(string.Format(otherTpl, "ManagedRefList", t));
     }
 
     private static bool Has(this RefListKinds self, RefListKinds value) => (self & value) != RefListKinds.None;
