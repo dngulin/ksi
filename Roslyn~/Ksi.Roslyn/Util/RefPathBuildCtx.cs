@@ -42,7 +42,7 @@ public static class RefPathBuildExtensions
 
     public static void PrependIndexer(this ref RefPathBuildCtx self, ITypeSymbol t)
     {
-        self.Prepend(RefPath.IndexerName, t);
+        self.Prepend(RefPath.Indexer, t);
     }
 
     public static void PrependMethod(this ref RefPathBuildCtx self, string name, ITypeSymbol t)

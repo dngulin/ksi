@@ -8,8 +8,9 @@ namespace Ksi.Roslyn.Util;
 
 public readonly struct RefPath
 {
-    public const string IndexerName = "[n]";
+    public const string Indexer = "[n]";
     public const string MethodSuffix = "()";
+    private const string DynSeparator = "!";
 
     public static RefPath Empty => new RefPath(ImmutableArray<string>.Empty, 0, false);
 
@@ -34,13 +35,13 @@ public readonly struct RefPath
         var sb = new StringBuilder();
         for (var i = 0; i < Segments.Length; i++)
         {
-            if (i != 0 && Segments[i] != IndexerName)
+            if (i != 0 && Segments[i] != Indexer)
                 sb.Append('.');
 
             sb.Append(Segments[i]);
 
             if (i == DynSizedLength - 1)
-                sb.Append('!');
+                sb.Append(DynSeparator);
         }
 
         return sb.ToString();
@@ -56,13 +57,13 @@ public readonly struct RefPath
         if (segments.Any(s => !IsValidSegment(s)))
             return false;
 
-        var dynSepCount = segments.Count(s => s == "!");
+        var dynSepCount = segments.Count(s => s == DynSeparator);
         if (dynSepCount > 1)
             return false;
 
-        var dynSizedLen = dynSepCount == 0 ? 0 : segments.TakeWhile(s => s != "!").Count();
+        var dynSizedLen = dynSepCount == 0 ? 0 : segments.TakeWhile(s => s != DynSeparator).Count();
 
-        result = new RefPath(segments.Where(s => s != "!").ToImmutableArray()!, dynSizedLen, false);
+        result = new RefPath(segments.Where(s => s != DynSeparator).ToImmutableArray()!, dynSizedLen, false);
         return true;
     }
 
@@ -71,7 +72,7 @@ public readonly struct RefPath
         if (segment == null)
             return false;
 
-        if (segment is IndexerName or "!")
+        if (segment is Indexer or DynSeparator)
             return true;
 
         if (segment.EndsWith(MethodSuffix))
@@ -91,7 +92,7 @@ public enum RefRelation
 }
 
 public static class RefExtensions {
-    public static RefRelation GetExplicitPathRelationTo(in this RefPath self, in RefPath other)
+    private static RefRelation GetExplicitPathRelationTo(in this RefPath self, in RefPath other)
     {
         if (self.Segments.Length == 0 || other.Segments.Length == 0 || self.Segments[0] != other.Segments[0])
             return RefRelation.Unrelated;
@@ -119,7 +120,7 @@ public static class RefExtensions {
         for (var i = start; i < end; i++)
         {
             var item = self.Segments[i];
-            if (item == RefPath.IndexerName || item.EndsWith(RefPath.MethodSuffix))
+            if (item == RefPath.Indexer || item.EndsWith(RefPath.MethodSuffix))
                 return true;
         }
 
