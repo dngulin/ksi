@@ -44,19 +44,21 @@ Key features:
   ```csharp
   var list = RefList.Empty<int>();
   ref var x = ref list.RefAdd();
-  ref var y = ref list.RefAdd(); // ERROR
-  //              ^^^^
-  // BORROW03: Passing a mutable reference argument to `list!` invalidates memory safety guaranties for the local
-  // variable `x` pointing to `list![n]`. Consider to pass a readonly/[DynNoResize] reference to avoid the problem
+  ref var y = ref list.RefAdd();
+  //              ^^^^ ERROR
+  // BORROW03: Passing a mutable reference argument to `list!` invalidates memory safety
+  // guaranties for the local variable `x` pointing to `list![n]`.
+  // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
   x++;
   y++;
   ```
   ```csharp
   var list = RefList.Empty<Entity>();
-  ParentChild(ref list, list.RefReadonlyAt(0)); // ERROR
-  //              ^^^^
-  // BORROW04: Passing a mutable reference to `list!` alongside with a reference to `list[n]!` as arguments invalidates
-  // memory safety rules within the calling method. Consider to pass a readonly/[DynNoResize] reference to avoid the problem
+  ParentChild(ref list, list.RefReadonlyAt(0));
+  //              ^^^^ ERROR
+  // BORROW04: Passing a mutable reference to `list!` alongside with a reference to
+  // `list[n]!` as arguments invalidates memory safety rules within the calling method.
+  // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
   ```
 
 TODO:
