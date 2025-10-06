@@ -1,8 +1,7 @@
 {
   "name": "dev.dngulin.ksi",
   "version": "0.0.1",
-  "displayName": "ѯ-DOTS",
-  "description": "This package provides core components for ѯ-DOTS",
-  "dependencies": {
-  }
+  "displayName": "ѯ-Framework for Unity DOTS",
+  "description": "This package provides provides data oriented design framework for Unity DOTS",
+  "dependencies": {}
 }

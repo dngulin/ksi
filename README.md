@@ -1,6 +1,6 @@
-# ѯ-DOTS Unity Package
+# ѯ-Framework for Unity DOTS
 
-![](Documentation~/logo.png)
+![](Documentation~/img/logo.png)
 
 _Pronounced as /ksi/_
 
@@ -9,40 +9,49 @@ _Pronounced as /ksi/_
 > [!WARNING]
 > The project is on the prototype development stage
 
-This unity package provides data structures and algorithms to implement the GameLoop pattern with Unity and Burst.
+This unity package provides a data oriented design framework for Unity DOTS.
+It implies to use the special attribute (trait) system
+and extensively uses Roslyn analyzers and code generators.
 
 Key features:
 
-- Nice API in the Busrt-compiled code
-  - `foreach` loops
-  - `by-ref` indexers and iterators
-  - dynamically sized collections
-  - data access control depedning on the acces mdifier: `in` or `ref`
-- Roslyn Analyzers and Code Generators to avoid mistakes and reduce amount of boilerplate code
-  - No implictily copyable structures 
-  - Hierarchical copying API
-  - Hierarchical deallocation API
+- Fully Burst-compatible
+- Dynamic collections with by-reference data access
+  ```csharp
+  var list = RefList.Empty<int>();
+  ref var x = ref list.RefAdd();
+  x = 3;
+  list.RefAt(0) = 0; // Same as the `x = 0`
+  ```
+- Data access control based on the data mutability
+  ```csharp
+  // This API call is possible if you have ANY REFERENCE to the data
+  public static ref readonly T RefReadonlyAt<T>(this in RefList<T> self, int index);
 
-See an example of the usage:
-```csharp
-[BurstCompile]
-public static class GameLogic
-{
-    [BurstCompile]
-    public static void Tick(in Specs specs, ref GameState state, ref FrameState frameState)
-    {
-        foreach (ref var entity in state.Entities.RefIter())
-        {
-            var modifier = specs.Entities.RefReadonlyAt(entity.SpecId).Modifier;
-            entity.Position += entity.Velocity * frameState.DeltaTime * modifier;
-        }
-    }
-}
-```
+  // This API call is possible only if you have a MUTABLE REFERENCE to the data
+  public static ref T RefAt<T>(this ref RefList<T> self, int index);
+  ```
+- Deallocation management
+  ```csharp
+  [ExplicitCopy, DynSized, Dealloc]
+  public struct Node { public RefList<Node> Children; }
 
-## TBD: Documentation
+  var root = new Node();
+  BuildTree(ref root);
+  root.Dealloc(); // This extension method deallocate the full tree
+  ```
+- Compile time memory safety checks
+  ![](Documentation~/img/borrow-03.png)
+  ![](Documentation~/img/borrow-04.png)
 
-- GameLoop Pattern
-- Data Access Control
-- RefList Collections
-- Memory Safety
+TODO:
+- ECS-like queries respecting both array-of-structs and struct-of-arrays
+- `RefHashTable<T>` to use it as `HashSet` / `HashMap`
+- Binary serialization
+
+## Documentation (TBD)
+
+- [Trait System](Documentation~/traits.md)
+- [Collections](Documentation~/traits.md)
+- [Referencing Rules](Documentation~/borrow-checker-at-home.md)
+- [Getting Started](Documentation~/getting-started.md)
