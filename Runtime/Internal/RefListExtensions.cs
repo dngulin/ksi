@@ -1,7 +1,7 @@
 using System;
 using Unity.Collections;
 
-#pragma warning disable REFLIST01, REFPATH03
+#pragma warning disable REFLIST01
 
 namespace Ksi
 {
