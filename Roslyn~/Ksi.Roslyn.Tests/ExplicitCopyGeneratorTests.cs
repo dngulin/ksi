@@ -216,4 +216,47 @@ public class ExplicitCopyGeneratorTests
             """
         );
     }
+
+    [Fact]
+    public async Task EnclosingTypeNameIsRespected()
+    {
+        await ExplicitCopyGeneratorTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class EnclosingType
+            {
+                [ExplicitCopy, DynSized, TempAlloc]
+                public struct MyStruct 
+                {
+                    public TempRefList<int> Collection;
+                }
+            }
+            """,
+            "EnclosingType.MyStructExplicitCopy.g.cs",
+            // language=cs
+            """
+            using Ksi;
+
+            public static class EnclosingType_MyStructExplicitCopy
+            {
+                public static void CopyFrom(this ref EnclosingType.MyStruct self, in EnclosingType.MyStruct other)
+                {
+                    self.Collection.CopyFrom(other.Collection);
+                }
+                
+                public static void CopyTo(this in EnclosingType.MyStruct self, ref EnclosingType.MyStruct other)
+                {
+                    other.CopyFrom(self);
+                }
+
+            """ +
+            RefListExtensions.IndentFormat(1, "TempRefList", "EnclosingType.MyStruct") +
+            """
+            }
+
+            """
+        );
+    }
 }

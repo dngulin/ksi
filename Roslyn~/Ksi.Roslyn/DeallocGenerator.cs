@@ -14,9 +14,9 @@ namespace Ksi.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class DeallocGenerator : IIncrementalGenerator
     {
-        private class DeallocInfo(string typeName)
+        private class DeallocInfo(string type)
         {
-            public readonly string TypeName = typeName;
+            public string Type = type;
             public string? Namespace;
             public CodeGenTraits Traits;
             public string[] Usings = [];
@@ -46,6 +46,7 @@ namespace Ksi.Roslyn
                     if (t == null)
                         return result;
 
+                    result.Type = t.FullTypeName();
                     result.Namespace = t.ContainingNamespace.FullyQualifiedName();
                     result.Traits = t.GetCodeGenTraits();
 
@@ -95,8 +96,8 @@ namespace Ksi.Roslyn
                 {
                     if (entry.Namespace == null)
                     {
-                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.TypeName}`");
-                        ctx.AddSource($"{entry.TypeName}Dealloc.g.cs", sb.ToString());
+                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.Type}`");
+                        ctx.AddSource($"{entry.Type}Dealloc.g.cs", sb.ToString());
                         sb.Clear();
                         continue;
                     }
@@ -109,25 +110,25 @@ namespace Ksi.Roslyn
                         file.AppendLine("");
 
                         using (var ns = file.OptNamespace(entry.Namespace))
-                        using (var cls = ns.PubStat($"class {entry.TypeName}Dealloc"))
+                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}Dealloc"))
                         {
                             EmitDeallocMethods(cls, entry);
 
                             var kinds = entry.Traits.ToRefListKinds();
-                            kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, entry.TypeName);
-                            kinds.Emit(cls, RefListDeallocated, entry.TypeName);
-                            kinds.Emit(cls, RefListSpecialized, entry.TypeName);
+                            kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, entry.Type);
+                            kinds.Emit(cls, RefListDeallocated, entry.Type);
+                            kinds.Emit(cls, RefListSpecialized, entry.Type);
                         }
                     }
 
-                    ctx.AddSource($"{entry.TypeName}Dealloc.g.cs", sb.ToString());
+                    ctx.AddSource($"{entry.Type}Dealloc.g.cs", sb.ToString());
                 }
             });
         }
 
         private static void EmitDeallocMethods(in AppendScope cls, DeallocInfo entry)
         {
-            var t = entry.TypeName;
+            var t = entry.Type;
             using (var m = cls.PubStat($"void Dealloc(this ref {t} self)"))
             {
                 foreach (var f in entry.Fields)

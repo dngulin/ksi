@@ -14,9 +14,9 @@ namespace Ksi.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class ExplicitCopyGenerator : IIncrementalGenerator
     {
-        private class TypeInfo(string typeName)
+        private class TypeInfo(string type)
         {
-            public readonly string TypeName = typeName;
+            public string Type = type;
             public string? Namespace;
             public CodeGenTraits Traits;
             public bool IsDealloc;
@@ -47,6 +47,7 @@ namespace Ksi.Roslyn
                     if (t == null)
                         return result;
 
+                    result.Type = t.FullTypeName();
                     result.Namespace = t.ContainingNamespace.FullyQualifiedName();
                     result.Traits = t.GetCodeGenTraits();
                     result.IsDealloc = t.IsDealloc();
@@ -96,8 +97,8 @@ namespace Ksi.Roslyn
                 {
                     if (entry.Namespace == null)
                     {
-                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.TypeName}`");
-                        ctx.AddSource($"{entry.TypeName}ExplicitCopy.g.cs", sb.ToString());
+                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.Type}`");
+                        ctx.AddSource($"{entry.Type}ExplicitCopy.g.cs", sb.ToString());
                         sb.Clear();
                         continue;
                     }
@@ -110,23 +111,23 @@ namespace Ksi.Roslyn
                         file.AppendLine("");
 
                         using (var ns = file.OptNamespace(entry.Namespace))
-                        using (var cls = ns.PubStat($"class {entry.TypeName}ExplicitCopy"))
+                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}ExplicitCopy"))
                         {
                             EmitExplicitCopyMethods(cls, entry);
 
                             var template = entry.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
-                            entry.Traits.ToRefListKinds().Emit(cls, template, entry.TypeName);
+                            entry.Traits.ToRefListKinds().Emit(cls, template, entry.Type);
                         }
                     }
 
-                    ctx.AddSource($"{entry.TypeName}ExplicitCopy.g.cs", sb.ToString());
+                    ctx.AddSource($"{entry.Type}ExplicitCopy.g.cs", sb.ToString());
                 }
             });
         }
 
         private static void EmitExplicitCopyMethods(in AppendScope cls, TypeInfo entry)
         {
-            var t = entry.TypeName;
+            var t = entry.Type;
             using (var m = cls.PubStat($"void CopyFrom(this ref {t} self, in {t} other)"))
             {
                 foreach (var (f, copy) in entry.Fields)

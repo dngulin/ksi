@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
@@ -188,5 +189,24 @@ public static class TypeSymbolExtensions
             TypeKind.TypeParameter => true,
             _ => false
         };
+    }
+
+    public static string FullTypeName(this INamedTypeSymbol self)
+    {
+        if (self.ContainingType == null)
+            return self.Name;
+
+        var segments = new List<string>(8);
+
+        while (true)
+        {
+            segments.Insert(0, self.Name);
+            if (self.ContainingType == null)
+                break;
+
+            self = self.ContainingType;
+        }
+
+        return string.Join(".", segments);
     }
 }
