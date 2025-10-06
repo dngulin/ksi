@@ -56,7 +56,7 @@ public static class OperationRefPathExtensions
                     ctx.Prepend(f.Field.Name, f.Field.Type);
 
                     if (f.Instance == null)
-                        return true;
+                        return false;
 
                     self = f.Instance;
                     continue;
