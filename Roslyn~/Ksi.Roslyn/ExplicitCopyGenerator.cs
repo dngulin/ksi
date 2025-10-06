@@ -92,13 +92,14 @@ namespace Ksi.Roslyn
             initCtx.RegisterSourceOutput(collected, (ctx, entries) =>
             {
                 var sb = new StringBuilder(16 * 1024);
+                var errIdx = 0;
 
                 foreach (var entry in entries)
                 {
                     if (entry.Namespace == null)
                     {
                         sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.Type}`");
-                        ctx.AddSource($"{entry.Type}ExplicitCopy.g.cs", sb.ToString());
+                        ctx.AddSource($"{entry.Type}.ExplicitCopy.Err{errIdx++}.g.cs", sb.ToString());
                         sb.Clear();
                         continue;
                     }
@@ -111,7 +112,7 @@ namespace Ksi.Roslyn
                         file.AppendLine("");
 
                         using (var ns = file.OptNamespace(entry.Namespace))
-                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}ExplicitCopy"))
+                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_ExplicitCopy"))
                         {
                             EmitExplicitCopyMethods(cls, entry);
 
@@ -120,7 +121,7 @@ namespace Ksi.Roslyn
                         }
                     }
 
-                    ctx.AddSource($"{entry.Type}ExplicitCopy.g.cs", sb.ToString());
+                    ctx.AddSource($"{entry.Type}.ExplicitCopy.g.cs", sb.ToString());
                 }
             });
         }

@@ -39,7 +39,7 @@ public static class RefListTemplates
 
         namespace Ksi
         {{
-            public static class {0}Impl
+            public static class {0}_Impl
             {{
                 public static int Capacity<T>(this in {0}<T> self) where T : {1} => self.GetBufferSize();
 
@@ -141,7 +141,7 @@ public static class RefListTemplates
 
         namespace Ksi
         {{
-            public static class {0}Dealloc
+            public static class {0}_Dealloc
             {{
                 public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
@@ -164,7 +164,7 @@ public static class RefListTemplates
 
         namespace Ksi
         {{
-            public static class {0}IteratorExtensions
+            public static class {0}_IteratorExtensions
             {{
                 [RefListIterator]
                 public static {0}ReadOnlyIterator<T> RefReadonlyIter<T>(this in {0}<T> self) where T : {1}
@@ -297,7 +297,7 @@ public static class RefListTemplates
 
         namespace Ksi
         {{
-            public static class {0}StringExtensions
+            public static class {0}_StringExtensions
             {{
                 public static void AppendUtf8String(this ref {0}<byte> list, string value)
                 {{

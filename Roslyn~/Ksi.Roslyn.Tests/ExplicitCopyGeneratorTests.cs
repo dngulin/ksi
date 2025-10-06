@@ -22,12 +22,12 @@ public class ExplicitCopyGeneratorTests
                 public RefList<int> Collection;
             }
             """,
-            "MyStructExplicitCopy.g.cs",
+            "MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
-            public static class MyStructExplicitCopy
+            public static class MyStruct_ExplicitCopy
             {
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
@@ -66,12 +66,12 @@ public class ExplicitCopyGeneratorTests
                 public ManagedRefList<int> Collection;
             }
             """,
-            "MyStructExplicitCopy.g.cs",
+            "MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
-            public static class MyStructExplicitCopy
+            public static class MyStruct_ExplicitCopy
             {
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
@@ -108,12 +108,12 @@ public class ExplicitCopyGeneratorTests
                 public TempRefList<int> Collection;
             }
             """,
-            "MyStructExplicitCopy.g.cs",
+            "MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
-            public static class MyStructExplicitCopy
+            public static class MyStruct_ExplicitCopy
             {
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
@@ -150,12 +150,12 @@ public class ExplicitCopyGeneratorTests
                 public TempRefList<int> Collection;
             }
             """,
-            "MyStructExplicitCopy.g.cs",
+            "MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
-            public static class MyStructExplicitCopy
+            public static class MyStruct_ExplicitCopy
             {
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
@@ -191,14 +191,14 @@ public class ExplicitCopyGeneratorTests
                 }
             }
             """,
-            "MyStructExplicitCopy.g.cs",
+            "MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
             namespace Test.Ns
             {
-                public static class MyStructExplicitCopy
+                public static class MyStruct_ExplicitCopy
                 {
                     public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                     {
@@ -234,12 +234,12 @@ public class ExplicitCopyGeneratorTests
                 }
             }
             """,
-            "EnclosingType.MyStructExplicitCopy.g.cs",
+            "EnclosingType.MyStruct.ExplicitCopy.g.cs",
             // language=cs
             """
             using Ksi;
 
-            public static class EnclosingType_MyStructExplicitCopy
+            public static class EnclosingType_MyStruct_ExplicitCopy
             {
                 public static void CopyFrom(this ref EnclosingType.MyStruct self, in EnclosingType.MyStruct other)
                 {
