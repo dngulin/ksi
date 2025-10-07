@@ -1,4 +1,4 @@
-# Trait System
+# Trait Attributes
 
 ѯ-Framework defines a set of special attributes (traits) that enable extra diagnostics
 and code generation for marked structures:
