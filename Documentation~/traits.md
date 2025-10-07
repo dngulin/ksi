@@ -24,7 +24,7 @@ var listB = listA.Move(); // `listA` copied to `listB` and then zeroed
 
 The trait also enables code generation that produces explicit copy extensions.
 
-### Generated API
+### Generated ExplicitCopy API
 
 Usage of the `[ExplicitCopy]` attribute triggers code generation of `CopyTo` and `CopyFrom` methods
 for the marked type and possible containers:
@@ -41,7 +41,7 @@ Where `TStruct` is the structure name and `TRefList` is a [compatible collection
 > - the structure cannot have private fields
 > - the structure cannot be generic
 
-### Diagnostics
+### ExplicitCopy Diagnostics
 
 Diagnostics enabled by the `[ExplicitCopy]` attribute:
 
@@ -67,14 +67,14 @@ See also the [Referencing Rules](borrow-checker-at-home.md) section.
 
 ### DynNoResizeAttribute
 
-### Diagnostics
+### DynSized Diagnostics
 
 ## DeallocAttribute
 
-### Generated API
+### Generated Dealloc API
 
-### Diagnostics
+### Dealloc Diagnostics
 
 ## TempAllocAttribute
 
-### Diagnostics
+### TempAlloc Diagnostics
