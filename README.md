@@ -9,8 +9,8 @@ _Pronounced as /ksi/_
 > [!WARNING]
 > The project is in the prototype development stage
 
-This unity package provides a data oriented design framework for Unity DOTS.
-It implies to use the special attribute (trait) system
+This unity package provides a data-oriented design framework for Unity DOTS.
+It implies using the special attribute (trait) system
 and extensively uses Roslyn analyzers and code generators.
 
 Key features:
