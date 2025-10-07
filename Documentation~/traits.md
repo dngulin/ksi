@@ -23,7 +23,7 @@ public struct ChildStruct
     public int UniqueId;
 }
 
-[ExplicitCopy] // <--- required because of the `ChildStruct` filed
+[ExplicitCopy] // <--- required because of the `ChildStruct` field
 public struc ParentStruct
 {
     public ChildStruct Child;
@@ -69,7 +69,7 @@ Diagnostics related to the `[ExplicitCopy]` attribute:
 | `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance         |
 | `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure      |
 | `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance           |
-| `EXPCOPY08`   | Error    | Private filed declaration in the `[ExplicitCopy]` type  |
+| `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type  |
 | `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration               |
 | `EXPCOPY10`   | Error    | Passing `[ExplicitCopy]` instance as a generic argument |
 | `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument        |
@@ -86,13 +86,13 @@ For details see the [Referencing Rules](borrow-checker-at-home.md) section.
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized] // <--- required because of the `ManagedRefList<int>` filed
+[ExplicitCopy, DynSized] // <--- required because of the `ManagedRefList<int>` field
 public struct ChildStruct
 {
     public ManagedRefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized] // <--- required because of the `ChildStruct` filed
+[ExplicitCopy, DynSized] // <--- required because of the `ChildStruct` field
 public struc ParentStruct
 {
     public ChildStruct Child;
@@ -126,13 +126,13 @@ any `[Dealloc]` fields like `RefList<T>`.
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `RefList<int>` filed
+[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `RefList<int>` field
 public struct MyStruct
 {
     public RefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `ChildStruct` filed
+[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `ChildStruct` field
 public struc ParentStruct
 {
     public ChildStruct Child;
@@ -192,13 +192,13 @@ but can be used as generic parameters of `[TempAlloc]` collections.
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `TempRefList<int>` filed
+[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `TempRefList<int>` field
 public struct MyStruct
 {
     public TempRefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `ChildStruct` filed
+[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `ChildStruct` field
 public struc ParentStruct
 {
     public ChildStruct Child;

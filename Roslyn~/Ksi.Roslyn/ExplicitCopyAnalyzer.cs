@@ -62,7 +62,7 @@ namespace Ksi.Roslyn
         );
 
         private static readonly DiagnosticDescriptor Rule08PrivateField = Rule(08,
-            "Private filed declaration in the [ExplicitCopy] type",
+            "Private field declaration in the [ExplicitCopy] type",
             "Declaring a private field prevents from providing explicit copy extensions"
         );
 
