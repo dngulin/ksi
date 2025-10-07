@@ -168,6 +168,16 @@ to suppress the `DEALLOC04` diagnostic.
 > There is no diagnostic analyzer to verify if the instance is actually deallocated.
 > Incorrect usage of the attribute can cause memory leaks due to missing deallocation.
 
+
+Example:
+```csharp
+var list = RefList.Empty<Entity>();
+list.RefAdd() = CreateRandomEntity(); // `RefAdd` has the `[NonAllocatedResult]` attribute
+
+list.RefAt(0) = CreateRandomEntity(); // <--- Error: DEALLOC04
+list.RefAt(0).Deallocated() = CreateRandomEntity(); // Assignment is allowed
+```
+
 ### Dealloc Diagnostics
 
 Diagnostics related to the `[Dealloc]` attribute:
