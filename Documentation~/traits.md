@@ -138,4 +138,20 @@ Diagnostics related to the `[Dealloc]` attribute:
 
 ## TempAllocAttribute
 
+The `[TempAlloc]` attribute indicates a type that should be stored only on stack.
+It requires `[ExplicitCopy]` attribute and should be used for structures that have
+any `[TempAlloc]` fields like `TempRefList<T>`.
+
+`[TempAlloc]` types are similar to `ref struct` types,
+but can be used as generic parameters of `[TempAlloc]` collections.
+
 ### TempAlloc Diagnostics
+
+Diagnostics related to the `[TempAlloc]` attribute:
+
+| Diagnostic Id  | Title                                              |
+|----------------|----------------------------------------------------|
+| `TEMPALLOC01`  | Missing `[TempAlloc]` attribute                    |
+| `TEMPALLOC02`  | Missing `[ExplicitCopy]` attribute                 |
+| `TEMPALLOC03`  | Redundant `[TempAlloc]` attribute                  |
+| `TEMPALLOC04`  | Incompatible allocator with the `[TempAlloc]` type |
