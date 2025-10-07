@@ -66,7 +66,7 @@ TODO:
 - `RefHashTable<T>` to use it as `HashSet` / `HashMap`
 - Binary serialization
 
-## Documentation (TBD)
+## Documentation
 
 - [Trait System](Documentation~/traits.md)
 - [Collections](Documentation~/collections.md)
