@@ -60,20 +60,20 @@ Where `TStruct` is the structure name and `TRefList` is a [compatible collection
 
 Diagnostics related to the `[ExplicitCopy]` attribute:
 
-| Diagnostic Id | Title                                                   |
-|---------------|---------------------------------------------------------|
-| `EXPCOPY01`   | Missing `[ExplicitCopy]` attribute                      |
-| `EXPCOPY02`   | Passing `[ExplicitCopy]` instance by value              |
-| `EXPCOPY03`   | Returning a copy of the `[ExplicitCopy]` instance       |
-| `EXPCOPY04`   | Assignment copy of the `[ExplicitCopy]` instance        |
-| `EXPCOPY05`   | Defensive copy of the `[ExplicitCopy]` instance         |
-| `EXPCOPY06`   | Capturing the `[ExplicitCopy]` instance by closure      |
-| `EXPCOPY07`   | Boxing/unboxing the `[ExplicitCopy]` instance           |
-| `EXPCOPY08`   | Private filed declaration in the `[ExplicitCopy]` type  |
-| `EXPCOPY09`   | Generic `[ExplicitCopy]` type declaration               |
-| `EXPCOPY10`   | Passing `[ExplicitCopy]` instance as a generic argument |
-| `EXPCOPY11`   | Passing `[ExplicitCopy]` type as a type argument        |
-| `EXPCOPY12`   | Using Span copying API with `[ExplicitCopy]` items      |
+| Diagnostic Id | Severity | Title                                                   |
+|---------------|----------|---------------------------------------------------------|
+| `EXPCOPY01`   | Error    | Missing `[ExplicitCopy]` attribute                      |
+| `EXPCOPY02`   | Error    | Passing `[ExplicitCopy]` instance by value              |
+| `EXPCOPY03`   | Error    | Returning a copy of the `[ExplicitCopy]` instance       |
+| `EXPCOPY04`   | Error    | Assignment copy of the `[ExplicitCopy]` instance        |
+| `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance         |
+| `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure      |
+| `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance           |
+| `EXPCOPY08`   | Error    | Private filed declaration in the `[ExplicitCopy]` type  |
+| `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration               |
+| `EXPCOPY10`   | Error    | Passing `[ExplicitCopy]` instance as a generic argument |
+| `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument        |
+| `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items      |
 
 ## DynSizedAttribute
 
@@ -103,20 +103,20 @@ public struc ParentStruct
 
 Diagnostics related to the `[DynSized]` attribute:
 
-| Diagnostic Id | Title                                                  |
-|---------------|--------------------------------------------------------|
-| `DYNSIZED01`  | Missing `[DynSized]` attribute                         |
-| `DYNSIZED02`  | Missing `[ExplicitCopy]` attribute                     |
-| `DYNSIZED03`  | Redundant `[DynSized]` attribute                       |
-| `DYNSIZED04`  | Resize is not allowed                                  |
-| `DYNSIZED05`  | Redundant `[DynNoResize]` attribute                    |
-| `DYNSIZED06`  | `[DynSized]` field of a reference type                 |
-| `DYNSIZED07`  | Redundant `ExclusiveAccess<T>` usage                   |
-| `BORROW01`    | Non-`[RefPath]` reference to `[DynSized]` data         |
-| `BORROW02`    | Changing local `[DynSized]` reference is not supported |
-| `BORROW03`    | Local reference invalidation                           |
-| `BORROW04`    | Reference arguments aliasing                           |
-| `BORROW05`    | Reference escapes the access scope                     |
+| Diagnostic Id | Severity | Title                                                  |
+|---------------|----------|--------------------------------------------------------|
+| `DYNSIZED01`  | Error    | Missing `[DynSized]` attribute                         |
+| `DYNSIZED02`  | Error    | Missing `[ExplicitCopy]` attribute                     |
+| `DYNSIZED03`  | Warning  | Redundant `[DynSized]` attribute                       |
+| `DYNSIZED04`  | Error    | Resize is not allowed                                  |
+| `DYNSIZED05`  | Warning  | Redundant `[DynNoResize]` attribute                    |
+| `DYNSIZED06`  | Error    | `[DynSized]` field of a reference type                 |
+| `DYNSIZED07`  | Warning  | Redundant `ExclusiveAccess<T>` usage                   |
+| `BORROW01`    | Error    | Non-`[RefPath]` reference to `[DynSized]` data         |
+| `BORROW02`    | Error    | Changing local `[DynSized]` reference is not supported |
+| `BORROW03`    | Error    | Local reference invalidation                           |
+| `BORROW04`    | Error    | Reference arguments aliasing                           |
+| `BORROW05`    | Error    | Reference escapes the access scope                     |
 
 ## DeallocAttribute
 
@@ -172,14 +172,14 @@ to suppress the `DEALLOC04` diagnostic.
 
 Diagnostics related to the `[Dealloc]` attribute:
 
-| Diagnostic Id | Title                                              |
-|---------------|----------------------------------------------------|
-| `DEALLOC01`   | Missing `[Dealloc]` attribute                      |
-| `DEALLOC02`   | Missing `[ExplicitCopy]` attribute                 |
-| `DEALLOC03`   | Redundant `[Dealloc]` attribute                    |
-| `DEALLOC04`   | Overwriting `[Dealloc]` instance                   |
-| `DEALLOC05`   | Unused `[Dealloc]` instance                        |
-| `DEALLOC06`   | Passing `[Dealloc]` instance as a generic argument |
+| Diagnostic Id | Severity | Title                                              |
+|---------------|----------|----------------------------------------------------|
+| `DEALLOC01`   | Error    | Missing `[Dealloc]` attribute                      |
+| `DEALLOC02`   | Error    | Missing `[ExplicitCopy]` attribute                 |
+| `DEALLOC03`   | Warning  | Redundant `[Dealloc]` attribute                    |
+| `DEALLOC04`   | Error    | Overwriting `[Dealloc]` instance                   |
+| `DEALLOC05`   | Error    | Unused `[Dealloc]` instance                        |
+| `DEALLOC06`   | Error    | Passing `[Dealloc]` instance as a generic argument |
 
 ## TempAllocAttribute
 
@@ -209,9 +209,9 @@ public struc ParentStruct
 
 Diagnostics related to the `[TempAlloc]` attribute:
 
-| Diagnostic Id  | Title                                              |
-|----------------|----------------------------------------------------|
-| `TEMPALLOC01`  | Missing `[TempAlloc]` attribute                    |
-| `TEMPALLOC02`  | Missing `[ExplicitCopy]` attribute                 |
-| `TEMPALLOC03`  | Redundant `[TempAlloc]` attribute                  |
-| `TEMPALLOC04`  | Incompatible allocator with the `[TempAlloc]` type |
+| Diagnostic Id  | Severity | Title                                              |
+|----------------|----------|----------------------------------------------------|
+| `TEMPALLOC01`  | Error    | Missing `[TempAlloc]` attribute                    |
+| `TEMPALLOC02`  | Error    | Missing `[ExplicitCopy]` attribute                 |
+| `TEMPALLOC03`  | Warning  | Redundant `[TempAlloc]` attribute                  |
+| `TEMPALLOC04`  | Error    | Incompatible allocator with the `[TempAlloc]` type |
