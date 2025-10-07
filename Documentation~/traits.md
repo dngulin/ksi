@@ -43,7 +43,7 @@ Where `TStruct` is the structure name and `TRefList` is a [compatible collection
 
 ### ExplicitCopy Diagnostics
 
-Diagnostics enabled by the `[ExplicitCopy]` attribute:
+Diagnostics related to the `[ExplicitCopy]` attribute:
 
 | Diagnostic Id | Title                                                   |
 |---------------|---------------------------------------------------------|
@@ -90,9 +90,51 @@ Diagnostics related to the `[DynSized]` attribute:
 
 ## DeallocAttribute
 
+The `[Dealloc]` attribute indicates a type that should be deallocated with the `Dealloc` extension method.
+It requires `[ExplicitCopy]` attribute and should be used for structures that have
+any `[Dealloc]` fields like `RefList<T>`.
+
 ### Generated Dealloc API
 
+Usage of the `[Dealloc]` attribute triggers code generation of `Dealloc` and `Deallocated` methods
+for the marked type:
+
+- `void Dealloc(this ref TStruct self)` - deallocates all data owned by the struct
+- `ref TStruct Deallocated(this ref TStruct self)` - deallocate the struct and returns it as
+an _assignable_ reference (see the `DEALLOC04` diagnostic message)
+
+It also generates specialized API calls for [compatible collections](collections.md):
+- `void Dealloc(this in TRefList<TStruct> self)` - specialized version that deallocate collection items
+- `ref TRefList Deallocated(this ref TRefList<TStruct> self)` - wrapper around the specialized `Dealloc` extension
+- `void RemoveAt(this ref TRefList<TStruct> self, int index)` - specialized version that deallocate collection items
+- `void Clear(this ref TRefList<TStruct> self)` - specialized version that deallocate collection items
+
+> [!NOTE]
+> The `Dealloc` extension method is also generated for collections
+> that don't require deallocation like `TempRefList<T>`.
+> In that case collection items are deallocated, but the collection itself is not cleared
+
+### NonAllocatedResultAttribute
+
+If you are sure that your method returns a deallocated instance, you can use the `[NonAllocatedResult]` attribute
+to suppress the `DEALLOC04` diagnostic.
+
+> [!WARNING]
+> There is no diagnostic analyzer to verify if the instance is actually deallocated.
+> Incorrect usage of the attribute can cause memory leaks due to missing deallocation.
+
 ### Dealloc Diagnostics
+
+Diagnostics related to the `[Dealloc]` attribute:
+
+| Diagnostic Id | Title                                              |
+|---------------|----------------------------------------------------|
+| `DEALLOC01`   | Missing `[Dealloc]` attribute                      |
+| `DEALLOC02`   | Missing `[ExplicitCopy]` attribute                 |
+| `DEALLOC03`   | Redundant `[Dealloc]` attribute                    |
+| `DEALLOC04`   | Overwriting `[Dealloc]` instance                   |
+| `DEALLOC05`   | Unused `[Dealloc]` instance                        |
+| `DEALLOC06`   | Passing `[Dealloc]` instance as a generic argument |
 
 ## TempAllocAttribute
 
