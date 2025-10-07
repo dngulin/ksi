@@ -7,7 +7,7 @@ _Pronounced as /ksi/_
 ## About
 
 > [!WARNING]
-> The project is on the prototype development stage
+> The project is in the prototype development stage
 
 This unity package provides a data oriented design framework for Unity DOTS.
 It implies to use the special attribute (trait) system
@@ -69,6 +69,5 @@ TODO:
 ## Documentation (TBD)
 
 - [Trait System](Documentation~/traits.md)
-- [Collections](Documentation~/traits.md)
+- [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
-- [Getting Started](Documentation~/getting-started.md)
