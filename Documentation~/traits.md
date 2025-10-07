@@ -60,14 +60,33 @@ Diagnostics enabled by the `[ExplicitCopy]` attribute:
 | `EXPCOPY11`   | Passing `[ExplicitCopy]` type as a type argument        |
 | `EXPCOPY12`   | Using Span copying API with `[ExplicitCopy]` items      |
 
-
 ## DynSizedAttribute
 
-See also the [Referencing Rules](borrow-checker-at-home.md) section.
+The `[DynSized]` attribute indicates that the structure owns dynamically allocated data.
+It should be used for structures that have any `[DynSized]` fields like `RefList<T>`.
+And it also requires `[ExplicitCopy]` attribute.
 
-### DynNoResizeAttribute
+The main purpose of the attribute is to indicate types affected by compile time referencing safety analysis.
+For details see the [Referencing Rules](borrow-checker-at-home.md) section.
 
 ### DynSized Diagnostics
+
+Diagnostics related to the `[DynSized]` attribute:
+
+| Diagnostic Id | Title                                                  |
+|---------------|--------------------------------------------------------|
+| `DYNSIZED01`  | Missing `[DynSized]` attribute                         |
+| `DYNSIZED02`  | Missing `[ExplicitCopy]` attribute                     |
+| `DYNSIZED03`  | Redundant `[DynSized]` attribute                       |
+| `DYNSIZED04`  | Resize is not allowed                                  |
+| `DYNSIZED05`  | Redundant `[DynNoResize]` attribute                    |
+| `DYNSIZED06`  | `[DynSized]` field of a reference type                 |
+| `DYNSIZED07`  | Redundant `ExclusiveAccess<T>` usage                   |
+| `BORROW01`    | Non-`[RefPath]` reference to `[DynSized]` data         |
+| `BORROW02`    | Changing local `[DynSized]` reference is not supported |
+| `BORROW03`    | Local reference invalidation                           |
+| `BORROW04`    | Reference arguments aliasing                           |
+| `BORROW05`    | Reference escapes the access scope                     |
 
 ## DeallocAttribute
 
