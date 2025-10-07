@@ -31,7 +31,7 @@ public struc ParentStruct
 ```
 
 For moving ownership use the `Move` extension method:
-```
+```csharp
 var listA = RefList.Empty<int>();
 listA.RefAdd() = 42;
 var listB = listA.Move(); // `listA` copied to `listB` and then zeroed
