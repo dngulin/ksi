@@ -15,6 +15,21 @@ that enables referencing safety checks
 The `[ExplicitCopy]` attribute enforces move semantics for a marked struct preventing any implicit copying.
 It should be used for structures that have any `[ExplicitCopy]` fields like `RefList<T>`.
 
+Usage example:
+```csharp
+[ExplicitCopy]
+public struct ChildStruct
+{
+    public int UniqueId;
+}
+
+[ExplicitCopy] // <--- required because of the `ChildStruct` filed
+public struc ParentStruct
+{
+    public ChildStruct Child;
+}
+```
+
 For moving ownership use the `Move` extension method:
 ```
 var listA = RefList.Empty<int>();
@@ -69,6 +84,21 @@ And it also requires `[ExplicitCopy]` attribute.
 The main purpose of the attribute is to indicate types affected by compile time referencing safety analysis.
 For details see the [Referencing Rules](borrow-checker-at-home.md) section.
 
+Usage example:
+```csharp
+[ExplicitCopy, DynSized] // <--- required because of the `ManagedRefList<int>` filed
+public struct ChildStruct
+{
+    public ManagedRefList<int> Numbers;
+}
+
+[ExplicitCopy, DynSized] // <--- required because of the `ChildStruct` filed
+public struc ParentStruct
+{
+    public ChildStruct Child;
+}
+```
+
 ### DynSized Diagnostics
 
 Diagnostics related to the `[DynSized]` attribute:
@@ -93,6 +123,21 @@ Diagnostics related to the `[DynSized]` attribute:
 The `[Dealloc]` attribute indicates a type that should be deallocated with the `Dealloc` extension method.
 It requires `[ExplicitCopy]` attribute and should be used for structures that have
 any `[Dealloc]` fields like `RefList<T>`.
+
+Usage example:
+```csharp
+[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `RefList<int>` filed
+public struct MyStruct
+{
+    public RefList<int> Numbers;
+}
+
+[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `ChildStruct` filed
+public struc ParentStruct
+{
+    public ChildStruct Child;
+}
+```
 
 ### Generated Dealloc API
 
@@ -144,6 +189,21 @@ any `[TempAlloc]` fields like `TempRefList<T>`.
 
 `[TempAlloc]` types are similar to `ref struct` types,
 but can be used as generic parameters of `[TempAlloc]` collections.
+
+Usage example:
+```csharp
+[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `TempRefList<int>` filed
+public struct MyStruct
+{
+    public TempRefList<int> Numbers;
+}
+
+[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `ChildStruct` filed
+public struc ParentStruct
+{
+    public ChildStruct Child;
+}
+```
 
 ### TempAlloc Diagnostics
 
