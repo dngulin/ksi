@@ -127,7 +127,7 @@ any `[Dealloc]` fields like `RefList<T>`.
 Usage example:
 ```csharp
 [ExplicitCopy, DynSized, Dealloc] // <--- required because of the `RefList<int>` field
-public struct MyStruct
+public struct ChildStruct
 {
     public RefList<int> Numbers;
 }
@@ -193,7 +193,7 @@ but can be used as generic parameters of `[TempAlloc]` collections.
 Usage example:
 ```csharp
 [ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `TempRefList<int>` field
-public struct MyStruct
+public struct ChildStruct
 {
     public TempRefList<int> Numbers;
 }
