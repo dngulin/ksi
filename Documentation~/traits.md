@@ -1,10 +1,11 @@
 # Trait System
 
-ѯ-Framework defines a set of special attributes (traits) that enable extra diagnostics and code generation for marked structures:
+ѯ-Framework defines a set of special attributes (traits) that enable extra diagnostics
+and code generation for marked structures:
 
 - Structures that should not be implicitly copied should be marked with the `[ExplicitCopy]` attribute
 - Structures that own dynamically allocated data should be marked with the `[DynSized]` attribute
-It enables referencing safety checks
+that enables referencing safety checks
 - For some `[DynSized]` structures the allocator policy attribute is also required:
   - The `[Dealloc]` attribute generates deallocation API and enables extra diagnostics
   - The `[TempAlloc]` attribute makes deallocation not required in exchange to be stored only on stack
@@ -12,7 +13,7 @@ It enables referencing safety checks
 ## ExplicitCopyAttribute
 
 The `[ExplicitCopy]` attribute enforces move semantics for a marked struct preventing any implicit copying.
-And should be used for structures that have any `[ExplicitCopy]` fields like `RefList<T>`.
+It should be used for structures that have any `[ExplicitCopy]` fields like `RefList<T>`.
 
 For moving ownership use the `Move` extension method:
 ```
