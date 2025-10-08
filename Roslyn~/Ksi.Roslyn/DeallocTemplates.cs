@@ -5,11 +5,13 @@ namespace Ksi.Roslyn
         public static readonly string[] RefListExtensionNames = ["Dealloc", "Deallocated", "Clear", "RemoveAt"];
 
         public const string RefListDeallocItemsAndSelf =
+            // language=cs
             """
 
             /// <summary>
-            /// Specialized implementation for Dealloc item types
+            /// Deallocates collection and all items.
             /// </summary>
+            /// <param name="self">collection to deallocate</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -22,11 +24,13 @@ namespace Ksi.Roslyn
             """;
 
         public const string RefListDeallocOnlyItems =
+            // language=cs
             """
 
             /// <summary>
-            /// Specialized implementation for Dealloc item types
+            /// Deallocates all collection items.
             /// </summary>
+            /// <param name="self">collection to deallocate items</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -35,12 +39,15 @@ namespace Ksi.Roslyn
             """;
 
         public const string RefListDeallocated =
+            // language=cs
             """
 
             /// <summary>
-            /// Specialized implementation for Dealloc item types
+            /// Deallcoates the collection and returns it.
             /// </summary>
-            [NonAllocatedResult]
+            /// <param name="self">collection to deallocate</param>
+            /// <returns>`self` as an assignable reference</returns>
+            [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0}<{1}> Deallocated(this ref {0}<{1}> self)
             {{
                 self.Dealloc();
@@ -49,11 +56,13 @@ namespace Ksi.Roslyn
             """;
 
         public const string RefListSpecialized =
+            // language=cs
             """
 
             /// <summary>
-            /// Specialized implementation for Dealloc item types
+            /// Clears the collection and deallocates all items. 
             /// </summary>
+            /// <param name="self">collection to clear</param>
             public static void Clear(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -65,8 +74,10 @@ namespace Ksi.Roslyn
             }}
 
             /// <summary>
-            /// Specialized implementation for Dealloc item types
+            /// Removes an item from the collection and deallcoates it.
             /// </summary>
+            /// <param name="self">collection to remove an item</param>
+            /// <param name="index">index of the item to remove</param>
             public static void RemoveAt(this ref {0}<{1}> self, int index)
             {{
                 self.RefAt(index).Dealloc();
@@ -78,8 +89,14 @@ namespace Ksi.Roslyn
             """;
 
         public const string DeallocatedExtension =
+            // language=cs
             """
 
+            /// <summary>
+            /// Deallcoates the structure owned resources and returns it.
+            /// </summary>
+            /// <param name="self">structure to deallocate</param>
+            /// <returns>`self` as an assignable reference</returns>
             [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0} Deallocated(this ref {0} self)
             {{

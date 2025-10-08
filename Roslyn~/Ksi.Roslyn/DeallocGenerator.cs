@@ -130,6 +130,10 @@ namespace Ksi.Roslyn
         private static void EmitDeallocMethods(in AppendScope cls, DeallocInfo entry)
         {
             var t = entry.Type;
+            cls.AppendLine("/// <summary>");
+            cls.AppendLine("/// Deallocates all owned resources by the structure.");
+            cls.AppendLine("/// </summary>");
+            cls.AppendLine("""/// <param name="self">structure to deallocate</param>""");
             using (var m = cls.PubStat($"void Dealloc(this ref {t} self)"))
             {
                 foreach (var f in entry.Fields)
