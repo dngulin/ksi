@@ -162,11 +162,11 @@ public struct RootStruct
 var root = new RootStruct();
 
 ref var a = ref root.ListOfDyn.RefAt(0); // root.ListOfDyn[n]!
-ref var b = ref root.ListOfDyn.RefAt(0).Numbers; // root.ListOfDyn[n].Numbers!
-ref var c = ref root.ListOfDyn.RefAt(0).Numbers.RefAt(0); // root.ListOfDyn[n].Numbers![n]
+ref var b = ref a.Numbers; // root.ListOfDyn[n].Numbers!
+ref var c = ref b.RefAt(0); // root.ListOfDyn[n].Numbers![n]
 
 ref var x = ref root.ListOfNonDyn[0]; // root.ListOfNonDyn![n]
-ref var y = ref root.ListOfNonDyn[0].Number; // root.ListOfNonDyn![n].Number
+ref var y = ref x.Number; // root.ListOfNonDyn![n].Number
 ```
 
 ### RefPathAttribute
