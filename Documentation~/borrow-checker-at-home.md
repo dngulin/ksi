@@ -65,7 +65,35 @@ Each access scope is `IDisposable` structure that provides by-ref access to the 
 Only one access scope can be active at a time.
 Creating a new access scope within other access scope's lifetime throws the `InvalidOperationException`.
 
+Example:
+```csharp
+[ExplicitCopy, DynSized, Dealloc]
+public struct DynStruct { public RefList<int> List; }
+
+public class DataOwner
+{
+    private readonly ExclusiveAccess<DynStruct> _data = new ExclusiveAccess<DynStruct>();
+    
+    public void IncrementFirstItem()
+    {
+        using var data = _data.Mutable;
+        
+        ref var x = data.Value.List.RefAt(0);
+        DeallocList(); // Throws InvalidOperationException
+        x++;
+    }
+    
+    private void DeallocList()
+    {
+        using var data = _data.Mutable;
+        data.Value.List.Dealloc();
+    }
+}
+```
+
 ## RefLike Types Support
+
+TBD
 
 ## RefPath
 
