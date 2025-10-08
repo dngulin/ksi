@@ -8,6 +8,10 @@
         <LangVersion>9</LangVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\netstandard2.1\Ksi.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Include="..\..\Runtime\**\*.cs" />
     </ItemGroup>
