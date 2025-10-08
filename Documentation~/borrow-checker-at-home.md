@@ -172,4 +172,56 @@ ref var y = ref x.Number; // root.ListOfNonDyn![n].Number
 
 ### RefPathAttribute
 
-TBD
+In some cases it is necessary to get an internal reference applying some logic.
+The `[RefPath]` attribute serves this purpose.
+
+You can use it to mark extension methods that return inner references:
+```csharp
+[ExplicitCopy, DynSized, Dealloc]
+public struct State
+{
+    public RefList<Item> Left;
+    public RefList<Item> Right;
+}
+
+[RefPath]
+public static ref RefList<Item> CurrentSide(this ref State self, int turn)
+{
+    if (turn % 2 == 0)
+        return ref self.Left;
+
+    return ref self.Right;
+}
+
+var state = CreateState();
+ref var items = ref state.CurrentSide(turn); // state.CurrentSide()!
+ProcessItems(ref items);
+```
+
+In the given example the `CurrentSide()` segment is a _non-explicit segment_.
+That means it _can reference any internal data_ of the `state`.
+
+> [!WARNING]
+> Extensive usage of non-explicit references can trigger redundant reference compatibility errors
+> because the analyzer can compare only explicit parts of paths.
+
+If your extension method returns the same reference every time,
+you can avoid that problem by passing the returning path to the `[RefPath]` attribute:
+
+```csharp
+[ExplicitCopy, DynSized, Dealloc]
+public struct State { public RefList<Item> Items; }
+
+[RefPath("self", "Items", "[n]", "!")]
+public static ref RefList<Item> RefItemAt(this ref State self, int idx)
+{
+    return ref self.Items.RefAt(idx);
+}
+
+var state = CreateState();
+ref var item = ref state.RefItemAt(42); // state.Items[n]!
+```
+
+> [!NOTE]
+> When you pass the explicit path to the `[RefPath]` attribute,
+> you have to pass a DynSized separator "!" as a segment.
