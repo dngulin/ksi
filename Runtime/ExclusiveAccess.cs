@@ -2,6 +2,11 @@ using System;
 
 namespace Ksi
 {
+    /// <summary>
+    /// Container designed to provide exclusive access to inner data.
+    /// It is achieved by maintaining only one active `MutableAccessScope` or `ReadOnlyAccessScope` wrapping inner data.
+    /// Supposed to wrap `[DynSized]` structures.
+    /// </summary>
     public sealed class ExclusiveAccess<T> where T: struct
     {
         private T _value;
@@ -9,8 +14,20 @@ namespace Ksi
         private ulong _nextAccessId;
         private ulong _activeAccessId;
 
+        /// <summary>
+        /// Creates a new instance of `MutableAccessScope`.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+        /// </exception>
         public MutableAccessScope<T> Mutable => new MutableAccessScope<T>(this, GetNextAccessId());
 
+        /// <summary>
+        /// Creates a new instance of `ReadOnlyAccessScope`.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+        /// </exception>
         public ReadOnlyAccessScope<T> ReadOnly => new ReadOnlyAccessScope<T>(this, GetNextAccessId());
 
         private ulong GetNextAccessId()
@@ -41,6 +58,10 @@ namespace Ksi
         }
     }
 
+    /// <summary>
+    /// Structure that provides mutable exclusive access to wrapped data.
+    /// Should be disposed after usage to release the lock on data.
+    /// </summary>
     public readonly ref struct MutableAccessScope<T> where T : struct
     {
         private readonly ExclusiveAccess<T> _exclusive;
@@ -52,10 +73,24 @@ namespace Ksi
             _accessId = accessId;
         }
 
+        /// <summary>
+        /// Returns a mutable reference to the wrapped data.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If the data is not available to this access scope (e.g. usage after disposing).
+        /// </exception>
         public ref T Value => ref _exclusive.Access(_accessId);
+
+        /// <summary>
+        /// Deactivates this access scope but allows creating a new one.
+        /// </summary>
         public void Dispose() => _exclusive?.Unlock(_accessId);
     }
 
+    /// <summary>
+    /// Structure that provides readonly exclusive access to wrapped data.
+    /// Should be disposed after usage to release the lock on data.
+    /// </summary>
     public readonly ref struct ReadOnlyAccessScope<T> where T : struct
     {
         private readonly ExclusiveAccess<T> _exclusive;
@@ -67,7 +102,17 @@ namespace Ksi
             _accessId = accessId;
         }
 
+        /// <summary>
+        /// Returns a readonly reference to the wrapped data.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// If the data is not available to this access scope (e.g. usage after disposing).
+        /// </exception>
         public ref readonly T Value => ref _exclusive.Access(_accessId);
+
+        /// <summary>
+        /// Deactivates this access scope but allows creating a new one.
+        /// </summary>
         public void Dispose() => _exclusive?.Unlock(_accessId);
     }
 }
