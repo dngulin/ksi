@@ -3,7 +3,7 @@
 Referencing rules are based on the `[DynSized]` type usage analysis.
 Any change to dynamically sized data can invalidate existing references.
 
-There are two reference safety cases:
+There are two reference invalidation cases:
 - Passing a mutable reference to `[DynSized]` data within the lifetime
 of a local reference that is derived from the same data:
     ```csharp
@@ -29,6 +29,10 @@ that is derived from the same data or can produce a reference derived from the s
     // It is possible to clear or re-allcoate the list within the method,
     // so the `x` argument will point to unreachable or deallcoated memory
     ```
+
+> [!NOTE]
+> For analyzers' simplicity reasons,
+> reassigning local references derived from `[DynSized]` data is not allowed.
 
 In some cases when mutable access doesn't require resizing any collections,
 you can mark the method parameter with the `[DynNoResize]` attribute.
