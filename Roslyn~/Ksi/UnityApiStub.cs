@@ -1,3 +1,5 @@
+#pragma warning disable CS1591
+
 // ReSharper disable once CheckNamespace
 namespace Unity.Collections
 {
