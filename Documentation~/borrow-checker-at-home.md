@@ -58,7 +58,7 @@ It has two access properties that return mutable and read-only access scopes:
 - `public MutableAccessScope<T> Mutable { get; }`
 - `public ReadOnlyAccessScope<T> ReadOnly { get; }`
 
-Each access scope is `IDisposable` structure that provides by-ref access to the data:
+Each access scope is a disposable ref-struct that provides by-ref access to the data:
 - `public ref T MutableAccessScope<T>.Value { get; }`
 - `public ref readonly T ReadOnlyAccessScope<T>.Value { get; }`
 
@@ -93,7 +93,14 @@ public class DataOwner
 
 ## RefLike Types Support
 
-TBD
+Reference safety analyzers support only these `ref struct` types:
+- `Span<T>` and `ReadOnlySpan<T>` derived from a `[RefList]` collection
+- `MutableAccessScope<T>` and `ReadOnlyAccessScope<T>` for top-level data access
+
+It is recommended to use spans only to work with external libraries that are not dependent on the ѯ-Framework.
+
+> [!WARNING]
+> Wrapping references derived from `[DynSized]` data into any other RefLike type can cause memory access errors.
 
 ## RefPath
 
