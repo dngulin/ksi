@@ -99,14 +99,15 @@ Reference safety analyzers support only these `ref struct` types:
 
 It is recommended to use spans only to work with external libraries that are not dependent on the ѯ-Framework.
 
-> [!WARNING]
-> Wrapping references derived from `[DynSized]` data into any other RefLike type can cause memory access errors.
+> [!CAUTION]
+> Wrapping references derived from `[DynSized]` data into any other RefLike types can cause memory access errors.
 
 ## RefPath
 
 To make the safety checks possible by Roslyn analyzers,
 there is a strict requirement for referencing `[DynSized]` data:
 
+> [!IMPORTANT]
 > If expression returns a reference and also references a `[DynSized]` data,
 > it should be a `RefPath`-compatible expression.
 

@@ -51,7 +51,7 @@ for the marked type and possible containers:
 
 Where `TStruct` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
 
-> [!WARNING]
+> [!IMPORTANT]
 > Explicit copy extension methods require access to the structure fields and their types:
 > - the structure cannot have private fields
 > - the structure cannot be generic
@@ -164,7 +164,7 @@ It also generates specialized API calls for [compatible collections](collections
 If you are sure that your method returns a deallocated instance, you can use the `[NonAllocatedResult]` attribute
 to suppress the `DEALLOC04` diagnostic.
 
-> [!WARNING]
+> [!CAUTION]
 > There is no diagnostic analyzer to verify if the instance is actually deallocated.
 > Incorrect usage of the attribute can cause memory leaks due to missing deallocation.
 
