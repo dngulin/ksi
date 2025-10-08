@@ -6,11 +6,11 @@ and code generation for marked structures:
 - Structures that should not be implicitly copied should be marked with the `[ExplicitCopy]` attribute
 - Structures that own dynamically allocated data should be marked with the `[DynSized]` attribute
 that enables referencing safety checks
-- For some `[DynSized]` structures the allocator policy attribute is also required:
+- For some `[DynSized]` structures the allocator policy trait is also required:
   - The `[Dealloc]` attribute generates deallocation API and enables extra diagnostics
   - The `[TempAlloc]` attribute makes deallocation not required in exchange to be stored only on stack
 
-## ExplicitCopyAttribute
+## ExplicitCopy Attribute
 
 The `[ExplicitCopy]` attribute enforces move semantics for a marked struct preventing any implicit copying.
 It should be used for structures that have any `[ExplicitCopy]` fields like `RefList<T>`.
@@ -75,7 +75,7 @@ Diagnostics related to the `[ExplicitCopy]` attribute:
 | `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument        |
 | `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items      |
 
-## DynSizedAttribute
+## DynSized Attribute
 
 The `[DynSized]` attribute indicates that the structure owns dynamically allocated data.
 It should be used for structures that have any `[DynSized]` fields like `RefList<T>`.
@@ -118,7 +118,7 @@ Diagnostics related to the `[DynSized]` attribute:
 | `BORROW04`    | Error    | Reference arguments aliasing                           |
 | `BORROW05`    | Error    | Reference escapes the access scope                     |
 
-## DeallocAttribute
+## Dealloc Attribute
 
 The `[Dealloc]` attribute indicates a type that should be deallocated with the `Dealloc` extension method.
 It requires `[ExplicitCopy]` attribute and should be used for structures that have
@@ -159,7 +159,7 @@ It also generates specialized API calls for [compatible collections](collections
 > that don't require deallocation like `TempRefList<T>`.
 > In that case collection items are deallocated, but the collection itself is not cleared
 
-### NonAllocatedResultAttribute
+### NonAllocatedResult Attribute
 
 If you are sure that your method returns a deallocated instance, you can use the `[NonAllocatedResult]` attribute
 to suppress the `DEALLOC04` diagnostic.
@@ -191,7 +191,7 @@ Diagnostics related to the `[Dealloc]` attribute:
 | `DEALLOC05`   | Error    | Unused `[Dealloc]` instance                        |
 | `DEALLOC06`   | Error    | Passing `[Dealloc]` instance as a generic argument |
 
-## TempAllocAttribute
+## TempAlloc Attribute
 
 The `[TempAlloc]` attribute indicates a type that should be stored only on stack.
 It requires `[ExplicitCopy]` attribute and should be used for structures that have
