@@ -51,7 +51,7 @@ namespace Ksi.Roslyn
                 foreach (var (t, c) in entries)
                 {
                     ctx.AddSource($"{t}.g.cs", string.Format(RefListTemplates.StaticApi, t, c));
-                    ctx.AddSource($"{t}.Impl.g.cs", string.Format(RefListTemplates.InstanceApi, t, c));
+                    ctx.AddSource($"{t}.Api.g.cs", string.Format(RefListTemplates.InstanceApi, t, c));
                     ctx.AddSource($"{t}.Iterators.g.cs", string.Format(RefListTemplates.Iterators, t, c));
                     ctx.AddSource($"{t}.StringExt.g.cs", string.Format(RefListTemplates.StringExt, t));
 
