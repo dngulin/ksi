@@ -133,6 +133,7 @@ Internally `RefPath` is composed of:
 - `Segments` - array of strings representing the reference path
 - `DynSizedLength` - number of segments that point to a `[DynSized]` data
 - `ExplicitLength` - number of segments that explicitly point to some data
+(number of segments before the first extension method in the path)
 
 Every segment can be one of the following:
 - local symbol name (variable or parameter)
