@@ -35,7 +35,8 @@ you can mark the method parameter with the `[DynNoResize]` attribute.
 It will disallow resizing but keep mutable data access.
 
 ```csharp
-void DoSomething([DynNoResize] ref RefList<int> list) {
+void DoSomething([DynNoResize] ref RefList<int> list)
+{
     list.Clear();
 //  ^^^^ Error: DYNSIZED04
 // It is not possible to resize a parameter that is marked with [DynNoResize]
@@ -44,7 +45,27 @@ void DoSomething([DynNoResize] ref RefList<int> list) {
 
 ## ExclusiveAccess\<T\>
 
-TBD
+Referencing rules make analyzers' logic quite simple, but it handles only parameters and local symbols.
+
+It is not possible to quickly verify reference compatibility between by-ref arguments and local fields
+because it is not possible to check if the argument is derived from the same field or not.
+Furthermore, calling non-static methods having a reference to a `[DynSized]` field can also invalidate the reference.
+
+To solve this problem, ѯ-Framework provides the `ExclusiveAccess<T>` type.
+It is a wrapper around the `[DynSized]` data, that guarantees that the owned data is exclusively accessed.
+
+It has two access properties that return mutable and read-only access scopes:
+- `public MutableAccessScope<T> Mutable { get; }`
+- `public ReadOnlyAccessScope<T> ReadOnly { get; }`
+
+Each access scope is `IDisposable` structure that provides by-ref access to the data:
+- `public ref T MutableAccessScope<T>.Value { get; }`
+- `public ref readonly T ReadOnlyAccessScope<T>.Value { get; }`
+
+Only one access scope can be active at a time.
+Creating a new access scope within other access scope's lifetime throws the `InvalidOperationException`.
+
+## RefLike Types Support
 
 ## RefPath
 
