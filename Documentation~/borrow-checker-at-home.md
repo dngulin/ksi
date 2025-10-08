@@ -127,9 +127,47 @@ A valid `RefPath` expression should be composed of:
 - `(ReadOnly)AccessScope<T>.Value` property
 - `[RefPath]` extension methods
 
-### RefPath Items
+### RefPath Representation
 
-TBD
+Internally `RefPath` is composed of:
+- `Segments` - array of strings representing the reference path
+- `DynSizedLength` - number of segments that point to a `[DynSized]` data
+- `ExplicitLength` - number of segments that explicitly point to some data
+
+Every segment can be one of the following:
+- local symbol name (variable or parameter)
+- field name
+- collection indexer `[n]`
+- `[RefPath]` extension method name suffixed with `()`, e.g. `ExtMethodName()`
+
+In the string representation the last `[DynSized]` segment is suffixed with `!` symbol, e.g. `myData.List![n]`.
+
+> [!NOTE]
+> Note that `[DynSized]` struct can contain a non-`[DynSized]` data but not vice versa.
+
+Examples:
+```csharp
+[ExplicitCopy, DynSized, Dealloc]
+public struct DynStruct { public RefList<int> Numbers; }
+
+public struct NonDynStruct { public int Number; }
+
+[ExplicitCopy, DynSized, Dealloc]
+public struct RootStruct
+{
+    public RefList<DynStruct> ListOfDyn;
+    public RefList<NonDynStruct> ListOfNonDyn;
+}
+
+var root = new RootStruct();
+
+ref var a = ref root.ListOfDyn.RefAt(0); // root.ListOfDyn[n]!
+ref var b = ref root.ListOfDyn.RefAt(0).Numbers; // root.ListOfDyn[n].Numbers!
+ref var c = ref root.ListOfDyn.RefAt(0).Numbers.RefAt(0); // root.ListOfDyn[n].Numbers![n]
+
+ref var x = ref root.ListOfNonDyn[0]; // root.ListOfNonDyn![n]
+ref var y = ref root.ListOfNonDyn[0].Number; // root.ListOfNonDyn![n].Number
+```
 
 ### RefPathAttribute
 
