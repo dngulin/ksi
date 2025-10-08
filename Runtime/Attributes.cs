@@ -89,7 +89,27 @@ namespace Ksi
     /// </summary>
     public class RefPathAttribute : Attribute
     {
+        /// <summary>
+        /// List of segments indicating the `RefPath` created by the marked extension method.
+        /// Is empty array in case of the non-explicit `RefPath`.
+        /// Can contain the `[DynSized]` separator "!".
+        /// </summary>
         public string[] Segments { get; }
+
+        /// <summary>
+        /// Non-explicit `[RefPath]` attribute constructor.
+        /// Will be embedded into the calling expression `RefPath` as the method name suffixed with "()".
+        /// </summary>
+        public RefPathAttribute() => Segments = Array.Empty<string>();
+
+        /// <summary>
+        /// Explicit `[RefPath]` attribute constructor.
+        /// Will be embedded into the calling expression `RefPath` as a sequence of segments.
+        /// </summary>
+        /// <param name="segments">
+        /// Array of segments produced by return expression.
+        /// The `[DynSized]` separator "!" should be passed as a separated segment.
+        /// </param>
         public RefPathAttribute(params string[] segments) => Segments = segments;
     }
 }
