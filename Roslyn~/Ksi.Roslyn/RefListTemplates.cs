@@ -20,7 +20,7 @@ public static class RefListTemplates
                 public static {0}<T> Empty<T>() where T : {1} => default;
 
                 /// <summary>
-                /// Creates a list with a given capacity
+                /// Creates a list with a given capacity.
                 /// </summary>
                 /// <param name="capacity">capacity of the list</param>
                 public static {0}<T> WithCapacity<T>(int capacity) where T : {1}
@@ -31,7 +31,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Creates a list filled with `default` items
+                /// Creates a list filled with `default` items.
                 /// </summary>
                 /// <param name="count">number of items</param>
                 public static {0}<T> WithDefaultItems<T>(int count) where T : {1}
@@ -59,7 +59,7 @@ public static class RefListTemplates
             public static class {0}_Api
             {{
                 /// <summary>
-                /// Returns capacity of the given list
+                /// Returns capacity of the given list.
                 /// </summary>
                 /// <param name="self">list to get capacity</param>
                 /// <returns>capacity of the given list (zero if the buffer is deallocated)</returns>
@@ -73,7 +73,7 @@ public static class RefListTemplates
                 public static int Count<T>(this in {0}<T> self) where T : {1} => self.Count;
 
                 /// <summary>
-                /// Returns a readonly reference to a list item
+                /// Returns a readonly reference to a list item.
                 /// </summary>
                 /// <param name="self">list to get an item reference</param>
                 /// <param name="index">required item index</param>
@@ -88,7 +88,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Returns a mutable reference to a list item
+                /// Returns a mutable reference to a list item.
                 /// </summary>
                 /// <param name="self">list to get an item reference</param>
                 /// <param name="index">required item index</param>
@@ -102,12 +102,22 @@ public static class RefListTemplates
                     return ref self.IndexBufferMut(index);
                 }}
 
+                /// <summary>
+                /// Adds a new item to the list.
+                /// </summary>
+                /// <param name="self">list to add an item</param>
+                /// <param name="item">item to add to the list</param>
                 public static void Add<T>(this ref {0}<T> self, T item) where T : {1}
                 {{
                     self.EnsureCanAdd();
                     self.IndexBufferMut(self.Count++) = item;
                 }}
 
+                /// <summary>
+                /// Adds a `default` item to the list and returns a mutable reference to it.
+                /// </summary>
+                /// <param name="self">list to add an item</param>
+                /// <returns>a mutable reference to the created item</returns>
                 [NonAllocatedResult, RefListIndexer]
                 public static ref T RefAdd<T>(this ref {0}<T> self) where T : {1}
                 {{
@@ -124,6 +134,11 @@ public static class RefListTemplates
                     self.SetBufferSize(newSize);
                 }}
 
+                /// <summary>
+                /// Removes an item from the list at the given index.
+                /// </summary>
+                /// <param name="self">list to remove the item</param>
+                /// <param name="index">an index to remove the item</param>
                 public static void RemoveAt<T>(this ref {0}<T> self, int index) where T : {1}
                 {{
                     if (index < 0 || index >= self.Count)
@@ -134,6 +149,10 @@ public static class RefListTemplates
                     self.IndexBufferMut(self.Count) = default;
                 }}
 
+                /// <summary>
+                /// Removes all items from the list.
+                /// </summary>
+                /// <param name="self">list to clear</param>
                 public static void Clear<T>(this ref {0}<T> self) where T : {1}
                 {{
                     if (self.Count == 0)
@@ -143,6 +162,11 @@ public static class RefListTemplates
                     self.Count = 0;
                 }}
 
+                /// <summary>
+                /// Adds a specified number of `default` items.
+                /// </summary>
+                /// <param name="self">list add items</param>
+                /// <param name="count">number of items to add</param>
                 public static void AppendDefault<T>(this ref {0}<T> self, int count) where T : {1}
                 {{
                     if (count < 0)
@@ -156,6 +180,12 @@ public static class RefListTemplates
                     self.Count = newCount;
                 }}
 
+                /// <summary>
+                /// Copies all items from another list.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination list</param>
+                /// <param name="other">source list</param>
                 public static void CopyFrom<T>(this ref {0}<T> self, in {0}<T> other) where T : {1}
                 {{
                     self.Clear();
@@ -163,6 +193,12 @@ public static class RefListTemplates
                     self.CopyBufferFrom(other);
                 }}
 
+                /// <summary>
+                /// Copies all items to another list.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source list</param>
+                /// <param name="other">destination list</param>
                 public static void CopyTo<T>(this in {0}<T> self, ref {0}<T> other) where T : {1}
                 {{
                     other.CopyFrom(self);
