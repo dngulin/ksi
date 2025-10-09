@@ -111,14 +111,19 @@ namespace Ksi.Roslyn
                         file.AppendLine("");
 
                         using (var ns = file.OptNamespace(entry.Namespace))
-                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_Dealloc"))
                         {
-                            EmitDeallocMethods(cls, entry);
+                            ns.AppendLine("/// <summary>");
+                            ns.AppendLine($"/// Deallocation extensions for {entry.Type}");
+                            ns.AppendLine("/// </summary>");
+                            using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_Dealloc"))
+                            {
+                                EmitDeallocMethods(cls, entry);
 
-                            var kinds = entry.Traits.ToRefListKinds();
-                            kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, entry.Type);
-                            kinds.Emit(cls, RefListDeallocated, entry.Type);
-                            kinds.Emit(cls, RefListSpecialized, entry.Type);
+                                var kinds = entry.Traits.ToRefListKinds();
+                                kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, entry.Type);
+                                kinds.Emit(cls, RefListDeallocated, entry.Type);
+                                kinds.Emit(cls, RefListSpecialized, entry.Type);
+                            }
                         }
                     }
 
