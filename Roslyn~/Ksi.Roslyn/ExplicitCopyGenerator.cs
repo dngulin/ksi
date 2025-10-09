@@ -112,12 +112,17 @@ namespace Ksi.Roslyn
                         file.AppendLine("");
 
                         using (var ns = file.OptNamespace(entry.Namespace))
-                        using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_ExplicitCopy"))
                         {
-                            EmitExplicitCopyMethods(cls, entry);
+                            ns.AppendLine("/// <summary>");
+                            ns.AppendLine($"/// Explicit copy extensions for {entry.Type}");
+                            ns.AppendLine("/// </summary>");
+                            using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_ExplicitCopy"))
+                            {
+                                EmitExplicitCopyMethods(cls, entry);
 
-                            var template = entry.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
-                            entry.Traits.ToRefListKinds().Emit(cls, template, entry.Type);
+                                var template = entry.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
+                                entry.Traits.ToRefListKinds().Emit(cls, template, entry.Type);
+                            }
                         }
                     }
 
@@ -129,6 +134,12 @@ namespace Ksi.Roslyn
         private static void EmitExplicitCopyMethods(in AppendScope cls, TypeInfo entry)
         {
             var t = entry.Type;
+            cls.AppendLine("/// <summary>");
+            cls.AppendLine("/// Copies all structure fields from another using explicit copy extension methods.");
+            cls.AppendLine("/// All items existing before copying are removed.");
+            cls.AppendLine("/// </summary>");
+            cls.AppendLine("""/// <param name="self">destination structure</param>""");
+            cls.AppendLine("""/// <param name="other">source structure</param>""");
             using (var m = cls.PubStat($"void CopyFrom(this ref {t} self, in {t} other)"))
             {
                 foreach (var (f, copy) in entry.Fields)
@@ -136,6 +147,12 @@ namespace Ksi.Roslyn
             }
 
             cls.AppendLine("");
+            cls.AppendLine("/// <summary>");
+            cls.AppendLine("/// Copies all structure fields to another using explicit copy extension methods.");
+            cls.AppendLine("/// All items existing before copying are removed.");
+            cls.AppendLine("/// </summary>");
+            cls.AppendLine("""/// <param name="self">source structure</param>""");
+            cls.AppendLine("""/// <param name="other">destination structure</param>""");
             using (var m = cls.PubStat($"void CopyTo(this in {t} self, ref {t} other)"))
             {
                 m.AppendLine("other.CopyFrom(self);");
