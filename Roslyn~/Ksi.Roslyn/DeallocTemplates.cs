@@ -9,9 +9,10 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocates collection and all items.
+            /// Deallocates the list and all items.
+            /// After deallocation the structure becomes zeroed.
             /// </summary>
-            /// <param name="self">collection to deallocate</param>
+            /// <param name="self">list to deallocate</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -28,9 +29,10 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocates all collection items.
+            /// Deallocates all list items.
+            /// After deallocation list is not cleared.
             /// </summary>
-            /// <param name="self">collection to deallocate items</param>
+            /// <param name="self">list to deallocate items</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -43,10 +45,10 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallcoates the collection and returns it.
+            /// Deallcoates the list and returns it.
             /// </summary>
-            /// <param name="self">collection to deallocate</param>
-            /// <returns>`self` as an assignable reference</returns>
+            /// <param name="self">list to deallocate</param>
+            /// <returns>the list as an assignable reference</returns>
             [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0}<{1}> Deallocated(this ref {0}<{1}> self)
             {{
@@ -60,9 +62,9 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Clears the collection and deallocates all items. 
+            /// Clears the list and deallocates all items. 
             /// </summary>
-            /// <param name="self">collection to clear</param>
+            /// <param name="self">list to clear</param>
             public static void Clear(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -74,9 +76,9 @@ namespace Ksi.Roslyn
             }}
 
             /// <summary>
-            /// Removes an item from the collection and deallcoates it.
+            /// Removes an item from the list and deallcoates it.
             /// </summary>
-            /// <param name="self">collection to remove an item</param>
+            /// <param name="self">list to remove an item</param>
             /// <param name="index">index of the item to remove</param>
             public static void RemoveAt(this ref {0}<{1}> self, int index)
             {{
@@ -96,7 +98,7 @@ namespace Ksi.Roslyn
             /// Deallcoates the structure owned resources and returns it.
             /// </summary>
             /// <param name="self">structure to deallocate</param>
-            /// <returns>`self` as an assignable reference</returns>
+            /// <returns>the structure as an assignable reference</returns>
             [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0} Deallocated(this ref {0} self)
             {{
