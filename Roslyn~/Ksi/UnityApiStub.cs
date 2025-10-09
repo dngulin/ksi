@@ -1,14 +1,12 @@
-#pragma warning disable CS1591
-
 // ReSharper disable once CheckNamespace
 namespace Unity.Collections
 {
     using System;
 
-    public enum Allocator { Persistent, Temp, }
+    internal enum Allocator { Persistent, Temp, }
 
     namespace LowLevel.Unsafe {
-        public static class UnsafeUtility
+        internal static class UnsafeUtility
         {
             public static unsafe void* Malloc(long size, int alignment, Allocator allocator) => throw new NotSupportedException();
             public static unsafe void Free(void* memory, Allocator allocator) => throw new NotSupportedException();
