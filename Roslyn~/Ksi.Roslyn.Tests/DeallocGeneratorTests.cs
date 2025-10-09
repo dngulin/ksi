@@ -27,8 +27,15 @@ public class DeallocGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Deallocation extensions for MyStruct
+            /// </summary>
             public static class MyStruct_Dealloc
             {
+                /// <summary>
+                /// Deallocate all owned resources by the structure.
+                /// </summary>
+                /// <param name="self">structure to deallocate</param>
                 public static void Dealloc(this ref MyStruct self)
                 {
                     self.Collection.Dealloc();
@@ -73,8 +80,15 @@ public class DeallocGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Deallocation extensions for MyStruct
+            /// </summary>
             public static class MyStruct_Dealloc
             {
+                /// <summary>
+                /// Deallocate all owned resources by the structure.
+                /// </summary>
+                /// <param name="self">structure to deallocate</param>
                 public static void Dealloc(this ref MyStruct self)
                 {
                     self.Collection.Dealloc();
@@ -113,8 +127,15 @@ public class DeallocGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Deallocation extensions for MyStruct
+            /// </summary>
             public static class MyStruct_Dealloc
             {
+                /// <summary>
+                /// Deallocate all owned resources by the structure.
+                /// </summary>
+                /// <param name="self">structure to deallocate</param>
                 public static void Dealloc(this ref MyStruct self)
                 {
                     self.Collection.Dealloc();
@@ -154,8 +175,15 @@ public class DeallocGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Deallocation extensions for MyStruct
+            /// </summary>
             public static class MyStruct_Dealloc
             {
+                /// <summary>
+                /// Deallocate all owned resources by the structure.
+                /// </summary>
+                /// <param name="self">structure to deallocate</param>
                 public static void Dealloc(this ref MyStruct self)
                 {
                     self.Collection.Dealloc();
@@ -197,8 +225,15 @@ public class DeallocGeneratorTests
 
             namespace Test.Ns
             {
+                /// <summary>
+                /// Deallocation extensions for MyStruct
+                /// </summary>
                 public static class MyStruct_Dealloc
                 {
+                    /// <summary>
+                    /// Deallocate all owned resources by the structure.
+                    /// </summary>
+                    /// <param name="self">structure to deallocate</param>
                     public static void Dealloc(this ref MyStruct self)
                     {
                         self.Collection.Dealloc();
@@ -239,8 +274,15 @@ public class DeallocGeneratorTests
             """
             using Ksi;
             
+            /// <summary>
+            /// Deallocation extensions for EnclosingType.MyStruct
+            /// </summary>
             public static class EnclosingType_MyStruct_Dealloc
             {
+                /// <summary>
+                /// Deallocate all owned resources by the structure.
+                /// </summary>
+                /// <param name="self">structure to deallocate</param>
                 public static void Dealloc(this ref EnclosingType.MyStruct self)
                 {
                     self.Collection.Dealloc();

@@ -27,14 +27,29 @@ public class ExplicitCopyGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Explicit copy extensions for MyStruct
+            /// </summary>
             public static class MyStruct_ExplicitCopy
             {
+                /// <summary>
+                /// Copies all structure fields from another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination structure</param>
+                /// <param name="other">source structure</param>
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
                     self.Primitive = other.Primitive;
                     self.Collection.CopyFrom(other.Collection);
                 }
                 
+                /// <summary>
+                /// Copies all structure fields to another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source structure</param>
+                /// <param name="other">destination structure</param>
                 public static void CopyTo(this in MyStruct self, ref MyStruct other)
                 {
                     other.CopyFrom(self);
@@ -71,14 +86,29 @@ public class ExplicitCopyGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Explicit copy extensions for MyStruct
+            /// </summary>
             public static class MyStruct_ExplicitCopy
             {
+                /// <summary>
+                /// Copies all structure fields from another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination structure</param>
+                /// <param name="other">source structure</param>
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
                     self.Primitive = other.Primitive;
                     self.Collection.CopyFrom(other.Collection);
                 }
                 
+                /// <summary>
+                /// Copies all structure fields to another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source structure</param>
+                /// <param name="other">destination structure</param>
                 public static void CopyTo(this in MyStruct self, ref MyStruct other)
                 {
                     other.CopyFrom(self);
@@ -113,14 +143,29 @@ public class ExplicitCopyGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Explicit copy extensions for MyStruct
+            /// </summary>
             public static class MyStruct_ExplicitCopy
             {
+                /// <summary>
+                /// Copies all structure fields from another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination structure</param>
+                /// <param name="other">source structure</param>
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
                     self.Primitive = other.Primitive;
                     self.Collection.CopyFrom(other.Collection);
                 }
                 
+                /// <summary>
+                /// Copies all structure fields to another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source structure</param>
+                /// <param name="other">destination structure</param>
                 public static void CopyTo(this in MyStruct self, ref MyStruct other)
                 {
                     other.CopyFrom(self);
@@ -155,14 +200,29 @@ public class ExplicitCopyGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Explicit copy extensions for MyStruct
+            /// </summary>
             public static class MyStruct_ExplicitCopy
             {
+                /// <summary>
+                /// Copies all structure fields from another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination structure</param>
+                /// <param name="other">source structure</param>
                 public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                 {
                     self.ManagedPrimitive = other.ManagedPrimitive;
                     self.Collection.CopyFrom(other.Collection);
                 }
                 
+                /// <summary>
+                /// Copies all structure fields to another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source structure</param>
+                /// <param name="other">destination structure</param>
                 public static void CopyTo(this in MyStruct self, ref MyStruct other)
                 {
                     other.CopyFrom(self);
@@ -198,14 +258,29 @@ public class ExplicitCopyGeneratorTests
 
             namespace Test.Ns
             {
+                /// <summary>
+                /// Explicit copy extensions for MyStruct
+                /// </summary>
                 public static class MyStruct_ExplicitCopy
                 {
+                    /// <summary>
+                    /// Copies all structure fields from another using explicit copy extension methods.
+                    /// All items existing before copying are removed.
+                    /// </summary>
+                    /// <param name="self">destination structure</param>
+                    /// <param name="other">source structure</param>
                     public static void CopyFrom(this ref MyStruct self, in MyStruct other)
                     {
                         self.ManagedPrimitive = other.ManagedPrimitive;
                         self.Collection.CopyFrom(other.Collection);
                     }
                     
+                    /// <summary>
+                    /// Copies all structure fields to another using explicit copy extension methods.
+                    /// All items existing before copying are removed.
+                    /// </summary>
+                    /// <param name="self">source structure</param>
+                    /// <param name="other">destination structure</param>
                     public static void CopyTo(this in MyStruct self, ref MyStruct other)
                     {
                         other.CopyFrom(self);
@@ -239,13 +314,28 @@ public class ExplicitCopyGeneratorTests
             """
             using Ksi;
 
+            /// <summary>
+            /// Explicit copy extensions for EnclosingType.MyStruct
+            /// </summary>
             public static class EnclosingType_MyStruct_ExplicitCopy
             {
+                /// <summary>
+                /// Copies all structure fields from another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">destination structure</param>
+                /// <param name="other">source structure</param>
                 public static void CopyFrom(this ref EnclosingType.MyStruct self, in EnclosingType.MyStruct other)
                 {
                     self.Collection.CopyFrom(other.Collection);
                 }
                 
+                /// <summary>
+                /// Copies all structure fields to another using explicit copy extension methods.
+                /// All items existing before copying are removed.
+                /// </summary>
+                /// <param name="self">source structure</param>
+                /// <param name="other">destination structure</param>
                 public static void CopyTo(this in EnclosingType.MyStruct self, ref EnclosingType.MyStruct other)
                 {
                     other.CopyFrom(self);
