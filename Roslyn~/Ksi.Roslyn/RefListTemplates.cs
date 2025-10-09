@@ -222,14 +222,14 @@ public static class RefListTemplates
             public static class {0}_Dealloc
             {{
                 /// <summary>
-                /// Deallocates the list.
+                /// Deallocate the list.
                 /// After deallocating the structure becomes zeroed.
                 /// </summary>
                 /// <param name="self">list to deallocate</param>
                 public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
                 /// <summary>
-                /// Deallcoates the list and returns it.
+                /// Deallocate the list and returns it.
                 /// </summary>
                 /// <param name="self">list to deallocate</param>
                 /// <returns>the list as an assignable reference</returns>
@@ -425,7 +425,7 @@ public static class RefListTemplates
                 /// Appends a given string to the list as UTF-8 bytes.
                 /// </summary>
                 /// <param name="self">list to append bytes</param>
-                /// <param name="value">string vlaue to append</param>
+                /// <param name="value">string value to append</param>
                 public static void AppendUtf8String(this ref {0}<byte> self, string value)
                 {{
                     if (string.IsNullOrEmpty(value))
@@ -442,7 +442,7 @@ public static class RefListTemplates
                 /// Appends a given string to the list as ASCII bytes.
                 /// </summary>
                 /// <param name="self">list to append bytes</param>
-                /// <param name="value">string vlaue to append</param>
+                /// <param name="value">string value to append</param>
                 public static void AppendAsciiString(this ref {0}<byte> self, string value)
                 {{
                     if (string.IsNullOrEmpty(value))
@@ -458,7 +458,7 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a string interpreting list contents as UTF-8 bytes.
                 /// </summary>
-                /// <param name="self">list containnig string bytes</param>
+                /// <param name="self">list containing string bytes</param>
                 /// <returns>the string created from bytes</returns>
                 public static string ToStringUtf8(this in {0}<byte> self)
                 {{
@@ -468,7 +468,7 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a string interpreting list contents as ASCII bytes.
                 /// </summary>
-                /// <param name="self">list containnig string bytes</param>
+                /// <param name="self">list containing string bytes</param>
                 /// <returns>the string created from bytes</returns>
                 public static string ToStringAscii(this in {0}<byte> self)
                 {{

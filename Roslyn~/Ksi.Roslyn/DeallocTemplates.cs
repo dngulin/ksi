@@ -9,7 +9,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocates the list and all items.
+            /// Deallocate the list and all items.
             /// After deallocation the structure becomes zeroed.
             /// </summary>
             /// <param name="self">list to deallocate</param>
@@ -29,7 +29,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocates all list items.
+            /// Deallocate all list items.
             /// After deallocation list is not cleared.
             /// </summary>
             /// <param name="self">list to deallocate items</param>
@@ -45,7 +45,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallcoates the list and returns it.
+            /// Deallocate the list and returns it.
             /// </summary>
             /// <param name="self">list to deallocate</param>
             /// <returns>the list as an assignable reference</returns>
@@ -62,7 +62,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Clears the list and deallocates all items. 
+            /// Clears the list and deallocate all items. 
             /// </summary>
             /// <param name="self">list to clear</param>
             public static void Clear(this ref {0}<{1}> self)
@@ -76,7 +76,7 @@ namespace Ksi.Roslyn
             }}
 
             /// <summary>
-            /// Removes an item from the list and deallcoates it.
+            /// Removes an item from the list and deallocate it.
             /// </summary>
             /// <param name="self">list to remove an item</param>
             /// <param name="index">index of the item to remove</param>
@@ -95,7 +95,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallcoates the structure owned resources and returns it.
+            /// Deallocate the structure owned resources and returns it.
             /// </summary>
             /// <param name="self">structure to deallocate</param>
             /// <returns>the structure as an assignable reference</returns>

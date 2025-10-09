@@ -131,7 +131,7 @@ namespace Ksi.Roslyn
         {
             var t = entry.Type;
             cls.AppendLine("/// <summary>");
-            cls.AppendLine("/// Deallocates all owned resources by the structure.");
+            cls.AppendLine("/// Deallocate all owned resources by the structure.");
             cls.AppendLine("/// </summary>");
             cls.AppendLine("""/// <param name="self">structure to deallocate</param>""");
             using (var m = cls.PubStat($"void Dealloc(this ref {t} self)"))
