@@ -54,11 +54,8 @@ public static class DocGenerator
 
         writer.WriteLine("# " + t.Symbol.ToMd());
 
-        writer.WriteLine();
-        writer.WriteLine(t.Summary);
-
-        writer.WriteLine();
-        writer.WriteLine(t.Declaration);
+        Write(writer, t.Summary);
+        Write(writer, t.Declaration);
 
         WriteMethods(writer, t.Constructors, "Constructors");
         WriteMethods(writer, t.ExternalConstructors, "Static Creation Methods");
@@ -82,21 +79,11 @@ public static class DocGenerator
     {
         writer.WriteLine("\n\n### " + m.Symbol.ToMd());
 
-        writer.WriteLine();
-        writer.WriteLine(m.Summary);
-
-        writer.WriteLine();
-        writer.WriteLine(m.Declaration);
-
-        if (m.Parameters.Length > 0)
-        {
-            writer.WriteLine("\nParameters");
-            foreach (var p in m.Parameters)
-                writer.WriteLine($"- {p}");
-        }
-
-        if (m.Returns != null)
-            writer.WriteLine("\nReturns " + m.Returns);
+        Write(writer, m.Summary);
+        Write(writer, m.Declaration);
+        Write(writer, m.Parameters, "Parameters", "- ");
+        Write(writer, m.Returns, "Returns ");
+        Write(writer, m.Exceptions, "> [!CAUTION]\n> Possible exceptions: ", "> - ");
     }
 
     private static void WriteProperties(StreamWriter writer, IReadOnlyList<PropertySpec> properties)
@@ -113,10 +100,39 @@ public static class DocGenerator
     {
         writer.WriteLine("\n\n### " + p.Symbol.Name);
 
+        Write(writer, p.Summary);
+        Write(writer, p.Declaration);
+        Write(writer, p.Exceptions, "> [!CAUTION]\n> Possible exceptions: ", "> - ");
+    }
+
+    private static void Write(StreamWriter writer, string text)
+    {
         writer.WriteLine();
-        writer.WriteLine(p.Summary);
+        writer.WriteLine(text);
+    }
+
+    private static void Write(StreamWriter writer, string? text, string prefix)
+    {
+        if (text == null)
+            return;
 
         writer.WriteLine();
-        writer.WriteLine(p.Declaration);
+        writer.Write(prefix);
+        writer.WriteLine(text);
+    }
+
+    private static void Write(StreamWriter writer, ImmutableArray<string> texts, string prefix, string itemPrefix)
+    {
+        if (texts.Length == 0)
+            return;
+
+        writer.WriteLine();
+        writer.WriteLine(prefix);
+
+        foreach (var text in texts)
+        {
+            writer.Write(itemPrefix);
+            writer.WriteLine(text);
+        }
     }
 }

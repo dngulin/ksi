@@ -19,6 +19,10 @@ Returns a mutable reference to the wrapped data.
 public ref T Value
 ```
 
+> [!CAUTION]
+> Possible exceptions: 
+> - `InvalidOperationException` — If the data is not available to this access scope (e.g. usage after disposing).
+
 
 ## Methods
 

@@ -19,6 +19,10 @@ Returns a readonly reference to the wrapped data.
 public ref readonly T Value
 ```
 
+> [!CAUTION]
+> Possible exceptions: 
+> - `InvalidOperationException` — If the data is not available to this access scope (e.g. usage after disposing).
+
 
 ## Methods
 

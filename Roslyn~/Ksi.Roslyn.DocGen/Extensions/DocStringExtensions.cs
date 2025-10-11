@@ -23,7 +23,7 @@ public static class DocStringExtensions
         return (self as XContainer)?.Element(elementName)?.ToMd();
     }
 
-    public static string[] AllToMd(this XNode self, string elementName)
+    public static string[] ManyToMd(this XNode self, string elementName)
     {
         return (self as XContainer)?
             .Elements(elementName)
@@ -57,14 +57,15 @@ public static class DocStringExtensions
         {
             "para" => $"{separator}{self.Nodes().ToMd()}",
             "item" => $"\n- {self.Nodes().ToMd()}",
-            "param" => $"`{self.NameAttr()}` — " + self.Nodes().ToMd(),
+            "param" => $"`{self.Attr("name")}` — " + self.Nodes().ToMd(),
+            "exception" => $"`{self.Attr("cref").Split('.').LastOrDefault()}` — " + self.Nodes().ToMd(),
             _ => self.Nodes().ToMd()
         };
     }
 
     private static string ToMd(this IEnumerable<XNode> self) => self.Aggregate("", (acc, e) => acc + e.ToMd());
 
-    private static string NameAttr(this XElement self) => self.Attribute("name")?.Value ?? "???";
+    private static string Attr(this XElement self, string name) => self.Attribute(name)?.Value ?? "???";
 
     public static string ToDecl(this INamedTypeSymbol symbol)
     {

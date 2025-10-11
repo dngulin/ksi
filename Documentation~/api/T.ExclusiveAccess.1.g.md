@@ -20,6 +20,10 @@ Creates a new instance of `MutableAccessScope`.
 public MutableAccessScope<T> Mutable
 ```
 
+> [!CAUTION]
+> Possible exceptions: 
+> - `InvalidOperationException` — If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+
 
 ### ReadOnly
 
@@ -28,3 +32,7 @@ Creates a new instance of `ReadOnlyAccessScope`.
 ```csharp
 public ReadOnlyAccessScope<T> ReadOnly
 ```
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `InvalidOperationException` — If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.

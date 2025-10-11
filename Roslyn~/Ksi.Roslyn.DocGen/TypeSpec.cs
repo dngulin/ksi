@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Xml.Linq;
 using Ksi.Roslyn.DocGen.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -72,6 +71,7 @@ public sealed class MethodSpec
     public readonly string Summary;
     public readonly ImmutableArray<string> Parameters;
     public readonly string? Returns;
+    public readonly ImmutableArray<string> Exceptions;
 
     public MethodSpec(IMethodSymbol m)
     {
@@ -80,8 +80,9 @@ public sealed class MethodSpec
 
         var xml = m.DocXml();
         Summary = xml.ToMd("summary")!;
-        Parameters = xml.AllToMd("param").ToImmutableArray();
+        Parameters = xml.ManyToMd("param").ToImmutableArray();
         Returns = xml.ToMd("returns");
+        Exceptions = xml.ManyToMd("exception").ToImmutableArray();
     }
 }
 
@@ -91,11 +92,15 @@ public sealed class PropertySpec
 
     public readonly string Declaration;
     public readonly string Summary;
+    public readonly ImmutableArray<string> Exceptions;
 
     public PropertySpec(IPropertySymbol symbol)
     {
         Symbol = symbol;
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
-        Summary = symbol.DocXml().ToMd("summary")!;
+
+        var xml = symbol.DocXml();
+        Summary = xml.ToMd("summary")!;
+        Exceptions = xml.ManyToMd("exception").ToImmutableArray();
     }
 }
