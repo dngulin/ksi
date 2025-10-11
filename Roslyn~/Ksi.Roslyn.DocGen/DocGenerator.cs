@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Ksi.Roslyn.DocGen.Extensions;
 
 namespace Ksi.Roslyn.DocGen;
 
@@ -106,7 +107,7 @@ public static class DocGenerator
     {
         if (properties.Count == 0)
             return;
-        
+
         writer.WriteLine("\n\n## Properties");
         foreach (var p in properties)
             WriteProperty(writer, p);

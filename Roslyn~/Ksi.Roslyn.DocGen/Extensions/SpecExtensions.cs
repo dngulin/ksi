@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Ksi.Roslyn.DocGen;
+namespace Ksi.Roslyn.DocGen.Extensions;
 
 public static class SpecExtensions
 {

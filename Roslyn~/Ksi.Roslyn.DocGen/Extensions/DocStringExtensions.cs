@@ -3,7 +3,7 @@ using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Ksi.Roslyn.DocGen;
+namespace Ksi.Roslyn.DocGen.Extensions;
 
 public static class DocStringExtensions
 {

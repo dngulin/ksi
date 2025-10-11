@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Ksi.Roslyn.DocGen.Extensions;
 using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 

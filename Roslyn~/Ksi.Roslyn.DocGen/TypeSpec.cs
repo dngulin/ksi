@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Xml.Linq;
+using Ksi.Roslyn.DocGen.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn.DocGen;
