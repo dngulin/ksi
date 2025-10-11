@@ -18,14 +18,18 @@ public static class DocStringExtensions
         return XDocument.Parse(xml).Element("member")!;
     }
 
-    public static string ToMd(this XNode self, string elementName)
+    public static string? ToMd(this XNode self, string elementName)
     {
-        return (self as XContainer)?.Element(elementName)?.ToMd() ?? "";
+        return (self as XContainer)?.Element(elementName)?.ToMd();
     }
 
-    public static string AllToMd(this XNode self, string elementName)
+    public static string[] AllToMd(this XNode self, string elementName)
     {
-        return (self as XContainer)?.Elements(elementName).ToMd() ?? "";
+        return (self as XContainer)?
+            .Elements(elementName)
+            .Select(e => e.ToMd())
+            .ToArray()
+            ?? [];
     }
 
     private static string ToMd(this XNode self)
@@ -53,7 +57,7 @@ public static class DocStringExtensions
         {
             "para" => $"{separator}{self.Nodes().ToMd()}",
             "item" => $"\n- {self.Nodes().ToMd()}",
-            "param" => $"\n- `{self.NameAttr()}` — " + self.Nodes().ToMd(),
+            "param" => $"`{self.NameAttr()}` — " + self.Nodes().ToMd(),
             _ => self.Nodes().ToMd()
         };
     }

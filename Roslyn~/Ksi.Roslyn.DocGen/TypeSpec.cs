@@ -8,7 +8,6 @@ namespace Ksi.Roslyn.DocGen;
 public sealed class TypeSpec
 {
     public readonly INamedTypeSymbol Symbol;
-    private readonly XNode _xml;
 
     public readonly ImmutableArray<MethodSpec> Constructors;
     public readonly ImmutableArray<PropertySpec> Properties;
@@ -28,10 +27,12 @@ public sealed class TypeSpec
                            ExternalConstructors.Count == 0 &&
                            ExternalMethods.Count == 0;
 
+    public readonly string Declaration;
+    public readonly string Summary;
+
     public TypeSpec(INamedTypeSymbol symbol)
     {
         Symbol = symbol;
-        _xml = symbol.DocXml();
 
         Constructors = symbol.Constructors
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
@@ -57,44 +58,44 @@ public sealed class TypeSpec
         }
 
         Methods = methods.ToImmutableArray();
-    }
 
-    public string Declaration => $"```csharp\n{Symbol.ToDecl()}\n```";
-    public string Summary => _xml.ToMd("summary");
+        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+        Summary = symbol.DocXml().ToMd("summary")!;
+    }
 }
 
 public sealed class MethodSpec
 {
     public readonly IMethodSymbol Symbol;
-    private readonly XNode _xml;
+
+    public readonly string Declaration;
+    public readonly string Summary;
+    public readonly ImmutableArray<string> Parameters;
+    public readonly string? Returns;
 
     public MethodSpec(IMethodSymbol m)
     {
         Symbol = m;
-        _xml = m.DocXml();
+        Declaration = $"```csharp\n{m.ToDecl()}\n```";
+
+        var xml = m.DocXml();
+        Summary = xml.ToMd("summary")!;
+        Parameters = xml.AllToMd("param").ToImmutableArray();
+        Returns = xml.ToMd("returns");
     }
-
-    public string Declaration => $"```csharp\n{Symbol.ToDecl()}\n```";
-
-    public string Summary => _xml.ToMd("summary");
-
-    public string Parameters => _xml.AllToMd("param");
-
-    public string Returns => _xml.ToMd("returns");
 }
 
 public sealed class PropertySpec
 {
     public readonly IPropertySymbol Symbol;
-    private readonly XNode _xml;
+
+    public readonly string Declaration;
+    public readonly string Summary;
 
     public PropertySpec(IPropertySymbol symbol)
     {
         Symbol = symbol;
-        _xml = symbol.DocXml();
+        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+        Summary = symbol.DocXml().ToMd("summary")!;
     }
-
-    public string Declaration => $"```csharp\n{Symbol.ToDecl()}\n```";
-
-    public string Summary => _xml.ToMd("summary");
 }

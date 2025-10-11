@@ -88,19 +88,15 @@ public static class DocGenerator
         writer.WriteLine();
         writer.WriteLine(m.Declaration);
 
-        var p = m.Parameters;
-        if (p != "")
+        if (m.Parameters.Length > 0)
         {
-            writer.Write("\nParameters");
-            writer.WriteLine(p);
+            writer.WriteLine("\nParameters");
+            foreach (var p in m.Parameters)
+                writer.WriteLine($"- {p}");
         }
 
-        var ret = m.Returns;
-        if (ret != "")
-        {
-            writer.Write("\nReturns ");
-            writer.WriteLine(ret);
-        }
+        if (m.Returns != null)
+            writer.WriteLine("\nReturns " + m.Returns);
     }
 
     private static void WriteProperties(StreamWriter writer, IReadOnlyList<PropertySpec> properties)
