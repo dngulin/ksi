@@ -71,3 +71,4 @@ TODO:
 - [Trait Attributes](Documentation~/traits.md)
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
+- [API Reference](Documentation~/api/index.g.md)
