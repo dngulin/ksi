@@ -9,7 +9,7 @@ namespace Ksi
     /// Can be also applied to a generic type parameter to make it compatible with [ExplicitCopy] types.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
-    public class ExplicitCopyAttribute : Attribute
+    public sealed class ExplicitCopyAttribute : Attribute
     {
     }
 
@@ -19,7 +19,7 @@ namespace Ksi
     /// Enables reference lifetime and aliasing diagnostics.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
-    public class DynSizedAttribute : Attribute
+    public sealed class DynSizedAttribute : Attribute
     {
     }
 
@@ -29,7 +29,7 @@ namespace Ksi
     /// Hints the reference lifetime analyzer that any internal buffer cannot be resized.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class DynNoResizeAttribute : Attribute
+    public sealed class DynNoResizeAttribute : Attribute
     {
     }
 
@@ -39,7 +39,7 @@ namespace Ksi
     /// Can be also applied to a generic type parameter to make it compatible with [Dealloc] types.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
-    public class DeallocAttribute : Attribute
+    public sealed class DeallocAttribute : Attribute
     {
     }
 
@@ -48,7 +48,7 @@ namespace Ksi
     /// Allows assigning a new value to the returned reference.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class NonAllocatedResultAttribute : Attribute
+    public sealed class NonAllocatedResultAttribute : Attribute
     {
     }
 
@@ -58,36 +58,43 @@ namespace Ksi
     /// Should be added to a struct that contains fields of the [TempAlloc] type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
-    public class TempAllocAttribute : Attribute
+    public sealed class TempAllocAttribute : Attribute
     {
     }
 
     /// <summary>
+    /// <para>
     /// A hint attribute for the reference path analyzer.
     /// If the method returns a specific reference path, specify it with positional parameters,
     /// otherwise omit them (that means the method can return any inner reference).
+    ///</para>
+    /// <para>
     /// Indexers should be indicated with the "[n]" segments.
-    /// The "!" should be placed after the last [SynSized] segment.
+    /// The "!" should be placed after the last `[SynSized]` segment.
+    ///</para>
+    /// <para>
     /// Examples:
     /// <list type="bullet">
     /// <item>
     /// <description>
-    /// [RefList] corresponds to the `MethodName()` reference path, meaning it can reference any inner data
+    /// `[RefList]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// [RefList("self", "!")] corresponds to the `self!` parameter reference path
+    /// `[RefList("self", "!")]` corresponds to the reference path `self!`, meaning it doesn't contribute to the parent reference path
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// [RefList("self", "Field", "!", "[n]")] corresponds to the `self.Field![n]` reference path
+    /// `[RefList("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
     /// </description>
     /// </item>
     /// </list>
+    /// </para>
     /// </summary>
-    public class RefPathAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RefPathAttribute : Attribute
     {
         /// <summary>
         /// List of segments indicating the `RefPath` created by the marked extension method.
