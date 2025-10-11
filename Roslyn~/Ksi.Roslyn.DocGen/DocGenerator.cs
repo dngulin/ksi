@@ -52,7 +52,7 @@ public static class DocGenerator
     {
         using var writer = new StreamWriter(path + "/" + t.FileName());
 
-        writer.WriteLine("# " + t.Symbol.ToMd());
+        writer.WriteLine("# " + t.Title);
 
         Write(writer, t.Summary);
         Write(writer, t.Declaration);
@@ -77,7 +77,7 @@ public static class DocGenerator
 
     private static void WriteMethod(StreamWriter writer, MethodSpec m)
     {
-        writer.WriteLine("\n\n### " + m.Symbol.ToMd());
+        writer.WriteLine("\n\n### " + m.Title);
 
         Write(writer, m.Summary);
         Write(writer, m.Declaration);
@@ -98,7 +98,7 @@ public static class DocGenerator
 
     private static void WriteProperty(StreamWriter writer, PropertySpec p)
     {
-        writer.WriteLine("\n\n### " + p.Symbol.Name);
+        writer.WriteLine("\n\n### " + p.Title);
 
         Write(writer, p.Summary);
         Write(writer, p.Declaration);

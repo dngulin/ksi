@@ -11,16 +11,13 @@ public struct RefList<T> where T : unmanaged
 ## Static Creation Methods
 
 
-### RefList.WithDefaultItems\<T\>(int)
+### RefList.Empty\<T\>()
 
-Creates a list filled with `default` items.
+Creates an empty list
 
 ```csharp
-public static RefList<T> WithDefaultItems<T>(int count) where T : unmanaged
+public static RefList<T> Empty<T>() where T : unmanaged
 ```
-
-Parameters
-- `count` — number of items
 
 
 ### RefList.WithCapacity\<T\>(int)
@@ -35,25 +32,19 @@ Parameters
 - `capacity` — capacity of the list
 
 
-### RefList.Empty\<T\>()
+### RefList.WithDefaultItems\<T\>(int)
 
-Creates an empty list
+Creates a list filled with `default` items.
 
 ```csharp
-public static RefList<T> Empty<T>() where T : unmanaged
+public static RefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 ```
+
+Parameters
+- `count` — number of items
 
 
 ## Extension Methods
-
-
-### (ref RefList\<T\>).AsSpan()
-
-Represent the collection as `Span`
-
-```csharp
-public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
-```
 
 
 ### (in RefList\<T\>).AsReadOnlySpan()
@@ -63,6 +54,20 @@ Represent the collection as `ReadOnlySpan`
 ```csharp
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : unmanaged
 ```
+
+
+### (in RefList\<T\>).Capacity()
+
+Returns capacity of the given list.
+
+```csharp
+public static int Capacity<T>(this in RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to get capacity
+
+Returns capacity of the given list (zero if the buffer is deallocated)
 
 
 ### (in RefList\<T\>).CopyTo(ref RefList\<T\>)
@@ -79,98 +84,18 @@ Parameters
 - `other` — destination list
 
 
-### (ref RefList\<T\>).CopyFrom(in RefList\<T\>)
+### (in RefList\<T\>).Count()
 
-Copies all items from another list.
-All items existing before copying are removed.
+Returns item count in the given list
 
 ```csharp
-public static void CopyFrom<T>(this ref RefList<T> self, in RefList<T> other) where T : unmanaged
+public static int Count<T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
-- `self` — destination list
-- `other` — source list
+- `self` — list to get item count
 
-
-### (ref RefList\<T\>).AppendDefault(int)
-
-Adds a specified number of `default` items.
-
-```csharp
-public static void AppendDefault<T>(this ref RefList<T> self, int count) where T : unmanaged
-```
-
-Parameters
-- `self` — list add items
-- `count` — number of items to add
-
-
-### (ref RefList\<T\>).Clear()
-
-Removes all items from the list.
-
-```csharp
-public static void Clear<T>(this ref RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to clear
-
-
-### (ref RefList\<T\>).RemoveAt(int)
-
-Removes an item from the list at the given index.
-
-```csharp
-public static void RemoveAt<T>(this ref RefList<T> self, int index) where T : unmanaged
-```
-
-Parameters
-- `self` — list to remove the item
-- `index` — an index to remove the item
-
-
-### (ref RefList\<T\>).RefAdd()
-
-Adds a `default` item to the list and returns a mutable reference to it.
-
-```csharp
-public static ref T RefAdd<T>(this ref RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to add an item
-
-Returns a mutable reference to the created item
-
-
-### (ref RefList\<T\>).Add(T)
-
-Adds a new item to the list.
-
-```csharp
-public static void Add<T>(this ref RefList<T> self, T item) where T : unmanaged
-```
-
-Parameters
-- `self` — list to add an item
-- `item` — item to add to the list
-
-
-### (ref RefList\<T\>).RefAt(int)
-
-Returns a mutable reference to a list item.
-
-```csharp
-public static ref T RefAt<T>([DynNoResize] this ref RefList<T> self, int index) where T : unmanaged
-```
-
-Parameters
-- `self` — list to get an item reference
-- `index` — required item index
-
-Returns a mutable reference to a list item at the given index
+Returns item count in the given list
 
 
 ### (in RefList\<T\>).RefReadonlyAt(int)
@@ -188,40 +113,12 @@ Parameters
 Returns a readonly reference to a list item at the given index
 
 
-### (in RefList\<T\>).Count()
+### (in RefList\<T\>).RefReadonlyIter()
 
-Returns item count in the given list
-
-```csharp
-public static int Count<T>(this in RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to get item count
-
-Returns item count in the given list
-
-
-### (in RefList\<T\>).Capacity()
-
-Returns capacity of the given list.
+Creates a readonly by-ref iterator for the list.
 
 ```csharp
-public static int Capacity<T>(this in RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to get capacity
-
-Returns capacity of the given list (zero if the buffer is deallocated)
-
-
-### (ref RefList\<T\>).RefIterReversed()
-
-Creates a mutable reversed by-ref iterator for the list.
-
-```csharp
-public static RefListIteratorReversed<T> RefIterReversed<T>(this ref RefList<T> self) where T : unmanaged
+public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -236,34 +133,6 @@ Creates a readonly reversed by-ref iterator for the list.
 
 ```csharp
 public static RefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to iterate
-
-Returns the iterator to use in the foreach loop
-
-
-### (ref RefList\<T\>).RefIter()
-
-Creates a mutable by-ref iterator for the list.
-
-```csharp
-public static RefListIterator<T> RefIter<T>(this ref RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to iterate
-
-Returns the iterator to use in the foreach loop
-
-
-### (in RefList\<T\>).RefReadonlyIter()
-
-Creates a readonly by-ref iterator for the list.
-
-```csharp
-public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -300,6 +169,164 @@ Parameters
 Returns the string created from bytes
 
 
+### (ref RefList\<T\>).Add(T)
+
+Adds a new item to the list.
+
+```csharp
+public static void Add<T>(this ref RefList<T> self, T item) where T : unmanaged
+```
+
+Parameters
+- `self` — list to add an item
+- `item` — item to add to the list
+
+
+### (ref RefList\<T\>).AppendDefault(int)
+
+Adds a specified number of `default` items.
+
+```csharp
+public static void AppendDefault<T>(this ref RefList<T> self, int count) where T : unmanaged
+```
+
+Parameters
+- `self` — list add items
+- `count` — number of items to add
+
+
+### (ref RefList\<T\>).AsSpan()
+
+Represent the collection as `Span`
+
+```csharp
+public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
+```
+
+
+### (ref RefList\<T\>).Clear()
+
+Removes all items from the list.
+
+```csharp
+public static void Clear<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to clear
+
+
+### (ref RefList\<T\>).CopyFrom(in RefList\<T\>)
+
+Copies all items from another list.
+All items existing before copying are removed.
+
+```csharp
+public static void CopyFrom<T>(this ref RefList<T> self, in RefList<T> other) where T : unmanaged
+```
+
+Parameters
+- `self` — destination list
+- `other` — source list
+
+
+### (ref RefList\<T\>).Dealloc()
+
+Deallocate the list.
+After deallocating the structure becomes zeroed.
+
+```csharp
+public static void Dealloc<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to deallocate
+
+
+### (ref RefList\<T\>).Deallocated()
+
+Deallocate the list and returns it.
+
+```csharp
+public static ref RefList<T> Deallocated<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to deallocate
+
+Returns the list as an assignable reference
+
+
+### (ref RefList\<T\>).RefAdd()
+
+Adds a `default` item to the list and returns a mutable reference to it.
+
+```csharp
+public static ref T RefAdd<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to add an item
+
+Returns a mutable reference to the created item
+
+
+### (ref RefList\<T\>).RefAt(int)
+
+Returns a mutable reference to a list item.
+
+```csharp
+public static ref T RefAt<T>([DynNoResize] this ref RefList<T> self, int index) where T : unmanaged
+```
+
+Parameters
+- `self` — list to get an item reference
+- `index` — required item index
+
+Returns a mutable reference to a list item at the given index
+
+
+### (ref RefList\<T\>).RefIter()
+
+Creates a mutable by-ref iterator for the list.
+
+```csharp
+public static RefListIterator<T> RefIter<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to iterate
+
+Returns the iterator to use in the foreach loop
+
+
+### (ref RefList\<T\>).RefIterReversed()
+
+Creates a mutable reversed by-ref iterator for the list.
+
+```csharp
+public static RefListIteratorReversed<T> RefIterReversed<T>(this ref RefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to iterate
+
+Returns the iterator to use in the foreach loop
+
+
+### (ref RefList\<T\>).RemoveAt(int)
+
+Removes an item from the list at the given index.
+
+```csharp
+public static void RemoveAt<T>(this ref RefList<T> self, int index) where T : unmanaged
+```
+
+Parameters
+- `self` — list to remove the item
+- `index` — an index to remove the item
+
+
 ### (ref RefList\<byte\>).AppendAsciiString(string)
 
 Appends a given string to the list as ASCII bytes.
@@ -324,30 +351,3 @@ public static void AppendUtf8String(this ref RefList<byte> self, string value)
 Parameters
 - `self` — list to append bytes
 - `value` — string value to append
-
-
-### (ref RefList\<T\>).Deallocated()
-
-Deallocate the list and returns it.
-
-```csharp
-public static ref RefList<T> Deallocated<T>(this ref RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to deallocate
-
-Returns the list as an assignable reference
-
-
-### (ref RefList\<T\>).Dealloc()
-
-Deallocate the list.
-After deallocating the structure becomes zeroed.
-
-```csharp
-public static void Dealloc<T>(this ref RefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to deallocate

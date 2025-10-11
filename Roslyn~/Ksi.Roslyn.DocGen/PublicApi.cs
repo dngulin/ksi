@@ -55,6 +55,13 @@ public class PublicApi(
             }
         }
 
+        foreach (var c in collections)
+        {
+            Comparison<MethodSpec> cmp = static (a, b) => string.Compare(a.Title, b.Title, StringComparison.Ordinal);
+            c.ExternalConstructors.Sort(cmp);
+            c.ExternalMethods.Sort(cmp);
+        }
+
         return new PublicApi(
             attributes.ToImmutableArray(),
             collections.ToImmutableArray(),

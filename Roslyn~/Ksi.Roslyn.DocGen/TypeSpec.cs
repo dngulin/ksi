@@ -26,6 +26,7 @@ public sealed class TypeSpec
                            ExternalConstructors.Count == 0 &&
                            ExternalMethods.Count == 0;
 
+    public readonly string Title;
     public readonly string Declaration;
     public readonly string Summary;
 
@@ -41,7 +42,7 @@ public sealed class TypeSpec
         Properties = symbol.GetMembers()
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
             .OfType<IPropertySymbol>()
-            .Select(m => new PropertySpec(m))
+            .Select(p => new PropertySpec(p))
             .ToImmutableArray();
 
         var methods = new List<MethodSpec>();
@@ -58,6 +59,7 @@ public sealed class TypeSpec
 
         Methods = methods.ToImmutableArray();
 
+        Title = symbol.ToMd();
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
         Summary = symbol.DocXml().ToMd("summary")!;
     }
@@ -66,6 +68,7 @@ public sealed class TypeSpec
 public sealed class MethodSpec
 {
     public readonly IMethodSymbol Symbol;
+    public readonly string Title;
 
     public readonly string Declaration;
     public readonly string Summary;
@@ -73,12 +76,14 @@ public sealed class MethodSpec
     public readonly string? Returns;
     public readonly ImmutableArray<string> Exceptions;
 
-    public MethodSpec(IMethodSymbol m)
+    public MethodSpec(IMethodSymbol symbol)
     {
-        Symbol = m;
-        Declaration = $"```csharp\n{m.ToDecl()}\n```";
+        Symbol = symbol;
 
-        var xml = m.DocXml();
+        Title = symbol.ToMd();
+        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+
+        var xml = symbol.DocXml();
         Summary = xml.ToMd("summary")!;
         Parameters = xml.ManyToMd("param").ToImmutableArray();
         Returns = xml.ToMd("returns");
@@ -89,6 +94,7 @@ public sealed class MethodSpec
 public sealed class PropertySpec
 {
     public readonly IPropertySymbol Symbol;
+    public readonly string Title;
 
     public readonly string Declaration;
     public readonly string Summary;
@@ -97,6 +103,7 @@ public sealed class PropertySpec
     public PropertySpec(IPropertySymbol symbol)
     {
         Symbol = symbol;
+        Title = symbol.Name;
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
 
         var xml = symbol.DocXml();
