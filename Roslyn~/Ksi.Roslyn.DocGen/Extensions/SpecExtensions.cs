@@ -48,37 +48,4 @@ public static class SpecExtensions
     }
 
     public static string FileName(this TypeSpec self) => $"type-{self.Symbol.Name}.g.md";
-
-    public static string Title(this TypeSpec self) =>
-        self.Symbol.IsGenericType ? $@"{self.Symbol.Name}\<T\>" : self.Symbol.Name;
-
-    public static string Title(this MethodSpec self)
-    {
-        var m = self.Symbol;
-        var t = self.Symbol.ContainingType;
-
-        switch (m.MethodKind)
-        {
-            case MethodKind.Constructor:
-            {
-                var prefix = t.IsGenericType ? $@"{t.Name}\<T\>" : t.Name;
-                var suffix = m.Parameters.IsEmpty ?
-                    "()" :
-                    $"({string.Join(",", m.Parameters.Select(p => p.Type.ToString()))})";
-                return prefix + suffix;
-            }
-
-            case MethodKind.Ordinary:
-            {
-                var prefix = m.IsGenericMethod ? $@"{m.Name}\<T\>" : m.Name;
-                var suffix = m.Parameters.IsEmpty ?
-                    "()" :
-                    $"({string.Join(",", m.Parameters.Select(p => p.Type.Name))})";
-                return prefix + suffix;
-            }
-
-            default:
-                return self.Symbol.Name;
-        }
-    }
 }

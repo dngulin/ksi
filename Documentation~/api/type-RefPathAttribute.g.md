@@ -30,7 +30,7 @@ public RefPathAttribute()
 ```
 
 
-### RefPathAttribute(string[])
+### RefPathAttribute(params string[])
 
 Explicit `[RefPath]` attribute constructor.
 Will be embedded into the calling expression `RefPath` as a sequence of segments.

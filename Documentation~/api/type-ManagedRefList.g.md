@@ -11,7 +11,7 @@ public struct ManagedRefList<T> where T : struct
 ## Static Creation Methods
 
 
-### WithDefaultItems\<T\>(Int32)
+### ManagedRefList.WithDefaultItems\<T\>(int)
 
 Creates a list filled with `default` items.
 
@@ -23,7 +23,7 @@ Parameters
 - `count` — number of items
 
 
-### WithCapacity\<T\>(Int32)
+### ManagedRefList.WithCapacity\<T\>(int)
 
 Creates a list with a given capacity.
 
@@ -35,7 +35,7 @@ Parameters
 - `capacity` — capacity of the list
 
 
-### Empty\<T\>()
+### ManagedRefList.Empty\<T\>()
 
 Creates an empty list
 
@@ -47,7 +47,7 @@ public static ManagedRefList<T> Empty<T>() where T : struct
 ## Extension Methods
 
 
-### AsSpan\<T\>(ManagedRefList)
+### (ref ManagedRefList\<T\>).AsSpan()
 
 Represent the collection as `Span`
 
@@ -56,7 +56,7 @@ public static Span<T> AsSpan<T>([DynNoResize] this ref ManagedRefList<T> self) w
 ```
 
 
-### AsReadOnlySpan\<T\>(ManagedRefList)
+### (in ManagedRefList\<T\>).AsReadOnlySpan()
 
 Represent the collection as `ReadOnlySpan`
 
@@ -65,7 +65,7 @@ public static ReadOnlySpan<T> AsReadOnlySpan<T>(this in ManagedRefList<T> self) 
 ```
 
 
-### CopyTo\<T\>(ManagedRefList,ManagedRefList)
+### (in ManagedRefList\<T\>).CopyTo(ref ManagedRefList\<T\>)
 
 Copies all items to another list.
 All items existing before copying are removed.
@@ -79,7 +79,7 @@ Parameters
 - `other` — destination list
 
 
-### CopyFrom\<T\>(ManagedRefList,ManagedRefList)
+### (ref ManagedRefList\<T\>).CopyFrom(in ManagedRefList\<T\>)
 
 Copies all items from another list.
 All items existing before copying are removed.
@@ -93,7 +93,7 @@ Parameters
 - `other` — source list
 
 
-### AppendDefault\<T\>(ManagedRefList,Int32)
+### (ref ManagedRefList\<T\>).AppendDefault(int)
 
 Adds a specified number of `default` items.
 
@@ -106,7 +106,7 @@ Parameters
 - `count` — number of items to add
 
 
-### Clear\<T\>(ManagedRefList)
+### (ref ManagedRefList\<T\>).Clear()
 
 Removes all items from the list.
 
@@ -118,7 +118,7 @@ Parameters
 - `self` — list to clear
 
 
-### RemoveAt\<T\>(ManagedRefList,Int32)
+### (ref ManagedRefList\<T\>).RemoveAt(int)
 
 Removes an item from the list at the given index.
 
@@ -131,7 +131,7 @@ Parameters
 - `index` — an index to remove the item
 
 
-### RefAdd\<T\>(ManagedRefList)
+### (ref ManagedRefList\<T\>).RefAdd()
 
 Adds a `default` item to the list and returns a mutable reference to it.
 
@@ -145,7 +145,7 @@ Parameters
 Returns a mutable reference to the created item
 
 
-### Add\<T\>(ManagedRefList,T)
+### (ref ManagedRefList\<T\>).Add(T)
 
 Adds a new item to the list.
 
@@ -158,7 +158,7 @@ Parameters
 - `item` — item to add to the list
 
 
-### RefAt\<T\>(ManagedRefList,Int32)
+### (ref ManagedRefList\<T\>).RefAt(int)
 
 Returns a mutable reference to a list item.
 
@@ -173,7 +173,7 @@ Parameters
 Returns a mutable reference to a list item at the given index
 
 
-### RefReadonlyAt\<T\>(ManagedRefList,Int32)
+### (in ManagedRefList\<T\>).RefReadonlyAt(int)
 
 Returns a readonly reference to a list item.
 
@@ -188,7 +188,7 @@ Parameters
 Returns a readonly reference to a list item at the given index
 
 
-### Count\<T\>(ManagedRefList)
+### (in ManagedRefList\<T\>).Count()
 
 Returns item count in the given list
 
@@ -202,7 +202,7 @@ Parameters
 Returns item count in the given list
 
 
-### Capacity\<T\>(ManagedRefList)
+### (in ManagedRefList\<T\>).Capacity()
 
 Returns capacity of the given list.
 
@@ -216,7 +216,7 @@ Parameters
 Returns capacity of the given list (zero if the buffer is deallocated)
 
 
-### RefIterReversed\<T\>(ManagedRefList)
+### (ref ManagedRefList\<T\>).RefIterReversed()
 
 Creates a mutable reversed by-ref iterator for the list.
 
@@ -230,7 +230,7 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### RefReadonlyIterReversed\<T\>(ManagedRefList)
+### (in ManagedRefList\<T\>).RefReadonlyIterReversed()
 
 Creates a readonly reversed by-ref iterator for the list.
 
@@ -244,7 +244,7 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### RefIter\<T\>(ManagedRefList)
+### (ref ManagedRefList\<T\>).RefIter()
 
 Creates a mutable by-ref iterator for the list.
 
@@ -258,7 +258,7 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### RefReadonlyIter\<T\>(ManagedRefList)
+### (in ManagedRefList\<T\>).RefReadonlyIter()
 
 Creates a readonly by-ref iterator for the list.
 
@@ -272,7 +272,7 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### ToStringAscii(ManagedRefList)
+### (in ManagedRefList\<byte\>).ToStringAscii()
 
 Creates a string interpreting list contents as ASCII bytes.
 
@@ -286,7 +286,7 @@ Parameters
 Returns the string created from bytes
 
 
-### ToStringUtf8(ManagedRefList)
+### (in ManagedRefList\<byte\>).ToStringUtf8()
 
 Creates a string interpreting list contents as UTF-8 bytes.
 
@@ -300,7 +300,7 @@ Parameters
 Returns the string created from bytes
 
 
-### AppendAsciiString(ManagedRefList,String)
+### (ref ManagedRefList\<byte\>).AppendAsciiString(string)
 
 Appends a given string to the list as ASCII bytes.
 
@@ -313,7 +313,7 @@ Parameters
 - `value` — string value to append
 
 
-### AppendUtf8String(ManagedRefList,String)
+### (ref ManagedRefList\<byte\>).AppendUtf8String(string)
 
 Appends a given string to the list as UTF-8 bytes.
 

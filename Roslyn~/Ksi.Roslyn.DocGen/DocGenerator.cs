@@ -36,7 +36,7 @@ public static class DocGenerator
 
         writer.WriteLine();
         foreach (var t in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
-            writer.WriteLine($"- [{t.Title()}]({t.FileName()})");
+            writer.WriteLine($"- [{t.Symbol.ToMd()}]({t.FileName()})");
     }
 
     private static void WriteTypes(string path, ImmutableArray<TypeSpec> types)
@@ -52,7 +52,7 @@ public static class DocGenerator
     {
         using var writer = new StreamWriter(path + "/" + t.FileName());
 
-        writer.WriteLine("# " + t.Title());
+        writer.WriteLine("# " + t.Symbol.ToMd());
 
         writer.WriteLine();
         writer.WriteLine(t.Summary);
@@ -80,7 +80,7 @@ public static class DocGenerator
 
     private static void WriteMethod(StreamWriter writer, MethodSpec m)
     {
-        writer.WriteLine("\n\n### " + m.Title());
+        writer.WriteLine("\n\n### " + m.Symbol.ToMd());
 
         writer.WriteLine();
         writer.WriteLine(m.Summary);
