@@ -3,25 +3,25 @@
 
 ## Attributes
 
-- [ExplicitCopyAttribute](type-ExplicitCopyAttribute.g.md)
-- [DynSizedAttribute](type-DynSizedAttribute.g.md)
-- [DynNoResizeAttribute](type-DynNoResizeAttribute.g.md)
-- [DeallocAttribute](type-DeallocAttribute.g.md)
-- [NonAllocatedResultAttribute](type-NonAllocatedResultAttribute.g.md)
-- [TempAllocAttribute](type-TempAllocAttribute.g.md)
-- [RefPathAttribute](type-RefPathAttribute.g.md)
+- [ExplicitCopyAttribute](T.ExplicitCopyAttribute.g.md)
+- [DynSizedAttribute](T.DynSizedAttribute.g.md)
+- [DynNoResizeAttribute](T.DynNoResizeAttribute.g.md)
+- [DeallocAttribute](T.DeallocAttribute.g.md)
+- [NonAllocatedResultAttribute](T.NonAllocatedResultAttribute.g.md)
+- [TempAllocAttribute](T.TempAllocAttribute.g.md)
+- [RefPathAttribute](T.RefPathAttribute.g.md)
 
 
 ## Collections
 
-- [RefList\<T\>](type-RefList.g.md)
-- [TempRefList\<T\>](type-TempRefList.g.md)
-- [ManagedRefList\<T\>](type-ManagedRefList.g.md)
+- [RefList\<T\>](T.RefList.1.g.md)
+- [TempRefList\<T\>](T.TempRefList.1.g.md)
+- [ManagedRefList\<T\>](T.ManagedRefList.1.g.md)
 
 
 ## Other Types
 
-- [KsiExtensions](type-KsiExtensions.g.md)
-- [ExclusiveAccess\<T\>](type-ExclusiveAccess.g.md)
-- [MutableAccessScope\<T\>](type-MutableAccessScope.g.md)
-- [ReadOnlyAccessScope\<T\>](type-ReadOnlyAccessScope.g.md)
+- [KsiExtensions](T.KsiExtensions.g.md)
+- [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md)
+- [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md)
+- [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md)
