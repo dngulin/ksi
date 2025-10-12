@@ -17,14 +17,14 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates an empty list
                 /// </summary>
-                /// <returns>A new empty insatnce of the <see cref="{0}{{T}}"/>.</returns>
+                /// <returns>A new empty instance of the <see cref="{0}{{T}}"/>.</returns>
                 public static {0}<T> Empty<T>() where T : {1} => default;
 
                 /// <summary>
                 /// Creates a list with a given capacity.
                 /// </summary>
                 /// <param name="capacity">Capacity of the list</param>
-                /// <returns>A new insatnce of the <see cref="{0}{{T}}"/> with the given capacity.</returns>
+                /// <returns>A new instance of the <see cref="{0}{{T}}"/> with the given capacity.</returns>
                 public static {0}<T> WithCapacity<T>(int capacity) where T : {1}
                 {{
                     var list = Empty<T>();
@@ -36,7 +36,7 @@ public static class RefListTemplates
                 /// Creates a list filled with <c>default</c> items.
                 /// </summary>
                 /// <param name="count">Number of items</param>
-                /// <returns>A new insatnce of the <see cref="{0}{{T}}"/> with the given number of <c>default</c> items.</returns>
+                /// <returns>A new instance of the <see cref="{0}{{T}}"/> with the given number of <c>default</c> items.</returns>
                 public static {0}<T> WithDefaultItems<T>(int count) where T : {1}
                 {{
                     var list = WithCapacity<T>(count);
@@ -81,7 +81,7 @@ public static class RefListTemplates
                 /// <param name="self">List to get an item reference</param>
                 /// <param name="index">Required item index</param>
                 /// <returns>A readonly reference to a list item at the given index.</returns>
-                /// <exception cref="IndexOutOfRangeException">If index is out of bounds</exception>
+                /// <exception cref="IndexOutOfRangeException">If the index is out of bounds</exception>
                 [RefListIndexer]
                 public static ref readonly T RefReadonlyAt<T>(this in {0}<T> self, int index) where T : {1}
                 {{
@@ -143,7 +143,7 @@ public static class RefListTemplates
                 /// </summary>
                 /// <param name="self">List to remove the item</param>
                 /// <param name="index">An index to remove the item.</param>
-                /// <exception cref="IndexOutOfRangeException">If index is out of bounds</exception>
+                /// <exception cref="IndexOutOfRangeException">If the index is out of bounds</exception>
                 public static void RemoveAt<T>(this ref {0}<T> self, int index) where T : {1}
                 {{
                     if (index < 0 || index >= self.Count)
@@ -172,7 +172,7 @@ public static class RefListTemplates
                 /// </summary>
                 /// <param name="self">List add items</param>
                 /// <param name="count">Number of items to add</param>
-                /// <exception cref="ArgumentException">If count is negative</exception>
+                /// <exception cref="ArgumentException">If the count is negative</exception>
                 public static void AppendDefault<T>(this ref {0}<T> self, int count) where T : {1}
                 {{
                     if (count < 0)

@@ -49,7 +49,7 @@ Creates an empty list
 public static RefList<T> Empty<T>() where T : unmanaged
 ```
 
-Returns a new empty insatnce of the [RefList\<T\>](T.RefList.1.g.md).
+Returns a new empty instance of the [RefList\<T\>](T.RefList.1.g.md).
 
 
 ### RefList.WithCapacity\<T\>\(int\)
@@ -63,7 +63,7 @@ public static RefList<T> WithCapacity<T>(int capacity) where T : unmanaged
 Parameters
 - `capacity` — capacity of the list
 
-Returns a new insatnce of the [RefList\<T\>](T.RefList.1.g.md) with the given capacity.
+Returns a new instance of the [RefList\<T\>](T.RefList.1.g.md) with the given capacity.
 
 
 ### RefList.WithDefaultItems\<T\>\(int\)
@@ -77,7 +77,7 @@ public static RefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 Parameters
 - `count` — number of items
 
-Returns a new insatnce of the [RefList\<T\>](T.RefList.1.g.md) with the given number of `default` items.
+Returns a new instance of the [RefList\<T\>](T.RefList.1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods
@@ -152,7 +152,7 @@ Returns a readonly reference to a list item at the given index.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if index is out of bounds
+> - `IndexOutOfRangeException` — if the index is out of bounds
 
 
 ### \(in RefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -238,7 +238,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `ArgumentException` — if count is negative
+> - `ArgumentException` — if the count is negative
 
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
@@ -376,7 +376,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if index is out of bounds
+> - `IndexOutOfRangeException` — if the index is out of bounds
 
 
 ### \(ref RefList\<byte\>\).AppendAsciiString\(string\)

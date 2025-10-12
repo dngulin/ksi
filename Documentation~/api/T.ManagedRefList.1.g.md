@@ -47,7 +47,7 @@ Creates an empty list
 public static ManagedRefList<T> Empty<T>() where T : struct
 ```
 
-Returns a new empty insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md).
+Returns a new empty instance of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md).
 
 
 ### ManagedRefList.WithCapacity\<T\>\(int\)
@@ -61,7 +61,7 @@ public static ManagedRefList<T> WithCapacity<T>(int capacity) where T : struct
 Parameters
 - `capacity` — capacity of the list
 
-Returns a new insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given capacity.
+Returns a new instance of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given capacity.
 
 
 ### ManagedRefList.WithDefaultItems\<T\>\(int\)
@@ -75,7 +75,7 @@ public static ManagedRefList<T> WithDefaultItems<T>(int count) where T : struct
 Parameters
 - `count` — number of items
 
-Returns a new insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given number of `default` items.
+Returns a new instance of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods
@@ -150,7 +150,7 @@ Returns a readonly reference to a list item at the given index.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if index is out of bounds
+> - `IndexOutOfRangeException` — if the index is out of bounds
 
 
 ### \(in ManagedRefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -236,7 +236,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `ArgumentException` — if count is negative
+> - `ArgumentException` — if the count is negative
 
 
 ### \(ref ManagedRefList\<T\>\).AsSpan\(\)
@@ -347,7 +347,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if index is out of bounds
+> - `IndexOutOfRangeException` — if the index is out of bounds
 
 
 ### \(ref ManagedRefList\<byte\>\).AppendAsciiString\(string\)
