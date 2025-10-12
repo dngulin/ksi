@@ -17,11 +17,11 @@ public sealed class RefPathAttribute : Attribute
 ```
 
 Constructors
-- [RefPathAttribute()](#refpathattribute) — Non-explicit `[RefPath]` attribute constructor
-- [RefPathAttribute(params string[])](#refpathattributeparams-string) — Explicit `[RefPath]` attribute constructor
+- [RefPathAttribute()](#refpathattribute) — non-explicit `[RefPath]` attribute constructor
+- [RefPathAttribute(params string[])](#refpathattributeparams-string) — explicit `[RefPath]` attribute constructor
 
 Properties
-- [Segments](#segments) — List of segments indicating the `RefPath` created by the marked extension method
+- [Segments](#segments) — list of segments indicating the `RefPath` created by the marked extension method
 
 
 ## Constructors
@@ -47,7 +47,7 @@ public RefPathAttribute(params string[] segments)
 ```
 
 Parameters
-- `segments` — Array of segments produced by return expression.
+- `segments` — array of segments produced by return expression.
 The `[DynSized]` separator "!" should be passed as a separated segment.
 
 

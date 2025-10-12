@@ -8,34 +8,34 @@ public struct RefList<T> where T : unmanaged
 ```
 
 Static Creation Methods
-- [RefList.Empty\<T\>()](#reflistemptyt) — Creates an empty list
-- [RefList.WithCapacity\<T\>(int)](#reflistwithcapacitytint) — Creates a list with a given capacity
-- [RefList.WithDefaultItems\<T\>(int)](#reflistwithdefaultitemstint) — Creates a list filled with `default` items
+- [RefList.Empty\<T\>()](#reflistemptyt) — creates an empty list
+- [RefList.WithCapacity\<T\>(int)](#reflistwithcapacitytint) — creates a list with a given capacity
+- [RefList.WithDefaultItems\<T\>(int)](#reflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [(in RefList\<T\>).AsReadOnlySpan()](#in-reflisttasreadonlyspan) — Represent the collection as `ReadOnlySpan`
-- [(in RefList\<T\>).Capacity()](#in-reflisttcapacity) — Returns capacity of the given list
-- [(in RefList\<T\>).CopyTo(ref RefList\<T\>)](#in-reflisttcopytoref-reflistt) — Copies all items to another list
-- [(in RefList\<T\>).Count()](#in-reflisttcount) — Returns item count in the given list
-- [(in RefList\<T\>).RefReadonlyAt(int)](#in-reflisttrefreadonlyatint) — Returns a readonly reference to a list item
-- [(in RefList\<T\>).RefReadonlyIter()](#in-reflisttrefreadonlyiter) — Creates a readonly by-ref iterator for the list
-- [(in RefList\<T\>).RefReadonlyIterReversed()](#in-reflisttrefreadonlyiterreversed) — Creates a readonly reversed by-ref iterator for the list
-- [(in RefList\<byte\>).ToStringAscii()](#in-reflistbytetostringascii) — Creates a string interpreting list contents as ASCII bytes
-- [(in RefList\<byte\>).ToStringUtf8()](#in-reflistbytetostringutf8) — Creates a string interpreting list contents as UTF-8 bytes
-- [(ref RefList\<T\>).Add(T)](#ref-reflisttaddt) — Adds a new item to the list
-- [(ref RefList\<T\>).AppendDefault(int)](#ref-reflisttappenddefaultint) — Adds a specified number of `default` items
-- [(ref RefList\<T\>).AsSpan()](#ref-reflisttasspan) — Represent the collection as `Span`
-- [(ref RefList\<T\>).Clear()](#ref-reflisttclear) — Removes all items from the list
-- [(ref RefList\<T\>).CopyFrom(in RefList\<T\>)](#ref-reflisttcopyfromin-reflistt) — Copies all items from another list
-- [(ref RefList\<T\>).Dealloc()](#ref-reflisttdealloc) — Deallocate the list
-- [(ref RefList\<T\>).Deallocated()](#ref-reflisttdeallocated) — Deallocate the list and returns it
-- [(ref RefList\<T\>).RefAdd()](#ref-reflisttrefadd) — Adds a `default` item to the list and returns a mutable reference to it
-- [(ref RefList\<T\>).RefAt(int)](#ref-reflisttrefatint) — Returns a mutable reference to a list item
-- [(ref RefList\<T\>).RefIter()](#ref-reflisttrefiter) — Creates a mutable by-ref iterator for the list
-- [(ref RefList\<T\>).RefIterReversed()](#ref-reflisttrefiterreversed) — Creates a mutable reversed by-ref iterator for the list
-- [(ref RefList\<T\>).RemoveAt(int)](#ref-reflisttremoveatint) — Removes an item from the list at the given index
-- [(ref RefList\<byte\>).AppendAsciiString(string)](#ref-reflistbyteappendasciistringstring) — Appends a given string to the list as ASCII bytes
-- [(ref RefList\<byte\>).AppendUtf8String(string)](#ref-reflistbyteappendutf8stringstring) — Appends a given string to the list as UTF-8 bytes
+- [(in RefList\<T\>).AsReadOnlySpan()](#in-reflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
+- [(in RefList\<T\>).Capacity()](#in-reflisttcapacity) — returns capacity of the given list
+- [(in RefList\<T\>).CopyTo(ref RefList\<T\>)](#in-reflisttcopytoref-reflistt) — copies all items to another list
+- [(in RefList\<T\>).Count()](#in-reflisttcount) — returns item count in the given list
+- [(in RefList\<T\>).RefReadonlyAt(int)](#in-reflisttrefreadonlyatint) — returns a readonly reference to a list item
+- [(in RefList\<T\>).RefReadonlyIter()](#in-reflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
+- [(in RefList\<T\>).RefReadonlyIterReversed()](#in-reflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
+- [(in RefList\<byte\>).ToStringAscii()](#in-reflistbytetostringascii) — creates a string interpreting list contents as ASCII bytes
+- [(in RefList\<byte\>).ToStringUtf8()](#in-reflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
+- [(ref RefList\<T\>).Add(T)](#ref-reflisttaddt) — adds a new item to the list
+- [(ref RefList\<T\>).AppendDefault(int)](#ref-reflisttappenddefaultint) — adds a specified number of `default` items
+- [(ref RefList\<T\>).AsSpan()](#ref-reflisttasspan) — represent the collection as `Span`
+- [(ref RefList\<T\>).Clear()](#ref-reflisttclear) — removes all items from the list
+- [(ref RefList\<T\>).CopyFrom(in RefList\<T\>)](#ref-reflisttcopyfromin-reflistt) — copies all items from another list
+- [(ref RefList\<T\>).Dealloc()](#ref-reflisttdealloc) — deallocate the list
+- [(ref RefList\<T\>).Deallocated()](#ref-reflisttdeallocated) — deallocate the list and returns it
+- [(ref RefList\<T\>).RefAdd()](#ref-reflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
+- [(ref RefList\<T\>).RefAt(int)](#ref-reflisttrefatint) — returns a mutable reference to a list item
+- [(ref RefList\<T\>).RefIter()](#ref-reflisttrefiter) — creates a mutable by-ref iterator for the list
+- [(ref RefList\<T\>).RefIterReversed()](#ref-reflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
+- [(ref RefList\<T\>).RemoveAt(int)](#ref-reflisttremoveatint) — removes an item from the list at the given index
+- [(ref RefList\<byte\>).AppendAsciiString(string)](#ref-reflistbyteappendasciistringstring) — appends a given string to the list as ASCII bytes
+- [(ref RefList\<byte\>).AppendUtf8String(string)](#ref-reflistbyteappendutf8stringstring) — appends a given string to the list as UTF-8 bytes
 
 
 ## Static Creation Methods

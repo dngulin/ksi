@@ -8,10 +8,10 @@ public readonly ref struct MutableAccessScope<T> where T : struct
 ```
 
 Properties
-- [Value](#value) — Returns a mutable reference to the wrapped data
+- [Value](#value) — returns a mutable reference to the wrapped data
 
 Methods
-- [Dispose()](#dispose) — Deactivates this access scope but allows creating a new one
+- [Dispose()](#dispose) — deactivates this access scope but allows creating a new one
 
 
 ## Properties
@@ -27,7 +27,7 @@ public ref T Value
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — If the data is not available to this access scope (e.g. usage after disposing).
+> - `InvalidOperationException` — if the data is not available to this access scope (e.g. usage after disposing).
 
 
 ## Methods

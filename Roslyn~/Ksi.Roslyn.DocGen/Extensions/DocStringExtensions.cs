@@ -57,8 +57,8 @@ public static class DocStringExtensions
         {
             "para" => $"{separator}{self.Nodes().ToMd()}",
             "item" => $"\n- {self.Nodes().ToMd()}",
-            "param" => $"`{self.Attr("name")}` — " + self.Nodes().ToMd(),
-            "exception" => $"`{self.Attr("cref").Split('.').LastOrDefault()}` — " + self.Nodes().ToMd(),
+            "param" => $"`{self.Attr("name")}` — " + self.Nodes().ToMd().Decapitalize(),
+            "exception" => $"`{self.Attr("cref").Split('.').LastOrDefault()}` — " + self.Nodes().ToMd().Decapitalize(),
             _ => self.Nodes().ToMd()
         };
     }
@@ -169,5 +169,15 @@ public static class DocStringExtensions
             .ToArray();
 
         return "#" + new string(filtered);
+    }
+
+    public static string Decapitalize(this string self)
+    {
+        return self.Length switch
+        {
+            0 => self,
+            1 => self.ToLower(),
+            _ => char.ToLower(self[0]) + self[1..]
+        };
     }
 }

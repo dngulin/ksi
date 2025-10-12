@@ -9,8 +9,8 @@ public sealed class ExclusiveAccess<T> where T: struct
 ```
 
 Properties
-- [Mutable](#mutable) — Creates a new instance of `MutableAccessScope`
-- [ReadOnly](#readonly) — Creates a new instance of `ReadOnlyAccessScope`
+- [Mutable](#mutable) — creates a new instance of `MutableAccessScope`
+- [ReadOnly](#readonly) — creates a new instance of `ReadOnlyAccessScope`
 
 
 ## Properties
@@ -26,7 +26,7 @@ public MutableAccessScope<T> Mutable
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+> - `InvalidOperationException` — if an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
 
 
 ### ReadOnly
@@ -39,4 +39,4 @@ public ReadOnlyAccessScope<T> ReadOnly
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+> - `InvalidOperationException` — if an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.

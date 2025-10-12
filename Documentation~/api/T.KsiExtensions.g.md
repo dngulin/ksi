@@ -7,7 +7,7 @@ public static class KsiExtensions
 ```
 
 Static Methods
-- [(ref T).Move()](#ref-tmove) — Move structure ownership
+- [(ref T).Move()](#ref-tmove) — move structure ownership
 
 
 ## Static Methods

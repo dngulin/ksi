@@ -85,7 +85,10 @@ public static class DocGenerator
         writer.WriteLine();
         writer.WriteLine(title);
         foreach (var (caption, desc) in entries)
-            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()}) — {desc.Split(".").First()}");
+        {
+            var brief = desc.Split(".").First();
+            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()}) — {brief.Decapitalize()}");
+        }
     }
 
     private static void WriteMethods(StreamWriter writer, IReadOnlyList<MethodSpec> methods, string title)
