@@ -17,11 +17,11 @@ public sealed class RefPathAttribute : Attribute
 ```
 
 Constructors
-- [RefPathAttribute()](#refpathattribute)
-- [RefPathAttribute(params string[])](#refpathattributeparams-string)
+- [RefPathAttribute()](#refpathattribute) — Non-explicit `[RefPath]` attribute constructor
+- [RefPathAttribute(params string[])](#refpathattributeparams-string) — Explicit `[RefPath]` attribute constructor
 
 Properties
-- [Segments](#segments)
+- [Segments](#segments) — List of segments indicating the `RefPath` created by the marked extension method
 
 
 ## Constructors

@@ -8,10 +8,10 @@ public readonly ref struct MutableAccessScope<T> where T : struct
 ```
 
 Properties
-- [Value](#value)
+- [Value](#value) — Returns a mutable reference to the wrapped data
 
 Methods
-- [Dispose()](#dispose)
+- [Dispose()](#dispose) — Deactivates this access scope but allows creating a new one
 
 
 ## Properties

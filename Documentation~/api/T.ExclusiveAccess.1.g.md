@@ -9,8 +9,8 @@ public sealed class ExclusiveAccess<T> where T: struct
 ```
 
 Properties
-- [Mutable](#mutable)
-- [ReadOnly](#readonly)
+- [Mutable](#mutable) — Creates a new instance of `MutableAccessScope`
+- [ReadOnly](#readonly) — Creates a new instance of `ReadOnlyAccessScope`
 
 
 ## Properties

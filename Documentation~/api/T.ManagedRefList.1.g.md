@@ -8,32 +8,32 @@ public struct ManagedRefList<T> where T : struct
 ```
 
 Static Creation Methods
-- [ManagedRefList.Empty\<T\>()](#managedreflistemptyt)
-- [ManagedRefList.WithCapacity\<T\>(int)](#managedreflistwithcapacitytint)
-- [ManagedRefList.WithDefaultItems\<T\>(int)](#managedreflistwithdefaultitemstint)
+- [ManagedRefList.Empty\<T\>()](#managedreflistemptyt) — Creates an empty list
+- [ManagedRefList.WithCapacity\<T\>(int)](#managedreflistwithcapacitytint) — Creates a list with a given capacity
+- [ManagedRefList.WithDefaultItems\<T\>(int)](#managedreflistwithdefaultitemstint) — Creates a list filled with `default` items
 
 Extension Methods
-- [(in ManagedRefList\<T\>).AsReadOnlySpan()](#in-managedreflisttasreadonlyspan)
-- [(in ManagedRefList\<T\>).Capacity()](#in-managedreflisttcapacity)
-- [(in ManagedRefList\<T\>).CopyTo(ref ManagedRefList\<T\>)](#in-managedreflisttcopytoref-managedreflistt)
-- [(in ManagedRefList\<T\>).Count()](#in-managedreflisttcount)
-- [(in ManagedRefList\<T\>).RefReadonlyAt(int)](#in-managedreflisttrefreadonlyatint)
-- [(in ManagedRefList\<T\>).RefReadonlyIter()](#in-managedreflisttrefreadonlyiter)
-- [(in ManagedRefList\<T\>).RefReadonlyIterReversed()](#in-managedreflisttrefreadonlyiterreversed)
-- [(in ManagedRefList\<byte\>).ToStringAscii()](#in-managedreflistbytetostringascii)
-- [(in ManagedRefList\<byte\>).ToStringUtf8()](#in-managedreflistbytetostringutf8)
-- [(ref ManagedRefList\<T\>).Add(T)](#ref-managedreflisttaddt)
-- [(ref ManagedRefList\<T\>).AppendDefault(int)](#ref-managedreflisttappenddefaultint)
-- [(ref ManagedRefList\<T\>).AsSpan()](#ref-managedreflisttasspan)
-- [(ref ManagedRefList\<T\>).Clear()](#ref-managedreflisttclear)
-- [(ref ManagedRefList\<T\>).CopyFrom(in ManagedRefList\<T\>)](#ref-managedreflisttcopyfromin-managedreflistt)
-- [(ref ManagedRefList\<T\>).RefAdd()](#ref-managedreflisttrefadd)
-- [(ref ManagedRefList\<T\>).RefAt(int)](#ref-managedreflisttrefatint)
-- [(ref ManagedRefList\<T\>).RefIter()](#ref-managedreflisttrefiter)
-- [(ref ManagedRefList\<T\>).RefIterReversed()](#ref-managedreflisttrefiterreversed)
-- [(ref ManagedRefList\<T\>).RemoveAt(int)](#ref-managedreflisttremoveatint)
-- [(ref ManagedRefList\<byte\>).AppendAsciiString(string)](#ref-managedreflistbyteappendasciistringstring)
-- [(ref ManagedRefList\<byte\>).AppendUtf8String(string)](#ref-managedreflistbyteappendutf8stringstring)
+- [(in ManagedRefList\<T\>).AsReadOnlySpan()](#in-managedreflisttasreadonlyspan) — Represent the collection as `ReadOnlySpan`
+- [(in ManagedRefList\<T\>).Capacity()](#in-managedreflisttcapacity) — Returns capacity of the given list
+- [(in ManagedRefList\<T\>).CopyTo(ref ManagedRefList\<T\>)](#in-managedreflisttcopytoref-managedreflistt) — Copies all items to another list
+- [(in ManagedRefList\<T\>).Count()](#in-managedreflisttcount) — Returns item count in the given list
+- [(in ManagedRefList\<T\>).RefReadonlyAt(int)](#in-managedreflisttrefreadonlyatint) — Returns a readonly reference to a list item
+- [(in ManagedRefList\<T\>).RefReadonlyIter()](#in-managedreflisttrefreadonlyiter) — Creates a readonly by-ref iterator for the list
+- [(in ManagedRefList\<T\>).RefReadonlyIterReversed()](#in-managedreflisttrefreadonlyiterreversed) — Creates a readonly reversed by-ref iterator for the list
+- [(in ManagedRefList\<byte\>).ToStringAscii()](#in-managedreflistbytetostringascii) — Creates a string interpreting list contents as ASCII bytes
+- [(in ManagedRefList\<byte\>).ToStringUtf8()](#in-managedreflistbytetostringutf8) — Creates a string interpreting list contents as UTF-8 bytes
+- [(ref ManagedRefList\<T\>).Add(T)](#ref-managedreflisttaddt) — Adds a new item to the list
+- [(ref ManagedRefList\<T\>).AppendDefault(int)](#ref-managedreflisttappenddefaultint) — Adds a specified number of `default` items
+- [(ref ManagedRefList\<T\>).AsSpan()](#ref-managedreflisttasspan) — Represent the collection as `Span`
+- [(ref ManagedRefList\<T\>).Clear()](#ref-managedreflisttclear) — Removes all items from the list
+- [(ref ManagedRefList\<T\>).CopyFrom(in ManagedRefList\<T\>)](#ref-managedreflisttcopyfromin-managedreflistt) — Copies all items from another list
+- [(ref ManagedRefList\<T\>).RefAdd()](#ref-managedreflisttrefadd) — Adds a `default` item to the list and returns a mutable reference to it
+- [(ref ManagedRefList\<T\>).RefAt(int)](#ref-managedreflisttrefatint) — Returns a mutable reference to a list item
+- [(ref ManagedRefList\<T\>).RefIter()](#ref-managedreflisttrefiter) — Creates a mutable by-ref iterator for the list
+- [(ref ManagedRefList\<T\>).RefIterReversed()](#ref-managedreflisttrefiterreversed) — Creates a mutable reversed by-ref iterator for the list
+- [(ref ManagedRefList\<T\>).RemoveAt(int)](#ref-managedreflisttremoveatint) — Removes an item from the list at the given index
+- [(ref ManagedRefList\<byte\>).AppendAsciiString(string)](#ref-managedreflistbyteappendasciistringstring) — Appends a given string to the list as ASCII bytes
+- [(ref ManagedRefList\<byte\>).AppendUtf8String(string)](#ref-managedreflistbyteappendutf8stringstring) — Appends a given string to the list as UTF-8 bytes
 
 
 ## Static Creation Methods

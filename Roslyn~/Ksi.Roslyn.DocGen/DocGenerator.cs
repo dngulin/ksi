@@ -69,23 +69,23 @@ public static class DocGenerator
 
     private static void WriteToc(StreamWriter writer, TypeSpec t)
     {
-        WriteTocSection(writer, t.Constructors.Select(x => x.Title).ToArray(), "Constructors");
-        WriteTocSection(writer, t.ExternalConstructors.Select(x => x.Title).ToArray(), "Static Creation Methods");
-        WriteTocSection(writer, t.Properties.Select(x => x.Title).ToArray(), "Properties");
-        WriteTocSection(writer, t.Methods.Select(x => x.Title).ToArray(), "Methods");
-        WriteTocSection(writer, t.StaticMethods.Select(x => x.Title).ToArray(), "Static Methods");
-        WriteTocSection(writer, t.ExternalMethods.Select(x => x.Title).ToArray(), "Extension Methods");
+        WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
+        WriteTocSection(writer, t.ExternalConstructors.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
+        WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
+        WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");
+        WriteTocSection(writer, t.StaticMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Methods");
+        WriteTocSection(writer, t.ExternalMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Extension Methods");
     }
 
-    private static void WriteTocSection(StreamWriter writer, string[] captions, string title)
+    private static void WriteTocSection(StreamWriter writer, (string Caption, string Desc)[] entries, string title)
     {
-        if (captions.Length == 0)
+        if (entries.Length == 0)
             return;
 
         writer.WriteLine();
         writer.WriteLine(title);
-        foreach (var caption in captions)
-            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()})");
+        foreach (var (caption, desc) in entries)
+            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()}) — {desc.Split(".").First()}");
     }
 
     private static void WriteMethods(StreamWriter writer, IReadOnlyList<MethodSpec> methods, string title)
