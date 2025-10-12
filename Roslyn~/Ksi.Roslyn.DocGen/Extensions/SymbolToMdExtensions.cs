@@ -21,8 +21,6 @@ public static class SymbolToMdExtensions
             SymbolDisplayMemberOptions.IncludeParameters | SymbolDisplayMemberOptions.IncludeContainingType
         );
 
-    private static string ToMd(this string self) => self.Replace("<", @"\<").Replace(">", @"\>");
-
     public static string ToMd(this ITypeSymbol self) => self.ToDisplayString(DefaultFormat).ToMd();
 
     public static string ToMd(this IMethodSymbol self)

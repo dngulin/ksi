@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn.DocGen.Extensions;
 
-public static class SpecExtensions
+public static class TypeSpecExtensions
 {
     public static bool TryAddExternalMethod(this TypeSpec self, MethodSpec method)
     {
