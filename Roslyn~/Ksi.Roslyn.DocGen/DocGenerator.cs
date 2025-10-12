@@ -109,7 +109,7 @@ public static class DocGenerator
         Write(writer, m.Summary);
         Write(writer, m.Declaration);
         Write(writer, m.Parameters, "Parameters", "- ");
-        Write(writer, m.Returns, "Returns ");
+        Write(writer, m.Returns?.Decapitalize(), "Returns ");
         Write(writer, m.Exceptions, "> [!CAUTION]\n> Possible exceptions: ", "> - ");
     }
 

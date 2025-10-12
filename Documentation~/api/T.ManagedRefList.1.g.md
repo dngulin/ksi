@@ -83,7 +83,7 @@ Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-u
 public static ReadOnlySpan<T> AsReadOnlySpan<T>(this in ManagedRefList<T> self) where T : struct
 ```
 
-Returns A [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
+Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(in ManagedRefList\<T\>\).Capacity\(\)
@@ -233,7 +233,7 @@ Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet
 public static Span<T> AsSpan<T>([DynNoResize] this ref ManagedRefList<T> self) where T : struct
 ```
 
-Returns A [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
+Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(ref ManagedRefList\<T\>\).Clear\(\)

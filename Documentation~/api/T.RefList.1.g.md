@@ -85,7 +85,7 @@ Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-u
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : unmanaged
 ```
 
-Returns A [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
+Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(in RefList\<T\>\).Capacity\(\)
@@ -235,7 +235,7 @@ Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet
 public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
 ```
 
-Returns A [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
+Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(ref RefList\<T\>\).Clear\(\)

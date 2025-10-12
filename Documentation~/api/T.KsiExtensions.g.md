@@ -25,4 +25,4 @@ public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struc
 Parameters
 - `self` — instance to be moved
 
-Returns A moved structure instance
+Returns a moved structure instance
