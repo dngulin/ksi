@@ -44,16 +44,16 @@ public static class XmlToMdExtensions
 
     private static string ToMd(this XElement self, Compilation comp)
     {
-        var contents = self.Nodes().ToMd(comp);
+        var text = self.Nodes().ToMd(comp);
         return self.Name.LocalName switch
         {
-            "c" => $"`{contents.Replace("`", @"\`")}`",
-            "see" => self.TryGetLink(comp, out var link) ? $"[{contents}]({link})" : contents,
-            "para" => $"{self.OptPrefix("\n\n")}{contents}",
-            "item" => $"\n- {contents}",
-            "param" => $"`{self.NameAttr()}` — {contents.Decapitalize()}",
-            "exception" => $"`{self.CrefShort()}` — {contents.Decapitalize()}",
-            _ => contents
+            "c" => $"`{self.Value.Replace("`", @"\`")}`",
+            "see" => self.TrySee(comp, ref text, out var link) ? $"[{text}]({link})" : $"`{text}`",
+            "para" => $"{self.OptPrefix("\n\n")}{text}",
+            "item" => $"\n- {text}",
+            "param" => $"`{self.NameAttr()}` — {text.Decapitalize()}",
+            "exception" => $"`{self.CrefShort()}` — {text.Decapitalize()}",
+            _ => text
         };
     }
 
@@ -69,7 +69,7 @@ public static class XmlToMdExtensions
 
     private static string OptPrefix(this XElement self, string value) => self.PreviousNode == null ? "" : value;
 
-    private static bool TryGetLink(this XElement self, Compilation comp, out string link)
+    private static bool TrySee(this XElement self, Compilation comp, ref string title, out string link)
     {
         link = "";
 
@@ -78,10 +78,23 @@ public static class XmlToMdExtensions
             return false;
 
         var symbol = DocumentationCommentId.GetFirstSymbolForReferenceId(cref, comp);
-        if (symbol is not INamedTypeSymbol { ContainingNamespace.Name: "Ksi" } t)
+        if (symbol is not INamedTypeSymbol t)
             return false;
 
-        link = t.MdFileName();
+        if (title == "")
+            title = t.ToMd();
+
+        var ns = t.ContainingNamespace.ToDisplayString();
+        if (ns == "Ksi")
+        {
+            link = t.MdFileName();
+        }
+        else
+        {
+            var name = t.MetadataName.Replace('`', '-');
+            link = $"https://learn.microsoft.com/en-us/dotnet/api/{ns}.{name}?view=netstandard-2.1";
+        }
+
         return true;
     }
 }

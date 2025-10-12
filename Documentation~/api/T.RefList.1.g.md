@@ -1,6 +1,6 @@
 # RefList\<T\>
 
-Dynamic array collection wrapping the Persistent allocator.
+Dynamic array collection wrapping the `Persistent` allocator.
 Requires manual deallocation.
 
 ```csharp
@@ -13,7 +13,7 @@ Static Creation Methods
 - [RefList.WithDefaultItems\<T\>\(int\)](#reflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [\(in RefList\<T\>\).AsReadOnlySpan\(\)](#in-reflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
+- [\(in RefList\<T\>\).AsReadOnlySpan\(\)](#in-reflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
 - [\(in RefList\<T\>\).Capacity\(\)](#in-reflisttcapacity) — returns capacity of the given list
 - [\(in RefList\<T\>\).CopyTo\(ref RefList\<T\>\)](#in-reflisttcopytoref-reflistt) — copies all items to another list
 - [\(in RefList\<T\>\).Count\(\)](#in-reflisttcount) — returns item count in the given list
@@ -24,7 +24,7 @@ Extension Methods
 - [\(in RefList\<byte\>\).ToStringUtf8\(\)](#in-reflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
 - [\(ref RefList\<T\>\).Add\(T\)](#ref-reflisttaddt) — adds a new item to the list
 - [\(ref RefList\<T\>\).AppendDefault\(int\)](#ref-reflisttappenddefaultint) — adds a specified number of `default` items
-- [\(ref RefList\<T\>\).AsSpan\(\)](#ref-reflisttasspan) — represent the collection as `Span`
+- [\(ref RefList\<T\>\).AsSpan\(\)](#ref-reflisttasspan) — represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref RefList\<T\>\).Clear\(\)](#ref-reflisttclear) — removes all items from the list
 - [\(ref RefList\<T\>\).CopyFrom\(in RefList\<T\>\)](#ref-reflisttcopyfromin-reflistt) — copies all items from another list
 - [\(ref RefList\<T\>\).Dealloc\(\)](#ref-reflisttdealloc) — deallocate the list
@@ -79,11 +79,13 @@ Parameters
 
 ### \(in RefList\<T\>\).AsReadOnlySpan\(\)
 
-Represent the collection as `ReadOnlySpan`
+Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
 
 ```csharp
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : unmanaged
 ```
+
+Returns A [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(in RefList\<T\>\).Capacity\(\)
@@ -227,11 +229,13 @@ Parameters
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
 
-Represent the collection as `Span`
+Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
 
 ```csharp
 public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
 ```
+
+Returns A [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(ref RefList\<T\>\).Clear\(\)

@@ -86,8 +86,9 @@ public static class DocGenerator
         writer.WriteLine(title);
         foreach (var (caption, desc) in entries)
         {
-            var brief = desc.Split(".").First();
-            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()}) — {brief.Decapitalize()}");
+            var brief = desc.TrimEnd('.').Replace('\n', ' ').Split(". ").First().Decapitalize();
+            var frag = caption.ToMdFragment();
+            writer.WriteLine($"- [{caption}]({frag}) — {brief}");
         }
     }
 

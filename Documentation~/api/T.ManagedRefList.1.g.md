@@ -1,7 +1,7 @@
 # ManagedRefList\<T\>
 
-Dynamic array collection wrapping the Managed allocator.
-Can store structures containing reference types, but it is not compatible with Burst.
+Dynamic array collection wrapping a managed array.
+Can store structures containing reference types, but it is not compatible with `Burst`.
 
 ```csharp
 public struct ManagedRefList<T> where T : struct
@@ -13,7 +13,7 @@ Static Creation Methods
 - [ManagedRefList.WithDefaultItems\<T\>\(int\)](#managedreflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [\(in ManagedRefList\<T\>\).AsReadOnlySpan\(\)](#in-managedreflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
+- [\(in ManagedRefList\<T\>\).AsReadOnlySpan\(\)](#in-managedreflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
 - [\(in ManagedRefList\<T\>\).Capacity\(\)](#in-managedreflisttcapacity) — returns capacity of the given list
 - [\(in ManagedRefList\<T\>\).CopyTo\(ref ManagedRefList\<T\>\)](#in-managedreflisttcopytoref-managedreflistt) — copies all items to another list
 - [\(in ManagedRefList\<T\>\).Count\(\)](#in-managedreflisttcount) — returns item count in the given list
@@ -24,7 +24,7 @@ Extension Methods
 - [\(in ManagedRefList\<byte\>\).ToStringUtf8\(\)](#in-managedreflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
 - [\(ref ManagedRefList\<T\>\).Add\(T\)](#ref-managedreflisttaddt) — adds a new item to the list
 - [\(ref ManagedRefList\<T\>\).AppendDefault\(int\)](#ref-managedreflisttappenddefaultint) — adds a specified number of `default` items
-- [\(ref ManagedRefList\<T\>\).AsSpan\(\)](#ref-managedreflisttasspan) — represent the collection as `Span`
+- [\(ref ManagedRefList\<T\>\).AsSpan\(\)](#ref-managedreflisttasspan) — represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref ManagedRefList\<T\>\).Clear\(\)](#ref-managedreflisttclear) — removes all items from the list
 - [\(ref ManagedRefList\<T\>\).CopyFrom\(in ManagedRefList\<T\>\)](#ref-managedreflisttcopyfromin-managedreflistt) — copies all items from another list
 - [\(ref ManagedRefList\<T\>\).RefAdd\(\)](#ref-managedreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
@@ -77,11 +77,13 @@ Parameters
 
 ### \(in ManagedRefList\<T\>\).AsReadOnlySpan\(\)
 
-Represent the collection as `ReadOnlySpan`
+Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
 
 ```csharp
 public static ReadOnlySpan<T> AsReadOnlySpan<T>(this in ManagedRefList<T> self) where T : struct
 ```
+
+Returns A [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(in ManagedRefList\<T\>\).Capacity\(\)
@@ -225,11 +227,13 @@ Parameters
 
 ### \(ref ManagedRefList\<T\>\).AsSpan\(\)
 
-Represent the collection as `Span`
+Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
 
 ```csharp
 public static Span<T> AsSpan<T>([DynNoResize] this ref ManagedRefList<T> self) where T : struct
 ```
+
+Returns A [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
 
 
 ### \(ref ManagedRefList\<T\>\).Clear\(\)

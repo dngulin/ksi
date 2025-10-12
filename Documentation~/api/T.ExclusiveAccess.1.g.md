@@ -1,16 +1,16 @@
 # ExclusiveAccess\<T\>
 
 Container designed to provide exclusive access to inner data.
-It is achieved by maintaining only one active `MutableAccessScope` or `ReadOnlyAccessScope` wrapping inner data.
-Supposed to wrap `[DynSized]` structures.
+It is achieved by maintaining only one active [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) wrapping inner data.
+Supposed to wrap [DynSized](T.DynSizedAttribute.g.md) structures.
 
 ```csharp
 public sealed class ExclusiveAccess<T> where T: struct
 ```
 
 Properties
-- [Mutable](#mutable) — creates a new instance of `MutableAccessScope`
-- [ReadOnly](#readonly) — creates a new instance of `ReadOnlyAccessScope`
+- [Mutable](#mutable) — creates a new instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md)
+- [ReadOnly](#readonly) — creates a new instance of `[ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md)
 
 
 ## Properties
@@ -18,7 +18,7 @@ Properties
 
 ### Mutable
 
-Creates a new instance of `MutableAccessScope`.
+Creates a new instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md).
 
 ```csharp
 public MutableAccessScope<T> Mutable
@@ -26,12 +26,12 @@ public MutableAccessScope<T> Mutable
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — if an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+> - `InvalidOperationException` — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.
 
 
 ### ReadOnly
 
-Creates a new instance of `ReadOnlyAccessScope`.
+Creates a new instance of `[ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md).
 
 ```csharp
 public ReadOnlyAccessScope<T> ReadOnly
@@ -39,4 +39,4 @@ public ReadOnlyAccessScope<T> ReadOnly
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — if an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+> - `InvalidOperationException` — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.

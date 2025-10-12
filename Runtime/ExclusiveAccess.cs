@@ -4,8 +4,8 @@ namespace Ksi
 {
     /// <summary>
     /// Container designed to provide exclusive access to inner data.
-    /// It is achieved by maintaining only one active `MutableAccessScope` or `ReadOnlyAccessScope` wrapping inner data.
-    /// Supposed to wrap `[DynSized]` structures.
+    /// It is achieved by maintaining only one active <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> wrapping inner data.
+    /// Supposed to wrap <see cref="DynSizedAttribute">DynSized</see> structures.
     /// </summary>
     public sealed class ExclusiveAccess<T> where T: struct
     {
@@ -15,18 +15,18 @@ namespace Ksi
         private ulong _activeAccessId;
 
         /// <summary>
-        /// Creates a new instance of `MutableAccessScope`.
+        /// Creates a new instance of <see cref="MutableAccessScope{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+        /// If an active instance of <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> already exists.
         /// </exception>
         public MutableAccessScope<T> Mutable => new MutableAccessScope<T>(this, GetNextAccessId());
 
         /// <summary>
-        /// Creates a new instance of `ReadOnlyAccessScope`.
+        /// Creates a new instance of `<see cref="ReadOnlyAccessScope{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// If an active instance of `MutableAccessScope` or `ReadOnlyAccessScope` already exists.
+        /// If an active instance of <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> already exists.
         /// </exception>
         public ReadOnlyAccessScope<T> ReadOnly => new ReadOnlyAccessScope<T>(this, GetNextAccessId());
 
@@ -60,7 +60,7 @@ namespace Ksi
 
     /// <summary>
     /// Structure that provides mutable exclusive access to wrapped data.
-    /// Should be disposed after usage to release the lock on data.
+    /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
     public readonly ref struct MutableAccessScope<T> where T : struct
     {
@@ -82,14 +82,14 @@ namespace Ksi
         public ref T Value => ref _exclusive.Access(_accessId);
 
         /// <summary>
-        /// Deactivates this access scope but allows creating a new one.
+        /// Deactivates the access scope and allows creating a new one from the parent <see cref="ExclusiveAccess{T}"/> instance.
         /// </summary>
         public void Dispose() => _exclusive?.Unlock(_accessId);
     }
 
     /// <summary>
     /// Structure that provides readonly exclusive access to wrapped data.
-    /// Should be disposed after usage to release the lock on data.
+    /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
     public readonly ref struct ReadOnlyAccessScope<T> where T : struct
     {
@@ -111,7 +111,7 @@ namespace Ksi
         public ref readonly T Value => ref _exclusive.Access(_accessId);
 
         /// <summary>
-        /// Deactivates this access scope but allows creating a new one.
+        /// Deactivates the access scope and allows creating a new one from the parent <see cref="ExclusiveAccess{T}"/> instance.
         /// </summary>
         public void Dispose() => _exclusive?.Unlock(_accessId);
     }

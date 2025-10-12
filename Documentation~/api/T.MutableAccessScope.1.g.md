@@ -1,7 +1,7 @@
 # MutableAccessScope\<T\>
 
 Structure that provides mutable exclusive access to wrapped data.
-Should be disposed after usage to release the lock on data.
+Should be disposed after usage to release access lock from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance.
 
 ```csharp
 public readonly ref struct MutableAccessScope<T> where T : struct
@@ -11,7 +11,7 @@ Properties
 - [Value](#value) — returns a mutable reference to the wrapped data
 
 Methods
-- [Dispose\(\)](#dispose) — deactivates this access scope but allows creating a new one
+- [Dispose\(\)](#dispose) — deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance
 
 
 ## Properties
@@ -35,7 +35,7 @@ public ref T Value
 
 ### Dispose\(\)
 
-Deactivates this access scope but allows creating a new one.
+Deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance.
 
 ```csharp
 public void Dispose()

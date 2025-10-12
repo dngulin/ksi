@@ -1,6 +1,6 @@
 # TempRefList\<T\>
 
-Dynamic array collection wrapping the Temp allocator.
+Dynamic array collection wrapping the `Temp` allocator.
 Can be stored only on stack.
 
 ```csharp
@@ -13,7 +13,7 @@ Static Creation Methods
 - [TempRefList.WithDefaultItems\<T\>\(int\)](#tempreflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
+- [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
 - [\(in TempRefList\<T\>\).Capacity\(\)](#in-tempreflisttcapacity) — returns capacity of the given list
 - [\(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)](#in-tempreflisttcopytoref-tempreflistt) — copies all items to another list
 - [\(in TempRefList\<T\>\).Count\(\)](#in-tempreflisttcount) — returns item count in the given list
@@ -24,7 +24,7 @@ Extension Methods
 - [\(in TempRefList\<byte\>\).ToStringUtf8\(\)](#in-tempreflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
 - [\(ref TempRefList\<T\>\).Add\(T\)](#ref-tempreflisttaddt) — adds a new item to the list
 - [\(ref TempRefList\<T\>\).AppendDefault\(int\)](#ref-tempreflisttappenddefaultint) — adds a specified number of `default` items
-- [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — represent the collection as `Span`
+- [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref TempRefList\<T\>\).Clear\(\)](#ref-tempreflisttclear) — removes all items from the list
 - [\(ref TempRefList\<T\>\).CopyFrom\(in TempRefList\<T\>\)](#ref-tempreflisttcopyfromin-tempreflistt) — copies all items from another list
 - [\(ref TempRefList\<T\>\).RefAdd\(\)](#ref-tempreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
@@ -77,7 +77,7 @@ Parameters
 
 ### \(in TempRefList\<T\>\).AsReadOnlySpan\(\)
 
-Represent the collection as `ReadOnlySpan`
+Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
 
 ```csharp
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> self) where T : unmanaged
@@ -225,7 +225,7 @@ Parameters
 
 ### \(ref TempRefList\<T\>\).AsSpan\(\)
 
-Represent the collection as `Span`
+Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
 
 ```csharp
 public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> self) where T : unmanaged
