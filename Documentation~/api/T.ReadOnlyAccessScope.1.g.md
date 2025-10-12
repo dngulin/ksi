@@ -27,7 +27,7 @@ public ref readonly T Value
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — if the data is not available to this access scope (e.g. usage after disposing).
+> - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — if the data is not available to this access scope (e.g. usage after disposing).
 
 
 ## Methods

@@ -152,7 +152,7 @@ Returns a readonly reference to a list item at the given index.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if the index is out of bounds
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is out of bounds
 
 
 ### \(in RefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -238,7 +238,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `ArgumentException` — if the count is negative
+> - [ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentException?view=netstandard-2.1) — if the count is negative
 
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
@@ -376,7 +376,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if the index is out of bounds
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is out of bounds
 
 
 ### \(ref RefList\<byte\>\).AppendAsciiString\(string\)

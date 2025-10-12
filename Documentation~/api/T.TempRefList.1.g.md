@@ -148,7 +148,7 @@ Returns a readonly reference to a list item at the given index.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if the index is out of bounds
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is out of bounds
 
 
 ### \(in TempRefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -234,7 +234,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `ArgumentException` — if the count is negative
+> - [ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentException?view=netstandard-2.1) — if the count is negative
 
 
 ### \(ref TempRefList\<T\>\).AsSpan\(\)
@@ -343,7 +343,7 @@ Parameters
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `IndexOutOfRangeException` — if the index is out of bounds
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is out of bounds
 
 
 ### \(ref TempRefList\<byte\>\).AppendAsciiString\(string\)

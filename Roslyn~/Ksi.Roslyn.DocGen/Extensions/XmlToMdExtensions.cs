@@ -45,16 +45,45 @@ public static class XmlToMdExtensions
     private static string ToMd(this XElement self, Compilation comp)
     {
         var text = self.Nodes().ToMd(comp);
-        return self.Name.LocalName switch
+        switch (self.Name.LocalName)
         {
-            "c" => $"`{self.Value.Replace("`", @"\`")}`",
-            "see" => self.TrySee(comp, ref text, out var link) ? $"[{text}]({link})" : $"`{text}`",
-            "para" => $"{self.OptPrefix("\n\n")}{text}",
-            "item" => $"\n- {text}",
-            "param" => $"`{self.NameAttr()}` — {text.Decapitalize()}",
-            "exception" => $"`{self.CrefShort()}` — {text.Decapitalize()}",
-            _ => text
-        };
+            case "c":
+            {
+                var inlineCode = self.Value.Replace("`", @"\`");
+                return $"`{inlineCode}`";
+            }
+            case "see":
+            {
+                return self.TryGetCref(comp, ref text, out var link) ?
+                    $"[{text}]({link})" :
+                    $"`{text}`";
+            }
+            case "para":
+            {
+                var parSep = self.OptPrefix("\n\n");
+                return $"{parSep}{text}";
+            }
+            case "item":
+            {
+                return $"\n- {text}";
+            }
+            case "param":
+            {
+                var name = self.NameAttr();
+                var desc = text.Decapitalize();
+                return $"`{name}` — {desc}";
+            }
+            case "exception":
+            {
+                var title = "";
+                var desc = text.Decapitalize();
+                return self.TryGetCref(comp, ref title, out var link)
+                    ? $"[{title}]({link}) — {desc}"
+                    : $"`{title}` — {desc}";
+            }
+            default:
+                return text;
+        }
     }
 
     private static string ToMd(this IEnumerable<XNode> self, Compilation comp)
@@ -65,11 +94,10 @@ public static class XmlToMdExtensions
     private static string? Attr(this XElement self, string name) => self.Attribute(name)?.Value;
 
     private static string NameAttr(this XElement self) => self.Attr("name") ?? "???";
-    private static string CrefShort(this XElement self) => self.Attr("cref")?.Split('.').Last() ?? "???";
 
     private static string OptPrefix(this XElement self, string value) => self.PreviousNode == null ? "" : value;
 
-    private static bool TrySee(this XElement self, Compilation comp, ref string title, out string link)
+    private static bool TryGetCref(this XElement self, Compilation comp, ref string title, out string link)
     {
         link = "";
 
@@ -79,7 +107,12 @@ public static class XmlToMdExtensions
 
         var symbol = DocumentationCommentId.GetFirstSymbolForReferenceId(cref, comp);
         if (symbol is not INamedTypeSymbol t)
+        {
+            if (title == "")
+                title = cref.Split('.').Last();
+
             return false;
+        }
 
         if (title == "")
             title = t.ToMd();

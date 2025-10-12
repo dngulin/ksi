@@ -26,7 +26,7 @@ public MutableAccessScope<T> Mutable
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.
+> - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.
 
 
 ### ReadOnly
@@ -39,4 +39,4 @@ public ReadOnlyAccessScope<T> ReadOnly
 
 > [!CAUTION]
 > Possible exceptions: 
-> - `InvalidOperationException` — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.
+> - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md) already exists.
