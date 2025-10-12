@@ -5,7 +5,7 @@ If the method returns a specific reference path, specify it with positional para
 otherwise omit them (that means the method can return any inner reference).
 
 Indexers should be indicated with the "[n]" segments.
-The "!" should be placed after the last `[SynSized]` segment.
+The "!" should be placed after the last [DynSized](T.DynSizedAttribute.g.md) segment.
 
 Examples: 
 - `[RefList]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
@@ -18,8 +18,8 @@ public sealed class RefPathAttribute : Attribute
 ```
 
 Constructors
-- [RefPathAttribute\(\)](#refpathattribute) — non-explicit `[RefPath]` attribute constructor
-- [RefPathAttribute\(params string\[\]\)](#refpathattributeparams-string) — explicit `[RefPath]` attribute constructor
+- [RefPathAttribute\(\)](#refpathattribute) — non-explicit `RefPath` attribute constructor
+- [RefPathAttribute\(params string\[\]\)](#refpathattributeparams-string) — explicit `RefPath` attribute constructor
 
 Properties
 - [Segments](#segments) — list of segments indicating the `RefPath` created by the marked extension method
@@ -30,7 +30,7 @@ Properties
 
 ### RefPathAttribute\(\)
 
-Non-explicit `[RefPath]` attribute constructor.
+Non-explicit `RefPath` attribute constructor.
 Will be embedded into the parent `RefPath` expression as the method name suffixed with `()`.
 
 ```csharp
@@ -40,7 +40,7 @@ public RefPathAttribute()
 
 ### RefPathAttribute\(params string\[\]\)
 
-Explicit `[RefPath]` attribute constructor.
+Explicit `RefPath` attribute constructor.
 Will be embedded into the parent `RefPath` expression as a sequence of segments.
 
 ```csharp
@@ -49,7 +49,7 @@ public RefPathAttribute(params string[] segments)
 
 Parameters
 - `segments` — array of segments produced by return expression.
-The `[DynSized]` separator "!" should be passed as a separated segment.
+The [DynSized](T.DynSizedAttribute.g.md) separator "!" should be passed as a separated segment.
 
 
 ## Properties
@@ -59,7 +59,7 @@ The `[DynSized]` separator "!" should be passed as a separated segment.
 
 List of segments indicating the `RefPath` created by the marked extension method.
 Is empty array in case of the non-explicit `RefPath`.
-Can contain the `[DynSized]` separator "!".
+Can contain the [DynSized](T.DynSizedAttribute.g.md) separator "!".
 
 ```csharp
 public string[] Segments

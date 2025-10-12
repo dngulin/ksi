@@ -16,7 +16,7 @@ Static Methods
 ### \(ref T\).Move\(\)
 
 Move structure ownership. After invocation the original value is set to `default` (zeroed).
-Can be required to work with `[ExplicitCopy]` types.
+Can be required to work with [ExplicitCopy](T.ExplicitCopyAttribute.g.md) types.
 
 ```csharp
 public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struct

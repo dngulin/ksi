@@ -46,11 +46,4 @@ public static class TypeSpecExtensions
 
         return SymbolEqualityComparer.Default.Equals(self, other);
     }
-
-    public static string FileName(this TypeSpec self)
-    {
-        var t = self.Symbol;
-        var suffix = t.IsGenericType ? $".{t.TypeArguments.Length}" : "";
-        return $"T.{t.Name}{suffix}.g.md";
-    }
 }

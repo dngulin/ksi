@@ -35,7 +35,7 @@ public class PublicApi(
             if (string.IsNullOrEmpty(xml))
                 continue;
 
-            var spec = new TypeSpec(t);
+            var spec = new TypeSpec(t, compilation);
 
             if (t.Name.EndsWith("Attribute"))
                 attributes.Add(spec);

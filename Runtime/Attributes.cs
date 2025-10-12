@@ -5,8 +5,8 @@ namespace Ksi
     /// <summary>
     /// Attribute that forbids structure implicit copying and provides explicit copy extension methods.
     /// Can be applied only to POD types without any methods and private fields.
-    /// Should be added to a struct that contains fields of ExplicitCopy type.
-    /// Can be also applied to a generic type parameter to make it compatible with [ExplicitCopy] types.
+    /// Should be added to a struct that contains fields of <c>ExplicitCopy</c> type.
+    /// Can be also applied to a generic type parameter to make it compatible with <c>ExplicitCopy</c> types.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class ExplicitCopyAttribute : Attribute
@@ -14,8 +14,9 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a [ExplicitCopy] type that contains a dynamically sized buffer.
-    /// Should be added to a struct that contains fields of the [DynSized] type.
+    /// Attribute to indicate an <see cref="ExplicitCopyAttribute">ExplicitCopy</see> type
+    /// that contains a dynamically sized buffer.
+    /// Should be added to a struct that contains fields of the <c>DynSized</c> type.
     /// Enables reference lifetime and aliasing diagnostics.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
@@ -24,7 +25,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute that disallows any resizing operations on a [DynSized] type instance.
+    /// Attribute that disallows any resizing operations on a <see cref="DynSizedAttribute">DynSized</see> type instance.
     /// Allows getting mutable references to collection items but disallows collection resizing.
     /// Hints the reference lifetime analyzer that any internal buffer cannot be resized.
     /// </summary>
@@ -34,9 +35,9 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a [DynSized] type that requires manual deallocation.
-    /// Should be added to a struct that contains fields of the [Dealloc] type.
-    /// Can be also applied to a generic type parameter to make it compatible with [Dealloc] types.
+    /// Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type that requires manual deallocation.
+    /// Should be added to a struct that contains fields of the <c>Dealloc</c> type.
+    /// Can be also applied to a generic type parameter to make it compatible with <c>Dealloc</c> types.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class DeallocAttribute : Attribute
@@ -44,7 +45,8 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a method that returns a reference to a deallocated instance of the [Dealloc] type.
+    /// Attribute to indicate a method that returns a reference to
+    /// a deallocated instance of the <see cref="DeallocAttribute">Dealloc</see> type.
     /// Allows assigning a new value to the returned reference.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
@@ -53,9 +55,10 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a [DynSized] type that uses temporary allocator and should be created only on stack.
+    /// Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type
+    /// that uses temporary allocator and should be created only on stack.
     /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
-    /// Should be added to a struct that contains fields of the [TempAlloc] type.
+    /// Should be added to a struct that contains fields of the <c>TempAlloc</c> type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class TempAllocAttribute : Attribute
@@ -70,7 +73,7 @@ namespace Ksi
     ///</para>
     /// <para>
     /// Indexers should be indicated with the "[n]" segments.
-    /// The "!" should be placed after the last `[SynSized]` segment.
+    /// The "!" should be placed after the last <see cref="DynSizedAttribute">DynSized</see> segment.
     ///</para>
     /// <para>
     /// Examples:
@@ -98,25 +101,25 @@ namespace Ksi
     public sealed class RefPathAttribute : Attribute
     {
         /// <summary>
-        /// List of segments indicating the `RefPath` created by the marked extension method.
-        /// Is empty array in case of the non-explicit `RefPath`.
-        /// Can contain the `[DynSized]` separator "!".
+        /// List of segments indicating the <c>RefPath</c> created by the marked extension method.
+        /// Is empty array in case of the non-explicit <c>RefPath</c>.
+        /// Can contain the <see cref="DynSizedAttribute">DynSized</see> separator "!".
         /// </summary>
         public string[] Segments { get; }
 
         /// <summary>
-        /// Non-explicit `[RefPath]` attribute constructor.
+        /// Non-explicit <c>RefPath</c> attribute constructor.
         /// Will be embedded into the parent <c>RefPath</c> expression as the method name suffixed with <c>()</c>.
         /// </summary>
         public RefPathAttribute() => Segments = Array.Empty<string>();
 
         /// <summary>
-        /// Explicit `[RefPath]` attribute constructor.
+        /// Explicit <c>RefPath</c> attribute constructor.
         /// Will be embedded into the parent <c>RefPath</c> expression as a sequence of segments.
         /// </summary>
         /// <param name="segments">
         /// Array of segments produced by return expression.
-        /// The `[DynSized]` separator "!" should be passed as a separated segment.
+        /// The <see cref="DynSizedAttribute">DynSized</see> separator "!" should be passed as a separated segment.
         /// </param>
         public RefPathAttribute(params string[] segments) => Segments = segments;
     }

@@ -30,19 +30,19 @@ public sealed class TypeSpec
     public readonly string Declaration;
     public readonly string Summary;
 
-    public TypeSpec(INamedTypeSymbol symbol)
+    public TypeSpec(INamedTypeSymbol symbol, Compilation comp)
     {
         Symbol = symbol;
 
         Constructors = symbol.Constructors
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
-            .Select(m => new MethodSpec(m))
+            .Select(m => new MethodSpec(m, comp))
             .ToImmutableArray();
 
         Properties = symbol.GetMembers()
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
             .OfType<IPropertySymbol>()
-            .Select(p => new PropertySpec(p))
+            .Select(p => new PropertySpec(p, comp))
             .ToImmutableArray();
 
         var methods = new List<MethodSpec>();
@@ -52,16 +52,16 @@ public sealed class TypeSpec
                 continue;
 
             if (!m.IsStatic)
-                methods.Add(new MethodSpec(m));
+                methods.Add(new MethodSpec(m, comp));
             else
-                StaticMethods.Add(new MethodSpec(m));
+                StaticMethods.Add(new MethodSpec(m, comp));
         }
 
         Methods = methods.ToImmutableArray();
 
         Title = symbol.ToMd();
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
-        Summary = symbol.DocXml().ToMd("summary")!;
+        Summary = symbol.DocXml().ToMd("summary", comp)!;
     }
 }
 
@@ -76,7 +76,7 @@ public sealed class MethodSpec
     public readonly string? Returns;
     public readonly ImmutableArray<string> Exceptions;
 
-    public MethodSpec(IMethodSymbol symbol)
+    public MethodSpec(IMethodSymbol symbol, Compilation comp)
     {
         Symbol = symbol;
 
@@ -84,10 +84,10 @@ public sealed class MethodSpec
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
 
         var xml = symbol.DocXml();
-        Summary = xml.ToMd("summary")!;
-        Parameters = xml.ManyToMd("param").ToImmutableArray();
-        Returns = xml.ToMd("returns");
-        Exceptions = xml.ManyToMd("exception").ToImmutableArray();
+        Summary = xml.ToMd("summary", comp)!;
+        Parameters = xml.ManyToMd("param", comp).ToImmutableArray();
+        Returns = xml.ToMd("returns", comp);
+        Exceptions = xml.ManyToMd("exception", comp).ToImmutableArray();
     }
 }
 
@@ -100,14 +100,14 @@ public sealed class PropertySpec
     public readonly string Summary;
     public readonly ImmutableArray<string> Exceptions;
 
-    public PropertySpec(IPropertySymbol symbol)
+    public PropertySpec(IPropertySymbol symbol, Compilation comp)
     {
         Symbol = symbol;
         Title = symbol.Name;
         Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
 
         var xml = symbol.DocXml();
-        Summary = xml.ToMd("summary")!;
-        Exceptions = xml.ManyToMd("exception").ToImmutableArray();
+        Summary = xml.ToMd("summary", comp)!;
+        Exceptions = xml.ManyToMd("exception", comp).ToImmutableArray();
     }
 }

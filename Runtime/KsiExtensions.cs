@@ -7,7 +7,7 @@ namespace Ksi
     {
         /// <summary>
         /// Move structure ownership. After invocation the original value is set to <c>default</c> (zeroed).
-        /// Can be required to work with `[ExplicitCopy]` types.
+        /// Can be required to work with <see cref="ExplicitCopyAttribute">ExplicitCopy</see> types.
         /// </summary>
         /// <param name="self">instance to be moved</param>
         /// <returns>A moved structure instance</returns>
