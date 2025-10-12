@@ -25,23 +25,28 @@ public static class XmlToMdExtensions
             XElement element => element.ToMd(),
             XCData cdata => $"```\n{cdata.Value.Trim()}\n```",
             XComment comment => $"<!--{comment.Value.Trim()}-->",
-            XText text => text.Value.XmlTextToMd(),
+            XText text => text.Value.XmlTextToMd(self.PreviousNode != null, self.NextNode != null),
             _ => ""
         };
     }
 
-    private static string XmlTextToMd(this string self)
+    private static string XmlTextToMd(this string self, bool keepLeadingSpace, bool keepTrailingSpace)
     {
+        var prefix = keepLeadingSpace && self.StartsWith(' ') ? " " : "";
+        var suffix = keepTrailingSpace && self.EndsWith(' ') ? " " : "";
+
         const StringSplitOptions splitOpt = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-        return string.Join("\n", self.Trim().Split('\n', splitOpt)).Trim();
+        var value = string.Join("\n", self.Split('\n', splitOpt));
+
+        return $"{prefix}{value}{suffix}";
     }
 
     private static string ToMd(this XElement self)
     {
-        var separator = self.PreviousNode == null ? "" : "\n\n";
         return self.Name.LocalName switch
         {
-            "para" => $"{separator}{self.Nodes().ToMd()}",
+            "c" => $"`{self.Nodes().ToMd().Replace("`", @"\`")}`",
+            "para" => $"{self.OptPrefix("\n\n")}{self.Nodes().ToMd()}",
             "item" => $"\n- {self.Nodes().ToMd()}",
             "param" => $"`{self.NameAttr()}` — " + self.Nodes().ToMd().Decapitalize(),
             "exception" => $"`{self.CrefAttrShort()}` — " + self.Nodes().ToMd().Decapitalize(),
@@ -55,4 +60,6 @@ public static class XmlToMdExtensions
 
     private static string NameAttr(this XElement self) => self.Attr("name");
     private static string CrefAttrShort(this XElement self) => self.Attr("cref").Split('.').Last();
+
+    private static string OptPrefix(this XElement self, string value) => self.PreviousNode == null ? "" : value;
 }

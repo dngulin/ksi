@@ -77,17 +77,18 @@ namespace Ksi
     /// <list type="bullet">
     /// <item>
     /// <description>
-    /// `[RefList]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
+    /// <c>[RefList]</c> corresponds to the reference path <c>MethodName()</c>, meaning it can reference any inner data
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// `[RefList("self", "!")]` corresponds to the reference path `self!`, meaning it doesn't contribute to the parent reference path
+    /// <c>[RefList("self", "!")]</c> corresponds to the reference path <c>self!</c>,
+    /// meaning it doesn't contribute to the parent reference path
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// `[RefList("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
+    /// <c>[RefList("self", "Field", "!", "[n]")]</c> corresponds to the reference path <c>self.Field![n]</c>
     /// </description>
     /// </item>
     /// </list>
@@ -105,13 +106,13 @@ namespace Ksi
 
         /// <summary>
         /// Non-explicit `[RefPath]` attribute constructor.
-        /// Will be embedded into the calling expression `RefPath` as the method name suffixed with "()".
+        /// Will be embedded into the parent <c>RefPath</c> expression as the method name suffixed with <c>()</c>.
         /// </summary>
         public RefPathAttribute() => Segments = Array.Empty<string>();
 
         /// <summary>
         /// Explicit `[RefPath]` attribute constructor.
-        /// Will be embedded into the calling expression `RefPath` as a sequence of segments.
+        /// Will be embedded into the parent <c>RefPath</c> expression as a sequence of segments.
         /// </summary>
         /// <param name="segments">
         /// Array of segments produced by return expression.

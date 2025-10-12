@@ -6,11 +6,11 @@ namespace Ksi
     public static class KsiExtensions
     {
         /// <summary>
-        /// Move structure ownership. After invocation the original value is set to `default` (zeroed).
+        /// Move structure ownership. After invocation the original value is set to <c>default</c> (zeroed).
         /// Can be required to work with `[ExplicitCopy]` types.
         /// </summary>
         /// <param name="self">instance to be moved</param>
-        /// <returns>A new instance crated from the `self` parameter</returns>
+        /// <returns>A moved structure instance</returns>
         public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struct
         {
 #pragma warning disable EXPCOPY04

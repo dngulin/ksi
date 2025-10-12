@@ -7,9 +7,10 @@ otherwise omit them (that means the method can return any inner reference).
 Indexers should be indicated with the "[n]" segments.
 The "!" should be placed after the last `[SynSized]` segment.
 
-Examples:
+Examples: 
 - `[RefList]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
-- `[RefList("self", "!")]` corresponds to the reference path `self!`, meaning it doesn't contribute to the parent reference path
+- `[RefList("self", "!")]` corresponds to the reference path `self!`,
+meaning it doesn't contribute to the parent reference path
 - `[RefList("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
 
 ```csharp
@@ -30,7 +31,7 @@ Properties
 ### RefPathAttribute\(\)
 
 Non-explicit `[RefPath]` attribute constructor.
-Will be embedded into the calling expression `RefPath` as the method name suffixed with "()".
+Will be embedded into the parent `RefPath` expression as the method name suffixed with `()`.
 
 ```csharp
 public RefPathAttribute()
@@ -40,7 +41,7 @@ public RefPathAttribute()
 ### RefPathAttribute\(params string\[\]\)
 
 Explicit `[RefPath]` attribute constructor.
-Will be embedded into the calling expression `RefPath` as a sequence of segments.
+Will be embedded into the parent `RefPath` expression as a sequence of segments.
 
 ```csharp
 public RefPathAttribute(params string[] segments)

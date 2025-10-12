@@ -31,7 +31,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Creates a list filled with `default` items.
+                /// Creates a list filled with <c>default</c> items.
                 /// </summary>
                 /// <param name="count">number of items</param>
                 public static {0}<T> WithDefaultItems<T>(int count) where T : {1}
@@ -114,7 +114,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Adds a `default` item to the list and returns a mutable reference to it.
+                /// Adds a <c>default</c> item to the list and returns a mutable reference to it.
                 /// </summary>
                 /// <param name="self">list to add an item</param>
                 /// <returns>a mutable reference to the created item</returns>
@@ -163,7 +163,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Adds a specified number of `default` items.
+                /// Adds a specified number of <c>default</c> items.
                 /// </summary>
                 /// <param name="self">list add items</param>
                 /// <param name="count">number of items to add</param>
