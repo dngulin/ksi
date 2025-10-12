@@ -57,12 +57,35 @@ public static class DocGenerator
         Write(writer, t.Summary);
         Write(writer, t.Declaration);
 
+        WriteToc(writer, t);
+
         WriteMethods(writer, t.Constructors, "Constructors");
         WriteMethods(writer, t.ExternalConstructors, "Static Creation Methods");
         WriteProperties(writer, t.Properties);
         WriteMethods(writer, t.Methods, "Methods");
         WriteMethods(writer, t.StaticMethods, "Static Methods");
         WriteMethods(writer, t.ExternalMethods, "Extension Methods");
+    }
+
+    private static void WriteToc(StreamWriter writer, TypeSpec t)
+    {
+        WriteTocSection(writer, t.Constructors.Select(x => x.Title).ToArray(), "Constructors");
+        WriteTocSection(writer, t.ExternalConstructors.Select(x => x.Title).ToArray(), "Static Creation Methods");
+        WriteTocSection(writer, t.Properties.Select(x => x.Title).ToArray(), "Properties");
+        WriteTocSection(writer, t.Methods.Select(x => x.Title).ToArray(), "Methods");
+        WriteTocSection(writer, t.StaticMethods.Select(x => x.Title).ToArray(), "Static Methods");
+        WriteTocSection(writer, t.ExternalMethods.Select(x => x.Title).ToArray(), "Extension Methods");
+    }
+
+    private static void WriteTocSection(StreamWriter writer, string[] captions, string title)
+    {
+        if (captions.Length == 0)
+            return;
+
+        writer.WriteLine();
+        writer.WriteLine(title);
+        foreach (var caption in captions)
+            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()})");
     }
 
     private static void WriteMethods(StreamWriter writer, IReadOnlyList<MethodSpec> methods, string title)

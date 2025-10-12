@@ -16,6 +16,13 @@ Examples:
 public sealed class RefPathAttribute : Attribute
 ```
 
+Constructors
+- [RefPathAttribute()](#refpathattribute)
+- [RefPathAttribute(params string[])](#refpathattributeparams-string)
+
+Properties
+- [Segments](#segments)
+
 
 ## Constructors
 

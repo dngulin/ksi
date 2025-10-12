@@ -6,6 +6,9 @@ General purpose extension methods provided by the ѯ-Framework.
 public static class KsiExtensions
 ```
 
+Static Methods
+- [(ref T).Move()](#ref-tmove)
+
 
 ## Static Methods
 

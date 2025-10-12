@@ -7,6 +7,34 @@ Can store structures containing reference types, but it is not compatible with B
 public struct ManagedRefList<T> where T : struct
 ```
 
+Static Creation Methods
+- [ManagedRefList.Empty\<T\>()](#managedreflistemptyt)
+- [ManagedRefList.WithCapacity\<T\>(int)](#managedreflistwithcapacitytint)
+- [ManagedRefList.WithDefaultItems\<T\>(int)](#managedreflistwithdefaultitemstint)
+
+Extension Methods
+- [(in ManagedRefList\<T\>).AsReadOnlySpan()](#in-managedreflisttasreadonlyspan)
+- [(in ManagedRefList\<T\>).Capacity()](#in-managedreflisttcapacity)
+- [(in ManagedRefList\<T\>).CopyTo(ref ManagedRefList\<T\>)](#in-managedreflisttcopytoref-managedreflistt)
+- [(in ManagedRefList\<T\>).Count()](#in-managedreflisttcount)
+- [(in ManagedRefList\<T\>).RefReadonlyAt(int)](#in-managedreflisttrefreadonlyatint)
+- [(in ManagedRefList\<T\>).RefReadonlyIter()](#in-managedreflisttrefreadonlyiter)
+- [(in ManagedRefList\<T\>).RefReadonlyIterReversed()](#in-managedreflisttrefreadonlyiterreversed)
+- [(in ManagedRefList\<byte\>).ToStringAscii()](#in-managedreflistbytetostringascii)
+- [(in ManagedRefList\<byte\>).ToStringUtf8()](#in-managedreflistbytetostringutf8)
+- [(ref ManagedRefList\<T\>).Add(T)](#ref-managedreflisttaddt)
+- [(ref ManagedRefList\<T\>).AppendDefault(int)](#ref-managedreflisttappenddefaultint)
+- [(ref ManagedRefList\<T\>).AsSpan()](#ref-managedreflisttasspan)
+- [(ref ManagedRefList\<T\>).Clear()](#ref-managedreflisttclear)
+- [(ref ManagedRefList\<T\>).CopyFrom(in ManagedRefList\<T\>)](#ref-managedreflisttcopyfromin-managedreflistt)
+- [(ref ManagedRefList\<T\>).RefAdd()](#ref-managedreflisttrefadd)
+- [(ref ManagedRefList\<T\>).RefAt(int)](#ref-managedreflisttrefatint)
+- [(ref ManagedRefList\<T\>).RefIter()](#ref-managedreflisttrefiter)
+- [(ref ManagedRefList\<T\>).RefIterReversed()](#ref-managedreflisttrefiterreversed)
+- [(ref ManagedRefList\<T\>).RemoveAt(int)](#ref-managedreflisttremoveatint)
+- [(ref ManagedRefList\<byte\>).AppendAsciiString(string)](#ref-managedreflistbyteappendasciistringstring)
+- [(ref ManagedRefList\<byte\>).AppendUtf8String(string)](#ref-managedreflistbyteappendutf8stringstring)
+
 
 ## Static Creation Methods
 

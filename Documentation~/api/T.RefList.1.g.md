@@ -7,6 +7,36 @@ Requires manual deallocation.
 public struct RefList<T> where T : unmanaged
 ```
 
+Static Creation Methods
+- [RefList.Empty\<T\>()](#reflistemptyt)
+- [RefList.WithCapacity\<T\>(int)](#reflistwithcapacitytint)
+- [RefList.WithDefaultItems\<T\>(int)](#reflistwithdefaultitemstint)
+
+Extension Methods
+- [(in RefList\<T\>).AsReadOnlySpan()](#in-reflisttasreadonlyspan)
+- [(in RefList\<T\>).Capacity()](#in-reflisttcapacity)
+- [(in RefList\<T\>).CopyTo(ref RefList\<T\>)](#in-reflisttcopytoref-reflistt)
+- [(in RefList\<T\>).Count()](#in-reflisttcount)
+- [(in RefList\<T\>).RefReadonlyAt(int)](#in-reflisttrefreadonlyatint)
+- [(in RefList\<T\>).RefReadonlyIter()](#in-reflisttrefreadonlyiter)
+- [(in RefList\<T\>).RefReadonlyIterReversed()](#in-reflisttrefreadonlyiterreversed)
+- [(in RefList\<byte\>).ToStringAscii()](#in-reflistbytetostringascii)
+- [(in RefList\<byte\>).ToStringUtf8()](#in-reflistbytetostringutf8)
+- [(ref RefList\<T\>).Add(T)](#ref-reflisttaddt)
+- [(ref RefList\<T\>).AppendDefault(int)](#ref-reflisttappenddefaultint)
+- [(ref RefList\<T\>).AsSpan()](#ref-reflisttasspan)
+- [(ref RefList\<T\>).Clear()](#ref-reflisttclear)
+- [(ref RefList\<T\>).CopyFrom(in RefList\<T\>)](#ref-reflisttcopyfromin-reflistt)
+- [(ref RefList\<T\>).Dealloc()](#ref-reflisttdealloc)
+- [(ref RefList\<T\>).Deallocated()](#ref-reflisttdeallocated)
+- [(ref RefList\<T\>).RefAdd()](#ref-reflisttrefadd)
+- [(ref RefList\<T\>).RefAt(int)](#ref-reflisttrefatint)
+- [(ref RefList\<T\>).RefIter()](#ref-reflisttrefiter)
+- [(ref RefList\<T\>).RefIterReversed()](#ref-reflisttrefiterreversed)
+- [(ref RefList\<T\>).RemoveAt(int)](#ref-reflisttremoveatint)
+- [(ref RefList\<byte\>).AppendAsciiString(string)](#ref-reflistbyteappendasciistringstring)
+- [(ref RefList\<byte\>).AppendUtf8String(string)](#ref-reflistbyteappendutf8stringstring)
+
 
 ## Static Creation Methods
 

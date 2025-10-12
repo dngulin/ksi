@@ -8,6 +8,10 @@ Supposed to wrap `[DynSized]` structures.
 public sealed class ExclusiveAccess<T> where T: struct
 ```
 
+Properties
+- [Mutable](#mutable)
+- [ReadOnly](#readonly)
+
 
 ## Properties
 

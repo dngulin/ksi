@@ -26,10 +26,10 @@ public static class DocStringExtensions
     public static string[] ManyToMd(this XNode self, string elementName)
     {
         return (self as XContainer)?
-            .Elements(elementName)
-            .Select(e => e.ToMd())
-            .ToArray()
-            ?? [];
+               .Elements(elementName)
+               .Select(e => e.ToMd())
+               .ToArray()
+               ?? [];
     }
 
     private static string ToMd(this XNode self)
@@ -152,5 +152,22 @@ public static class DocStringExtensions
         sb.Append(pds.Identifier);
 
         return sb.ToString();
+    }
+
+    public static string ToMdFragment(this string self)
+    {
+        var filtered = self
+            .ToLower()
+            .Select(c =>
+            {
+                if (char.IsDigit(c) || char.IsLetter(c))
+                    return c;
+
+                return char.IsWhiteSpace(c) ? '-' : ' ';
+            })
+            .Where(c => c != ' ')
+            .ToArray();
+
+        return "#" + new string(filtered);
     }
 }

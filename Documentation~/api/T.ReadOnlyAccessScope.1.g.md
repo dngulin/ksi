@@ -7,6 +7,12 @@ Should be disposed after usage to release the lock on data.
 public readonly ref struct ReadOnlyAccessScope<T> where T : struct
 ```
 
+Properties
+- [Value](#value)
+
+Methods
+- [Dispose()](#dispose)
+
 
 ## Properties
 
