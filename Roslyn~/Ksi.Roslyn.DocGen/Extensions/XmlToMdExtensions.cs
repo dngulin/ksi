@@ -43,14 +43,15 @@ public static class XmlToMdExtensions
 
     private static string ToMd(this XElement self)
     {
+        var contents = self.Nodes().ToMd();
         return self.Name.LocalName switch
         {
-            "c" => $"`{self.Nodes().ToMd().Replace("`", @"\`")}`",
-            "para" => $"{self.OptPrefix("\n\n")}{self.Nodes().ToMd()}",
-            "item" => $"\n- {self.Nodes().ToMd()}",
-            "param" => $"`{self.NameAttr()}` — " + self.Nodes().ToMd().Decapitalize(),
-            "exception" => $"`{self.CrefAttrShort()}` — " + self.Nodes().ToMd().Decapitalize(),
-            _ => self.Nodes().ToMd()
+            "c" => $"`{contents.Replace("`", @"\`")}`",
+            "para" => $"{self.OptPrefix("\n\n")}{contents}",
+            "item" => $"\n- {contents}",
+            "param" => $"`{self.NameAttr()}` — {contents.Decapitalize()}",
+            "exception" => $"`{self.CrefAttrShort()}` — {contents.Decapitalize()}",
+            _ => contents
         };
     }
 
