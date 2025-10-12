@@ -10,9 +10,9 @@ namespace Ksi.Roslyn
 
             /// <summary>
             /// Deallocate the list and all items.
-            /// After deallocation the structure becomes zeroed.
+            /// After deallocation the list becomes zeroed.
             /// </summary>
-            /// <param name="self">list to deallocate</param>
+            /// <param name="self">List to deallocate</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -32,7 +32,7 @@ namespace Ksi.Roslyn
             /// Deallocate all list items.
             /// After deallocation list is not cleared.
             /// </summary>
-            /// <param name="self">list to deallocate items</param>
+            /// <param name="self">List to deallocate items</param>
             public static void Dealloc(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -47,8 +47,8 @@ namespace Ksi.Roslyn
             /// <summary>
             /// Deallocate the list and returns it.
             /// </summary>
-            /// <param name="self">list to deallocate</param>
-            /// <returns>the list as an assignable reference</returns>
+            /// <param name="self">List to deallocate</param>
+            /// <returns>The list as an assignable reference.</returns>
             [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0}<{1}> Deallocated(this ref {0}<{1}> self)
             {{
@@ -64,7 +64,7 @@ namespace Ksi.Roslyn
             /// <summary>
             /// Clears the list and deallocate all items. 
             /// </summary>
-            /// <param name="self">list to clear</param>
+            /// <param name="self">List to clear</param>
             public static void Clear(this ref {0}<{1}> self)
             {{
                 foreach(ref var item in self.RefIter())
@@ -78,8 +78,8 @@ namespace Ksi.Roslyn
             /// <summary>
             /// Removes an item from the list and deallocate it.
             /// </summary>
-            /// <param name="self">list to remove an item</param>
-            /// <param name="index">index of the item to remove</param>
+            /// <param name="self">List to remove an item</param>
+            /// <param name="index">Index of the item to remove</param>
             public static void RemoveAt(this ref {0}<{1}> self, int index)
             {{
                 self.RefAt(index).Dealloc();
@@ -97,8 +97,8 @@ namespace Ksi.Roslyn
             /// <summary>
             /// Deallocate the structure owned resources and returns it.
             /// </summary>
-            /// <param name="self">structure to deallocate</param>
-            /// <returns>the structure as an assignable reference</returns>
+            /// <param name="self">Structure to deallocate</param>
+            /// <returns>The structure as an assignable reference</returns>
             [RefPath("self", "!"), NonAllocatedResult]
             public static ref {0} Deallocated(this ref {0} self)
             {{

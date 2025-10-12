@@ -114,7 +114,7 @@ namespace Ksi.Roslyn
                         using (var ns = file.OptNamespace(entry.Namespace))
                         {
                             ns.AppendLine("/// <summary>");
-                            ns.AppendLine($"/// Explicit copy extensions for {entry.Type}");
+                            ns.AppendLine($"/// Explicit copy extensions for {entry.Type}.");
                             ns.AppendLine("/// </summary>");
                             using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_ExplicitCopy"))
                             {
@@ -138,8 +138,8 @@ namespace Ksi.Roslyn
             cls.AppendLine("/// Copies all structure fields from another using explicit copy extension methods.");
             cls.AppendLine("/// All items existing before copying are removed.");
             cls.AppendLine("/// </summary>");
-            cls.AppendLine("""/// <param name="self">destination structure</param>""");
-            cls.AppendLine("""/// <param name="other">source structure</param>""");
+            cls.AppendLine("""/// <param name="self">Destination structure</param>""");
+            cls.AppendLine("""/// <param name="other">Source structure</param>""");
             using (var m = cls.PubStat($"void CopyFrom(this ref {t} self, in {t} other)"))
             {
                 foreach (var (f, copy) in entry.Fields)
@@ -151,8 +151,8 @@ namespace Ksi.Roslyn
             cls.AppendLine("/// Copies all structure fields to another using explicit copy extension methods.");
             cls.AppendLine("/// All items existing before copying are removed.");
             cls.AppendLine("/// </summary>");
-            cls.AppendLine("""/// <param name="self">source structure</param>""");
-            cls.AppendLine("""/// <param name="other">destination structure</param>""");
+            cls.AppendLine("""/// <param name="self">Source structure</param>""");
+            cls.AppendLine("""/// <param name="other">Destination structure</param>""");
             using (var m = cls.PubStat($"void CopyTo(this in {t} self, ref {t} other)"))
             {
                 m.AppendLine("other.CopyFrom(self);");

@@ -14,9 +14,9 @@ Static Creation Methods
 
 Extension Methods
 - [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
-- [\(in TempRefList\<T\>\).Capacity\(\)](#in-tempreflisttcapacity) — returns capacity of the given list
+- [\(in TempRefList\<T\>\).Capacity\(\)](#in-tempreflisttcapacity) — returns capacity of the list
 - [\(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)](#in-tempreflisttcopytoref-tempreflistt) — copies all items to another list
-- [\(in TempRefList\<T\>\).Count\(\)](#in-tempreflisttcount) — returns item count in the given list
+- [\(in TempRefList\<T\>\).Count\(\)](#in-tempreflisttcount) — returns item count in the list
 - [\(in TempRefList\<T\>\).RefReadonlyAt\(int\)](#in-tempreflisttrefreadonlyatint) — returns a readonly reference to a list item
 - [\(in TempRefList\<T\>\).RefReadonlyIterReversed\(\)](#in-tempreflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
 - [\(in TempRefList\<T\>\).RefReadonlyIter\(\)](#in-tempreflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
@@ -47,6 +47,8 @@ Creates an empty list
 public static TempRefList<T> Empty<T>() where T : unmanaged
 ```
 
+Returns a new empty insatnce of the [TempRefList\<T\>](T.TempRefList.1.g.md).
+
 
 ### TempRefList.WithCapacity\<T\>\(int\)
 
@@ -59,6 +61,8 @@ public static TempRefList<T> WithCapacity<T>(int capacity) where T : unmanaged
 Parameters
 - `capacity` — capacity of the list
 
+Returns a new insatnce of the [TempRefList\<T\>](T.TempRefList.1.g.md) with the given capacity.
+
 
 ### TempRefList.WithDefaultItems\<T\>\(int\)
 
@@ -70,6 +74,8 @@ public static TempRefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 
 Parameters
 - `count` — number of items
+
+Returns a new insatnce of the [TempRefList\<T\>](T.TempRefList.1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods
@@ -86,7 +92,7 @@ public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> se
 
 ### \(in TempRefList\<T\>\).Capacity\(\)
 
-Returns capacity of the given list.
+Returns capacity of the list.
 
 ```csharp
 public static int Capacity<T>(this in TempRefList<T> self) where T : unmanaged
@@ -95,7 +101,7 @@ public static int Capacity<T>(this in TempRefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to get capacity
 
-Returns capacity of the given list (zero if the buffer is deallocated)
+Returns capacity of the list (zero if the buffer is deallocated).
 
 
 ### \(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)
@@ -114,7 +120,7 @@ Parameters
 
 ### \(in TempRefList\<T\>\).Count\(\)
 
-Returns item count in the given list
+Returns item count in the list.
 
 ```csharp
 public static int Count<T>(this in TempRefList<T> self) where T : unmanaged
@@ -123,7 +129,7 @@ public static int Count<T>(this in TempRefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to get item count
 
-Returns item count in the given list
+Returns item count in the list.
 
 
 ### \(in TempRefList\<T\>\).RefReadonlyAt\(int\)
@@ -138,7 +144,11 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a readonly reference to a list item at the given index
+Returns a readonly reference to a list item at the given index.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(in TempRefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -152,7 +162,7 @@ public static TempRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in TempRefList\<T\>\).RefReadonlyIter\(\)
@@ -166,7 +176,7 @@ public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefL
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in TempRefList\<byte\>\).ToStringAscii\(\)
@@ -180,7 +190,7 @@ public static string ToStringAscii(this in TempRefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(in TempRefList\<byte\>\).ToStringUtf8\(\)
@@ -194,7 +204,7 @@ public static string ToStringUtf8(this in TempRefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(ref TempRefList\<T\>\).Add\(T\)
@@ -221,6 +231,10 @@ public static void AppendDefault<T>(this ref TempRefList<T> self, int count) whe
 Parameters
 - `self` — list add items
 - `count` — number of items to add
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `ArgumentException` — if count is negative
 
 
 ### \(ref TempRefList\<T\>\).AsSpan\(\)
@@ -269,7 +283,7 @@ public static ref T RefAdd<T>(this ref TempRefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to add an item
 
-Returns a mutable reference to the created item
+Returns a mutable reference to the created item.
 
 
 ### \(ref TempRefList\<T\>\).RefAt\(int\)
@@ -284,7 +298,7 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a mutable reference to a list item at the given index
+Returns a mutable reference to a list item at the given index.
 
 
 ### \(ref TempRefList\<T\>\).RefIterReversed\(\)
@@ -298,7 +312,7 @@ public static TempRefListIteratorReversed<T> RefIterReversed<T>(this ref TempRef
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref TempRefList\<T\>\).RefIter\(\)
@@ -312,7 +326,7 @@ public static TempRefListIterator<T> RefIter<T>(this ref TempRefList<T> self) wh
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref TempRefList\<T\>\).RemoveAt\(int\)
@@ -325,7 +339,11 @@ public static void RemoveAt<T>(this ref TempRefList<T> self, int index) where T 
 
 Parameters
 - `self` — list to remove the item
-- `index` — an index to remove the item
+- `index` — an index to remove the item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(ref TempRefList\<byte\>\).AppendAsciiString\(string\)

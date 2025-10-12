@@ -113,7 +113,7 @@ namespace Ksi.Roslyn
                         using (var ns = file.OptNamespace(entry.Namespace))
                         {
                             ns.AppendLine("/// <summary>");
-                            ns.AppendLine($"/// Deallocation extensions for {entry.Type}");
+                            ns.AppendLine($"/// Deallocation extensions for {entry.Type}.");
                             ns.AppendLine("/// </summary>");
                             using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_Dealloc"))
                             {
@@ -138,7 +138,7 @@ namespace Ksi.Roslyn
             cls.AppendLine("/// <summary>");
             cls.AppendLine("/// Deallocate all owned resources by the structure.");
             cls.AppendLine("/// </summary>");
-            cls.AppendLine("""/// <param name="self">structure to deallocate</param>""");
+            cls.AppendLine("""/// <param name="self">Structure to deallocate</param>""");
             using (var m = cls.PubStat($"void Dealloc(this ref {t} self)"))
             {
                 foreach (var f in entry.Fields)

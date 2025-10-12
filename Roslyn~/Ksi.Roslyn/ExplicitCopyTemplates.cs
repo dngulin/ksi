@@ -12,8 +12,8 @@ namespace Ksi.Roslyn
             /// Copies all items from another list using explicit copy extension methods.
             /// All items existing before copying are removed.
             /// </summary>
-            /// <param name="self">destination list</param>
-            /// <param name="other">source list</param>
+            /// <param name="self">Destination list</param>
+            /// <param name="other">Source list</param>
             public static void CopyFrom(this ref {0}<{1}> self, in {0}<{1}> other)
             {{
                 self.Clear();
@@ -27,8 +27,8 @@ namespace Ksi.Roslyn
             /// Copies all items to another list using explicit copy extension methods.
             /// All items existing before copying are removed.
             /// </summary>
-            /// <param name="self">destination list</param>
-            /// <param name="other">source list</param>
+            /// <param name="self">Destination list</param>
+            /// <param name="other">Source list</param>
             public static void CopyTo(this in {0}<{1}> self, ref {0}<{1}> other)
             {{
                 other.CopyFrom(self);
@@ -43,8 +43,8 @@ namespace Ksi.Roslyn
             /// Copies all items from another list using explicit copy extension methods.
             /// All items that are not updated by copying are removed and deallcoated.
             /// </summary>
-            /// <param name="self">destination list</param>
-            /// <param name="other">source list</param>
+            /// <param name="self">Destination list</param>
+            /// <param name="other">Source list</param>
             public static void CopyFrom(this ref {0}<{1}> self, in {0}<{1}> other)
             {{
                 while (self.Count() > other.Count())
@@ -61,8 +61,8 @@ namespace Ksi.Roslyn
             /// Copies all items to another list using explicit copy extension methods.
             /// All items that are not updated by copying are removed and deallcoated.
             /// </summary>
-            /// <param name="self">source list</param>
-            /// <param name="other">destination list</param>
+            /// <param name="self">Source list</param>
+            /// <param name="other">Destination list</param>
             public static void CopyTo(this in {0}<{1}> self, ref {0}<{1}> other)
             {{
                 other.CopyFrom(self);

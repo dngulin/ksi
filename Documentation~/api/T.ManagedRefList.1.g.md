@@ -14,9 +14,9 @@ Static Creation Methods
 
 Extension Methods
 - [\(in ManagedRefList\<T\>\).AsReadOnlySpan\(\)](#in-managedreflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
-- [\(in ManagedRefList\<T\>\).Capacity\(\)](#in-managedreflisttcapacity) — returns capacity of the given list
+- [\(in ManagedRefList\<T\>\).Capacity\(\)](#in-managedreflisttcapacity) — returns capacity of the list
 - [\(in ManagedRefList\<T\>\).CopyTo\(ref ManagedRefList\<T\>\)](#in-managedreflisttcopytoref-managedreflistt) — copies all items to another list
-- [\(in ManagedRefList\<T\>\).Count\(\)](#in-managedreflisttcount) — returns item count in the given list
+- [\(in ManagedRefList\<T\>\).Count\(\)](#in-managedreflisttcount) — returns item count in the list
 - [\(in ManagedRefList\<T\>\).RefReadonlyAt\(int\)](#in-managedreflisttrefreadonlyatint) — returns a readonly reference to a list item
 - [\(in ManagedRefList\<T\>\).RefReadonlyIterReversed\(\)](#in-managedreflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
 - [\(in ManagedRefList\<T\>\).RefReadonlyIter\(\)](#in-managedreflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
@@ -47,6 +47,8 @@ Creates an empty list
 public static ManagedRefList<T> Empty<T>() where T : struct
 ```
 
+Returns a new empty insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md).
+
 
 ### ManagedRefList.WithCapacity\<T\>\(int\)
 
@@ -59,6 +61,8 @@ public static ManagedRefList<T> WithCapacity<T>(int capacity) where T : struct
 Parameters
 - `capacity` — capacity of the list
 
+Returns a new insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given capacity.
+
 
 ### ManagedRefList.WithDefaultItems\<T\>\(int\)
 
@@ -70,6 +74,8 @@ public static ManagedRefList<T> WithDefaultItems<T>(int count) where T : struct
 
 Parameters
 - `count` — number of items
+
+Returns a new insatnce of the [ManagedRefList\<T\>](T.ManagedRefList.1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods
@@ -88,7 +94,7 @@ Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/Syste
 
 ### \(in ManagedRefList\<T\>\).Capacity\(\)
 
-Returns capacity of the given list.
+Returns capacity of the list.
 
 ```csharp
 public static int Capacity<T>(this in ManagedRefList<T> self) where T : struct
@@ -97,7 +103,7 @@ public static int Capacity<T>(this in ManagedRefList<T> self) where T : struct
 Parameters
 - `self` — list to get capacity
 
-Returns capacity of the given list (zero if the buffer is deallocated)
+Returns capacity of the list (zero if the buffer is deallocated).
 
 
 ### \(in ManagedRefList\<T\>\).CopyTo\(ref ManagedRefList\<T\>\)
@@ -116,7 +122,7 @@ Parameters
 
 ### \(in ManagedRefList\<T\>\).Count\(\)
 
-Returns item count in the given list
+Returns item count in the list.
 
 ```csharp
 public static int Count<T>(this in ManagedRefList<T> self) where T : struct
@@ -125,7 +131,7 @@ public static int Count<T>(this in ManagedRefList<T> self) where T : struct
 Parameters
 - `self` — list to get item count
 
-Returns item count in the given list
+Returns item count in the list.
 
 
 ### \(in ManagedRefList\<T\>\).RefReadonlyAt\(int\)
@@ -140,7 +146,11 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a readonly reference to a list item at the given index
+Returns a readonly reference to a list item at the given index.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(in ManagedRefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -154,7 +164,7 @@ public static ManagedRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in ManagedRefList\<T\>\).RefReadonlyIter\(\)
@@ -168,7 +178,7 @@ public static ManagedRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in Manag
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in ManagedRefList\<byte\>\).ToStringAscii\(\)
@@ -182,7 +192,7 @@ public static string ToStringAscii(this in ManagedRefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(in ManagedRefList\<byte\>\).ToStringUtf8\(\)
@@ -196,7 +206,7 @@ public static string ToStringUtf8(this in ManagedRefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(ref ManagedRefList\<T\>\).Add\(T\)
@@ -223,6 +233,10 @@ public static void AppendDefault<T>(this ref ManagedRefList<T> self, int count) 
 Parameters
 - `self` — list add items
 - `count` — number of items to add
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `ArgumentException` — if count is negative
 
 
 ### \(ref ManagedRefList\<T\>\).AsSpan\(\)
@@ -273,7 +287,7 @@ public static ref T RefAdd<T>(this ref ManagedRefList<T> self) where T : struct
 Parameters
 - `self` — list to add an item
 
-Returns a mutable reference to the created item
+Returns a mutable reference to the created item.
 
 
 ### \(ref ManagedRefList\<T\>\).RefAt\(int\)
@@ -288,7 +302,7 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a mutable reference to a list item at the given index
+Returns a mutable reference to a list item at the given index.
 
 
 ### \(ref ManagedRefList\<T\>\).RefIterReversed\(\)
@@ -302,7 +316,7 @@ public static ManagedRefListIteratorReversed<T> RefIterReversed<T>(this ref Mana
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref ManagedRefList\<T\>\).RefIter\(\)
@@ -316,7 +330,7 @@ public static ManagedRefListIterator<T> RefIter<T>(this ref ManagedRefList<T> se
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref ManagedRefList\<T\>\).RemoveAt\(int\)
@@ -329,7 +343,11 @@ public static void RemoveAt<T>(this ref ManagedRefList<T> self, int index) where
 
 Parameters
 - `self` — list to remove the item
-- `index` — an index to remove the item
+- `index` — an index to remove the item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(ref ManagedRefList\<byte\>\).AppendAsciiString\(string\)

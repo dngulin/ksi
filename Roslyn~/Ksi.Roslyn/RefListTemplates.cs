@@ -17,12 +17,14 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates an empty list
                 /// </summary>
+                /// <returns>A new empty insatnce of the <see cref="{0}{{T}}"/>.</returns>
                 public static {0}<T> Empty<T>() where T : {1} => default;
 
                 /// <summary>
                 /// Creates a list with a given capacity.
                 /// </summary>
-                /// <param name="capacity">capacity of the list</param>
+                /// <param name="capacity">Capacity of the list</param>
+                /// <returns>A new insatnce of the <see cref="{0}{{T}}"/> with the given capacity.</returns>
                 public static {0}<T> WithCapacity<T>(int capacity) where T : {1}
                 {{
                     var list = Empty<T>();
@@ -33,7 +35,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a list filled with <c>default</c> items.
                 /// </summary>
-                /// <param name="count">number of items</param>
+                /// <param name="count">Number of items</param>
+                /// <returns>A new insatnce of the <see cref="{0}{{T}}"/> with the given number of <c>default</c> items.</returns>
                 public static {0}<T> WithDefaultItems<T>(int count) where T : {1}
                 {{
                     var list = WithCapacity<T>(count);
@@ -54,30 +57,31 @@ public static class RefListTemplates
         namespace Ksi
         {{
             /// <summary>
-            /// {0} API
+            /// {0} API.
             /// </summary>
             public static class {0}_Api
             {{
                 /// <summary>
-                /// Returns capacity of the given list.
+                /// Returns capacity of the list.
                 /// </summary>
-                /// <param name="self">list to get capacity</param>
-                /// <returns>capacity of the given list (zero if the buffer is deallocated)</returns>
+                /// <param name="self">List to get capacity</param>
+                /// <returns>Capacity of the list (zero if the buffer is deallocated).</returns>
                 public static int Capacity<T>(this in {0}<T> self) where T : {1} => self.GetBufferSize();
 
                 /// <summary>
-                /// Returns item count in the given list
+                /// Returns item count in the list.
                 /// </summary>
-                /// <param name="self">list to get item count</param>
-                /// <returns>item count in the given list</returns>
+                /// <param name="self">List to get item count</param>
+                /// <returns>Item count in the list.</returns>
                 public static int Count<T>(this in {0}<T> self) where T : {1} => self.Count;
 
                 /// <summary>
                 /// Returns a readonly reference to a list item.
                 /// </summary>
-                /// <param name="self">list to get an item reference</param>
-                /// <param name="index">required item index</param>
-                /// <returns>a readonly reference to a list item at the given index</returns>
+                /// <param name="self">List to get an item reference</param>
+                /// <param name="index">Required item index</param>
+                /// <returns>A readonly reference to a list item at the given index.</returns>
+                /// <exception cref="IndexOutOfRangeException">If index is out of bounds</exception>
                 [RefListIndexer]
                 public static ref readonly T RefReadonlyAt<T>(this in {0}<T> self, int index) where T : {1}
                 {{
@@ -90,9 +94,9 @@ public static class RefListTemplates
                 /// <summary>
                 /// Returns a mutable reference to a list item.
                 /// </summary>
-                /// <param name="self">list to get an item reference</param>
-                /// <param name="index">required item index</param>
-                /// <returns>a mutable reference to a list item at the given index</returns>
+                /// <param name="self">List to get an item reference</param>
+                /// <param name="index">Required item index</param>
+                /// <returns>A mutable reference to a list item at the given index.</returns>
                 [RefListIndexer]
                 public static ref T RefAt<T>([DynNoResize] this ref {0}<T> self, int index) where T : {1}
                 {{
@@ -105,8 +109,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Adds a new item to the list.
                 /// </summary>
-                /// <param name="self">list to add an item</param>
-                /// <param name="item">item to add to the list</param>
+                /// <param name="self">List to add an item</param>
+                /// <param name="item">Item to add to the list</param>
                 public static void Add<T>(this ref {0}<T> self, T item) where T : {1}
                 {{
                     self.EnsureCanAdd();
@@ -116,8 +120,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Adds a <c>default</c> item to the list and returns a mutable reference to it.
                 /// </summary>
-                /// <param name="self">list to add an item</param>
-                /// <returns>a mutable reference to the created item</returns>
+                /// <param name="self">List to add an item</param>
+                /// <returns>A mutable reference to the created item.</returns>
                 [NonAllocatedResult, RefListIndexer]
                 public static ref T RefAdd<T>(this ref {0}<T> self) where T : {1}
                 {{
@@ -137,8 +141,9 @@ public static class RefListTemplates
                 /// <summary>
                 /// Removes an item from the list at the given index.
                 /// </summary>
-                /// <param name="self">list to remove the item</param>
-                /// <param name="index">an index to remove the item</param>
+                /// <param name="self">List to remove the item</param>
+                /// <param name="index">An index to remove the item.</param>
+                /// <exception cref="IndexOutOfRangeException">If index is out of bounds</exception>
                 public static void RemoveAt<T>(this ref {0}<T> self, int index) where T : {1}
                 {{
                     if (index < 0 || index >= self.Count)
@@ -152,7 +157,7 @@ public static class RefListTemplates
                 /// <summary>
                 /// Removes all items from the list.
                 /// </summary>
-                /// <param name="self">list to clear</param>
+                /// <param name="self">List to clear</param>
                 public static void Clear<T>(this ref {0}<T> self) where T : {1}
                 {{
                     if (self.Count == 0)
@@ -165,12 +170,13 @@ public static class RefListTemplates
                 /// <summary>
                 /// Adds a specified number of <c>default</c> items.
                 /// </summary>
-                /// <param name="self">list add items</param>
-                /// <param name="count">number of items to add</param>
+                /// <param name="self">List add items</param>
+                /// <param name="count">Number of items to add</param>
+                /// <exception cref="ArgumentException">If count is negative</exception>
                 public static void AppendDefault<T>(this ref {0}<T> self, int count) where T : {1}
                 {{
                     if (count < 0)
-                        throw new InvalidOperationException();
+                        throw new ArgumentException();
 
                     var newCount = self.Count + count;
 
@@ -184,8 +190,8 @@ public static class RefListTemplates
                 /// Copies all items from another list.
                 /// All items existing before copying are removed.
                 /// </summary>
-                /// <param name="self">destination list</param>
-                /// <param name="other">source list</param>
+                /// <param name="self">Destination list</param>
+                /// <param name="other">Source list</param>
                 public static void CopyFrom<T>(this ref {0}<T> self, in {0}<T> other) where T : {1}
                 {{
                     self.Clear();
@@ -197,8 +203,8 @@ public static class RefListTemplates
                 /// Copies all items to another list.
                 /// All items existing before copying are removed.
                 /// </summary>
-                /// <param name="self">source list</param>
-                /// <param name="other">destination list</param>
+                /// <param name="self">Source list</param>
+                /// <param name="other">Destination list</param>
                 public static void CopyTo<T>(this in {0}<T> self, ref {0}<T> other) where T : {1}
                 {{
                     other.CopyFrom(self);
@@ -217,7 +223,7 @@ public static class RefListTemplates
         namespace Ksi
         {{
             /// <summary>
-            /// {0} deallocation extensions
+            /// {0} deallocation extensions.
             /// </summary>
             public static class {0}_Dealloc
             {{
@@ -225,14 +231,14 @@ public static class RefListTemplates
                 /// Deallocate the list.
                 /// After deallocating the structure becomes zeroed.
                 /// </summary>
-                /// <param name="self">list to deallocate</param>
+                /// <param name="self">List to deallocate</param>
                 public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
                 /// <summary>
                 /// Deallocate the list and returns it.
                 /// </summary>
-                /// <param name="self">list to deallocate</param>
-                /// <returns>the list as an assignable reference</returns>
+                /// <param name="self">List to deallocate</param>
+                /// <returns>The list as an assignable reference.</returns>
                 [RefPath("self", "!"), NonAllocatedResult]
                 public static ref {0}<T> Deallocated<T>(this ref {0}<T> self) where T : {1}
                 {{
@@ -253,7 +259,7 @@ public static class RefListTemplates
         namespace Ksi
         {{
             /// <summary>
-            /// {0} iterators
+            /// {0} iterators.
             /// </summary>
             public static class {0}_IteratorExtensions
             {{
@@ -261,8 +267,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a readonly by-ref iterator for the list.
                 /// </summary>
-                /// <param name="self">list to iterate</param>
-                /// <returns>the iterator to use in the foreach loop</returns>
+                /// <param name="self">List to iterate</param>
+                /// <returns>The iterator to use in the foreach loop.</returns>
                 [RefListIterator]
                 public static {0}ReadOnlyIterator<T> RefReadonlyIter<T>(this in {0}<T> self) where T : {1}
                 {{
@@ -272,8 +278,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a mutable by-ref iterator for the list.
                 /// </summary>
-                /// <param name="self">list to iterate</param>
-                /// <returns>the iterator to use in the foreach loop</returns>
+                /// <param name="self">List to iterate</param>
+                /// <returns>The iterator to use in the foreach loop.</returns>
                 [RefListIterator]
                 public static {0}Iterator<T> RefIter<T>(this ref {0}<T> self) where T : {1}
                 {{
@@ -283,8 +289,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a readonly reversed by-ref iterator for the list.
                 /// </summary>
-                /// <param name="self">list to iterate</param>
-                /// <returns>the iterator to use in the foreach loop</returns>
+                /// <param name="self">List to iterate</param>
+                /// <returns>The iterator to use in the foreach loop.</returns>
                 [RefListIterator]
                 public static {0}ReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in {0}<T> self) where T : {1}
                 {{
@@ -294,8 +300,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a mutable reversed by-ref iterator for the list.
                 /// </summary>
-                /// <param name="self">list to iterate</param>
-                /// <returns>the iterator to use in the foreach loop</returns>
+                /// <param name="self">List to iterate</param>
+                /// <returns>The iterator to use in the foreach loop.</returns>
                 [RefListIterator]
                 public static {0}IteratorReversed<T> RefIterReversed<T>(this ref {0}<T> self) where T : {1}
                 {{
@@ -409,7 +415,6 @@ public static class RefListTemplates
     public const string StringExt =
         // language=cs
         """
-        // Generated by Ksi.Roslyn
         using System;
         using System.Text;
 
@@ -424,8 +429,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Appends a given string to the list as UTF-8 bytes.
                 /// </summary>
-                /// <param name="self">list to append bytes</param>
-                /// <param name="value">string value to append</param>
+                /// <param name="self">List to append bytes</param>
+                /// <param name="value">String value to append</param>
                 public static void AppendUtf8String(this ref {0}<byte> self, string value)
                 {{
                     if (string.IsNullOrEmpty(value))
@@ -441,8 +446,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Appends a given string to the list as ASCII bytes.
                 /// </summary>
-                /// <param name="self">list to append bytes</param>
-                /// <param name="value">string value to append</param>
+                /// <param name="self">List to append bytes</param>
+                /// <param name="value">String value to append</param>
                 public static void AppendAsciiString(this ref {0}<byte> self, string value)
                 {{
                     if (string.IsNullOrEmpty(value))
@@ -458,8 +463,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a string interpreting list contents as UTF-8 bytes.
                 /// </summary>
-                /// <param name="self">list containing string bytes</param>
-                /// <returns>the string created from bytes</returns>
+                /// <param name="self">List containing string bytes</param>
+                /// <returns>The string created from bytes.</returns>
                 public static string ToStringUtf8(this in {0}<byte> self)
                 {{
                     return self.Count == 0 ? "" : Encoding.UTF8.GetString(self.AsReadOnlySpan());
@@ -468,8 +473,8 @@ public static class RefListTemplates
                 /// <summary>
                 /// Creates a string interpreting list contents as ASCII bytes.
                 /// </summary>
-                /// <param name="self">list containing string bytes</param>
-                /// <returns>the string created from bytes</returns>
+                /// <param name="self">List containing string bytes</param>
+                /// <returns>The string created from bytes.</returns>
                 public static string ToStringAscii(this in {0}<byte> self)
                 {{
                     return self.Count == 0 ? "" : Encoding.ASCII.GetString(self.AsReadOnlySpan());

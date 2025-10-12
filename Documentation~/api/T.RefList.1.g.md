@@ -14,9 +14,9 @@ Static Creation Methods
 
 Extension Methods
 - [\(in RefList\<T\>\).AsReadOnlySpan\(\)](#in-reflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
-- [\(in RefList\<T\>\).Capacity\(\)](#in-reflisttcapacity) — returns capacity of the given list
+- [\(in RefList\<T\>\).Capacity\(\)](#in-reflisttcapacity) — returns capacity of the list
 - [\(in RefList\<T\>\).CopyTo\(ref RefList\<T\>\)](#in-reflisttcopytoref-reflistt) — copies all items to another list
-- [\(in RefList\<T\>\).Count\(\)](#in-reflisttcount) — returns item count in the given list
+- [\(in RefList\<T\>\).Count\(\)](#in-reflisttcount) — returns item count in the list
 - [\(in RefList\<T\>\).RefReadonlyAt\(int\)](#in-reflisttrefreadonlyatint) — returns a readonly reference to a list item
 - [\(in RefList\<T\>\).RefReadonlyIterReversed\(\)](#in-reflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
 - [\(in RefList\<T\>\).RefReadonlyIter\(\)](#in-reflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
@@ -49,6 +49,8 @@ Creates an empty list
 public static RefList<T> Empty<T>() where T : unmanaged
 ```
 
+Returns a new empty insatnce of the [RefList\<T\>](T.RefList.1.g.md).
+
 
 ### RefList.WithCapacity\<T\>\(int\)
 
@@ -61,6 +63,8 @@ public static RefList<T> WithCapacity<T>(int capacity) where T : unmanaged
 Parameters
 - `capacity` — capacity of the list
 
+Returns a new insatnce of the [RefList\<T\>](T.RefList.1.g.md) with the given capacity.
+
 
 ### RefList.WithDefaultItems\<T\>\(int\)
 
@@ -72,6 +76,8 @@ public static RefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 
 Parameters
 - `count` — number of items
+
+Returns a new insatnce of the [RefList\<T\>](T.RefList.1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods
@@ -90,7 +96,7 @@ Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/Syste
 
 ### \(in RefList\<T\>\).Capacity\(\)
 
-Returns capacity of the given list.
+Returns capacity of the list.
 
 ```csharp
 public static int Capacity<T>(this in RefList<T> self) where T : unmanaged
@@ -99,7 +105,7 @@ public static int Capacity<T>(this in RefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to get capacity
 
-Returns capacity of the given list (zero if the buffer is deallocated)
+Returns capacity of the list (zero if the buffer is deallocated).
 
 
 ### \(in RefList\<T\>\).CopyTo\(ref RefList\<T\>\)
@@ -118,7 +124,7 @@ Parameters
 
 ### \(in RefList\<T\>\).Count\(\)
 
-Returns item count in the given list
+Returns item count in the list.
 
 ```csharp
 public static int Count<T>(this in RefList<T> self) where T : unmanaged
@@ -127,7 +133,7 @@ public static int Count<T>(this in RefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to get item count
 
-Returns item count in the given list
+Returns item count in the list.
 
 
 ### \(in RefList\<T\>\).RefReadonlyAt\(int\)
@@ -142,7 +148,11 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a readonly reference to a list item at the given index
+Returns a readonly reference to a list item at the given index.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(in RefList\<T\>\).RefReadonlyIterReversed\(\)
@@ -156,7 +166,7 @@ public static RefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in RefList\<T\>\).RefReadonlyIter\(\)
@@ -170,7 +180,7 @@ public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> s
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(in RefList\<byte\>\).ToStringAscii\(\)
@@ -184,7 +194,7 @@ public static string ToStringAscii(this in RefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(in RefList\<byte\>\).ToStringUtf8\(\)
@@ -198,7 +208,7 @@ public static string ToStringUtf8(this in RefList<byte> self)
 Parameters
 - `self` — list containing string bytes
 
-Returns the string created from bytes
+Returns the string created from bytes.
 
 
 ### \(ref RefList\<T\>\).Add\(T\)
@@ -225,6 +235,10 @@ public static void AppendDefault<T>(this ref RefList<T> self, int count) where T
 Parameters
 - `self` — list add items
 - `count` — number of items to add
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `ArgumentException` — if count is negative
 
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
@@ -288,7 +302,7 @@ public static ref RefList<T> Deallocated<T>(this ref RefList<T> self) where T : 
 Parameters
 - `self` — list to deallocate
 
-Returns the list as an assignable reference
+Returns the list as an assignable reference.
 
 
 ### \(ref RefList\<T\>\).RefAdd\(\)
@@ -302,7 +316,7 @@ public static ref T RefAdd<T>(this ref RefList<T> self) where T : unmanaged
 Parameters
 - `self` — list to add an item
 
-Returns a mutable reference to the created item
+Returns a mutable reference to the created item.
 
 
 ### \(ref RefList\<T\>\).RefAt\(int\)
@@ -317,7 +331,7 @@ Parameters
 - `self` — list to get an item reference
 - `index` — required item index
 
-Returns a mutable reference to a list item at the given index
+Returns a mutable reference to a list item at the given index.
 
 
 ### \(ref RefList\<T\>\).RefIterReversed\(\)
@@ -331,7 +345,7 @@ public static RefListIteratorReversed<T> RefIterReversed<T>(this ref RefList<T> 
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref RefList\<T\>\).RefIter\(\)
@@ -345,7 +359,7 @@ public static RefListIterator<T> RefIter<T>(this ref RefList<T> self) where T : 
 Parameters
 - `self` — list to iterate
 
-Returns the iterator to use in the foreach loop
+Returns the iterator to use in the foreach loop.
 
 
 ### \(ref RefList\<T\>\).RemoveAt\(int\)
@@ -358,7 +372,11 @@ public static void RemoveAt<T>(this ref RefList<T> self, int index) where T : un
 
 Parameters
 - `self` — list to remove the item
-- `index` — an index to remove the item
+- `index` — an index to remove the item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - `IndexOutOfRangeException` — if index is out of bounds
 
 
 ### \(ref RefList\<byte\>\).AppendAsciiString\(string\)
