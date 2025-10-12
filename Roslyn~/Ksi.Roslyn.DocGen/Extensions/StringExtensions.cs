@@ -4,7 +4,7 @@ namespace Ksi.Roslyn.DocGen.Extensions;
 
 public static class StringExtensions
 {
-    private const string EscapeChars = "<>";
+    private const string EscapeChars = @"\*_{}[]<>()#+-|"; // Missing: `.!
 
     public static string ToMd(this string self)
     {

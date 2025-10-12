@@ -17,8 +17,8 @@ public sealed class RefPathAttribute : Attribute
 ```
 
 Constructors
-- [RefPathAttribute()](#refpathattribute) — non-explicit `[RefPath]` attribute constructor
-- [RefPathAttribute(params string[])](#refpathattributeparams-string) — explicit `[RefPath]` attribute constructor
+- [RefPathAttribute\(\)](#refpathattribute) — non-explicit `[RefPath]` attribute constructor
+- [RefPathAttribute\(params string\[\]\)](#refpathattributeparams-string) — explicit `[RefPath]` attribute constructor
 
 Properties
 - [Segments](#segments) — list of segments indicating the `RefPath` created by the marked extension method
@@ -27,7 +27,7 @@ Properties
 ## Constructors
 
 
-### RefPathAttribute()
+### RefPathAttribute\(\)
 
 Non-explicit `[RefPath]` attribute constructor.
 Will be embedded into the calling expression `RefPath` as the method name suffixed with "()".
@@ -37,7 +37,7 @@ public RefPathAttribute()
 ```
 
 
-### RefPathAttribute(params string[])
+### RefPathAttribute\(params string\[\]\)
 
 Explicit `[RefPath]` attribute constructor.
 Will be embedded into the calling expression `RefPath` as a sequence of segments.

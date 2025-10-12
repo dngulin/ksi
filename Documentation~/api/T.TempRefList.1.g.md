@@ -8,38 +8,38 @@ public struct TempRefList<T> where T : unmanaged
 ```
 
 Static Creation Methods
-- [TempRefList.Empty\<T\>()](#tempreflistemptyt) — creates an empty list
-- [TempRefList.WithCapacity\<T\>(int)](#tempreflistwithcapacitytint) — creates a list with a given capacity
-- [TempRefList.WithDefaultItems\<T\>(int)](#tempreflistwithdefaultitemstint) — creates a list filled with `default` items
+- [TempRefList.Empty\<T\>\(\)](#tempreflistemptyt) — creates an empty list
+- [TempRefList.WithCapacity\<T\>\(int\)](#tempreflistwithcapacitytint) — creates a list with a given capacity
+- [TempRefList.WithDefaultItems\<T\>\(int\)](#tempreflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [(in TempRefList\<T\>).AsReadOnlySpan()](#in-tempreflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
-- [(in TempRefList\<T\>).Capacity()](#in-tempreflisttcapacity) — returns capacity of the given list
-- [(in TempRefList\<T\>).CopyTo(ref TempRefList\<T\>)](#in-tempreflisttcopytoref-tempreflistt) — copies all items to another list
-- [(in TempRefList\<T\>).Count()](#in-tempreflisttcount) — returns item count in the given list
-- [(in TempRefList\<T\>).RefReadonlyAt(int)](#in-tempreflisttrefreadonlyatint) — returns a readonly reference to a list item
-- [(in TempRefList\<T\>).RefReadonlyIter()](#in-tempreflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
-- [(in TempRefList\<T\>).RefReadonlyIterReversed()](#in-tempreflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
-- [(in TempRefList\<byte\>).ToStringAscii()](#in-tempreflistbytetostringascii) — creates a string interpreting list contents as ASCII bytes
-- [(in TempRefList\<byte\>).ToStringUtf8()](#in-tempreflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
-- [(ref TempRefList\<T\>).Add(T)](#ref-tempreflisttaddt) — adds a new item to the list
-- [(ref TempRefList\<T\>).AppendDefault(int)](#ref-tempreflisttappenddefaultint) — adds a specified number of `default` items
-- [(ref TempRefList\<T\>).AsSpan()](#ref-tempreflisttasspan) — represent the collection as `Span`
-- [(ref TempRefList\<T\>).Clear()](#ref-tempreflisttclear) — removes all items from the list
-- [(ref TempRefList\<T\>).CopyFrom(in TempRefList\<T\>)](#ref-tempreflisttcopyfromin-tempreflistt) — copies all items from another list
-- [(ref TempRefList\<T\>).RefAdd()](#ref-tempreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
-- [(ref TempRefList\<T\>).RefAt(int)](#ref-tempreflisttrefatint) — returns a mutable reference to a list item
-- [(ref TempRefList\<T\>).RefIter()](#ref-tempreflisttrefiter) — creates a mutable by-ref iterator for the list
-- [(ref TempRefList\<T\>).RefIterReversed()](#ref-tempreflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
-- [(ref TempRefList\<T\>).RemoveAt(int)](#ref-tempreflisttremoveatint) — removes an item from the list at the given index
-- [(ref TempRefList\<byte\>).AppendAsciiString(string)](#ref-tempreflistbyteappendasciistringstring) — appends a given string to the list as ASCII bytes
-- [(ref TempRefList\<byte\>).AppendUtf8String(string)](#ref-tempreflistbyteappendutf8stringstring) — appends a given string to the list as UTF-8 bytes
+- [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — represent the collection as `ReadOnlySpan`
+- [\(in TempRefList\<T\>\).Capacity\(\)](#in-tempreflisttcapacity) — returns capacity of the given list
+- [\(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)](#in-tempreflisttcopytoref-tempreflistt) — copies all items to another list
+- [\(in TempRefList\<T\>\).Count\(\)](#in-tempreflisttcount) — returns item count in the given list
+- [\(in TempRefList\<T\>\).RefReadonlyAt\(int\)](#in-tempreflisttrefreadonlyatint) — returns a readonly reference to a list item
+- [\(in TempRefList\<T\>\).RefReadonlyIterReversed\(\)](#in-tempreflisttrefreadonlyiterreversed) — creates a readonly reversed by-ref iterator for the list
+- [\(in TempRefList\<T\>\).RefReadonlyIter\(\)](#in-tempreflisttrefreadonlyiter) — creates a readonly by-ref iterator for the list
+- [\(in TempRefList\<byte\>\).ToStringAscii\(\)](#in-tempreflistbytetostringascii) — creates a string interpreting list contents as ASCII bytes
+- [\(in TempRefList\<byte\>\).ToStringUtf8\(\)](#in-tempreflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
+- [\(ref TempRefList\<T\>\).Add\(T\)](#ref-tempreflisttaddt) — adds a new item to the list
+- [\(ref TempRefList\<T\>\).AppendDefault\(int\)](#ref-tempreflisttappenddefaultint) — adds a specified number of `default` items
+- [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — represent the collection as `Span`
+- [\(ref TempRefList\<T\>\).Clear\(\)](#ref-tempreflisttclear) — removes all items from the list
+- [\(ref TempRefList\<T\>\).CopyFrom\(in TempRefList\<T\>\)](#ref-tempreflisttcopyfromin-tempreflistt) — copies all items from another list
+- [\(ref TempRefList\<T\>\).RefAdd\(\)](#ref-tempreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
+- [\(ref TempRefList\<T\>\).RefAt\(int\)](#ref-tempreflisttrefatint) — returns a mutable reference to a list item
+- [\(ref TempRefList\<T\>\).RefIterReversed\(\)](#ref-tempreflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
+- [\(ref TempRefList\<T\>\).RefIter\(\)](#ref-tempreflisttrefiter) — creates a mutable by-ref iterator for the list
+- [\(ref TempRefList\<T\>\).RemoveAt\(int\)](#ref-tempreflisttremoveatint) — removes an item from the list at the given index
+- [\(ref TempRefList\<byte\>\).AppendAsciiString\(string\)](#ref-tempreflistbyteappendasciistringstring) — appends a given string to the list as ASCII bytes
+- [\(ref TempRefList\<byte\>\).AppendUtf8String\(string\)](#ref-tempreflistbyteappendutf8stringstring) — appends a given string to the list as UTF-8 bytes
 
 
 ## Static Creation Methods
 
 
-### TempRefList.Empty\<T\>()
+### TempRefList.Empty\<T\>\(\)
 
 Creates an empty list
 
@@ -48,7 +48,7 @@ public static TempRefList<T> Empty<T>() where T : unmanaged
 ```
 
 
-### TempRefList.WithCapacity\<T\>(int)
+### TempRefList.WithCapacity\<T\>\(int\)
 
 Creates a list with a given capacity.
 
@@ -60,7 +60,7 @@ Parameters
 - `capacity` — capacity of the list
 
 
-### TempRefList.WithDefaultItems\<T\>(int)
+### TempRefList.WithDefaultItems\<T\>\(int\)
 
 Creates a list filled with `default` items.
 
@@ -75,7 +75,7 @@ Parameters
 ## Extension Methods
 
 
-### (in TempRefList\<T\>).AsReadOnlySpan()
+### \(in TempRefList\<T\>\).AsReadOnlySpan\(\)
 
 Represent the collection as `ReadOnlySpan`
 
@@ -84,7 +84,7 @@ public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> se
 ```
 
 
-### (in TempRefList\<T\>).Capacity()
+### \(in TempRefList\<T\>\).Capacity\(\)
 
 Returns capacity of the given list.
 
@@ -98,7 +98,7 @@ Parameters
 Returns capacity of the given list (zero if the buffer is deallocated)
 
 
-### (in TempRefList\<T\>).CopyTo(ref TempRefList\<T\>)
+### \(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)
 
 Copies all items to another list.
 All items existing before copying are removed.
@@ -112,7 +112,7 @@ Parameters
 - `other` — destination list
 
 
-### (in TempRefList\<T\>).Count()
+### \(in TempRefList\<T\>\).Count\(\)
 
 Returns item count in the given list
 
@@ -126,7 +126,7 @@ Parameters
 Returns item count in the given list
 
 
-### (in TempRefList\<T\>).RefReadonlyAt(int)
+### \(in TempRefList\<T\>\).RefReadonlyAt\(int\)
 
 Returns a readonly reference to a list item.
 
@@ -141,21 +141,7 @@ Parameters
 Returns a readonly reference to a list item at the given index
 
 
-### (in TempRefList\<T\>).RefReadonlyIter()
-
-Creates a readonly by-ref iterator for the list.
-
-```csharp
-public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to iterate
-
-Returns the iterator to use in the foreach loop
-
-
-### (in TempRefList\<T\>).RefReadonlyIterReversed()
+### \(in TempRefList\<T\>\).RefReadonlyIterReversed\(\)
 
 Creates a readonly reversed by-ref iterator for the list.
 
@@ -169,7 +155,21 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### (in TempRefList\<byte\>).ToStringAscii()
+### \(in TempRefList\<T\>\).RefReadonlyIter\(\)
+
+Creates a readonly by-ref iterator for the list.
+
+```csharp
+public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to iterate
+
+Returns the iterator to use in the foreach loop
+
+
+### \(in TempRefList\<byte\>\).ToStringAscii\(\)
 
 Creates a string interpreting list contents as ASCII bytes.
 
@@ -183,7 +183,7 @@ Parameters
 Returns the string created from bytes
 
 
-### (in TempRefList\<byte\>).ToStringUtf8()
+### \(in TempRefList\<byte\>\).ToStringUtf8\(\)
 
 Creates a string interpreting list contents as UTF-8 bytes.
 
@@ -197,7 +197,7 @@ Parameters
 Returns the string created from bytes
 
 
-### (ref TempRefList\<T\>).Add(T)
+### \(ref TempRefList\<T\>\).Add\(T\)
 
 Adds a new item to the list.
 
@@ -210,7 +210,7 @@ Parameters
 - `item` — item to add to the list
 
 
-### (ref TempRefList\<T\>).AppendDefault(int)
+### \(ref TempRefList\<T\>\).AppendDefault\(int\)
 
 Adds a specified number of `default` items.
 
@@ -223,7 +223,7 @@ Parameters
 - `count` — number of items to add
 
 
-### (ref TempRefList\<T\>).AsSpan()
+### \(ref TempRefList\<T\>\).AsSpan\(\)
 
 Represent the collection as `Span`
 
@@ -232,7 +232,7 @@ public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> sel
 ```
 
 
-### (ref TempRefList\<T\>).Clear()
+### \(ref TempRefList\<T\>\).Clear\(\)
 
 Removes all items from the list.
 
@@ -244,7 +244,7 @@ Parameters
 - `self` — list to clear
 
 
-### (ref TempRefList\<T\>).CopyFrom(in TempRefList\<T\>)
+### \(ref TempRefList\<T\>\).CopyFrom\(in TempRefList\<T\>\)
 
 Copies all items from another list.
 All items existing before copying are removed.
@@ -258,7 +258,7 @@ Parameters
 - `other` — source list
 
 
-### (ref TempRefList\<T\>).RefAdd()
+### \(ref TempRefList\<T\>\).RefAdd\(\)
 
 Adds a `default` item to the list and returns a mutable reference to it.
 
@@ -272,7 +272,7 @@ Parameters
 Returns a mutable reference to the created item
 
 
-### (ref TempRefList\<T\>).RefAt(int)
+### \(ref TempRefList\<T\>\).RefAt\(int\)
 
 Returns a mutable reference to a list item.
 
@@ -287,21 +287,7 @@ Parameters
 Returns a mutable reference to a list item at the given index
 
 
-### (ref TempRefList\<T\>).RefIter()
-
-Creates a mutable by-ref iterator for the list.
-
-```csharp
-public static TempRefListIterator<T> RefIter<T>(this ref TempRefList<T> self) where T : unmanaged
-```
-
-Parameters
-- `self` — list to iterate
-
-Returns the iterator to use in the foreach loop
-
-
-### (ref TempRefList\<T\>).RefIterReversed()
+### \(ref TempRefList\<T\>\).RefIterReversed\(\)
 
 Creates a mutable reversed by-ref iterator for the list.
 
@@ -315,7 +301,21 @@ Parameters
 Returns the iterator to use in the foreach loop
 
 
-### (ref TempRefList\<T\>).RemoveAt(int)
+### \(ref TempRefList\<T\>\).RefIter\(\)
+
+Creates a mutable by-ref iterator for the list.
+
+```csharp
+public static TempRefListIterator<T> RefIter<T>(this ref TempRefList<T> self) where T : unmanaged
+```
+
+Parameters
+- `self` — list to iterate
+
+Returns the iterator to use in the foreach loop
+
+
+### \(ref TempRefList\<T\>\).RemoveAt\(int\)
 
 Removes an item from the list at the given index.
 
@@ -328,7 +328,7 @@ Parameters
 - `index` — an index to remove the item
 
 
-### (ref TempRefList\<byte\>).AppendAsciiString(string)
+### \(ref TempRefList\<byte\>\).AppendAsciiString\(string\)
 
 Appends a given string to the list as ASCII bytes.
 
@@ -341,7 +341,7 @@ Parameters
 - `value` — string value to append
 
 
-### (ref TempRefList\<byte\>).AppendUtf8String(string)
+### \(ref TempRefList\<byte\>\).AppendUtf8String\(string\)
 
 Appends a given string to the list as UTF-8 bytes.
 

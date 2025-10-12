@@ -7,13 +7,13 @@ public static class KsiExtensions
 ```
 
 Static Methods
-- [(ref T).Move()](#ref-tmove) — move structure ownership
+- [\(ref T\).Move\(\)](#ref-tmove) — move structure ownership
 
 
 ## Static Methods
 
 
-### (ref T).Move()
+### \(ref T\).Move\(\)
 
 Move structure ownership. After invocation the original value is set to `default` (zeroed).
 Can be required to work with `[ExplicitCopy]` types.

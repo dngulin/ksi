@@ -11,7 +11,7 @@ Properties
 - [Value](#value) — returns a readonly reference to the wrapped data
 
 Methods
-- [Dispose()](#dispose) — deactivates this access scope but allows creating a new one
+- [Dispose\(\)](#dispose) — deactivates this access scope but allows creating a new one
 
 
 ## Properties
@@ -33,7 +33,7 @@ public ref readonly T Value
 ## Methods
 
 
-### Dispose()
+### Dispose\(\)
 
 Deactivates this access scope but allows creating a new one.
 
