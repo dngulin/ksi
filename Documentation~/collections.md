@@ -18,6 +18,14 @@ and inherit different sets of [trait attributes](traits.md).
 | `TempRefList<T>`    | `unmanaged`     | Temp             | `ExplicitCopy`, `DynSized`, `TempAlloc` | Yes   |
 | `ManagedRefList<T>` | `struct`        | Runtime-provided | `ExplicitCopy`, `DynSized`              | No    |
 
+## Default Value Safety
+
+All collections are safe to use in a `default` (zeroed) state.
+It just indicates that the collection is empty and its internal buffer is not allocated.
+
+After [moving](api/T.KsiExtensions.g.md#ref-tmove) or [deallocating itself](api/T.RefList-1.g.md#ref-reflisttdealloc),
+the collection becomes zeroed and can be used again.
+
 ## Data Access Control
 
 ѯ-Framework collections API is provided with extension methods that allow having separate methods with _mutable_ and
@@ -40,7 +48,7 @@ In practice, it means:
 
 > [!IMPORTANT]
 > If you compose your data with ѯ-Framework collections,
-> you can control the access to the data with reference mutability. 
+> you can control the access to the data with reference mutability.
 
 See the full list of extension methods in the API reference:
 - [RefList\<T\>](api/T.RefList-1.g.md)
