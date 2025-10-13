@@ -14,6 +14,7 @@ meaning it doesn't contribute to the parent reference path
 - `[RefList("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
 
 ```csharp
+[AttributeUsage(AttributeTargets.Method)]
 public sealed class RefPathAttribute : Attribute
 ```
 
@@ -62,5 +63,5 @@ Is empty array in case of the non-explicit `RefPath`.
 Can contain the [DynSized](T.DynSizedAttribute.g.md) separator "!".
 
 ```csharp
-public string[] Segments
+public string[] Segments { get; }
 ```

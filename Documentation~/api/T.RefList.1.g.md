@@ -4,6 +4,7 @@ Dynamic array collection wrapping the `Persistent` allocator.
 Requires manual deallocation.
 
 ```csharp
+[ExplicitCopy, DynSized, Dealloc]
 public struct RefList<T> where T : unmanaged
 ```
 
@@ -296,6 +297,7 @@ Parameters
 Deallocate the list and returns it.
 
 ```csharp
+[RefPath("self", "!"), NonAllocatedResult]
 public static ref RefList<T> Deallocated<T>(this ref RefList<T> self) where T : unmanaged
 ```
 
@@ -310,6 +312,7 @@ Returns the list as an assignable reference.
 Adds a `default` item to the list and returns a mutable reference to it.
 
 ```csharp
+[NonAllocatedResult]
 public static ref T RefAdd<T>(this ref RefList<T> self) where T : unmanaged
 ```
 

@@ -22,7 +22,7 @@ Methods
 Returns a readonly reference to the wrapped data.
 
 ```csharp
-public ref readonly T Value
+public ref readonly T Value { get; }
 ```
 
 > [!CAUTION]

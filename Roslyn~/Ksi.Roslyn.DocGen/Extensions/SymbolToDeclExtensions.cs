@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,7 +7,7 @@ namespace Ksi.Roslyn.DocGen.Extensions;
 
 public static class SymbolToDeclExtensions
 {
-    public static string ToDecl(this INamedTypeSymbol symbol)
+    public static string ToDecl(this INamedTypeSymbol symbol, Compilation comp)
     {
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         if (syntax is not TypeDeclarationSyntax tds)
@@ -14,42 +15,35 @@ public static class SymbolToDeclExtensions
 
         var sb = new StringBuilder(128);
 
-        sb.Append(tds.Modifiers);
-        sb.Append(' ');
-        sb.Append(tds.Keyword);
-        sb.Append(' ');
-        sb.Append(tds.Identifier);
+        var attributes = tds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+        if (attributes.Length > 0)
+            sb.AppendLine($"[{string.Join(", ", attributes)}]");
 
+        sb.Append($"{tds.Modifiers} {tds.Keyword} {tds.Identifier}");
         if (tds.TypeParameterList != null)
             sb.Append(tds.TypeParameterList);
 
         if (tds.BaseList != null)
-        {
-            sb.Append(' ');
-            sb.Append(tds.BaseList);
-        }
+            sb.Append($" {tds.BaseList}");
 
         if (tds.ConstraintClauses.Count > 0)
-        {
-            sb.Append(' ');
-            sb.Append(tds.ConstraintClauses);
-        }
+            sb.Append($" {tds.ConstraintClauses}");
 
         return sb.ToString();
     }
 
-    public static string ToDecl(this IMethodSymbol symbol)
+    public static string ToDecl(this IMethodSymbol symbol, Compilation comp)
     {
         var sb = new StringBuilder(128);
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         switch (syntax)
         {
             case MethodDeclarationSyntax mds:
-                sb.Append(mds.Modifiers);
-                sb.Append(' ');
-                sb.Append(mds.ReturnType);
-                sb.Append(' ');
-                sb.Append(mds.Identifier);
+                var attributes = mds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+                if (attributes.Length > 0)
+                    sb.AppendLine($"[{string.Join(", ", attributes)}]");
+
+                sb.Append($"{mds.Modifiers} {mds.ReturnType} {mds.Identifier}");
 
                 if (mds.TypeParameterList != null)
                     sb.Append(mds.TypeParameterList);
@@ -57,18 +51,12 @@ public static class SymbolToDeclExtensions
                 sb.Append(mds.ParameterList);
 
                 if (mds.ConstraintClauses.Count > 0)
-                {
-                    sb.Append(' ');
-                    sb.Append(mds.ConstraintClauses);
-                }
+                    sb.Append($" {mds.ConstraintClauses}");
 
                 return sb.ToString();
 
             case ConstructorDeclarationSyntax cds:
-                sb.Append(cds.Modifiers);
-                sb.Append(' ');
-                sb.Append(cds.Identifier);
-                sb.Append(cds.ParameterList);
+                sb.Append($"{cds.Modifiers} {cds.Identifier}{cds.ParameterList}");
                 return sb.ToString();
 
             default:
@@ -76,7 +64,7 @@ public static class SymbolToDeclExtensions
         }
     }
 
-    public static string ToDecl(this IPropertySymbol symbol)
+    public static string ToDecl(this IPropertySymbol symbol, Compilation comp)
     {
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         if (syntax is not PropertyDeclarationSyntax pds)
@@ -84,12 +72,27 @@ public static class SymbolToDeclExtensions
 
         var sb = new StringBuilder(128);
 
-        sb.Append(pds.Modifiers);
-        sb.Append(' ');
-        sb.Append(pds.Type);
-        sb.Append(' ');
-        sb.Append(pds.Identifier);
+        var attributes = pds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+        if (attributes.Length > 0)
+            sb.AppendLine($"[{string.Join(", ", attributes)}]");
+
+        sb.Append($"{pds.Modifiers} {pds.Type} {pds.Identifier}");
+
+        if (symbol.IsReadOnly)
+            sb.Append(" { get; }");
+        else if (symbol.IsWriteOnly)
+            sb.Append(" { set; }");
+        else
+            sb.Append(" { get; set; }");
 
         return sb.ToString();
+    }
+
+    private static ImmutableArray<AttributeSyntax> PublicOnes(this SyntaxList<AttributeListSyntax> lists, SemanticModel sm)
+    {
+        return lists
+            .SelectMany(l => l.Attributes)
+            .Where(a => sm.GetSymbolInfo(a.Name).Symbol?.ContainingType.DeclaredAccessibility == Accessibility.Public)
+            .ToImmutableArray();
     }
 }

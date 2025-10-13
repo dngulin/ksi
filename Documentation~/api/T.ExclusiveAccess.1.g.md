@@ -21,7 +21,7 @@ Properties
 Creates a new instance of [MutableAccessScope\<T\>](T.MutableAccessScope.1.g.md).
 
 ```csharp
-public MutableAccessScope<T> Mutable
+public MutableAccessScope<T> Mutable { get; }
 ```
 
 > [!CAUTION]
@@ -34,7 +34,7 @@ public MutableAccessScope<T> Mutable
 Creates a new instance of `[ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope.1.g.md).
 
 ```csharp
-public ReadOnlyAccessScope<T> ReadOnly
+public ReadOnlyAccessScope<T> ReadOnly { get; }
 ```
 
 > [!CAUTION]

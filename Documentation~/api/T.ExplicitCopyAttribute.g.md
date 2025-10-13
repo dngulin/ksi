@@ -6,5 +6,6 @@ Should be added to a struct that contains fields of `ExplicitCopy` type.
 Can be also applied to a generic type parameter to make it compatible with `ExplicitCopy` types.
 
 ```csharp
+[AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
 public sealed class ExplicitCopyAttribute : Attribute
 ```

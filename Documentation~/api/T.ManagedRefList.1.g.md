@@ -4,6 +4,7 @@ Dynamic array collection wrapping a managed array.
 Can store structures containing reference types, but it is not compatible with `Burst`.
 
 ```csharp
+[ExplicitCopy, DynSized]
 public struct ManagedRefList<T> where T : struct
 ```
 
@@ -281,6 +282,7 @@ Parameters
 Adds a `default` item to the list and returns a mutable reference to it.
 
 ```csharp
+[NonAllocatedResult]
 public static ref T RefAdd<T>(this ref ManagedRefList<T> self) where T : struct
 ```
 

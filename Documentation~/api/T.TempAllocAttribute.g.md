@@ -6,5 +6,6 @@ Allows omitting manual deallocation in exchange for a lifetime limited by a fram
 Should be added to a struct that contains fields of the `TempAlloc` type.
 
 ```csharp
+[AttributeUsage(AttributeTargets.Struct)]
 public sealed class TempAllocAttribute : Attribute
 ```

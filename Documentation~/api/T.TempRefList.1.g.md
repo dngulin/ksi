@@ -4,6 +4,7 @@ Dynamic array collection wrapping the `Temp` allocator.
 Can be stored only on stack.
 
 ```csharp
+[ExplicitCopy, DynSized, TempAlloc]
 public struct TempRefList<T> where T : unmanaged
 ```
 
@@ -277,6 +278,7 @@ Parameters
 Adds a `default` item to the list and returns a mutable reference to it.
 
 ```csharp
+[NonAllocatedResult]
 public static ref T RefAdd<T>(this ref TempRefList<T> self) where T : unmanaged
 ```
 

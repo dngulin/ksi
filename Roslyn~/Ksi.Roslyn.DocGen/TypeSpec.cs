@@ -60,7 +60,7 @@ public sealed class TypeSpec
         Methods = methods.ToImmutableArray();
 
         Title = symbol.ToMd();
-        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+        Declaration = $"```csharp\n{symbol.ToDecl(comp)}\n```";
         Summary = symbol.DocXml().ToMd("summary", comp)!;
     }
 }
@@ -81,7 +81,7 @@ public sealed class MethodSpec
         Symbol = symbol;
 
         Title = symbol.ToMd();
-        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+        Declaration = $"```csharp\n{symbol.ToDecl(comp)}\n```";
 
         var xml = symbol.DocXml();
         Summary = xml.ToMd("summary", comp)!;
@@ -104,7 +104,7 @@ public sealed class PropertySpec
     {
         Symbol = symbol;
         Title = symbol.Name;
-        Declaration = $"```csharp\n{symbol.ToDecl()}\n```";
+        Declaration = $"```csharp\n{symbol.ToDecl(comp)}\n```";
 
         var xml = symbol.DocXml();
         Summary = xml.ToMd("summary", comp)!;

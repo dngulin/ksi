@@ -22,7 +22,7 @@ Methods
 Returns a mutable reference to the wrapped data.
 
 ```csharp
-public ref T Value
+public ref T Value { get; }
 ```
 
 > [!CAUTION]

@@ -5,5 +5,6 @@ Allows getting mutable references to collection items but disallows collection r
 Hints the reference lifetime analyzer that any internal buffer cannot be resized.
 
 ```csharp
+[AttributeUsage(AttributeTargets.Parameter)]
 public sealed class DynNoResizeAttribute : Attribute
 ```
