@@ -1,5 +1,11 @@
 # RefPathAttribute
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / RefPathAttribute**
+> \]
+
 A hint attribute for the reference path analyzer.
 If the method returns a specific reference path, specify it with positional parameters,
 otherwise omit them (that means the method can return any inner reference).

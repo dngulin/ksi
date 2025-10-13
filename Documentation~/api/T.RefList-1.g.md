@@ -1,5 +1,11 @@
 # RefList\<T\>
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / RefList\<T\>**
+> \]
+
 Dynamic array collection wrapping the `Persistent` allocator.
 Requires manual deallocation.
 

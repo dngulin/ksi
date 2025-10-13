@@ -1,5 +1,11 @@
 # Trait Attributes
 
+> \[ **Traits**
+> \| [Collections](collections.md)
+> \| [Referencing](borrow-checker-at-home.md)
+> \| [API](api/index.g.md)
+> \]
+
 ѯ-Framework defines a set of special attributes (traits) that enable extra diagnostics
 and code generation for marked structures:
 

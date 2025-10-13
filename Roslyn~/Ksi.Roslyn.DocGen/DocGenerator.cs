@@ -5,6 +5,16 @@ namespace Ksi.Roslyn.DocGen;
 
 public static class DocGenerator
 {
+    private const string Navbar =
+        """
+        
+        > \[ [Traits](../traits.md)
+        > \| [Collections](../collections.md)
+        > \| [Referencing](../borrow-checker-at-home.md)
+        > \| {0}
+        > \]
+        """;
+
     public static void WriteToDirectory(string path, PublicApi api)
     {
         RemoveGeneratedFiles(path);
@@ -25,6 +35,8 @@ public static class DocGenerator
         using var writer = new StreamWriter(path + "/index.g.md");
 
         writer.WriteLine("# API Reference");
+        writer.WriteLine(Navbar, "**API**");
+
         WriteIndexSection(writer, "Attributes", api.Attributes);
         WriteIndexSection(writer, "Collections", api.Collections);
         WriteIndexSection(writer, "Other Types", api.OtherTypes);
@@ -53,6 +65,7 @@ public static class DocGenerator
         using var writer = new StreamWriter(path + "/" + t.Symbol.MdFileName());
 
         writer.WriteLine("# " + t.Title);
+        writer.WriteLine(Navbar, $"**[API](index.g.md) / {t.Title}**");
 
         Write(writer, t.Summary);
         Write(writer, t.Declaration);

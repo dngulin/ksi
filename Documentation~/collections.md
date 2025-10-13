@@ -1,5 +1,11 @@
 # Collections
 
+> \[ [Traits](traits.md)
+> \| **Collections**
+> \| [Referencing](borrow-checker-at-home.md)
+> \| [API](api/index.g.md)
+> \]
+
 There are three dynamic collections provided by the framework:
 `RefList<T>`, `TempRefList<T>` and `ManagedRefList<T>`.
 All of them have the same public API but use different allocators

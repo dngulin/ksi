@@ -1,5 +1,11 @@
 # DynNoResizeAttribute
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / DynNoResizeAttribute**
+> \]
+
 Attribute that disallows any resizing operations on a [DynSized](T.DynSizedAttribute.g.md) type instance.
 Allows getting mutable references to collection items but disallows collection resizing.
 Hints the reference lifetime analyzer that any internal buffer cannot be resized.

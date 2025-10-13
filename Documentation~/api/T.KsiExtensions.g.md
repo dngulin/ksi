@@ -1,5 +1,11 @@
 # KsiExtensions
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / KsiExtensions**
+> \]
+
 General purpose extension methods provided by the ѯ-Framework.
 
 ```csharp

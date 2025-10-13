@@ -1,5 +1,11 @@
 # Referencing Rules
 
+> \[ [Traits](traits.md)
+> \| [Collections](collections.md)
+> \| **Referencing**
+> \| [API](api/index.g.md)
+> \]
+
 Referencing rules are based on the `[DynSized]` type usage analysis.
 Any change to dynamically sized data can invalidate existing references.
 

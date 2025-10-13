@@ -1,5 +1,11 @@
 # NonAllocatedResultAttribute
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / NonAllocatedResultAttribute**
+> \]
+
 Attribute to indicate a method that returns a reference to
 a deallocated instance of the [Dealloc](T.DeallocAttribute.g.md) type.
 Allows assigning a new value to the returned reference.

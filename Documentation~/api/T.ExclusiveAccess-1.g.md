@@ -1,5 +1,11 @@
 # ExclusiveAccess\<T\>
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / ExclusiveAccess\<T\>**
+> \]
+
 Container designed to provide exclusive access to inner data.
 It is achieved by maintaining only one active [MutableAccessScope\<T\>](T.MutableAccessScope-1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope-1.g.md) wrapping inner data.
 Supposed to wrap [DynSized](T.DynSizedAttribute.g.md) structures.

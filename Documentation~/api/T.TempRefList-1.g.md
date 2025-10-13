@@ -1,5 +1,11 @@
 # TempRefList\<T\>
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **[API](index.g.md) / TempRefList\<T\>**
+> \]
+
 Dynamic array collection wrapping the `Temp` allocator.
 Can be stored only on stack.
 

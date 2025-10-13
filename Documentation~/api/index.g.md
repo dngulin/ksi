@@ -1,5 +1,11 @@
 # API Reference
 
+> \[ [Traits](../traits.md)
+> \| [Collections](../collections.md)
+> \| [Referencing](../borrow-checker-at-home.md)
+> \| **API**
+> \]
+
 
 ## Attributes
 
