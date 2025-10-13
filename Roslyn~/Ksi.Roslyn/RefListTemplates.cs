@@ -77,6 +77,7 @@ public static class RefListTemplates
 
                 /// <summary>
                 /// Returns a readonly reference to a list item.
+                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to get an item reference</param>
                 /// <param name="index">Required item index</param>
@@ -93,6 +94,7 @@ public static class RefListTemplates
 
                 /// <summary>
                 /// Returns a mutable reference to a list item.
+                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to get an item reference</param>
                 /// <param name="index">Required item index</param>
@@ -119,6 +121,7 @@ public static class RefListTemplates
 
                 /// <summary>
                 /// Adds a <c>default</c> item to the list and returns a mutable reference to it.
+                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to add an item</param>
                 /// <returns>A mutable reference to the created item.</returns>
@@ -236,6 +239,7 @@ public static class RefListTemplates
 
                 /// <summary>
                 /// Deallocate the list and returns it.
+                /// <para>Does not add any segments to <c>RefPath</c>.</para>
                 /// </summary>
                 /// <param name="self">List to deallocate</param>
                 /// <returns>The list as an assignable reference.</returns>
@@ -266,6 +270,7 @@ public static class RefListTemplates
                 
                 /// <summary>
                 /// Creates a readonly by-ref iterator for the list.
+                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to iterate</param>
                 /// <returns>The iterator to use in the foreach loop.</returns>

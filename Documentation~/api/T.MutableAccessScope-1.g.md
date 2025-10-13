@@ -25,7 +25,9 @@ Methods
 
 ### Value
 
-Returns a mutable reference to the wrapped data.
+Returns a mutable reference to the wrapped data. 
+
+Does not add any segments to `RefPath`.
 
 ```csharp
 public ref T Value { get; }

@@ -75,6 +75,7 @@ namespace Ksi
 
         /// <summary>
         /// Returns a mutable reference to the wrapped data.
+        /// <para>Does not add any segments to <c>RefPath</c>.</para>
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// If the data is not available to this access scope (e.g. usage after disposing).
@@ -104,6 +105,7 @@ namespace Ksi
 
         /// <summary>
         /// Returns a readonly reference to the wrapped data.
+        /// <para>Does not add any segments to <c>RefPath</c>.</para>
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// If the data is not available to this access scope (e.g. usage after disposing).

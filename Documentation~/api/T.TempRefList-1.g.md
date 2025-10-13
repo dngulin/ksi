@@ -20,7 +20,7 @@ Static Creation Methods
 - [TempRefList.WithDefaultItems\<T\>\(int\)](#tempreflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
+- [\(in TempRefList\<T\>\).AsReadOnlySpan\(\)](#in-tempreflisttasreadonlyspan) — wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
 - [\(in TempRefList\<T\>\).Capacity\(\)](#in-tempreflisttcapacity) — returns capacity of the list
 - [\(in TempRefList\<T\>\).CopyTo\(ref TempRefList\<T\>\)](#in-tempreflisttcopytoref-tempreflistt) — copies all items to another list
 - [\(in TempRefList\<T\>\).Count\(\)](#in-tempreflisttcount) — returns item count in the list
@@ -31,7 +31,7 @@ Extension Methods
 - [\(in TempRefList\<byte\>\).ToStringUtf8\(\)](#in-tempreflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
 - [\(ref TempRefList\<T\>\).Add\(T\)](#ref-tempreflisttaddt) — adds a new item to the list
 - [\(ref TempRefList\<T\>\).AppendDefault\(int\)](#ref-tempreflisttappenddefaultint) — adds a specified number of `default` items
-- [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
+- [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref TempRefList\<T\>\).Clear\(\)](#ref-tempreflisttclear) — removes all items from the list
 - [\(ref TempRefList\<T\>\).CopyFrom\(in TempRefList\<T\>\)](#ref-tempreflisttcopyfromin-tempreflistt) — copies all items from another list
 - [\(ref TempRefList\<T\>\).RefAdd\(\)](#ref-tempreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
@@ -90,7 +90,9 @@ Returns a new instance of the [TempRefList\<T\>](T.TempRefList-1.g.md) with the 
 
 ### \(in TempRefList\<T\>\).AsReadOnlySpan\(\)
 
-Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
+Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1). 
+
+Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
 ```csharp
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> self) where T : unmanaged
@@ -141,7 +143,9 @@ Returns item count in the list.
 
 ### \(in TempRefList\<T\>\).RefReadonlyAt\(int\)
 
-Returns a readonly reference to a list item.
+Returns a readonly reference to a list item. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static ref readonly T RefReadonlyAt<T>(this in TempRefList<T> self, int index) where T : unmanaged
@@ -174,7 +178,9 @@ Returns the iterator to use in the foreach loop.
 
 ### \(in TempRefList\<T\>\).RefReadonlyIter\(\)
 
-Creates a readonly by-ref iterator for the list.
+Creates a readonly by-ref iterator for the list. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefList<T> self) where T : unmanaged
@@ -246,7 +252,9 @@ Parameters
 
 ### \(ref TempRefList\<T\>\).AsSpan\(\)
 
-Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
+Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1). 
+
+Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
 ```csharp
 public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> self) where T : unmanaged
@@ -281,7 +289,9 @@ Parameters
 
 ### \(ref TempRefList\<T\>\).RefAdd\(\)
 
-Adds a `default` item to the list and returns a mutable reference to it.
+Adds a `default` item to the list and returns a mutable reference to it. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 [NonAllocatedResult]
@@ -296,7 +306,9 @@ Returns a mutable reference to the created item.
 
 ### \(ref TempRefList\<T\>\).RefAt\(int\)
 
-Returns a mutable reference to a list item.
+Returns a mutable reference to a list item. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static ref T RefAt<T>([DynNoResize] this ref TempRefList<T> self, int index) where T : unmanaged

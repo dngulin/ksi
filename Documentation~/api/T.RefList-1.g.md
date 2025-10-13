@@ -20,7 +20,7 @@ Static Creation Methods
 - [RefList.WithDefaultItems\<T\>\(int\)](#reflistwithdefaultitemstint) — creates a list filled with `default` items
 
 Extension Methods
-- [\(in RefList\<T\>\).AsReadOnlySpan\(\)](#in-reflisttasreadonlyspan) — represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
+- [\(in RefList\<T\>\).AsReadOnlySpan\(\)](#in-reflisttasreadonlyspan) — wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1)
 - [\(in RefList\<T\>\).Capacity\(\)](#in-reflisttcapacity) — returns capacity of the list
 - [\(in RefList\<T\>\).CopyTo\(ref RefList\<T\>\)](#in-reflisttcopytoref-reflistt) — copies all items to another list
 - [\(in RefList\<T\>\).Count\(\)](#in-reflisttcount) — returns item count in the list
@@ -31,7 +31,7 @@ Extension Methods
 - [\(in RefList\<byte\>\).ToStringUtf8\(\)](#in-reflistbytetostringutf8) — creates a string interpreting list contents as UTF-8 bytes
 - [\(ref RefList\<T\>\).Add\(T\)](#ref-reflisttaddt) — adds a new item to the list
 - [\(ref RefList\<T\>\).AppendDefault\(int\)](#ref-reflisttappenddefaultint) — adds a specified number of `default` items
-- [\(ref RefList\<T\>\).AsSpan\(\)](#ref-reflisttasspan) — represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
+- [\(ref RefList\<T\>\).AsSpan\(\)](#ref-reflisttasspan) — wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref RefList\<T\>\).Clear\(\)](#ref-reflisttclear) — removes all items from the list
 - [\(ref RefList\<T\>\).CopyFrom\(in RefList\<T\>\)](#ref-reflisttcopyfromin-reflistt) — copies all items from another list
 - [\(ref RefList\<T\>\).Dealloc\(\)](#ref-reflisttdealloc) — deallocate the list
@@ -92,7 +92,9 @@ Returns a new instance of the [RefList\<T\>](T.RefList-1.g.md) with the given nu
 
 ### \(in RefList\<T\>\).AsReadOnlySpan\(\)
 
-Represent the collection as [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
+Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1). 
+
+Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
 ```csharp
 public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : unmanaged
@@ -145,7 +147,9 @@ Returns item count in the list.
 
 ### \(in RefList\<T\>\).RefReadonlyAt\(int\)
 
-Returns a readonly reference to a list item.
+Returns a readonly reference to a list item. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static ref readonly T RefReadonlyAt<T>(this in RefList<T> self, int index) where T : unmanaged
@@ -178,7 +182,9 @@ Returns the iterator to use in the foreach loop.
 
 ### \(in RefList\<T\>\).RefReadonlyIter\(\)
 
-Creates a readonly by-ref iterator for the list.
+Creates a readonly by-ref iterator for the list. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> self) where T : unmanaged
@@ -250,7 +256,9 @@ Parameters
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
 
-Represent the collection as [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
+Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1). 
+
+Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
 ```csharp
 public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
@@ -300,7 +308,9 @@ Parameters
 
 ### \(ref RefList\<T\>\).Deallocated\(\)
 
-Deallocate the list and returns it.
+Deallocate the list and returns it. 
+
+Does not add any segments to `RefPath`.
 
 ```csharp
 [RefPath("self", "!"), NonAllocatedResult]
@@ -315,7 +325,9 @@ Returns the list as an assignable reference.
 
 ### \(ref RefList\<T\>\).RefAdd\(\)
 
-Adds a `default` item to the list and returns a mutable reference to it.
+Adds a `default` item to the list and returns a mutable reference to it. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 [NonAllocatedResult]
@@ -330,7 +342,9 @@ Returns a mutable reference to the created item.
 
 ### \(ref RefList\<T\>\).RefAt\(int\)
 
-Returns a mutable reference to a list item.
+Returns a mutable reference to a list item. 
+
+Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 public static ref T RefAt<T>([DynNoResize] this ref RefList<T> self, int index) where T : unmanaged

@@ -25,7 +25,9 @@ Methods
 
 ### Value
 
-Returns a readonly reference to the wrapped data.
+Returns a readonly reference to the wrapped data. 
+
+Does not add any segments to `RefPath`.
 
 ```csharp
 public ref readonly T Value { get; }
