@@ -92,7 +92,7 @@ Returns a new instance of the [RefList\<T\>](T.RefList-1.g.md) with the given nu
 
 ### \(in RefList\<T\>\).AsReadOnlySpan\(\)
 
-Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1). 
+Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
 
 Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
@@ -147,7 +147,7 @@ Returns item count in the list.
 
 ### \(in RefList\<T\>\).RefReadonlyAt\(int\)
 
-Returns a readonly reference to a list item. 
+Returns a readonly reference to a list item.
 
 Adds to `RefPath` an indexer segment `[n]`.
 
@@ -182,9 +182,7 @@ Returns the iterator to use in the foreach loop.
 
 ### \(in RefList\<T\>\).RefReadonlyIter\(\)
 
-Creates a readonly by-ref iterator for the list. 
-
-Adds to `RefPath` an indexer segment `[n]`.
+Creates a readonly by-ref iterator for the list.
 
 ```csharp
 public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> self) where T : unmanaged
@@ -256,7 +254,7 @@ Parameters
 
 ### \(ref RefList\<T\>\).AsSpan\(\)
 
-Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1). 
+Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
 
 Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
@@ -308,7 +306,7 @@ Parameters
 
 ### \(ref RefList\<T\>\).Deallocated\(\)
 
-Deallocate the list and returns it. 
+Deallocate the list and returns it.
 
 Does not add any segments to `RefPath`.
 
@@ -325,7 +323,7 @@ Returns the list as an assignable reference.
 
 ### \(ref RefList\<T\>\).RefAdd\(\)
 
-Adds a `default` item to the list and returns a mutable reference to it. 
+Adds a `default` item to the list and returns a mutable reference to it.
 
 Adds to `RefPath` an indexer segment `[n]`.
 
@@ -342,7 +340,7 @@ Returns a mutable reference to the created item.
 
 ### \(ref RefList\<T\>\).RefAt\(int\)
 
-Returns a mutable reference to a list item. 
+Returns a mutable reference to a list item.
 
 Adds to `RefPath` an indexer segment `[n]`.
 

@@ -45,7 +45,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocate the list and returns it.
+            /// <para>Deallocate the list and returns it.</para>
             /// <para>Does not add any segments to <c>RefPath</c>.</para>
             /// </summary>
             /// <param name="self">List to deallocate</param>
@@ -96,7 +96,7 @@ namespace Ksi.Roslyn
             """
 
             /// <summary>
-            /// Deallocate the structure and returns it.
+            /// <para>Deallocate the structure and returns it.</para>
             /// <para>Does not add any segments to <c>RefPath</c>.</para>
             /// </summary>
             /// <param name="self">Structure to deallocate</param>

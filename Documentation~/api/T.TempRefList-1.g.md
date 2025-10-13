@@ -90,7 +90,7 @@ Returns a new instance of the [TempRefList\<T\>](T.TempRefList-1.g.md) with the 
 
 ### \(in TempRefList\<T\>\).AsReadOnlySpan\(\)
 
-Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1). 
+Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1).
 
 Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
@@ -143,7 +143,7 @@ Returns item count in the list.
 
 ### \(in TempRefList\<T\>\).RefReadonlyAt\(int\)
 
-Returns a readonly reference to a list item. 
+Returns a readonly reference to a list item.
 
 Adds to `RefPath` an indexer segment `[n]`.
 
@@ -178,9 +178,7 @@ Returns the iterator to use in the foreach loop.
 
 ### \(in TempRefList\<T\>\).RefReadonlyIter\(\)
 
-Creates a readonly by-ref iterator for the list. 
-
-Adds to `RefPath` an indexer segment `[n]`.
+Creates a readonly by-ref iterator for the list.
 
 ```csharp
 public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefList<T> self) where T : unmanaged
@@ -252,7 +250,7 @@ Parameters
 
 ### \(ref TempRefList\<T\>\).AsSpan\(\)
 
-Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1). 
+Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1).
 
 Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
@@ -289,7 +287,7 @@ Parameters
 
 ### \(ref TempRefList\<T\>\).RefAdd\(\)
 
-Adds a `default` item to the list and returns a mutable reference to it. 
+Adds a `default` item to the list and returns a mutable reference to it.
 
 Adds to `RefPath` an indexer segment `[n]`.
 
@@ -306,7 +304,7 @@ Returns a mutable reference to the created item.
 
 ### \(ref TempRefList\<T\>\).RefAt\(int\)
 
-Returns a mutable reference to a list item. 
+Returns a mutable reference to a list item.
 
 Adds to `RefPath` an indexer segment `[n]`.
 

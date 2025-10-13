@@ -74,7 +74,7 @@ namespace Ksi
         }
 
         /// <summary>
-        /// Returns a mutable reference to the wrapped data.
+        /// <para>Returns a mutable reference to the wrapped data.</para>
         /// <para>Does not add any segments to <c>RefPath</c>.</para>
         /// </summary>
         /// <exception cref="InvalidOperationException">
@@ -104,7 +104,7 @@ namespace Ksi
         }
 
         /// <summary>
-        /// Returns a readonly reference to the wrapped data.
+        /// <para>Returns a readonly reference to the wrapped data.</para>
         /// <para>Does not add any segments to <c>RefPath</c>.</para>
         /// </summary>
         /// <exception cref="InvalidOperationException">

@@ -25,7 +25,7 @@ Methods
 
 ### Value
 
-Returns a readonly reference to the wrapped data. 
+Returns a readonly reference to the wrapped data.
 
 Does not add any segments to `RefPath`.
 

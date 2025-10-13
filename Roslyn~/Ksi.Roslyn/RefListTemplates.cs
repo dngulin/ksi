@@ -76,7 +76,7 @@ public static class RefListTemplates
                 public static int Count<T>(this in {0}<T> self) where T : {1} => self.Count;
 
                 /// <summary>
-                /// Returns a readonly reference to a list item.
+                /// <para>Returns a readonly reference to a list item.</para>
                 /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to get an item reference</param>
@@ -93,7 +93,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Returns a mutable reference to a list item.
+                /// <para>Returns a mutable reference to a list item.</para>
                 /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to get an item reference</param>
@@ -120,7 +120,7 @@ public static class RefListTemplates
                 }}
 
                 /// <summary>
-                /// Adds a <c>default</c> item to the list and returns a mutable reference to it.
+                /// <para>Adds a <c>default</c> item to the list and returns a mutable reference to it.</para>
                 /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to add an item</param>
@@ -238,7 +238,7 @@ public static class RefListTemplates
                 public static void Dealloc<T>(this ref {0}<T> self) where T : {1} => self.SetBufferSize(0);
 
                 /// <summary>
-                /// Deallocate the list and returns it.
+                /// <para>Deallocate the list and returns it.</para>
                 /// <para>Does not add any segments to <c>RefPath</c>.</para>
                 /// </summary>
                 /// <param name="self">List to deallocate</param>
@@ -270,7 +270,6 @@ public static class RefListTemplates
                 
                 /// <summary>
                 /// Creates a readonly by-ref iterator for the list.
-                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
                 /// </summary>
                 /// <param name="self">List to iterate</param>
                 /// <returns>The iterator to use in the foreach loop.</returns>
