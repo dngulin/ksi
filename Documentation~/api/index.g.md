@@ -6,6 +6,10 @@
 > \| **API**
 > \]
 
+The API Reference is generated from XML documentation comments.
+
+Extension methods are grouped together with their target types.
+
 
 ## Attributes
 
