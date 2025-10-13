@@ -40,7 +40,7 @@ In practice, it means:
 
 > [!IMPORTANT]
 > If you compose your data with ѯ-Framework collections,
-> you can control the access to the data by using the appropriate reference type. 
+> you can control the access to the data with reference mutability. 
 
 See the full list of extension methods in the API reference:
 - [RefList\<T\>](api/T.RefList-1.g.md)
