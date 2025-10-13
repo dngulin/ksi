@@ -6,7 +6,7 @@
 > \| [API](api/index.g.md)
 > \]
 
-Referencing rules are based on the `[DynSized]` type usage analysis.
+Referencing rules are based on the [DynSized](api/T.DynSizedAttribute.g.md) type usage analysis.
 Any change to dynamically sized data can invalidate existing references.
 
 There are two reference invalidation cases:
@@ -41,7 +41,7 @@ that is derived from the same data or can produce a reference derived from the s
 > reassigning local references derived from `[DynSized]` data is not allowed.
 
 In some cases when mutable access doesn't require resizing any collections,
-you can mark the method parameter with the `[DynNoResize]` attribute.
+you can mark the method parameter with the [DynNoResizeAttribute](api/T.DynNoResizeAttribute.g.md).
 It will disallow resizing but keep mutable data access.
 
 ```csharp
@@ -61,7 +61,7 @@ It is not possible to quickly verify reference compatibility between by-ref argu
 because it is not possible to check if the argument is derived from the same field or not.
 Furthermore, calling non-static methods having a reference to a `[DynSized]` field can also invalidate the reference.
 
-To solve this problem, ѯ-Framework provides the `ExclusiveAccess<T>` type.
+To solve this problem, ѯ-Framework provides the [ExclusiveAccess\<T\>](api/T.ExclusiveAccess-1.g.md) type.
 It is a wrapper around the `[DynSized]` data, that guarantees that the owned data is exclusively accessed.
 
 It has two access properties that return mutable and read-only access scopes:
@@ -105,7 +105,8 @@ public class DataOwner
 
 Reference safety analyzers support only these `ref struct` types:
 - `Span<T>` and `ReadOnlySpan<T>` derived from a `[RefList]` collection
-- `MutableAccessScope<T>` and `ReadOnlyAccessScope<T>` for top-level data access
+- [MutableAccessScope\<T\>](api/T.MutableAccessScope-1.g.md) and
+[ReadOnlyAccessScope\<T\>](api/T.ReadOnlyAccessScope-1.g.md) for top-level data access
 
 It is recommended to use spans only to work with external libraries that are not dependent on the ѯ-Framework.
 
@@ -179,7 +180,7 @@ ref var y = ref x.Number; // root.ListOfNonDyn![n].Number
 ### RefPathAttribute
 
 In some cases it is necessary to get an internal reference applying some logic.
-The `[RefPath]` attribute serves this purpose.
+The [RefPathAttribute](api/T.RefPathAttribute.g.md) serves this purpose.
 
 You can use it to mark extension methods that return inner references:
 ```csharp

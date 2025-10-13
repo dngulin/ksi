@@ -9,17 +9,20 @@
 ѯ-Framework defines a set of special attributes (traits) that enable extra diagnostics
 and code generation for marked structures:
 
-- Structures that should not be implicitly copied should be marked with the `[ExplicitCopy]` attribute
-- Structures that own dynamically allocated data should be marked with the `[DynSized]` attribute
-that enables referencing safety checks
+- Structures that should not be implicitly copied should be marked with
+the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md)
+- Structures that own dynamically allocated data should be marked with
+the [DynSizedAttribute](api/T.DynSizedAttribute.g.md) that enables referencing safety checks
 - For some `[DynSized]` structures the allocator policy trait is also required:
-  - The `[Dealloc]` attribute generates deallocation API and enables extra diagnostics
-  - The `[TempAlloc]` attribute makes deallocation not required in exchange to be stored only on stack
+  - The [DeallocAttribute](api/T.DeallocAttribute.g.md) generates deallocation API and enables extra diagnostics
+  - The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) makes deallocation not required
+  in exchange to be stored only on stack
 
 ## ExplicitCopy Attribute
 
-The `[ExplicitCopy]` attribute enforces move semantics for a marked struct preventing any implicit copying.
-It should be used for structures that have any `[ExplicitCopy]` fields like `RefList<T>`.
+The [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) enforces move semantics for a marked struct
+preventing any implicit copying.
+It should be used for structures that have any `[ExplicitCopy]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
 
 Usage example:
 ```csharp
@@ -47,8 +50,8 @@ The trait also enables code generation that produces explicit copy extensions.
 
 ### Generated ExplicitCopy API
 
-Usage of the `[ExplicitCopy]` attribute triggers code generation of `CopyTo` and `CopyFrom` methods
-for the marked type and possible containers:
+Usage of the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) triggers
+code generation of `CopyTo` and `CopyFrom` methods for the marked type and possible containers:
 
 - `TStruct CopyTo(this in TStruct self, ref TStruct other)`
 - `TStruct CopyForm(this ref TStruct self, in TStruct other)`
@@ -64,7 +67,7 @@ Where `TStruct` is the structure name and `TRefList` is a [compatible collection
 
 ### ExplicitCopy Diagnostics
 
-Diagnostics related to the `[ExplicitCopy]` attribute:
+Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md):
 
 | Diagnostic Id | Severity | Title                                                   |
 |---------------|----------|---------------------------------------------------------|
@@ -83,9 +86,9 @@ Diagnostics related to the `[ExplicitCopy]` attribute:
 
 ## DynSized Attribute
 
-The `[DynSized]` attribute indicates that the structure owns dynamically allocated data.
-It should be used for structures that have any `[DynSized]` fields like `RefList<T>`.
-And it also requires `[ExplicitCopy]` attribute.
+The [DynSizedAttribute](api/T.DynSizedAttribute.g.md) indicates that the structure owns dynamically allocated data.
+It should be used for structures that have any `[DynSized]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
+And it also requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md).
 
 The main purpose of the attribute is to indicate types affected by compile time referencing safety analysis.
 For details see the [Referencing Rules](borrow-checker-at-home.md) section.
@@ -107,7 +110,7 @@ public struc ParentStruct
 
 ### DynSized Diagnostics
 
-Diagnostics related to the `[DynSized]` attribute:
+Diagnostics related to the [DynSizedAttribute](api/T.DynSizedAttribute.g.md):
 
 | Diagnostic Id | Severity | Title                                                  |
 |---------------|----------|--------------------------------------------------------|
@@ -126,9 +129,9 @@ Diagnostics related to the `[DynSized]` attribute:
 
 ## Dealloc Attribute
 
-The `[Dealloc]` attribute indicates a type that should be deallocated with the `Dealloc` extension method.
-It requires `[ExplicitCopy]` attribute and should be used for structures that have
-any `[Dealloc]` fields like `RefList<T>`.
+The [DeallocAttribute](api/T.DeallocAttribute.g.md) indicates a type that should be deallocated
+with the `Dealloc` extension method. It requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md)
+and should be used for structures that have any `[Dealloc]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
 
 Usage example:
 ```csharp
@@ -147,8 +150,8 @@ public struc ParentStruct
 
 ### Generated Dealloc API
 
-Usage of the `[Dealloc]` attribute triggers code generation of `Dealloc` and `Deallocated` methods
-for the marked type:
+Usage of the [DeallocAttribute](api/T.DeallocAttribute.g.md) attribute triggers
+code generation of `Dealloc` and `Deallocated` methods for the marked type:
 
 - `void Dealloc(this ref TStruct self)` - deallocates all data owned by the struct
 - `ref TStruct Deallocated(this ref TStruct self)` - deallocate the struct and returns it as
@@ -167,8 +170,8 @@ It also generates specialized API calls for [compatible collections](collections
 
 ### NonAllocatedResult Attribute
 
-If you are sure that your method returns a deallocated instance, you can use the `[NonAllocatedResult]` attribute
-to suppress the `DEALLOC04` diagnostic.
+If you are sure that your method returns a deallocated instance, you can use
+the [NonAllocatedResultAttribute](api/T.NonAllocatedResultAttribute.g.md) to suppress the `DEALLOC04` diagnostic.
 
 > [!CAUTION]
 > There is no diagnostic analyzer to verify if the instance is actually deallocated.
@@ -186,7 +189,7 @@ list.RefAt(0).Deallocated() = CreateRandomEntity(); // Assignment is allowed
 
 ### Dealloc Diagnostics
 
-Diagnostics related to the `[Dealloc]` attribute:
+Diagnostics related to the [DeallocAttribute](api/T.DeallocAttribute.g.md):
 
 | Diagnostic Id | Severity | Title                                              |
 |---------------|----------|----------------------------------------------------|
@@ -199,9 +202,9 @@ Diagnostics related to the `[Dealloc]` attribute:
 
 ## TempAlloc Attribute
 
-The `[TempAlloc]` attribute indicates a type that should be stored only on stack.
-It requires `[ExplicitCopy]` attribute and should be used for structures that have
-any `[TempAlloc]` fields like `TempRefList<T>`.
+The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) indicates a type that should be stored only on stack.
+It requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) and should be used for structures that have
+any `[TempAlloc]` fields like [TempRefList\<T\>](api/T.TempRefList-1.g.md).
 
 `[TempAlloc]` types are similar to `ref struct` types,
 but can be used as generic parameters of `[TempAlloc]` collections.
@@ -223,7 +226,7 @@ public struc ParentStruct
 
 ### TempAlloc Diagnostics
 
-Diagnostics related to the `[TempAlloc]` attribute:
+Diagnostics related to the [TempAllocAttribute](api/T.TempAllocAttribute.g.md):
 
 | Diagnostic Id  | Severity | Title                                              |
 |----------------|----------|----------------------------------------------------|

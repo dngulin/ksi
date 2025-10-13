@@ -7,7 +7,8 @@
 > \]
 
 There are three dynamic collections provided by the framework:
-`RefList<T>`, `TempRefList<T>` and `ManagedRefList<T>`.
+[RefList\<T\>](api/T.RefList-1.g.md), [TempRefList\<T\>](api/T.TempRefList-1.g.md)
+and [ManagedRefList\<T\>](api/T.ManagedRefList-1.g.md).
 All of them have the same public API but use different allocators
 and inherit different sets of [trait attributes](traits.md).
 
