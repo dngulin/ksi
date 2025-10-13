@@ -3,10 +3,10 @@ using System;
 namespace Ksi
 {
     /// <summary>
-    /// Attribute that forbids structure implicit copying and provides explicit copy extension methods.
-    /// Can be applied only to POD types without any methods and private fields.
-    /// Should be added to a struct that contains fields of <c>ExplicitCopy</c> type.
-    /// Can be also applied to a generic type parameter to make it compatible with <c>ExplicitCopy</c> types.
+    /// <para>Attribute that forbids structure implicit copying and provides explicit copy extension methods.
+    /// Can be applied only to POD types without any methods and private fields.</para>
+    /// <para>Should be added to a struct that contains fields of <c>ExplicitCopy</c> type.</para>
+    /// <para>Can be also applied to a generic type parameter to make it compatible with <c>ExplicitCopy</c> types.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class ExplicitCopyAttribute : Attribute
@@ -14,10 +14,9 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate an <see cref="ExplicitCopyAttribute">ExplicitCopy</see> type
-    /// that contains a dynamically sized buffer.
-    /// Should be added to a struct that contains fields of the <c>DynSized</c> type.
-    /// Enables reference lifetime and aliasing diagnostics.
+    /// <para>Attribute to indicate an <see cref="ExplicitCopyAttribute">ExplicitCopy</see> type
+    /// that contains a dynamically sized buffer that enables reference lifetime and aliasing diagnostics.</para>
+    /// <para>Should be added to a struct that contains fields of the <c>DynSized</c> type.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class DynSizedAttribute : Attribute
@@ -25,9 +24,9 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute that disallows any resizing operations on a <see cref="DynSizedAttribute">DynSized</see> type instance.
-    /// Allows getting mutable references to collection items but disallows collection resizing.
-    /// Hints the reference lifetime analyzer that any internal buffer cannot be resized.
+    /// <para>Attribute that disallows any resizing operations
+    /// on a <see cref="DynSizedAttribute">DynSized</see> type instance.</para>
+    /// <para>Hints the reference lifetime analyzer that any internal buffer cannot be resized.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class DynNoResizeAttribute : Attribute
@@ -35,9 +34,10 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type that requires manual deallocation.
-    /// Should be added to a struct that contains fields of the <c>Dealloc</c> type.
-    /// Can be also applied to a generic type parameter to make it compatible with <c>Dealloc</c> types.
+    /// <para>Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see>
+    /// type that requires manual deallocation.</para>
+    /// <para>Should be added to a struct that contains fields of the <c>Dealloc</c> type.</para>
+    /// <para>Can be also applied to a generic type parameter to make it compatible with <c>Dealloc</c> types.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class DeallocAttribute : Attribute
@@ -55,10 +55,10 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type
+    /// <para>Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type
     /// that uses temporary allocator and should be created only on stack.
-    /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
-    /// Should be added to a struct that contains fields of the <c>TempAlloc</c> type.
+    /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.</para>
+    /// <para>Should be added to a struct that contains fields of the <c>TempAlloc</c> type.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class TempAllocAttribute : Attribute
