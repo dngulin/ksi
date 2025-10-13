@@ -18,9 +18,34 @@ and inherit different sets of [trait attributes](traits.md).
 | `TempRefList<T>`    | `unmanaged`     | Temp             | `ExplicitCopy`, `DynSized`, `TempAlloc` | Yes   |
 | `ManagedRefList<T>` | `struct`        | Runtime-provided | `ExplicitCopy`, `DynSized`              | No    |
 
-## Public API
+## Data Access Control
 
-TBD
+ѯ-Framework collections API is provided with extension methods that allow having separate methods with _mutable_ and
+_readonly_ access to the data.
+It is possible because extension methods can be defined separately for `this ref` and `this in` parameters:
+
+```csharp
+// This method is available if you have ANY REFERENCE to the data
+public static ref readonly T RefReadonlyAt<T>(this in RefList<T> self, int index)
+
+// This method is available only if you have a MUTABLE REFERENCE to the data
+public static ref T RefAt<T>(this ref RefList<T> self, int index)
+```
+
+The example above shows that you can get a mutable reference to a collection item
+if you have a mutable reference to the collection itself.
+But you can get a readonly reference to the item even if you have a mutable reference to the collection.
+
+In practice, it means:
+
+> [!IMPORTANT]
+> If you compose your data with ѯ-Framework collections,
+> you can control the access to the data by using the appropriate reference type. 
+
+See the full list of extension methods in the API reference:
+- [RefList\<T\>](api/T.RefList-1.g.md)
+- [TempRefList\<T\>](api/T.TempRefList-1.g.md)
+- [ManagedRefList\<T\>](api/T.ManagedRefList-1.g.md)
 
 ## Diagnostics
 
