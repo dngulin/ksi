@@ -72,3 +72,16 @@ TODO:
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
 - [API Reference](Documentation~/api/index.g.md)
+
+## Installation
+
+- Ensure that the .NET API compatibility level provides `Netstandard 2.1` APIs (Unity 2021.2+)
+- Add the package to your `manifest.json`:
+    ```json
+    {
+      "dependencies": {
+        ...,
+        "dev.dngulin.ksi": "git@github.com:dngulin/ksi.git"
+      }
+    }
+    ```
