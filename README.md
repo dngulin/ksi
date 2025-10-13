@@ -7,7 +7,7 @@ _Pronounced as /ksi/_
 ## About
 
 > [!WARNING]
-> The project is in the prototype development stage
+> The project is in the alpha version stage
 
 This unity package provides a data-oriented design framework for Unity DOTS.
 It implies using the special attribute (trait) system
