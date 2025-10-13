@@ -1,7 +1,7 @@
 # ReadOnlyAccessScope\<T\>
 
 Structure that provides readonly exclusive access to wrapped data.
-Should be disposed after usage to release access lock from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance.
+Should be disposed after usage to release access lock from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md) instance.
 
 ```csharp
 public readonly ref struct ReadOnlyAccessScope<T> where T : struct
@@ -11,7 +11,7 @@ Properties
 - [Value](#value) — returns a readonly reference to the wrapped data
 
 Methods
-- [Dispose\(\)](#dispose) — deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance
+- [Dispose\(\)](#dispose) — deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md) instance
 
 
 ## Properties
@@ -35,7 +35,7 @@ public ref readonly T Value { get; }
 
 ### Dispose\(\)
 
-Deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess.1.g.md) instance.
+Deactivates the access scope and allows creating a new one from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md) instance.
 
 ```csharp
 public void Dispose()

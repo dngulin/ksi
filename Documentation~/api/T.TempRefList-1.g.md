@@ -48,7 +48,7 @@ Creates an empty list
 public static TempRefList<T> Empty<T>() where T : unmanaged
 ```
 
-Returns a new empty instance of the [TempRefList\<T\>](T.TempRefList.1.g.md).
+Returns a new empty instance of the [TempRefList\<T\>](T.TempRefList-1.g.md).
 
 
 ### TempRefList.WithCapacity\<T\>\(int\)
@@ -62,7 +62,7 @@ public static TempRefList<T> WithCapacity<T>(int capacity) where T : unmanaged
 Parameters
 - `capacity` — capacity of the list
 
-Returns a new instance of the [TempRefList\<T\>](T.TempRefList.1.g.md) with the given capacity.
+Returns a new instance of the [TempRefList\<T\>](T.TempRefList-1.g.md) with the given capacity.
 
 
 ### TempRefList.WithDefaultItems\<T\>\(int\)
@@ -76,7 +76,7 @@ public static TempRefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 Parameters
 - `count` — number of items
 
-Returns a new instance of the [TempRefList\<T\>](T.TempRefList.1.g.md) with the given number of `default` items.
+Returns a new instance of the [TempRefList\<T\>](T.TempRefList-1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods

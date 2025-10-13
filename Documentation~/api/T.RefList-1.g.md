@@ -50,7 +50,7 @@ Creates an empty list
 public static RefList<T> Empty<T>() where T : unmanaged
 ```
 
-Returns a new empty instance of the [RefList\<T\>](T.RefList.1.g.md).
+Returns a new empty instance of the [RefList\<T\>](T.RefList-1.g.md).
 
 
 ### RefList.WithCapacity\<T\>\(int\)
@@ -64,7 +64,7 @@ public static RefList<T> WithCapacity<T>(int capacity) where T : unmanaged
 Parameters
 - `capacity` — capacity of the list
 
-Returns a new instance of the [RefList\<T\>](T.RefList.1.g.md) with the given capacity.
+Returns a new instance of the [RefList\<T\>](T.RefList-1.g.md) with the given capacity.
 
 
 ### RefList.WithDefaultItems\<T\>\(int\)
@@ -78,7 +78,7 @@ public static RefList<T> WithDefaultItems<T>(int count) where T : unmanaged
 Parameters
 - `count` — number of items
 
-Returns a new instance of the [RefList\<T\>](T.RefList.1.g.md) with the given number of `default` items.
+Returns a new instance of the [RefList\<T\>](T.RefList-1.g.md) with the given number of `default` items.
 
 
 ## Extension Methods

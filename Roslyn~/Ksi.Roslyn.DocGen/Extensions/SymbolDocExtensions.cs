@@ -18,7 +18,7 @@ public static class SymbolDocExtensions
 
     public static string MdFileName(this INamedTypeSymbol self)
     {
-        var suffix = self.IsGenericType ? $".{self.TypeArguments.Length}" : "";
+        var suffix = self.IsGenericType ? $"-{self.TypeArguments.Length}" : "";
         return $"T.{self.Name}{suffix}.g.md";
     }
 }
