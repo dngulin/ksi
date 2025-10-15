@@ -110,7 +110,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
             return RuleId.Rule01GenericItemType;
 
-        if (gt.IsGenericType && gt.IsRefList())
+        if (gt.IsRefList())
             return RuleId.Rule02JaggedRefList;
 
         return RuleId.None;
@@ -130,8 +130,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         if (p.Length == 0 || p[0].Type is not INamedTypeSymbol t)
             return;
 
-        var isRefList = t.IsGenericType && t.IsRefList();
-        if (!isRefList)
+        if (!t.IsRefList())
             return;
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)

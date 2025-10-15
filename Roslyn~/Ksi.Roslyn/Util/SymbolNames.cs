@@ -19,5 +19,10 @@ public static class SymbolNames
     public const string RefList = "RefList";
     public const string RefListIndexer = "RefListIndexer";
 
+    public const string KsiComponent = "KsiComponent";
+    public const string KsiEntity = "KsiEntity";
+    public const string KsiArchetype = "KsiArchetype";
+    public const string KsiDomain = "KsiDomain";
+
     public const string Attribute = "Attribute";
 }

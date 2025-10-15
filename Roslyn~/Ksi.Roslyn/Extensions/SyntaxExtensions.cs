@@ -12,64 +12,35 @@ public static class SyntaxExtensions
         return self.IsKind(SyntaxKind.TypeConstraint) && self is TypeConstraintSyntax tcs && tcs.Type.IsUnmanaged;
     }
 
-    public static bool ContainsDealloc(this SyntaxList<AttributeListSyntax> lists)
+    public static bool ContainsDealloc(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.Dealloc);
+    public static bool ContainsExplicitCopy(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.ExplicitCopy);
+    public static bool ContainsRefList(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.RefList);
+    public static bool ContainsKsiEntity(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiEntity);
+    public static bool ContainsKsiArchetype(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiArchetype);
+    public static bool ContainsKsiDomain(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiDomain);
+
+    private static bool Contains(this SyntaxList<AttributeListSyntax> self, string attr)
     {
-        foreach (var l in lists)
+        foreach (var l in self)
         foreach (var a in l.Attributes)
         {
-            if (a.IsDealloc())
+            if (a.Is(attr))
                 return true;
         }
 
         return false;
     }
 
-    private static bool IsDealloc(this AttributeSyntax attribute)
+    private static bool Is(this AttributeSyntax self, string name)
     {
         const string ns = SymbolNames.Ksi;
-        const string name = SymbolNames.Dealloc;
         const string attr = SymbolNames.Attribute;
-        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
-    }
 
-    public static bool ContainsExplicitCopy(this SyntaxList<AttributeListSyntax> lists)
-    {
-        foreach (var l in lists)
-        foreach (var a in l.Attributes)
-        {
-            if (a.IsExplicitCopy())
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsExplicitCopy(this AttributeSyntax attribute)
-    {
-        const string ns = SymbolNames.Ksi;
-        const string name = SymbolNames.ExplicitCopy;
-        const string attr = SymbolNames.Attribute;
-        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
-    }
-
-    public static bool ContainsRefList(this SyntaxList<AttributeListSyntax> lists)
-    {
-        foreach (var l in lists)
-        foreach (var a in l.Attributes)
-        {
-            if (a.IsRefList())
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsRefList(this AttributeSyntax attribute)
-    {
-        const string ns = SymbolNames.Ksi;
-        const string name = SymbolNames.RefList;
-        const string attr = SymbolNames.Attribute;
-        return attribute.Name.ToString() is name or $"{name}{attr}" or $"{ns}.{name}" or $"{ns}.{name}{attr}";
+        var decl = self.Name.ToString();
+        return decl == name ||
+               decl == $"{name}{attr}" ||
+               decl == $"{ns}.{name}" ||
+               decl == $"{ns}.{name}{attr}";
     }
 
     public static ExpressionSyntax GetTypeExpr(this GenericNameSyntax self)

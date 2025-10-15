@@ -159,21 +159,31 @@ public static class TypeSymbolExtensions
 
     public static bool IsJaggedRefList(this INamedTypeSymbol self)
     {
-        if (!self.IsSingleArgGenericStruct() || !self.IsRefList())
+        if (!self.IsRefList())
             return false;
 
-        if (self.TypeArguments.First() is not INamedTypeSymbol gt)
-            return false;
-
-        return gt.IsSingleArgGenericStruct() && gt.IsRefList();
+        return self.TypeArguments.First() is INamedTypeSymbol gt && gt.IsRefList();
     }
 
-    public static bool IsSingleArgGenericStruct(this INamedTypeSymbol self)
+    public static bool IsRefList(this INamedTypeSymbol self)
+        => self.IsSingleArgGenericStruct() && self.Is(SymbolNames.RefList);
+
+    public static bool IsRefListOfComponents(this INamedTypeSymbol self)
+        => self.IsRefList() && self.TypeArguments[0].IsKsiComponent();
+
+    public static bool IsRefListOfEntities(this INamedTypeSymbol self)
+        => self.IsRefList() && self.TypeArguments[0].IsKsiEntity();
+
+    private static bool IsSingleArgGenericStruct(this INamedTypeSymbol self)
         => self is { TypeKind: TypeKind.Struct, IsGenericType: true, TypeArguments.Length: 1 };
 
     public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
     public static bool IsDynSized(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.DynSized);
     public static bool IsTempAlloc(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.TempAlloc);
+
+    public static bool IsKsiComponent(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiComponent);
+    public static bool IsKsiEntity(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiEntity);
+    public static bool IsKsiArchetype(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiArchetype);
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
