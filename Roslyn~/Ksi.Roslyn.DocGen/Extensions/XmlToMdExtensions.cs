@@ -33,8 +33,8 @@ public static class XmlToMdExtensions
 
     private static string XmlTextToMd(this string self, bool keepLeadingSpace, bool keepTrailingSpace)
     {
-        var prefix = keepLeadingSpace && self.StartsWith(' ') ? " " : "";
-        var suffix = keepTrailingSpace && self.EndsWith(' ') ? " " : "";
+        var prefix = keepLeadingSpace && self.TrimStart('\n').StartsWith(' ') ? self[..1] : "";
+        var suffix = keepTrailingSpace && self.TrimEnd('\n').EndsWith(' ') ? self[^1..] : "";
 
         const StringSplitOptions splitOpt = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
         var value = string.Join("\n", self.Split('\n', splitOpt));

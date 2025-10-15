@@ -6,7 +6,8 @@
 > \| **[API](index.g.md) / DeallocAttribute**
 > \]
 
-Attribute to indicate a [DynSized](T.DynSizedAttribute.g.md)type that requires manual deallocation.
+Attribute to indicate a [DynSized](T.DynSizedAttribute.g.md)
+type that requires manual deallocation.
 
 Should be added to a struct that contains fields of the `Dealloc` type.
 
