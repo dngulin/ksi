@@ -127,6 +127,16 @@ public class KsiCompAnalyzerTests
             {
                 public RefList<Entity> AoS;
             }
+            
+            public static class Wrap
+            {
+                [KsiDomain]
+                [ExplicitCopy, DynSized, Dealloc]
+                public partial struct {|KSICOMP03:Domain|}
+                {
+                    public RefList<Entity> AoS;
+                }
+            }
             """
         );
     }

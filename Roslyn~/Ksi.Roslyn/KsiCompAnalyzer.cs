@@ -35,15 +35,15 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         "Repeated components within the Entity are not supported"
     );
 
-    private static readonly DiagnosticDescriptor Rule03NonPartialKsiDomain = Rule(03, DiagnosticSeverity.Error,
-        "Non-partial [KsiDomain] struct",
-        "Structure marked with [KsiDomain] should be a partial struct to provide inner `Section` and `Handle` types"
+    private static readonly DiagnosticDescriptor Rule03InvalidDomainAccessibility = Rule(03, DiagnosticSeverity.Error,
+        "Invalid [KsiDomain] accessibility",
+        "Structure marked with [KsiDomain] should be a partial top-level struct"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01InvalidField,
         Rule02RepeatedComponent,
-        Rule03NonPartialKsiDomain
+        Rule03InvalidDomainAccessibility
     );
 
     public override void Initialize(AnalysisContext context)
@@ -120,11 +120,11 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         const string typeReq = "[KsiDomain]";
         const string fieldReq = "[KsiArchetype] or `RefList` over [KsiEntity]";
 
-        if (sds.Modifiers.All(m => !m.IsKind(SyntaxKind.PartialKeyword)))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule03NonPartialKsiDomain, sds.Identifier.GetLocation()));
-
         if (t == null)
             return;
+
+        if (t.ContainingType != null || sds.Modifiers.All(m => !m.IsKind(SyntaxKind.PartialKeyword)))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDomainAccessibility, sds.Identifier.GetLocation()));
 
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic))
         {

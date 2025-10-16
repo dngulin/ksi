@@ -31,7 +31,7 @@ public partial class KsiCompGenerator
             transform: (ctx, ct) =>
             {
                 var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
-                if (t == null)
+                if (t == null || t.ContainingType != null)
                     return null;
 
                 var typeInfo = new DomainTypeInfo(t);
