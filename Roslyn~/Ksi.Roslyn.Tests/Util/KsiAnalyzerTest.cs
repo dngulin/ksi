@@ -9,7 +9,8 @@ public class KsiAnalyzerTest<T> : CSharpAnalyzerTest<T, DefaultVerifier> where T
 {
     protected override IEnumerable<Type> GetSourceGenerators() => [
         typeof(ExplicitCopyGenerator),
-        typeof(DeallocGenerator)
+        typeof(DeallocGenerator),
+        typeof(KsiCompGenerator)
     ];
 
     public static async Task RunAsync([StringSyntax("c#-test")] string code)

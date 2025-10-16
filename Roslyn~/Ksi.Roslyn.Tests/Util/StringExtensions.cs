@@ -1,3 +1,5 @@
+using Ksi.Roslyn.Util;
+
 namespace Ksi.Roslyn.Tests.Util;
 
 public static class StringExtensions
@@ -9,6 +11,13 @@ public static class StringExtensions
 
     private static string Indented(this string self, int indent)
     {
-        return string.Join("\n", self.Split("\n").Select(s => new string(' ', indent * 4) + s));
+        var spaces = new string(' ', indent * AppendScope.Indent.Length);
+        return string.Join("\n", self.Split("\n").Select(s => spaces + s));
+    }
+
+    public static string WithIndent(this string self, int indent)
+    {
+        var spaces = new string(' ', indent * AppendScope.Indent.Length);
+        return string.Join($"\n{spaces}", self.Split('\n'));
     }
 }

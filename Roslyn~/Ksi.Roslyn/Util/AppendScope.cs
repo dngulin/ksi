@@ -8,8 +8,9 @@ public readonly struct AppendScope : IDisposable
     public const string Indent = "    ";
 
     private readonly StringBuilder _sb;
-    private readonly int _depth;
     private readonly bool _closeScope;
+
+    public readonly int Depth;
 
     public static AppendScope Root(StringBuilder sb)
     {
@@ -20,27 +21,27 @@ public readonly struct AppendScope : IDisposable
     private AppendScope(StringBuilder sb, int depth, bool closeScope)
     {
         _sb = sb;
-        _depth = depth;
+        Depth = depth;
         _closeScope = closeScope;
     }
 
     public AppendScope Sub(string? header)
     {
         if (header == null)
-            return new AppendScope(_sb, _depth, false);
+            return new AppendScope(_sb, Depth, false);
 
-        _sb.AppendLineIndented(_depth, header);
-        _sb.AppendLineIndented(_depth, "{");
+        _sb.AppendLineIndented(Depth, header);
+        _sb.AppendLineIndented(Depth, "{");
 
-        return new AppendScope(_sb, _depth + 1, true);
+        return new AppendScope(_sb, Depth + 1, true);
     }
 
-    public void AppendLine(string value) => _sb.AppendLineIndented(_depth, value);
+    public void AppendLine(string value) => _sb.AppendLineIndented(Depth, value);
 
     public void Dispose()
     {
         if (_closeScope)
-            _sb.AppendLineIndented(_depth - 1, "}");
+            _sb.AppendLineIndented(Depth - 1, "}");
     }
 }
 
