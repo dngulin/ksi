@@ -35,9 +35,15 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         "Repeated components within the Entity are not supported"
     );
 
+    private static readonly DiagnosticDescriptor Rule03NonPartialKsiDomain = Rule(03, DiagnosticSeverity.Error,
+        "Non-partial [KsiDomain] struct",
+        "Structure marked with [KsiDomain] should be a partial struct to provide inner `Section` and `Handle` types"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01InvalidField,
-        Rule02RepeatedComponent
+        Rule02RepeatedComponent,
+        Rule03NonPartialKsiDomain
     );
 
     public override void Initialize(AnalysisContext context)
@@ -73,7 +79,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         }
 
         if (attrs.ContainsKsiDomain())
-            AnalyzeDomain(ctx, sm.GetDeclaredSymbol(sds, ct));
+            AnalyzeDomain(ctx, sm.GetDeclaredSymbol(sds, ct), sds);
     }
 
     private readonly struct Req(string type, string field)
@@ -109,10 +115,13 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeDomain(SyntaxNodeAnalysisContext ctx, INamedTypeSymbol? t)
+    private static void AnalyzeDomain(SyntaxNodeAnalysisContext ctx, INamedTypeSymbol? t, StructDeclarationSyntax sds)
     {
         const string typeReq = "[KsiDomain]";
         const string fieldReq = "[KsiArchetype] or `RefList` over [KsiEntity]";
+
+        if (sds.Modifiers.All(m => !m.IsKind(SyntaxKind.PartialKeyword)))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03NonPartialKsiDomain, sds.Identifier.GetLocation()));
 
         if (t == null)
             return;

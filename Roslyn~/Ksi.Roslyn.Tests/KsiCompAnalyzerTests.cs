@@ -32,7 +32,7 @@ public class KsiCompAnalyzerTests
             
             [KsiDomain]
             [ExplicitCopy, DynSized, Dealloc]
-            public struct Domain
+            public partial struct Domain
             {
                 public Archetype SoA;
                 public RefList<Entity> AoS;
@@ -71,7 +71,7 @@ public class KsiCompAnalyzerTests
             
             [KsiDomain]
             [ExplicitCopy, DynSized, Dealloc]
-            public struct Domain
+            public partial struct Domain
             {
                 private Archetype {|KSICOMP01:SoA|}; // Wrong access modifier
                 public RefList<int> {|KSICOMP01:AoS|}; // Wrong type
@@ -105,6 +105,27 @@ public class KsiCompAnalyzerTests
                 public RefList<CompA> A1;
                 public RefList<CompA> {|KSICOMP02:A2|};
                 public RefList<CompA> {|KSICOMP02:A3|};
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task KsiQuery03NonPartialKsiDomain()
+    {
+        await KsiCompAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            [KsiComponent] public struct CompA { public int Data; }
+            [KsiEntity] public struct Entity { public CompA A; }
+            
+            [KsiDomain]
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct {|KSICOMP03:Domain|}
+            {
+                public RefList<Entity> AoS;
             }
             """
         );
