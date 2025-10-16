@@ -13,6 +13,7 @@ public partial class KsiCompGenerator
 {
     private class DomainTypeInfo(INamedTypeSymbol type)
     {
+        public readonly string Accessibility = SyntaxFacts.GetText(type.DeclaredAccessibility);
         public readonly string Type = type.FullTypeName();
         public readonly string Namespace = type.ContainingNamespace.FullyQualifiedName();
         public readonly List<string> Fields = new List<string>();
@@ -61,6 +62,7 @@ public partial class KsiCompGenerator
                 if (typeInfo == null)
                     continue;
 
+                var acc = typeInfo.Accessibility;
                 var t = typeInfo.Type;
 
                 using (var file = AppendScope.Root(sb))
@@ -68,7 +70,7 @@ public partial class KsiCompGenerator
                 {
                     var items = typeInfo.Fields.Select((f, idx) => $"{f} = {idx + 1}");
                     var indent = new string(' ', AppendScope.Indent.Length * (ns.Depth + 2));
-                    var handle = string.Format(KsiCompTemplates.KsiHandle, t, string.Join($",\n{indent}", items));
+                    var handle = string.Format(KsiCompTemplates.KsiHandle, acc, t, string.Join($",\n{indent}", items));
                     ns.AppendLine(handle);
                 }
 

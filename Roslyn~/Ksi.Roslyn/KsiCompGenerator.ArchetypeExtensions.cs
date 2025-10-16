@@ -12,8 +12,9 @@ namespace Ksi.Roslyn;
 
 public partial class KsiCompGenerator
 {
-    private class ArchetypeTypeInfo(INamedTypeSymbol type)
+    private class ArchetypeTypeInfo(Accessibility acc, INamedTypeSymbol type)
     {
+        public readonly string Accessibility = SyntaxFacts.GetText(acc);
         public readonly string Type = type.FullTypeName();
         public readonly string Namespace = type.ContainingNamespace.FullyQualifiedName();
         public readonly List<string> Fields = new List<string>();
@@ -30,7 +31,11 @@ public partial class KsiCompGenerator
                 if (t == null)
                     return null;
 
-                var typeInfo = new ArchetypeTypeInfo(t);
+                var acc = t.InAssemblyAccessibility();
+                if (acc < Accessibility.Internal)
+                    return null;
+
+                var typeInfo = new ArchetypeTypeInfo(acc, t);
                 var usings = new HashSet<string>();
 
                 foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
@@ -65,6 +70,9 @@ public partial class KsiCompGenerator
                 if (typeInfo == null)
                     continue;
 
+                var acc = typeInfo.Accessibility;
+                var t = typeInfo.Type;
+
                 using (var file = AppendScope.Root(sb))
                 {
                     foreach (var u in typeInfo.Usings)
@@ -74,25 +82,25 @@ public partial class KsiCompGenerator
                         file.AppendLine("");
 
                     using (var ns = file.OptNamespace(typeInfo.Namespace))
+                    using (var cls = ns.Sub($"{acc} static class {t.Replace('.', '_')}_KsiArchetypeExtensions"))
                     {
                         var fields = typeInfo.Fields;
 
-                        var indent = new string(' ', AppendScope.Indent.Length * (ns.Depth + 2));
-                        Func<string, string, string> indented = (a, b) => $"{a}\n{indent}{b}";
+                        Func<string, string, string> indented = static (a, b) => $"{a}\n{AppendScope.Indent}{b}";
 
                         var handle = string.Format(
                             KsiCompTemplates.ArchetypeExtensions,
-                            typeInfo.Type,
+                            t,
                             fields.Count == 0 ? "return 0;" : $"return self.{fields[0]}.Count();",
                             fields.Select(f => $"self.{f}.RefAdd();").Aggregate(indented),
                             fields.Select(f => $"self.{f}.RemoveAt(index);").Aggregate(indented),
                             fields.Select(f => $"self.{f}.Clear();").Aggregate(indented)
                         );
-                        ns.AppendLine(handle);
+                        cls.AppendLine(handle);
                     }
                 }
 
-                ctx.AddSource($"{typeInfo.Type}.KsiArchetypeExtensions.g.cs", sb.ToString());
+                ctx.AddSource($"{t}.KsiArchetypeExtensions.g.cs", sb.ToString());
             }
         });
     }

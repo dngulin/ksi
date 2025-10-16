@@ -29,6 +29,7 @@ public class KsiCompGeneratorTests
             "Domain.KsiHandle.g.cs",
             string.Format(
                 KsiHandle,
+                "public",
                 "Domain",
                 """
                 Section1 = 1,
@@ -61,6 +62,8 @@ public class KsiCompGeneratorTests
             """
             using Ksi;
             
+            public static class Archetype_KsiArchetypeExtensions
+            {
             
             """ +
             string.Format(
@@ -70,16 +73,21 @@ public class KsiCompGeneratorTests
                 """
                 self.A.RefAdd();
                 self.B.RefAdd();
-                """.WithNewLineIndent(2),
+                """.WithNewLineIndent(1),
                 """
                 self.A.RemoveAt(index);
                 self.B.RemoveAt(index);
-                """.WithNewLineIndent(2),
+                """.WithNewLineIndent(1),
                 """
                 self.A.Clear();
                 self.B.Clear();
-                """.WithNewLineIndent(2)
-                ) + '\n'
+                """.WithNewLineIndent(1)
+            ).Indented(1) +
+            """
+           
+            }
+            
+            """
         );
     }
 }

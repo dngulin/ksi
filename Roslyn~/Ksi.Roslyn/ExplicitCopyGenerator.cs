@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,14 +13,15 @@ namespace Ksi.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class ExplicitCopyGenerator : IIncrementalGenerator
     {
-        private class TypeInfo(string type)
+        private class ExpCopyTypeInfo(Accessibility acc, INamedTypeSymbol t)
         {
-            public string Type = type;
-            public string? Namespace;
-            public CodeGenTraits Traits;
-            public bool IsDealloc;
-            public string[] Usings = [];
-            public readonly List<(string, bool)> Fields = new List<(string, bool)>();
+            public readonly string Accessibility = SyntaxFacts.GetText(acc);
+            public readonly string Type = t.FullTypeName();
+            public readonly string Namespace = t.ContainingNamespace.FullyQualifiedName();
+            public readonly CodeGenTraits Traits = t.GetCodeGenTraits();
+            public readonly bool IsDealloc = t.IsDealloc();
+            public readonly List<string> Usings = new List<string>(8);
+            public readonly List<(string, bool)> Fields = new List<(string, bool)>(16);
         }
 
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
@@ -39,19 +39,15 @@ namespace Ksi.Roslyn
                 },
                 transform: (ctx, ct) =>
                 {
-                    var c = (StructDeclarationSyntax)ctx.Node;
-
                     var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
-                    var result = new TypeInfo(c.Identifier.ValueText);
-
                     if (t == null)
-                        return result;
+                        return null;
 
-                    result.Type = t.FullTypeName();
-                    result.Namespace = t.ContainingNamespace.FullyQualifiedName();
-                    result.Traits = t.GetCodeGenTraits();
-                    result.IsDealloc = t.IsDealloc();
+                    var acc = t.InAssemblyAccessibility();
+                    if (acc < Accessibility.Internal)
+                        return null;
 
+                    var result = new ExpCopyTypeInfo(acc, t);
                     var usings = new HashSet<string>();
 
                     foreach (var m in t.GetMembers())
@@ -79,9 +75,8 @@ namespace Ksi.Roslyn
                         usings.Add(SymbolNames.Ksi);
 
                     usings.Remove(result.Namespace);
-                    result.Usings = usings.Where(u => u != "").ToArray();
-
-                    Array.Sort(result.Usings);
+                    result.Usings.AddRange(usings.Where(u => u != ""));
+                    result.Usings.Sort();
 
                     return result;
                 }
@@ -89,49 +84,46 @@ namespace Ksi.Roslyn
 
             var collected = query.Collect();
 
-            initCtx.RegisterSourceOutput(collected, (ctx, entries) =>
+            initCtx.RegisterSourceOutput(collected, (ctx, typeInfos) =>
             {
                 var sb = new StringBuilder(16 * 1024);
-                var errIdx = 0;
 
-                foreach (var entry in entries)
+                foreach (var typeInfo in typeInfos)
                 {
-                    if (entry.Namespace == null)
-                    {
-                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.Type}`");
-                        ctx.AddSource($"{entry.Type}.ExplicitCopy.Err{errIdx++}.g.cs", sb.ToString());
-                        sb.Clear();
+                    if (typeInfo == null)
                         continue;
-                    }
+
+                    var acc = typeInfo.Accessibility;
+                    var t = typeInfo.Type;
 
                     using (var file = AppendScope.Root(sb))
                     {
-                        foreach (var u in entry.Usings)
+                        foreach (var u in typeInfo.Usings)
                             file.AppendLine($"using {u};");
 
                         file.AppendLine("");
 
-                        using (var ns = file.OptNamespace(entry.Namespace))
+                        using (var ns = file.OptNamespace(typeInfo.Namespace))
                         {
                             ns.AppendLine("/// <summary>");
-                            ns.AppendLine($"/// Explicit copy extensions for {entry.Type}.");
+                            ns.AppendLine($"/// Explicit copy extensions for {t}.");
                             ns.AppendLine("/// </summary>");
-                            using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_ExplicitCopy"))
+                            using (var cls = ns.Sub($"{acc} static class {t.Replace('.', '_')}_ExplicitCopy"))
                             {
-                                EmitExplicitCopyMethods(cls, entry);
+                                EmitExplicitCopyMethods(cls, typeInfo);
 
-                                var template = entry.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
-                                entry.Traits.ToRefListKinds().Emit(cls, template, entry.Type);
+                                var template = typeInfo.IsDealloc ? RefListExtensionsForDeallocItems : RefListExtensions;
+                                typeInfo.Traits.ToRefListKinds().Emit(cls, template, t);
                             }
                         }
                     }
 
-                    ctx.AddSource($"{entry.Type}.ExplicitCopy.g.cs", sb.ToString());
+                    ctx.AddSource($"{t}.ExplicitCopy.g.cs", sb.ToString());
                 }
             });
         }
 
-        private static void EmitExplicitCopyMethods(in AppendScope cls, TypeInfo entry)
+        private static void EmitExplicitCopyMethods(in AppendScope cls, ExpCopyTypeInfo entry)
         {
             var t = entry.Type;
             cls.AppendLine("/// <summary>");

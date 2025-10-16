@@ -9,10 +9,10 @@ public static class StringExtensions
         return string.Format(self.Indented(indent), args) + "\n";
     }
 
-    private static string Indented(this string self, int indent)
+    public static string Indented(this string self, int indent)
     {
         var spaces = new string(' ', indent * AppendScope.Indent.Length);
-        return string.Join("\n", self.Split("\n").Select(s => spaces + s));
+        return string.Join("\n", self.Split('\n').Select(s => spaces + s));
     }
 
     public static string WithNewLineIndent(this string self, int indent)

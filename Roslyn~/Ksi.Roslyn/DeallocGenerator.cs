@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +13,14 @@ namespace Ksi.Roslyn
     [Generator(LanguageNames.CSharp)]
     public class DeallocGenerator : IIncrementalGenerator
     {
-        private class DeallocInfo(string type)
+        private class DeallocInfo(Accessibility acc, INamedTypeSymbol t)
         {
-            public string Type = type;
-            public string? Namespace;
-            public CodeGenTraits Traits;
-            public string[] Usings = [];
-            public readonly List<string> Fields = new List<string>();
+            public readonly string Accessibility = SyntaxFacts.GetText(acc);
+            public readonly string Type = t.FullTypeName();
+            public readonly string Namespace = t.ContainingNamespace.FullyQualifiedName();
+            public readonly CodeGenTraits Traits = t.GetCodeGenTraits();
+            public readonly List<string> Usings = new List<string>(8);
+            public readonly List<string> Fields = new List<string>(16);
         }
 
         public void Initialize(IncrementalGeneratorInitializationContext initCtx)
@@ -38,18 +38,15 @@ namespace Ksi.Roslyn
                 },
                 transform: (ctx, ct) =>
                 {
-                    var c = (StructDeclarationSyntax)ctx.Node;
-
                     var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
-                    var result = new DeallocInfo(c.Identifier.ValueText);
-
                     if (t == null)
-                        return result;
+                        return null;
 
-                    result.Type = t.FullTypeName();
-                    result.Namespace = t.ContainingNamespace.FullyQualifiedName();
-                    result.Traits = t.GetCodeGenTraits();
+                    var acc = t.InAssemblyAccessibility();
+                    if (acc < Accessibility.Internal)
+                        return null;
 
+                    var result = new DeallocInfo(acc, t);
                     var usings = new HashSet<string>();
 
                     foreach (var m in t.GetMembers())
@@ -78,9 +75,8 @@ namespace Ksi.Roslyn
                         usings.Add(SymbolNames.Ksi);
 
                     usings.Remove(result.Namespace);
-                    result.Usings = usings.Where(u => u != "").ToArray();
-
-                    Array.Sort(result.Usings);
+                    result.Usings.AddRange(usings.Where(u => u != ""));
+                    result.Usings.Sort();
 
                     return result;
                 }
@@ -91,17 +87,14 @@ namespace Ksi.Roslyn
             initCtx.RegisterSourceOutput(collected, (ctx, entries) =>
             {
                 var sb = new StringBuilder(16 * 1024);
-                var errIdx = 0;
 
                 foreach (var entry in entries)
                 {
-                    if (entry.Namespace == null)
-                    {
-                        sb.AppendLine($"#error Failed to get a declared symbol for the `{entry.Type}`");
-                        ctx.AddSource($"{entry.Type}.Dealloc.Err{errIdx++}.g.cs", sb.ToString());
-                        sb.Clear();
+                    if (entry == null)
                         continue;
-                    }
+
+                    var t = entry.Type;
+                    var acc = entry.Accessibility;
 
                     using (var file = AppendScope.Root(sb))
                     {
@@ -113,21 +106,21 @@ namespace Ksi.Roslyn
                         using (var ns = file.OptNamespace(entry.Namespace))
                         {
                             ns.AppendLine("/// <summary>");
-                            ns.AppendLine($"/// Deallocation extensions for {entry.Type}.");
+                            ns.AppendLine($"/// Deallocation extensions for {t}.");
                             ns.AppendLine("/// </summary>");
-                            using (var cls = ns.PubStat($"class {entry.Type.Replace('.', '_')}_Dealloc"))
+                            using (var cls = ns.Sub($"{acc} static class {t.Replace('.', '_')}_Dealloc"))
                             {
                                 EmitDeallocMethods(cls, entry);
 
                                 var kinds = entry.Traits.ToRefListKinds();
-                                kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, entry.Type);
-                                kinds.Emit(cls, RefListDeallocated, entry.Type);
-                                kinds.Emit(cls, RefListSpecialized, entry.Type);
+                                kinds.Emit(cls, RefListDeallocItemsAndSelf, RefListDeallocOnlyItems, t);
+                                kinds.Emit(cls, RefListDeallocated, t);
+                                kinds.Emit(cls, RefListSpecialized, t);
                             }
                         }
                     }
 
-                    ctx.AddSource($"{entry.Type}.Dealloc.g.cs", sb.ToString());
+                    ctx.AddSource($"{t}.Dealloc.g.cs", sb.ToString());
                 }
             });
         }

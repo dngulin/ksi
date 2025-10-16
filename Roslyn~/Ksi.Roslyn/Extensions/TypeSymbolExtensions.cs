@@ -219,4 +219,21 @@ public static class TypeSymbolExtensions
 
         return string.Join(".", segments);
     }
+
+    public static Accessibility InAssemblyAccessibility(this ITypeSymbol self)
+    {
+        var accessibility = self.DeclaredAccessibility;
+
+        while (true)
+        {
+            if (self.ContainingType == null)
+                break;
+
+            self = self.ContainingType;
+            if (self.DeclaredAccessibility < accessibility)
+                accessibility = self.DeclaredAccessibility;
+        }
+
+        return accessibility == Accessibility.ProtectedOrInternal ? Accessibility.Internal : accessibility;
+    }
 }
