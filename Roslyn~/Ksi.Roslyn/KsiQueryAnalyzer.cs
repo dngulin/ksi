@@ -30,7 +30,7 @@ public class KsiQueryAnalyzer : DiagnosticAnalyzer
         "The structure is marked with the {0} that can have only non-private fields of {1} types"
     );
 
-    private static readonly DiagnosticDescriptor Rule02RepeatedComponent = Rule(01, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule02RepeatedComponent = Rule(02, DiagnosticSeverity.Error,
         "Repeated component",
         "Repeated components within the Entity are not supported"
     );
