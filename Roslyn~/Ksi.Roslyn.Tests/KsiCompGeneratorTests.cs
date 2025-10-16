@@ -10,12 +10,6 @@ public class KsiCompGeneratorTests
     [Fact]
     public async Task KsiHandleIsProduced()
     {
-        const string sectionEnumItems =
-            """
-            Section1 = 1,
-            Section2 = 2
-            """;
-
         await KsiCompGeneratorTest.RunAsync(
             // language=cs
             """
@@ -33,7 +27,59 @@ public class KsiCompGeneratorTests
             }
             """,
             "Domain.KsiHandle.g.cs",
-            string.Format(KsiHandle, "Domain", sectionEnumItems.WithIndent(2)) + '\n'
+            string.Format(
+                KsiHandle,
+                "Domain",
+                """
+                Section1 = 1,
+                Section2 = 2
+                """.WithNewLineIndent(2)
+            ) + '\n'
+        );
+    }
+
+    [Fact]
+    public async Task ArchetypeExtensionsAreProduced()
+    {
+        await KsiCompGeneratorTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [KsiComponent] public struct CompA { public int Data; }
+            [KsiComponent] public struct CompB { public int Data; }
+
+            [KsiArchetype]
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct Archetype
+            {
+                public RefList<CompA> A;
+                public RefList<CompB> B;
+            }
+            """,
+            "Archetype.KsiArchetypeExtensions.g.cs",
+            """
+            using Ksi;
+            
+            
+            """ +
+            string.Format(
+                ArchetypeExtensions,
+                "Archetype",
+                "return self.A.Count();",
+                """
+                self.A.RefAdd();
+                self.B.RefAdd();
+                """.WithNewLineIndent(2),
+                """
+                self.A.RemoveAt(index);
+                self.B.RemoveAt(index);
+                """.WithNewLineIndent(2),
+                """
+                self.A.Clear();
+                self.B.Clear();
+                """.WithNewLineIndent(2)
+                ) + '\n'
         );
     }
 }

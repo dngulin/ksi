@@ -15,7 +15,7 @@ public static class StringExtensions
         return string.Join("\n", self.Split("\n").Select(s => spaces + s));
     }
 
-    public static string WithIndent(this string self, int indent)
+    public static string WithNewLineIndent(this string self, int indent)
     {
         var spaces = new string(' ', indent * AppendScope.Indent.Length);
         return string.Join($"\n{spaces}", self.Split('\n'));
