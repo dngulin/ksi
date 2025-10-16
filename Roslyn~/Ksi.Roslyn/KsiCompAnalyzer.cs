@@ -11,12 +11,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Ksi.Roslyn;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class KsiQueryAnalyzer : DiagnosticAnalyzer
+public class KsiCompAnalyzer : DiagnosticAnalyzer
 {
     private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"KSIQUERY{id:D2}",
+            id: $"KSICOMP{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",

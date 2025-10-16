@@ -1,13 +1,13 @@
 namespace Ksi.Roslyn.Tests;
 
-using KsiQueryAnalyzerTest = Util.KsiAnalyzerTest<KsiQueryAnalyzer>;
+using KsiCompAnalyzerTest = Util.KsiAnalyzerTest<KsiCompAnalyzer>;
 
-public class KsiQueryAnalyzerTests
+public class KsiCompAnalyzerTests
 {
     [Fact]
     public async Task Smoke()
     {
-        await KsiQueryAnalyzerTest.RunAsync(
+        await KsiCompAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
@@ -44,7 +44,7 @@ public class KsiQueryAnalyzerTests
     [Fact]
     public async Task KsiQuery01InvalidField()
     {
-        await KsiQueryAnalyzerTest.RunAsync(
+        await KsiCompAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
@@ -56,8 +56,8 @@ public class KsiQueryAnalyzerTests
             public struct Entity
             {
                 public CompA A;
-                private CompB {|KSIQUERY01:B|}; // Wrong access modifier
-                public int {|KSIQUERY01:C|}; // Wrong type
+                private CompB {|KSICOMP01:B|}; // Wrong access modifier
+                public int {|KSICOMP01:C|}; // Wrong type
             }
             
             [KsiArchetype]
@@ -65,16 +65,16 @@ public class KsiQueryAnalyzerTests
             public struct Archetype
             {
                 public RefList<CompA> A;
-                private RefList<CompB> {|KSIQUERY01:B|}; // Wrong access modifier
-                public RefList<int> {|KSIQUERY01:C|}; // Wrong type
+                private RefList<CompB> {|KSICOMP01:B|}; // Wrong access modifier
+                public RefList<int> {|KSICOMP01:C|}; // Wrong type
             }
             
             [KsiDomain]
             [ExplicitCopy, DynSized, Dealloc]
             public struct Domain
             {
-                private Archetype {|KSIQUERY01:SoA|}; // Wrong access modifier
-                public RefList<int> {|KSIQUERY01:AoS|}; // Wrong type
+                private Archetype {|KSICOMP01:SoA|}; // Wrong access modifier
+                public RefList<int> {|KSICOMP01:AoS|}; // Wrong type
             }
             """
         );
@@ -83,7 +83,7 @@ public class KsiQueryAnalyzerTests
     [Fact]
     public async Task KsiQuery02RepeatedComponent()
     {
-        await KsiQueryAnalyzerTest.RunAsync(
+        await KsiCompAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
@@ -94,8 +94,8 @@ public class KsiQueryAnalyzerTests
             public struct Entity
             {
                 public CompA A1;
-                public CompA {|KSIQUERY02:A2|};
-                public CompA {|KSIQUERY02:A3|};
+                public CompA {|KSICOMP02:A2|};
+                public CompA {|KSICOMP02:A3|};
             }
 
             [KsiArchetype]
@@ -103,8 +103,8 @@ public class KsiQueryAnalyzerTests
             public struct Archetype
             {
                 public RefList<CompA> A1;
-                public RefList<CompA> {|KSIQUERY02:A2|};
-                public RefList<CompA> {|KSIQUERY02:A3|};
+                public RefList<CompA> {|KSICOMP02:A2|};
+                public RefList<CompA> {|KSICOMP02:A3|};
             }
             """
         );
