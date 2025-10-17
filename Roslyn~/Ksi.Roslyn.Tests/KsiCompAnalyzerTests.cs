@@ -42,7 +42,7 @@ public class KsiCompAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiQuery01InvalidField()
+    public async Task KsiComp01InvalidField()
     {
         await KsiCompAnalyzerTest.RunAsync(
             // language=cs
@@ -81,7 +81,7 @@ public class KsiCompAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiQuery02RepeatedComponent()
+    public async Task KsiComp02RepeatedComponent()
     {
         await KsiCompAnalyzerTest.RunAsync(
             // language=cs
@@ -111,7 +111,7 @@ public class KsiCompAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiQuery03NonPartialKsiDomain()
+    public async Task KsiComp03InvalidDomain()
     {
         await KsiCompAnalyzerTest.RunAsync(
             // language=cs
@@ -142,7 +142,7 @@ public class KsiCompAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiComp04LowAccessibility()
+    public async Task KsiComp04LowArchetypeAccessibility()
     {
         await KsiCompAnalyzerTest.RunAsync(
             // language=cs
