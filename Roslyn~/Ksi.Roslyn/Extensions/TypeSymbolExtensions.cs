@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Ksi.Roslyn.Extensions;
 
@@ -184,6 +187,15 @@ public static class TypeSymbolExtensions
     public static bool IsKsiComponent(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiComponent);
     public static bool IsKsiEntity(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiEntity);
     public static bool IsKsiArchetype(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiArchetype);
+    public static bool IsKsiDomain(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiDomain);
+
+    public static bool IsKsiHandle(this ITypeSymbol self)
+    {
+        if (self is not INamedTypeSymbol { TypeKind: TypeKind.Struct, IsGenericType: false, Name: "KsiHandle" } t)
+            return false;
+
+        return t.ContainingType is { IsGenericType: false } ct && ct.IsKsiDomain();
+    }
 
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
@@ -235,5 +247,13 @@ public static class TypeSymbolExtensions
         }
 
         return accessibility == Accessibility.ProtectedOrInternal ? Accessibility.Internal : accessibility;
+    }
+
+    public static bool IsTopLevel(this ITypeSymbol self) => self.ContainingType == null;
+
+    public static bool IsPartial(this ITypeSymbol self, CancellationToken ct)
+    {
+        var syntax = self.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(ct);
+        return syntax is TypeDeclarationSyntax tds && tds.Modifiers.Any(SyntaxKind.PartialKeyword);
     }
 }

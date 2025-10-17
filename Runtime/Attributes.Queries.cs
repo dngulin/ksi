@@ -102,13 +102,16 @@ namespace Ksi
     /// <summary>
     /// <para>
     /// An attribute to produce the <c>ECS</c>-like query.
-    /// It creates a code-generated extension method for the <see cref="KsiDomainAttribute">KsiDomain</see>
-    /// structure that calls the marked method for each matching entity in the domain.
+    /// It creates a code-generated public method in the same type with the same name that receives
+    /// an instance of <see cref="KsiDomainAttribute">KsiDomain</see>
+    /// and a set of <see cref="KsiQueryParamAttribute">KsiQueryParam</see>.
+    /// The generated method invokes the marked method for each matching entity in the given domain.
     /// </para>
     /// <para>
     /// Method signature requirements:
     /// <list type="bullet">
-    /// <item><description>Should be a non-generic <c>static</c> method</description></item>
+    /// <item><description>Should be declared in a top-level <c>partial</c> type</description></item>
+    /// <item><description>Should be a non-generic <c>static void</c> method</description></item>
     /// <item><description>All parameters should be by-ref parameters to named structures</description></item>
     /// <item><description>
     /// The first argument should be a readonly reference to
@@ -119,14 +122,14 @@ namespace Ksi
     /// At least one argument of that kind should be present
     /// </description></item>
     /// <item><description>
-    /// Optionally, after that you can declare parameters marked with <see cref="KsiQueryParamAttribute"/>
-    /// that are passed through from the generated extension method to the marked query method.
+    /// Additionally, you can declare parameters marked with <see cref="KsiQueryParamAttribute"/>
+    /// that are passed through from the generated method to the marked query method.
     /// Only the <see cref="DynNoResizeAttribute"/> is inherited for these parameters
     /// </description></item>
     /// </list>
     /// </para>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class KsiQueryAttribute : Attribute
     {
     }

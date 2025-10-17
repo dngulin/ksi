@@ -46,11 +46,38 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         "prevents from generation extension methods"
     );
 
+    private static readonly DiagnosticDescriptor Rule05InvalidQueryContainingType = Rule(05, DiagnosticSeverity.Error,
+        "Non top-level partial type containing [KsiQuery]",
+        "Type containing [KsiQuery] methods should be a partial top-level type"
+    );
+
+    private static readonly DiagnosticDescriptor Rule06InvalidQueryMethod = Rule(06, DiagnosticSeverity.Error,
+        "Invalid [KsiQuery] method signature",
+        "Method marked with [KsiQuery] should be a `static void` method that " +
+        "declares `KsiHandle` as the first parameter (passed by `in`) and " +
+        "at least one parameter that is not marked with [KsiQueryParam]"
+    );
+
+    private static readonly DiagnosticDescriptor Rule07NonRefQueryParameter = Rule(07, DiagnosticSeverity.Error,
+        "Non reference [KsiQuery] method parameter",
+        "Non first [KsiQuery] method parameter should be a struct passed by reference"
+    );
+
+    private static readonly DiagnosticDescriptor Rule08InvalidQueryParameterType = Rule(08, DiagnosticSeverity.Error,
+        "Invalid [KsiQuery] method parameter type",
+        "Non first [KsiQuery] method parameter should be a [KsiComponent] or " +
+        "should be marked with [KsiQueryParam]"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01InvalidField,
         Rule02RepeatedComponent,
         Rule03InvalidDomain,
-        Rule04LowArchetypeAccessibility
+        Rule04LowArchetypeAccessibility,
+        Rule05InvalidQueryContainingType,
+        Rule06InvalidQueryMethod,
+        Rule07NonRefQueryParameter,
+        Rule08InvalidQueryParameterType
     );
 
     public override void Initialize(AnalysisContext context)
@@ -61,6 +88,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
 
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+        context.RegisterSymbolAction(AnalyzeMethod, SymbolKind.Method);
     }
 
     private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
@@ -144,6 +172,37 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
 
             if (invalidField)
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule01InvalidField, f.Locations.First(), typeReq, fieldReq));
+        }
+    }
+
+    private static void AnalyzeMethod(SymbolAnalysisContext ctx)
+    {
+        var m = (IMethodSymbol)ctx.Symbol;
+        if (!m.IsKsiQuery())
+            return;
+
+        var ct = m.ContainingType;
+        if (!ct.IsTopLevel() || !ct.IsPartial(ctx.CancellationToken))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule05InvalidQueryContainingType, ct.Locations.First()));
+
+        var invalidMethod = !m.IsStatic ||
+                            !m.ReturnsVoid ||
+                            m.Parameters.Length < 2 ||
+                            m.Parameters[0].RefKind != RefKind.In ||
+                            !m.Parameters[0].Type.IsKsiHandle() ||
+                            m.Parameters.Skip(1).All(p => p.IsKsiQueryParam());
+
+        if (invalidMethod)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule06InvalidQueryMethod, m.Locations.First()));
+
+        for (var i = 1; i < m.Parameters.Length; i++)
+        {
+            var p = m.Parameters[i];
+            if (p.RefKind == RefKind.None || p.Type.TypeKind != TypeKind.Struct)
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule07NonRefQueryParameter, p.Locations.First()));
+
+            if (!p.Type.IsKsiComponent() && !p.IsKsiQueryParam())
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule08InvalidQueryParameterType, p.Locations.First()));
         }
     }
 }

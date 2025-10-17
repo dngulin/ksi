@@ -20,13 +20,13 @@ namespace Ksi.Roslyn
                 /// Represents an <c>Entity</c> address within the <c>Domain</c>.
                 /// Default value is invalid handle.
                 /// </summary>
-                public readonly struct KsiHandle
+                public struct KsiHandle
                 {{
                     /// <summary>Section within the <c>Domain</c>.</summary>
-                    public readonly KsiSection Section;
+                    public KsiSection Section;
                     
                     /// <summary>Index of <c>Entity</c> in the <c>Section</c>.</summary>
-                    public readonly int Index;
+                    public int Index;
                 
                     /// <summary>Creates a new instance pointing to an <c>Entity</c> in the <c>Section</c>.</summary>
                     public KsiHandle(KsiSection section, int index)

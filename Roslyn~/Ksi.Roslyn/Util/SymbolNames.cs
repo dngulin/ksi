@@ -24,5 +24,8 @@ public static class SymbolNames
     public const string KsiArchetype = "KsiArchetype";
     public const string KsiDomain = "KsiDomain";
 
+    public const string KsiQuery = "KsiQuery";
+    public const string KsiQueryParam = "KsiQueryParam";
+
     public const string Attribute = "Attribute";
 }

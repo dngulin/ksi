@@ -19,9 +19,10 @@ public static class ParameterSymbolExtensions
     }
 
     public static bool IsDynNoResize(this IParameterSymbol self) => self.Is(SymbolNames.DynNoResize);
+    public static bool IsKsiQueryParam(this IParameterSymbol self) => self.Is(SymbolNames.KsiQueryParam);
 
     private static bool Is(this IParameterSymbol self, string attributeName)
     {
-        return self.GetAttributes().Any(attribute => SymbolExtensions.Is(attribute, attributeName));
+        return self.GetAttributes().Any(attribute => attribute.Is(attributeName));
     }
 }

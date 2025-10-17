@@ -52,6 +52,7 @@ public static class MethodSymbolExtensions
 
     public static bool IsNonAllocatedResultRef(this IMethodSymbol self) => self.Is(SymbolNames.NonAllocatedResult);
     public static bool IsRefListIndexer(this IMethodSymbol self) => self.Is(SymbolNames.RefListIndexer);
+    public static bool IsKsiQuery(this IMethodSymbol self) => self.Is(SymbolNames.KsiQuery);
     public static bool IsRefPath(this IMethodSymbol self, out ImmutableArray<string?> segments)
     {
         foreach (var attr in self.GetAttributes().Where(attr => attr.Is(SymbolNames.RefPath)))
