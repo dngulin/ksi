@@ -37,6 +37,16 @@ public class KsiCompAnalyzerTests
                 public Archetype SoA;
                 public RefList<Entity> AoS;
             }
+            
+            public struct ExtraData {}
+            
+            public static partial class TestSystem
+            {
+                [KsiQuery]
+                private static void Tick(in Domain.KsiHandle handle, ref CompA a, in CompB b, [KsiQueryParam] in ExtraData data)
+                {
+                }
+            }
             """
         );
     }
