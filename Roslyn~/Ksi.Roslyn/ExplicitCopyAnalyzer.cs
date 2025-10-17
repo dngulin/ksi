@@ -86,6 +86,12 @@ namespace Ksi.Roslyn
             "Span operation is not valid for [ExplicitCopy] types"
         );
 
+        private static readonly DiagnosticDescriptor Rule13LowAccessibility = Rule(13,
+            "Declaring [ExplicitCopy] struct with low accessibility",
+            "Declaring [ExplicitCopy] struct with accessibility lower than `internal` " +
+            "prevents from providing explicit copy extensions"
+        );
+
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Rule01MissingAttr,
             Rule02ArgumentCopy,
@@ -98,7 +104,8 @@ namespace Ksi.Roslyn
             Rule09GenericDeclaration,
             Rule10GenericArgument,
             Rule11TypeArgument,
-            Rule12SpanCopy
+            Rule12SpanCopy,
+            Rule13LowAccessibility
         );
 
         public override void Initialize(AnalysisContext context)
@@ -272,12 +279,15 @@ namespace Ksi.Roslyn
 
         private static void AnalyzeStruct(SyntaxNodeAnalysisContext ctx)
         {
-            var sym = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ctx.CancellationToken);
-            if (sym == null)
+            var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ctx.CancellationToken);
+            if (t == null)
                 return;
 
-            if (sym.IsGenericType && sym.IsExplicitCopy() && !sym.IsRefList())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule09GenericDeclaration, sym.Locations.First(), sym.Name));
+            if (t.IsGenericType && t.IsExplicitCopy() && !t.IsRefList())
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule09GenericDeclaration, t.Locations.First(), t.Name));
+
+            if (t.IsExplicitCopy() && t.InAssemblyAccessibility() < Accessibility.Internal)
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule13LowAccessibility, t.Locations.First()));
         }
 
         private static void AnalyzeTuple(OperationAnalysisContext ctx)

@@ -324,4 +324,34 @@ public class ExplicitCopyAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task ExpCopy13LowAccessibility()
+    {
+        await ExplicitCopyAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public class Test
+            {
+                [Ksi.ExplicitCopy]
+                private struct {|EXPCOPY13:PrivStruct|} { public int Field; }
+                
+                [Ksi.ExplicitCopy]
+                private protected struct {|EXPCOPY13:ProvProtStruct|} { public int Field; }
+                
+                [Ksi.ExplicitCopy]
+                protected struct {|EXPCOPY13:ProtStruct|} { public int Field; }
+                
+                [Ksi.ExplicitCopy]
+                internal struct IntStruct { public int Field; }
+                
+                [Ksi.ExplicitCopy]
+                protected internal struct ProtIntStruct { public int Field; }
+                
+                [Ksi.ExplicitCopy]
+                public struct PubStruct { public int Field; }
+            }
+            """
+        );
+    }
 }

@@ -35,15 +35,22 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         "Repeated components within the Entity are not supported"
     );
 
-    private static readonly DiagnosticDescriptor Rule03InvalidDomainAccessibility = Rule(03, DiagnosticSeverity.Error,
-        "Invalid [KsiDomain] accessibility",
+    private static readonly DiagnosticDescriptor Rule03InvalidDomain = Rule(03, DiagnosticSeverity.Error,
+        "Invalid [KsiDomain] declaration",
         "Structure marked with [KsiDomain] should be a partial top-level struct"
+    );
+
+    private static readonly DiagnosticDescriptor Rule04LowArchetypeAccessibility = Rule(04, DiagnosticSeverity.Error,
+        "Invalid accessibility",
+        "Declaring a [KsiArchetype] struct with accessibility lower than `internal` " +
+        "prevents from generation extension methods"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01InvalidField,
         Rule02RepeatedComponent,
-        Rule03InvalidDomainAccessibility
+        Rule03InvalidDomain,
+        Rule04LowArchetypeAccessibility
     );
 
     public override void Initialize(AnalysisContext context)
@@ -76,6 +83,9 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
             var t = sm.GetDeclaredSymbol(sds, ct);
             var req = new Req("[KsiArchetype]", "`RefList` over [KsiComponent]");
             AnalyzeEntity(ctx, t, req, static ft => ft.IsRefListOfComponents());
+
+            if (t != null && t.InAssemblyAccessibility() < Accessibility.Internal)
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule04LowArchetypeAccessibility, t.Locations.First()));
         }
 
         if (attrs.ContainsKsiDomain())
@@ -124,7 +134,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
             return;
 
         if (t.ContainingType != null || sds.Modifiers.All(m => !m.IsKind(SyntaxKind.PartialKeyword)))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDomainAccessibility, sds.Identifier.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDomain, sds.Identifier.GetLocation()));
 
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic))
         {

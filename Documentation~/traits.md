@@ -69,20 +69,21 @@ Where `TStruct` is the structure name and `TRefList` is a [compatible collection
 
 Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md):
 
-| Diagnostic Id | Severity | Title                                                   |
-|---------------|----------|---------------------------------------------------------|
-| `EXPCOPY01`   | Error    | Missing `[ExplicitCopy]` attribute                      |
-| `EXPCOPY02`   | Error    | Passing `[ExplicitCopy]` instance by value              |
-| `EXPCOPY03`   | Error    | Returning a copy of the `[ExplicitCopy]` instance       |
-| `EXPCOPY04`   | Error    | Assignment copy of the `[ExplicitCopy]` instance        |
-| `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance         |
-| `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure      |
-| `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance           |
-| `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type  |
-| `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration               |
-| `EXPCOPY10`   | Error    | Passing `[ExplicitCopy]` instance as a generic argument |
-| `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument        |
-| `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items      |
+| Diagnostic Id | Severity | Title                                                    |
+|---------------|----------|----------------------------------------------------------|
+| `EXPCOPY01`   | Error    | Missing `[ExplicitCopy]` attribute                       |
+| `EXPCOPY02`   | Error    | Passing `[ExplicitCopy]` instance by value               |
+| `EXPCOPY03`   | Error    | Returning a copy of the `[ExplicitCopy]` instance        |
+| `EXPCOPY04`   | Error    | Assignment copy of the `[ExplicitCopy]` instance         |
+| `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance          |
+| `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure       |
+| `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance            |
+| `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type   |
+| `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration                |
+| `EXPCOPY10`   | Error    | Passing `[ExplicitCopy]` instance as a generic argument  |
+| `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument         |
+| `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items       |
+| `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility |
 
 ## DynSized Attribute
 

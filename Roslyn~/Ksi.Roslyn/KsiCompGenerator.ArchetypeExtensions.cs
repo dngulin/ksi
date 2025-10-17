@@ -85,16 +85,15 @@ public partial class KsiCompGenerator
                     using (var cls = ns.Sub($"{acc} static class {t.Replace('.', '_')}_KsiArchetypeExtensions"))
                     {
                         var fields = typeInfo.Fields;
-
                         Func<string, string, string> indented = static (a, b) => $"{a}\n{AppendScope.Indent}{b}";
 
                         var handle = string.Format(
                             KsiCompTemplates.ArchetypeExtensions,
                             t,
                             fields.Count == 0 ? "return 0;" : $"return self.{fields[0]}.Count();",
-                            fields.Select(f => $"self.{f}.RefAdd();").Aggregate(indented),
-                            fields.Select(f => $"self.{f}.RemoveAt(index);").Aggregate(indented),
-                            fields.Select(f => $"self.{f}.Clear();").Aggregate(indented)
+                            fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.RefAdd();").Aggregate(indented),
+                            fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.RemoveAt(index);").Aggregate(indented),
+                            fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.Clear();").Aggregate(indented)
                         );
                         cls.AppendLine(handle);
                     }

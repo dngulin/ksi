@@ -140,4 +140,34 @@ public class KsiCompAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiComp04LowAccessibility()
+    {
+        await KsiCompAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            public class Test
+            {
+                [Ksi.KsiArchetype]
+                private struct {|KSICOMP04:PrivStruct|} { }
+                
+                [Ksi.KsiArchetype]
+                private protected struct {|KSICOMP04:ProvProtStruct|} { }
+                
+                [Ksi.KsiArchetype]
+                protected struct {|KSICOMP04:ProtStruct|} { }
+                
+                [Ksi.KsiArchetype]
+                internal struct IntStruct { }
+                
+                [Ksi.KsiArchetype]
+                protected internal struct ProtIntStruct { }
+                
+                [Ksi.KsiArchetype]
+                public struct PubStruct { }
+            }
+            """
+        );
+    }
 }
