@@ -210,4 +210,48 @@ public class KsiCompAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiComp06InvalidQueryMethod()
+    {
+        await KsiCompAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [KsiComponent] public struct CompA { public int Data; }
+            [KsiEntity] public struct Entity { public CompA A; }
+
+            [KsiDomain]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct Domain { public RefList<Entity> AoS; }
+            
+            public struct ExtraData {}
+
+            public partial class TestSystem 
+            {
+                [KsiQuery]
+                private static void Valid(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private void {|KSICOMP06:NonStatic|}(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private static int {|KSICOMP06:NonVoid|}(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in ExtraData data) => 0;
+                
+                [KsiQuery]
+                private static void {|KSICOMP06:NoHandle|}(ref CompA a, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private static void {|KSICOMP06:NonInHandle|}(Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private static void {|KSICOMP06:NoComponents1|}(in Domain.KsiHandle h, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private static void {|KSICOMP06:NoComponents2|}(in Domain.KsiHandle h) {}
+            }
+            """
+        );
+    }
 }
