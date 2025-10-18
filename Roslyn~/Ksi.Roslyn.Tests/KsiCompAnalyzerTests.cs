@@ -254,4 +254,36 @@ public class KsiCompAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiComp07NonRefQueryParameter()
+    {
+        await KsiCompAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [KsiComponent] public struct CompA { public int Data; }
+            [KsiEntity] public struct Entity { public CompA A; }
+
+            [KsiDomain]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct Domain { public RefList<Entity> AoS; }
+
+            public struct ExtraData {}
+
+            public partial class TestSystem 
+            {
+                [KsiQuery]
+                private static void Valid(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in ExtraData data) {}
+                
+                [KsiQuery]
+                private static void NonRef(in Domain.KsiHandle h, CompA {|KSICOMP07:a|}, [KsiQueryParam] ExtraData {|KSICOMP07:data|}) {}
+                
+                [KsiQuery]
+                private static void NonStruct(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] ref object {|KSICOMP07:data|}) {}
+            }
+            """
+        );
+    }
 }
