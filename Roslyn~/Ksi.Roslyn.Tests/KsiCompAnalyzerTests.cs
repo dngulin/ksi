@@ -180,4 +180,34 @@ public class KsiCompAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiComp05InvalidQueryContainingType()
+    {
+        await KsiCompAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            [KsiComponent] public struct CompA { public int Data; }
+            [KsiEntity] public struct Entity { public CompA A; }
+            
+            [KsiDomain]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct Domain { public RefList<Entity> AoS; }
+            
+            public class {|KSICOMP05:TopLevel|} // Non-partial type
+            {
+                [KsiQuery]
+                private static void Test(in Domain.KsiHandle h, ref CompA a) {}
+                
+                public partial class {|KSICOMP05:Inner|} // Non top-level type
+                {
+                    [KsiQuery]
+                    private static void TestInner(in Domain.KsiHandle h, ref CompA a) {}
+                }
+            }
+            """
+        );
+    }
 }
