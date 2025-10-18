@@ -198,10 +198,10 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         for (var i = 1; i < m.Parameters.Length; i++)
         {
             var p = m.Parameters[i];
-            if (p.RefKind == RefKind.None || p.Type.TypeKind != TypeKind.Struct)
+            if (p.RefKind != RefKind.Ref && p.RefKind != RefKind.In)
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule07NonRefQueryParameter, p.Locations.First()));
 
-            if (!p.Type.IsKsiComponent() && !p.IsKsiQueryParam())
+            if (p.Type.TypeKind != TypeKind.Struct || (!p.Type.IsKsiComponent() && !p.IsKsiQueryParam()))
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule08InvalidQueryParameterType, p.Locations.First()));
         }
     }
