@@ -51,10 +51,7 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (m is not IFieldSymbol f || f.Type.TypeKind != TypeKind.Struct || f.IsStatic)
-                            continue;
-
-                        if (f.DeclaredAccessibility == Accessibility.Private)
+                        if (m is not IFieldSymbol f || !f.Type.IsStruct() || f.IsStatic || f.IsPrivate())
                             continue;
 
                         if (f.Type is not INamedTypeSymbol ft || !ft.IsDeallocOrRefListOverDealloc())

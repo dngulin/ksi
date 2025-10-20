@@ -25,6 +25,9 @@ public static class SymbolExtensions
             self.Locations.First();
     }
 
+    public static bool IsPublic(this ISymbol self) => self.DeclaredAccessibility == Accessibility.Public;
+    public static bool IsPrivate(this ISymbol self) => self.DeclaredAccessibility == Accessibility.Private;
+
     public static string FullyQualifiedName(this INamespaceSymbol self)
     {
         if (self.IsGlobalNamespace || self.ContainingNamespace.IsGlobalNamespace)

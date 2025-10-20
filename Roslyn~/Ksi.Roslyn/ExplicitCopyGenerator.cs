@@ -52,7 +52,7 @@ namespace Ksi.Roslyn
 
                     foreach (var m in t.GetMembers())
                     {
-                        if (m is not IFieldSymbol f || f.IsStatic || f.DeclaredAccessibility == Accessibility.Private)
+                        if (m is not IFieldSymbol f || f.IsStatic || f.IsPrivate())
                             continue;
 
                         if (f.Type is not INamedTypeSymbol ft || ft.IsJaggedRefList())

@@ -60,7 +60,7 @@ public partial class KsiCompGenerator
                 var parameters = m.Parameters.Skip(1).Select(p => new ParamInfo(p)).ToImmutableArray();
                 var queryInfo = new QueryInfo(m, tDomain, parameters);
 
-                foreach (var f in tDomain.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic))
+                foreach (var f in tDomain.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && f.IsPublic()))
                 {
                     if (f.Type is not INamedTypeSymbol ft)
                         continue;

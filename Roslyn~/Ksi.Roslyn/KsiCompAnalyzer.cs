@@ -28,7 +28,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule01InvalidField = Rule(01, DiagnosticSeverity.Error,
         "Invalid field",
-        "The structure is marked with the {0} that can have only non-private fields of {1} types"
+        "The structure is marked with the {0} that can have only public fields of {1} types"
     );
 
     private static readonly DiagnosticDescriptor Rule02RepeatedComponent = Rule(02, DiagnosticSeverity.Error,
@@ -145,7 +145,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
 
             typesSet.Add(f.Type);
 
-            var invalidField = f.DeclaredAccessibility == Accessibility.Private ||
+            var invalidField = !f.IsPublic() ||
                                f.Type is not INamedTypeSymbol ft ||
                                !checkFieldType(ft);
 
@@ -167,7 +167,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
 
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic))
         {
-            var invalidField = f.DeclaredAccessibility == Accessibility.Private ||
+            var invalidField = !f.IsPublic() ||
                                f.Type is not INamedTypeSymbol ft ||
                                !(ft.IsKsiArchetype() || ft.IsRefListOfEntities());
 

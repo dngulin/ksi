@@ -173,7 +173,7 @@ namespace Ksi.Roslyn
             if (!isExplicitCopyStruct && t.IsExplicitCopy())
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule01MissingAttr, ct.Locations.First(), t.Name));
 
-            if (isExplicitCopyStruct && f.DeclaredAccessibility == Accessibility.Private)
+            if (isExplicitCopyStruct && f.IsPrivate())
                 ctx.ReportDiagnostic(
                     Diagnostic.Create(Rule08PrivateField, f.Locations.First(), ct.Name));
         }

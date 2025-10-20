@@ -38,11 +38,8 @@ public partial class KsiCompGenerator
                     return null;
 
                 var typeInfo = new DomainTypeInfo(t, sds);
-                foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
+                foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && f.IsPublic()))
                 {
-                    if (f.IsStatic || f.DeclaredAccessibility == Accessibility.Private)
-                        continue;
-
                     if (f.Type is not INamedTypeSymbol ft || !(ft.IsKsiArchetype() || ft.IsRefListOfEntities()))
                         continue;
 

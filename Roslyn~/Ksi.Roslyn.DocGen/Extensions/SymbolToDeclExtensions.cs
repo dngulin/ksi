@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Text;
+using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -92,7 +93,7 @@ public static class SymbolToDeclExtensions
     {
         return lists
             .SelectMany(l => l.Attributes)
-            .Where(a => sm.GetSymbolInfo(a.Name).Symbol?.ContainingType.DeclaredAccessibility == Accessibility.Public)
+            .Where(a => sm.GetSymbolInfo(a.Name).Symbol?.ContainingType.IsPublic() ?? false)
             .ToImmutableArray();
     }
 }

@@ -38,11 +38,8 @@ public partial class KsiCompGenerator
                 var typeInfo = new ArchetypeTypeInfo(acc, t);
                 var usings = new HashSet<string>();
 
-                foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
+                foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic && f.IsPublic()))
                 {
-                    if (f.IsStatic || f.DeclaredAccessibility == Accessibility.Private)
-                        continue;
-
                     if (f.Type is not INamedTypeSymbol ft || !ft.IsRefListOfComponents())
                         continue;
 
