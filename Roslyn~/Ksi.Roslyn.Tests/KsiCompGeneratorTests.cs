@@ -106,7 +106,8 @@ public class KsiCompGeneratorTests
             [ExplicitCopy, DynSized, Dealloc]
             internal struct Archetype { public RefList<CompA> A; }
             
-            internal struct CustomData { public int Data; }
+            [ExplicitCopy, DynSized, Dealloc]
+            internal struct CustomData { public RefList<int> Data; }
             
             [KsiDomain]
             [ExplicitCopy, DynSized, Dealloc]
@@ -119,7 +120,7 @@ public class KsiCompGeneratorTests
             internal static partial class TestSystem
             {
                 [KsiQuery]
-                private static void Tick(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in CustomData entity, [KsiQueryParam] in CustomData data) {}
+                private static void Tick(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in CustomData entity, [KsiQueryParam, DynNoResize] ref CustomData data) {}
             }
             """,
             "Archetype.KsiArchetypeExtensions.g.cs",
@@ -159,20 +160,20 @@ public class KsiCompGeneratorTests
             
             internal static partial class TestSystem
             {
-                public static void Tick([DynNoResize] ref Domain domain, in CustomData p0_entity, in CustomData data)
+                public static void Tick([DynNoResize] ref Domain domain, in CustomData p0_entity, [DynNoResize] ref CustomData data)
                 {
                     var handle = new Domain.KsiHandle(Domain.KsiSection.SoA, 0);
                     for (handle.Index = 0; handle.Index < domain.SoA.Count(); handle.Index++)
                     {
                         ref var archetype = ref domain.SoA;
-                        Tick(in handle, ref archetype.A.RefAt(handle.Index), in p0_entity, in data);
+                        Tick(in handle, ref archetype.A.RefAt(handle.Index), in p0_entity, ref data);
                     }
                     
                     handle.Section = Domain.KsiSection.AoS;
                     for (handle.Index = 0; handle.Index < domain.AoS.Count(); handle.Index++)
                     {
                         ref var entity = ref domain.AoS.RefAt(handle.Index);
-                        Tick(in handle, ref entity.A, in p0_entity, in data);
+                        Tick(in handle, ref entity.A, in p0_entity, ref data);
                     }
                 }
             }

@@ -33,6 +33,7 @@ public partial class KsiCompGenerator
     {
         public readonly IParameterSymbol Symbol = p;
         public readonly bool IsQueryParam = p.IsKsiQueryParam();
+        public readonly bool IsDynNoResize = p.IsDynNoResize();
         public readonly string RefKindStr = p.RefKind == RefKind.Ref ? "ref" : "in";
     }
 
@@ -104,7 +105,12 @@ public partial class KsiCompGenerator
                 };
                 var parameters = q.Parameters
                     .Where(p => p.IsQueryParam)
-                    .Select((p, idx) => $"{p.RefKindStr} {p.Symbol.Type} {QueryParamName(p.Symbol.Name, idx)}")
+                    .Select((p, idx) =>
+                    {
+                        var attrs = p.IsDynNoResize ? "[DynNoResize] " : "";
+                        var name = QueryParamName(p.Symbol.Name, idx);
+                        return $"{attrs}{p.RefKindStr} {p.Symbol.Type} {name}";
+                    })
                     .Prepend($"{dMut} {tDomain} domain")
                     .CommaSeparated();
 
@@ -170,7 +176,7 @@ public partial class KsiCompGenerator
             var mut = p.RefKind switch
             {
                 RefKind.In => RefMutability.Readonly,
-                _ => p.IsDynNoResize() || !p.Type.IsDynSized() ? RefMutability.MutableNoResize : RefMutability.Mutable
+                _ => pi.IsDynNoResize || !p.Type.IsDynSized() ? RefMutability.MutableNoResize : RefMutability.Mutable
             };
 
             if (mut > result)
