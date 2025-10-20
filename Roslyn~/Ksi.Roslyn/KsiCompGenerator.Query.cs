@@ -32,7 +32,6 @@ public partial class KsiCompGenerator
     private class ParamInfo(IParameterSymbol p)
     {
         public readonly IParameterSymbol Symbol = p;
-        public readonly string Name = p.Name; // TODO: prevent clashes with `archetype`, `handle` & `entity`
         public readonly bool IsQueryParam = p.IsKsiQueryParam();
         public readonly string RefKindStr = p.RefKind == RefKind.Ref ? "ref" : "in";
     }
@@ -105,7 +104,7 @@ public partial class KsiCompGenerator
                 };
                 var parameters = q.Parameters
                     .Where(p => p.IsQueryParam)
-                    .Select(p => $"{p.RefKindStr} {p.Symbol.Type} {p.Name}")
+                    .Select((p, idx) => $"{p.RefKindStr} {p.Symbol.Type} {QueryParamName(p.Symbol.Name, idx)}")
                     .Prepend($"{dMut} {tDomain} domain")
                     .CommaSeparated();
 
@@ -146,6 +145,16 @@ public partial class KsiCompGenerator
                 ctx.AddSource($"{t.MetadataName}.{m.MetadataName}.KsiQuery.g.cs", sb.ToString());
             }
         });
+    }
+
+    private static string QueryParamName(string name, int idx)
+    {
+        if (name == "")
+            return $"p{idx}";
+
+        var replace = name is "domain" or "handle" or "entity" or "archetype" ||
+                     (name.Length > 1 && name[0] == 'p' && char.IsDigit(name[1]));
+        return replace ? $"p{idx}_" + name : name;
     }
 
     private static RefMutability EstimateDomainMutability(ImmutableArray<ParamInfo> parameters)
@@ -240,10 +249,13 @@ public partial class KsiCompGenerator
         }
 
         var args = new string[parameters.Length];
+        var pIdx = 0;
         for (var i = 0; i < parameters.Length; i++)
         {
             var param = parameters[i];
-            args[i] = param.IsQueryParam ? param.Name : entityFields[param.Symbol.Type];
+            args[i] = param.IsQueryParam ?
+                QueryParamName(param.Symbol.Name, pIdx++) :
+                entityFields[param.Symbol.Type];
         }
 
         matchArgs = args.ToImmutableArray();

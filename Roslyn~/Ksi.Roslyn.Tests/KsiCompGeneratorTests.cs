@@ -106,6 +106,8 @@ public class KsiCompGeneratorTests
             [ExplicitCopy, DynSized, Dealloc]
             internal struct Archetype { public RefList<CompA> A; }
             
+            internal struct CustomData { public int Data; }
+            
             [KsiDomain]
             [ExplicitCopy, DynSized, Dealloc]
             internal partial struct Domain
@@ -117,7 +119,7 @@ public class KsiCompGeneratorTests
             internal static partial class TestSystem
             {
                 [KsiQuery]
-                private static void Tick(in Domain.KsiHandle h, ref CompA a) {}
+                private static void Tick(in Domain.KsiHandle h, ref CompA a, [KsiQueryParam] in CustomData entity, [KsiQueryParam] in CustomData data) {}
             }
             """,
             "Archetype.KsiArchetypeExtensions.g.cs",
@@ -157,20 +159,20 @@ public class KsiCompGeneratorTests
             
             internal static partial class TestSystem
             {
-                public static void Tick([DynNoResize] ref Domain domain)
+                public static void Tick([DynNoResize] ref Domain domain, in CustomData p0_entity, in CustomData data)
                 {
                     var handle = new Domain.KsiHandle(Domain.KsiSection.SoA, 0);
                     for (handle.Index = 0; handle.Index < domain.SoA.Count(); handle.Index++)
                     {
                         ref var archetype = ref domain.SoA;
-                        Tick(in handle, ref archetype.A.RefAt(handle.Index));
+                        Tick(in handle, ref archetype.A.RefAt(handle.Index), in p0_entity, in data);
                     }
                     
                     handle.Section = Domain.KsiSection.AoS;
                     for (handle.Index = 0; handle.Index < domain.AoS.Count(); handle.Index++)
                     {
                         ref var entity = ref domain.AoS.RefAt(handle.Index);
-                        Tick(in handle, ref entity.A);
+                        Tick(in handle, ref entity.A, in p0_entity, in data);
                     }
                 }
             }
