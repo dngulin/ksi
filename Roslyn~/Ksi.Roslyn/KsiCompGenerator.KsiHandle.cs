@@ -14,7 +14,7 @@ public partial class KsiCompGenerator
     private class DomainTypeInfo(INamedTypeSymbol type)
     {
         public readonly string Accessibility = SyntaxFacts.GetText(type.DeclaredAccessibility);
-        public readonly string Type = type.FullTypeName();
+        public readonly string Type = type.Name; // TODO: generics?
         public readonly string Namespace = type.ContainingNamespace.FullyQualifiedName();
         public readonly List<string> Fields = new List<string>();
     }
@@ -32,7 +32,7 @@ public partial class KsiCompGenerator
             transform: (ctx, ct) =>
             {
                 var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
-                if (t == null || t.ContainingType != null)
+                if (t == null || !t.IsTopLevel())
                     return null;
 
                 var typeInfo = new DomainTypeInfo(t);

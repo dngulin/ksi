@@ -26,4 +26,29 @@ public static class KsiGeneratorTest<T> where T : IIncrementalGenerator, new()
 
         await test.RunAsync();
     }
+
+    public static async Task RunAsync(
+        [StringSyntax("c#-test")] string code,
+        params string[] nameContentsPairs
+    )
+    {
+        var test = new CSharpSourceGeneratorTest<T, DefaultVerifier>
+        {
+            ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard21,
+            TestState =
+            {
+                AdditionalReferences = { typeof(RefList<>).Assembly },
+            },
+            TestCode = code
+        };
+
+        for (var i = 0; i < nameContentsPairs.Length; i += 2)
+        {
+            var fileName = nameContentsPairs[i];
+            var fileContents = nameContentsPairs[i + 1];
+            test.TestState.GeneratedSources.Add((typeof(T), fileName, fileContents));
+        }
+
+        await test.RunAsync();
+    }
 }

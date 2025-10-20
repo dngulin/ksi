@@ -191,7 +191,7 @@ public static class TypeSymbolExtensions
 
     public static bool IsKsiHandle(this ITypeSymbol self)
     {
-        if (self is not INamedTypeSymbol { TypeKind: TypeKind.Struct, IsGenericType: false, Name: "KsiHandle" } t)
+        if (self is not INamedTypeSymbol { IsGenericType: false, Name: "KsiHandle" } t)
             return false;
 
         return t.ContainingType is { IsGenericType: false } ct && ct.IsKsiDomain();

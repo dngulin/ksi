@@ -18,6 +18,7 @@ public static class SyntaxExtensions
     public static bool ContainsKsiEntity(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiEntity);
     public static bool ContainsKsiArchetype(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiArchetype);
     public static bool ContainsKsiDomain(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiDomain);
+    public static bool ContainsKsiQuery(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiQuery);
 
     private static bool Contains(this SyntaxList<AttributeListSyntax> self, string attr)
     {

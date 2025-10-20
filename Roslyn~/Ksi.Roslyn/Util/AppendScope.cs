@@ -60,7 +60,7 @@ public static class AppendScopeExtensions
 
 public static class StringBuilderExtensions
 {
-    private static void AppendIndent(this StringBuilder self, int depth)
+    public static void AppendIndent(this StringBuilder self, int depth)
     {
         for (var i = 0; i < depth; i++)
             self.Append(AppendScope.Indent);

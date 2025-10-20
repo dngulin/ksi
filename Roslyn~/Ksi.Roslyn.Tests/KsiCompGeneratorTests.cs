@@ -90,4 +90,92 @@ public class KsiCompGeneratorTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiQueryIsProduced()
+    {
+        await KsiCompGeneratorTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [KsiComponent] internal struct CompA { public int Data; }
+            [KsiEntity] internal struct Entity { public CompA A; }
+            
+            [KsiArchetype]
+            [ExplicitCopy, DynSized, Dealloc]
+            internal struct Archetype { public RefList<CompA> A; }
+            
+            [KsiDomain]
+            [ExplicitCopy, DynSized, Dealloc]
+            internal partial struct Domain
+            {
+                public Archetype SoA;
+                public RefList<Entity> AoS;
+            }
+            
+            internal static partial class TestSystem
+            {
+                [KsiQuery]
+                private static void Tick(in Domain.KsiHandle h, ref CompA a) {}
+            }
+            """,
+            "Archetype.KsiArchetypeExtensions.g.cs",
+            """
+            using Ksi;
+
+            internal static class Archetype_KsiArchetypeExtensions
+            {
+
+            """ +
+            string.Format(
+                ArchetypeExtensions,
+                "Archetype",
+                "return self.A.Count();",
+                "self.A.RefAdd();",
+                "self.A.RemoveAt(index);",
+                "self.A.Clear();"
+            ).Indented(1) + '\n' +
+            """
+            }
+
+            """,
+            "Domain.KsiHandle.g.cs",
+            string.Format(
+                KsiHandle,
+                "internal",
+                "Domain",
+                """
+                SoA = 1,
+                AoS = 2
+                """.WithNewLineIndent(2)
+            ) + '\n',
+            "TestSystem.Tick.KsiQuery.g.cs",
+            // language=cs
+            """
+            using Ksi;
+            
+            internal static partial class TestSystem
+            {
+                public static void Tick([DynNoResize] ref Domain domain)
+                {
+                    var handle = new Domain.KsiHandle(Domain.KsiSection.SoA, 0);
+                    for (handle.Index = 0; handle.Index < domain.SoA.Count(); handle.Index++)
+                    {
+                        ref var archetype = ref domain.SoA;
+                        Tick(in handle, ref archetype.A.RefAt(handle.Index));
+                    }
+                    
+                    handle.Section = Domain.KsiSection.AoS;
+                    for (handle.Index = 0; handle.Index < domain.AoS.Count(); handle.Index++)
+                    {
+                        ref var entity = ref domain.AoS.RefAt(handle.Index);
+                        Tick(in handle, ref entity.A);
+                    }
+                }
+            }
+            
+            """
+        );
+    }
 }

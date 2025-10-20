@@ -9,5 +9,6 @@ public partial class KsiCompGenerator : IIncrementalGenerator
     {
         GenerateKsiArchetypeExtensions(initCtx);
         GenerateKsiHandle(initCtx);
+        GenerateKsiQuery(initCtx);
     }
 }
