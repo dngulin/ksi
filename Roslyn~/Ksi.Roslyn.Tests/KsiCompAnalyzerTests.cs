@@ -250,6 +250,9 @@ public class KsiCompAnalyzerTests
                 
                 [KsiQuery]
                 private static void {|KSICOMP06:NoComponents2|}(in Domain.KsiHandle h) {}
+                
+                [KsiQuery]
+                private static void {|KSICOMP06:RepComponent|}(in Domain.KsiHandle h, ref CompA a, ref CompA b) {}
             }
             """
         );

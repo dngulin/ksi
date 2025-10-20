@@ -183,7 +183,8 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
             return;
 
         if (!IsValidKsiQueryType(m, ctx.CancellationToken))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule05InvalidQueryContainingType, m.ContainingType.Locations.First()));
+            ctx.ReportDiagnostic(
+                Diagnostic.Create(Rule05InvalidQueryContainingType, m.ContainingType.Locations.First()));
 
         if (!IsValidKsiQueryMethodSignature(m))
             ctx.ReportDiagnostic(Diagnostic.Create(Rule06InvalidQueryMethod, m.Locations.First()));
@@ -206,11 +207,18 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
 
     private static bool IsValidKsiQueryMethodSignature(IMethodSymbol m)
     {
-        return m is { IsStatic: true, ReturnsVoid: true } &&
-               m.Parameters.Length >= 2 &&
-               m.Parameters[0].RefKind == RefKind.In &&
-               m.Parameters[0].Type.IsKsiHandle() &&
-               m.Parameters.Skip(1).Any(p => !p.IsKsiQueryParam());
+        var isStaticVoid = m is { IsStatic: true, ReturnsVoid: true };
+        if (!isStaticVoid)
+            return false;
+
+        var firstArgIsKsiHandle = m.Parameters.Length >= 2 &&
+                                  m.Parameters[0].RefKind == RefKind.In &&
+                                  m.Parameters[0].Type.IsKsiHandle();
+        if (!firstArgIsKsiHandle)
+            return false;
+
+        var nonParmTypes = m.Parameters.Skip(1).Where(p => !p.IsKsiQueryParam()).Select(p => p.Type).ToImmutableArray();
+        return nonParmTypes.Length != 0 && nonParmTypes.AreUnique();
     }
 
     private static bool IsValidKsiQueryParamType(IParameterSymbol p)

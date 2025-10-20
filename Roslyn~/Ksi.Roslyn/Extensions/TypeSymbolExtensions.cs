@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Ksi.Roslyn.Util;
@@ -255,5 +256,11 @@ public static class TypeSymbolExtensions
     {
         var syntax = self.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(ct);
         return syntax is TypeDeclarationSyntax tds && tds.Modifiers.Any(SyntaxKind.PartialKeyword);
+    }
+
+    public static bool AreUnique(this ImmutableArray<ITypeSymbol> self)
+    {
+        var types = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+        return self.All(t => types.Add(t));
     }
 }
