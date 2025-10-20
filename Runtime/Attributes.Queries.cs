@@ -119,7 +119,7 @@ namespace Ksi
     /// </description></item>
     /// <item><description>
     /// The following parameters should be references to <see cref="KsiComponentAttribute">KsiComponent</see> types.
-    /// At least one argument of that kind should be present
+    /// All component types should be unique, and at least one argument of that kind should be present
     /// </description></item>
     /// <item><description>
     /// Additionally, you can declare parameters marked with <see cref="KsiQueryParamAttribute"/>
