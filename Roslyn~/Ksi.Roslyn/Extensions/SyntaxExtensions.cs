@@ -52,4 +52,9 @@ public static class SyntaxExtensions
             _ => self
         };
     }
+
+    public static string PartialTypeName(this TypeDeclarationSyntax self)
+    {
+        return $"{self.Identifier}{self.TypeParameterList}";
+    }
 }

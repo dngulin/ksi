@@ -11,10 +11,11 @@ namespace Ksi.Roslyn;
 
 public partial class KsiCompGenerator
 {
-    private class DomainTypeInfo(INamedTypeSymbol type)
+    private class DomainTypeInfo(INamedTypeSymbol type, TypeDeclarationSyntax tds)
     {
+        public readonly INamedTypeSymbol Type = type;
         public readonly string Accessibility = SyntaxFacts.GetText(type.DeclaredAccessibility);
-        public readonly string Type = type.Name; // TODO: generics?
+        public readonly string PartialTypeName = tds.PartialTypeName();
         public readonly string Namespace = type.ContainingNamespace.FullyQualifiedName();
         public readonly List<string> Fields = new List<string>();
     }
@@ -31,11 +32,12 @@ public partial class KsiCompGenerator
             },
             transform: (ctx, ct) =>
             {
-                var t = ctx.SemanticModel.GetDeclaredSymbol((StructDeclarationSyntax)ctx.Node, ct);
+                var sds = (StructDeclarationSyntax)ctx.Node;
+                var t = ctx.SemanticModel.GetDeclaredSymbol(sds, ct);
                 if (t == null || !t.IsTopLevel())
                     return null;
 
-                var typeInfo = new DomainTypeInfo(t);
+                var typeInfo = new DomainTypeInfo(t, sds);
                 foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
                 {
                     if (f.IsStatic || f.DeclaredAccessibility == Accessibility.Private)
@@ -63,7 +65,7 @@ public partial class KsiCompGenerator
                     continue;
 
                 var acc = typeInfo.Accessibility;
-                var t = typeInfo.Type;
+                var t = typeInfo.PartialTypeName;
 
                 using (var file = AppendScope.Root(sb))
                 using (var ns = file.OptNamespace(typeInfo.Namespace))
@@ -74,7 +76,7 @@ public partial class KsiCompGenerator
                     ns.AppendLine(handle);
                 }
 
-                ctx.AddSource($"{typeInfo.Type}.KsiHandle.g.cs", sb.ToString());
+                ctx.AddSource($"{typeInfo.Type.MetadataName}.KsiHandle.g.cs", sb.ToString());
             }
         });
     }
