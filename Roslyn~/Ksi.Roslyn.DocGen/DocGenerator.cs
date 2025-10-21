@@ -11,6 +11,7 @@ public static class DocGenerator
         > \[ [Traits](../traits.md)
         > \| [Collections](../collections.md)
         > \| [Referencing](../borrow-checker-at-home.md)
+        > \| [ECS](../ecs.md)
         > \| {0}
         > \]
         """;

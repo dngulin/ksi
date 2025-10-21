@@ -30,3 +30,6 @@
 - `[RefPath]` referencing rules
 - Memory safety analyzer (borrow checker)
 - Unit tests for Roslyn analyzers and code generators
+- ECS-like data processing:
+  - Data layout attributes: `[KsiComponent]`, `[KsiEntity]`, `[KsiArchetype]`, `[KsiDomain]`
+  - Data querying attributes: `[KsiQuery]`, `[KsiQueryParam]`

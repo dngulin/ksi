@@ -60,10 +60,18 @@ Key features:
   // `list[n]!` as arguments invalidates memory safety rules within the calling method.
   // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
   ```
+- ECS-like data composition and queries
+  ```csharp
+  // ѯ-Framework generates a method `public static void Tick(ref Domain domain, ref SomeData d)`
+  // that iterates over entities in the domain and calls the method below for mathcing ones
+  [KsiQuery]
+  private static void Tick(in Domain.KsiHandle h, ref CompA a, ref CompB b, [KsiQueryParam] ref SomeData d)
+  {
+  }
+  ```
 
 TODO:
-- ECS-like queries respecting both array-of-structs and struct-of-arrays
-- `RefHashTable<T>` to use it as `HashSet` / `HashMap`
+- `HashSet` / `HashMap` types
 - Binary serialization
 
 ## Documentation
@@ -71,7 +79,10 @@ TODO:
 - [Trait Attributes](Documentation~/traits.md)
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
+- [ECS Data Composition](Documentation~/ecs.md)
 - [API Reference](Documentation~/api/index.g.md)
+
+See also [package unit tests](Tests) and [roslyn unit tests](Roslyn~/Ksi.Roslyn.Tests).
 
 ## Installation
 

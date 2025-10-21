@@ -3,6 +3,7 @@
 > \[ [Traits](traits.md)
 > \| [Collections](collections.md)
 > \| **Referencing**
+> \| [ECS](ecs.md)
 > \| [API](api/index.g.md)
 > \]
 
