@@ -85,7 +85,7 @@ TODO:
 - [Trait Attributes](Documentation~/traits.md)
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
-- [ECS Data Composition](Documentation~/ecs.md)
+- [ECS-Like Data Composition](Documentation~/ecs.md)
 - [API Reference](Documentation~/api/index.g.md)
 
 See also [package unit tests](Tests) and [roslyn unit tests](Roslyn~/Ksi.Roslyn.Tests).
