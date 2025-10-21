@@ -27,12 +27,12 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly DiagnosticDescriptor Rule01InvalidField = Rule(01, DiagnosticSeverity.Error,
-        "Invalid field",
+        "Invalid field of data composition type",
         "The structure is marked with the {0} that can have only public fields of {1} types"
     );
 
     private static readonly DiagnosticDescriptor Rule02RepeatedComponent = Rule(02, DiagnosticSeverity.Error,
-        "Repeated component",
+        "Repeated entity component",
         "Repeated components within the Entity are not supported"
     );
 
@@ -42,7 +42,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
     );
 
     private static readonly DiagnosticDescriptor Rule04LowArchetypeAccessibility = Rule(04, DiagnosticSeverity.Error,
-        "Invalid accessibility",
+        "Invalid [KsiArchetype] accessibility",
         "Declaring a [KsiArchetype] struct with accessibility lower than `internal` " +
         "prevents from generation extension methods"
     );

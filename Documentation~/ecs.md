@@ -170,3 +170,18 @@ and can be used for referencing.
 
 Also, note that the [KsiQueryParam](api/T.KsiQueryParamAttribute.g.md) attribute
 is used to pass custom data to the query method.
+
+## Diagnostics
+
+Diagnostic messages related to ECS-like data composition:
+
+| Diagnostic Id | Severity | Title                                              |
+|---------------|----------|----------------------------------------------------|
+| `KSICOMP01`   | Error    | Invalid field of data composition type             |
+| `KSICOMP02`   | Error    | Repeated entity component                          |
+| `KSICOMP03`   | Error    | Invalid `[KsiDomain]` declaration                  |
+| `KSICOMP04`   | Error    | Invalid `[KsiArchetype]` accessibility             |
+| `KSICOMP05`   | Error    | Non top-level partial type containing `[KsiQuery]` |
+| `KSICOMP06`   | Error    | Invalid `[KsiQuery]` method signature              |
+| `KSICOMP07`   | Error    | Non reference `[KsiQuery]` method parameter        |
+| `KSICOMP08`   | Error    | Invalid `[KsiQuery]` method parameter type         |
