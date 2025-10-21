@@ -63,7 +63,7 @@ Key features:
 - ECS-like data composition and queries
   ```csharp
   // ѯ-Framework generates `public static void Tick(ref Domain domain, ref SomeData d)`
-  // that iterates over entities in the domain and pass them to the method below
+  // that iterates over entities in the domain and passes them to the method below
   [KsiQuery]
   private static void Tick(
       in Domain.KsiHandle h, // Current entity address
