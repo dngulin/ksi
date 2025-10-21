@@ -41,8 +41,7 @@ namespace Ksi.Tests
             try
             {
                 domain.AoS.AppendDefault(n);
-                for (var i = 0; i < n; i++)
-                    domain.SoA.Add();
+                domain.SoA.AppendDefault(n);
 
                 var inc = 0;
                 IncrementSystem.Tick(ref domain, ref inc);

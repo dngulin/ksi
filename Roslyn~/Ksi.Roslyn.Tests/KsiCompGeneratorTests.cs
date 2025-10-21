@@ -71,8 +71,8 @@ public class KsiCompGeneratorTests
                 "Archetype",
                 "return self.A.Count();",
                 """
-                self.A.RefAdd();
-                self.B.RefAdd();
+                self.A.AppendDefault(count);
+                self.B.AppendDefault(count);
                 """.WithNewLineIndent(1),
                 """
                 self.A.RemoveAt(index);
@@ -135,7 +135,7 @@ public class KsiCompGeneratorTests
                 ArchetypeExtensions,
                 "Archetype",
                 "return self.A.Count();",
-                "self.A.RefAdd();",
+                "self.A.AppendDefault(count);",
                 "self.A.RemoveAt(index);",
                 "self.A.Clear();"
             ).Indented(1) + '\n' +

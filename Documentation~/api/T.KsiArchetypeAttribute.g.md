@@ -18,10 +18,10 @@ with the [KsiComponent](T.KsiComponentAttribute.g.md) item type
 - All field types should be unique
 
 Triggers extension methods code generation to keep all inner lists with the same length: 
-- `(in T).Count()` — get entity count
-- `(ref T).RemoveAt(int)` — remove an entity at the given index
-- `(ref T).Add()` — add a new `default` value to each inner list
-- `(ref T).Clear()` — clear all inner lists
+- `(in T).Count()` — gets entity count
+- `(ref T).AppendDefault(int)` — adds a specified number of `default` components to each inner list
+- `(ref T).RemoveAt(int)` — removes an entity at the given index
+- `(ref T).Clear()` — clears all inner lists
 
 ```csharp
 [AttributeUsage(AttributeTargets.Struct)]

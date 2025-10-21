@@ -53,11 +53,11 @@ namespace Ksi.Roslyn
             }}
             
             /// <summary>
-            /// Adds a new entity to the archetype.
-            /// Inernally adds a new item into each component list.
+            /// Adds a specified number of <c>default</c> entities to the archetype.
+            /// Inernally adds <c>default</c> default items into each component list.
             /// </summary>
-            /// <param name="self">Archetype to add an item</param>
-            public static void Add(this ref {0} self)
+            /// <param name="self">Archetype to append entities</param>
+            public static void AppendDefault(this ref {0} self, int count)
             {{
                 {2}
             }}

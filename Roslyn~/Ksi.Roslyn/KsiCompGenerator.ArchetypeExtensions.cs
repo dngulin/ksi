@@ -88,7 +88,7 @@ public partial class KsiCompGenerator
                             KsiCompTemplates.ArchetypeExtensions,
                             t,
                             fields.Count == 0 ? "return 0;" : $"return self.{fields[0]}.Count();",
-                            fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.RefAdd();").Aggregate(indented),
+                            fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.AppendDefault(count);").Aggregate(indented),
                             fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.RemoveAt(index);").Aggregate(indented),
                             fields.Count == 0 ? "" : fields.Select(f => $"self.{f}.Clear();").Aggregate(indented)
                         );

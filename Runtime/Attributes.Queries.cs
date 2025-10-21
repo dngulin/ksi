@@ -51,10 +51,10 @@ namespace Ksi
     /// <para>
     /// Triggers extension methods code generation to keep all inner lists with the same length:
     /// <list type="bullet">
-    /// <item><description><c>(in T).Count()</c> — get entity count</description></item>
-    /// <item><description><c>(ref T).RemoveAt(int)</c> — remove an entity at the given index</description></item>
-    /// <item><description><c>(ref T).Add()</c> — add a new <c>default</c> value to each inner list</description></item>
-    /// <item><description><c>(ref T).Clear()</c> — clear all inner lists</description></item>
+    /// <item><description><c>(in T).Count()</c> — gets entity count</description></item>
+    /// <item><description><c>(ref T).AppendDefault(int)</c> — adds a specified number of <c>default</c> components to each inner list</description></item>
+    /// <item><description><c>(ref T).RemoveAt(int)</c> — removes an entity at the given index</description></item>
+    /// <item><description><c>(ref T).Clear()</c> — clears all inner lists</description></item>
     /// </list>
     /// </para>
     /// </summary>
