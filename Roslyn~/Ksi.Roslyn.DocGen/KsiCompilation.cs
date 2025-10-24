@@ -10,7 +10,7 @@ public static class KsiCompilation
         var sources = Directory
             .EnumerateFiles("Runtime", "*.cs", SearchOption.AllDirectories)
             .Append("Roslyn~/Ksi/UnityApiStub.cs")
-            .Select(p => CSharpSyntaxTree.ParseText(File.ReadAllText(p)));
+            .Select(p => CSharpSyntaxTree.ParseText(File.ReadAllText(p), null, p));
 
         var refs = new[]
         {

@@ -7,6 +7,7 @@ namespace Ksi.Roslyn.DocGen;
 public sealed class TypeSpec
 {
     public readonly INamedTypeSymbol Symbol;
+    public readonly string FileName;
 
     public readonly ImmutableArray<MethodSpec> Constructors;
     public readonly ImmutableArray<PropertySpec> Properties;
@@ -35,6 +36,7 @@ public sealed class TypeSpec
     public TypeSpec(INamedTypeSymbol symbol, Compilation comp)
     {
         Symbol = symbol;
+        FileName = Path.GetFileNameWithoutExtension(symbol.DeclaringSyntaxReferences.First().SyntaxTree.FilePath);
 
         Constructors = symbol.Constructors
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
