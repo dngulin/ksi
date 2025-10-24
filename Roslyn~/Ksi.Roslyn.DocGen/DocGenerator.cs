@@ -43,7 +43,7 @@ public static class DocGenerator
         writer.WriteLine("Extension methods are grouped together with their target types.");
 
         WriteIndexSection(writer, "Attributes", api.Attributes);
-        WriteIndexSection(writer, "Collections", api.Collections);
+        WriteIndexSection(writer, @"TRefList\<T\> Variants", api.Collections);
         WriteIndexSection(writer, "Other Types", api.OtherTypes);
     }
 

@@ -31,7 +31,7 @@ Extension methods are grouped together with their target types.
 - [RefPathAttribute](T.RefPathAttribute.g.md)
 
 
-## Collections
+## TRefList\<T\> Variants
 
 - [RefList\<T\>](T.RefList-1.g.md)
 - [TempRefList\<T\>](T.TempRefList-1.g.md)
