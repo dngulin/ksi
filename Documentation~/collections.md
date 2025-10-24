@@ -13,11 +13,11 @@ and [ManagedRefList\<T\>](api/T.ManagedRefList-1.g.md).
 All of them have the same public API but use different allocators
 and inherit different sets of [trait attributes](traits.md).
 
-| Collection          | Item Constraint | Allocator        | Trait Attributes                        | Burst |
-|---------------------|-----------------|------------------|-----------------------------------------|-------|
-| `RefList<T>`        | `unmanaged`     | Persistent       | `ExplicitCopy`, `DynSized`, `Dealloc`   | Yes   |
-| `TempRefList<T>`    | `unmanaged`     | Temp             | `ExplicitCopy`, `DynSized`, `TempAlloc` | Yes   |
-| `ManagedRefList<T>` | `struct`        | Runtime-provided | `ExplicitCopy`, `DynSized`              | No    |
+| Collection          | Item Constraint | Allocator        | Trait Attributes                        | Stack-only | Burst |
+|---------------------|-----------------|------------------|-----------------------------------------|------------|-------|
+| `RefList<T>`        | `unmanaged`     | Persistent       | `ExplicitCopy`, `DynSized`, `Dealloc`   | No         | Yes   |
+| `TempRefList<T>`    | `unmanaged`     | Temp             | `ExplicitCopy`, `DynSized`, `TempAlloc` | Yes        | Yes   |
+| `ManagedRefList<T>` | `struct`        | Runtime-provided | `ExplicitCopy`, `DynSized`              | No         | No    |
 
 As a general term all these types referenced as the `TRefList<T>`.
 
