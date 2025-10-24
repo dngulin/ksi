@@ -79,6 +79,7 @@ public static class DocGenerator
 
         WriteMethods(writer, t.Constructors, "Constructors");
         WriteMethods(writer, t.ExternalConstructors, "Static Creation Methods");
+        WriteFields(writer, t.Fields);
         WriteProperties(writer, t.Properties);
         WriteMethods(writer, t.Methods, "Methods");
         WriteMethods(writer, t.StaticMethods, "Static Methods");
@@ -89,6 +90,7 @@ public static class DocGenerator
     {
         WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
         WriteTocSection(writer, t.ExternalConstructors.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
+        WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
         WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
         WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");
         WriteTocSection(writer, t.StaticMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Methods");
@@ -129,6 +131,28 @@ public static class DocGenerator
         Write(writer, m.Parameters, "Parameters", "- ");
         Write(writer, m.Returns?.Decapitalize(), "Returns ");
         Write(writer, m.Exceptions, "> [!CAUTION]\n> Possible exceptions: ", "> - ");
+    }
+
+    private static void WriteFields(StreamWriter writer, IReadOnlyList<FieldSpec> fields)
+    {
+        if (fields.Count == 0)
+            return;
+
+        writer.WriteLine("\n\n## Fields");
+        foreach (var f in fields)
+            WriteField(writer, f);
+    }
+
+    private static void WriteField(StreamWriter writer, FieldSpec f)
+    {
+        writer.WriteLine("\n\n### " + f.Title);
+
+        Write(writer, f.Summary);
+
+        if (f.Value != null)
+            Write(writer, $"Value is `{f.Value}`.");
+
+        Write(writer, f.Declaration);
     }
 
     private static void WriteProperties(StreamWriter writer, IReadOnlyList<PropertySpec> properties)

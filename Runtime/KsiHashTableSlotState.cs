@@ -6,7 +6,7 @@ namespace Ksi
     public enum KsiHashTableSlotState
     {
         /// <summary>
-        /// Slot is not used.
+        /// Slot doesn't store a value.
         /// </summary>
         Empty,
 
@@ -16,7 +16,13 @@ namespace Ksi
         Occupied,
 
         /// <summary>
-        /// Slot is empty but required for linear probing.
+        /// <para>
+        /// Slot doesn't store a value because it was deleted.
+        /// Slots with that state are treated as empty ones during insertions and as occupied ones during lookups.
+        /// </para>
+        /// <para>
+        /// Only trailing deleted slot sequences are set to empty after item deletion.
+        /// </para>
         /// </summary>
         Deleted,
     }

@@ -76,9 +76,9 @@ public static class SymbolToDeclExtensions
 
         var sb = new StringBuilder(128);
 
-        var attributes = pds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
-        if (attributes.Length > 0)
-            sb.AppendLine($"[{string.Join(", ", attributes)}]");
+        var attrs = pds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+        if (attrs.Length > 0)
+            sb.AppendLine($"[{string.Join(", ", attrs)}]");
 
         sb.Append($"{pds.Modifiers} {pds.Type} {pds.Identifier}");
 
@@ -90,6 +90,44 @@ public static class SymbolToDeclExtensions
             sb.Append(" { get; set; }");
 
         return sb.ToString();
+    }
+
+    public static string ToDecl(this IFieldSymbol symbol, Compilation comp)
+    {
+        var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+        switch (syntax)
+        {
+            case EnumMemberDeclarationSyntax mds:
+            {
+                var sb = new StringBuilder(128);
+
+                var attrs = mds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+                if (attrs.Length > 0)
+                    sb.AppendLine($"{attrs.Select(a => a.ToString()).CommaSeparated()}]");
+
+                sb.AppendLine(mds.Identifier.ToString());
+                if (mds.EqualsValue != null)
+                    sb.Append($" {mds.EqualsValue}");
+
+                return sb.ToString();
+            }
+
+            case FieldDeclarationSyntax fds:
+            {
+                var sb = new StringBuilder(128);
+
+                var attrs = fds.AttributeLists.PublicOnes(comp.GetSemanticModel(syntax.SyntaxTree));
+                if (attrs.Length > 0)
+                    sb.AppendLine($"{attrs.Select(a => a.ToString()).CommaSeparated()}]");
+
+                sb.Append($"{fds.Modifiers} {fds.Declaration}");
+
+                return sb.ToString();
+            }
+
+            default:
+                return "// No declaration found";
+        }
     }
 
     private static ImmutableArray<AttributeSyntax> PublicOnes(this SyntaxList<AttributeListSyntax> lists, SemanticModel sm)

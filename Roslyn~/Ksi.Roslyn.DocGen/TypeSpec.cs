@@ -10,6 +10,7 @@ public sealed class TypeSpec
 
     public readonly ImmutableArray<MethodSpec> Constructors;
     public readonly ImmutableArray<PropertySpec> Properties;
+    public readonly ImmutableArray<FieldSpec> Fields;
     public readonly ImmutableArray<MethodSpec> Methods;
 
     // Extensions and static constructors can be moved to another type
@@ -22,6 +23,7 @@ public sealed class TypeSpec
     public bool IsEmpty => Constructors.IsEmpty &&
                            Properties.IsEmpty &&
                            Methods.IsEmpty &&
+                           Fields.IsEmpty &&
                            StaticMethods.Count == 0 &&
                            ExternalConstructors.Count == 0 &&
                            ExternalMethods.Count == 0;
@@ -43,6 +45,12 @@ public sealed class TypeSpec
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
             .OfType<IPropertySymbol>()
             .Select(p => new PropertySpec(p, comp))
+            .ToImmutableArray();
+
+        Fields = symbol.GetMembers()
+            .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
+            .OfType<IFieldSymbol>()
+            .Select(f => new FieldSpec(f, comp))
             .ToImmutableArray();
 
         var methods = new List<MethodSpec>();
@@ -109,5 +117,25 @@ public sealed class PropertySpec
         var xml = symbol.DocXml();
         Summary = xml.ToMd("summary", comp)!;
         Exceptions = xml.ManyToMd("exception", comp).ToImmutableArray();
+    }
+}
+
+public sealed class FieldSpec
+{
+    public readonly IFieldSymbol Symbol;
+    public readonly string Title;
+    public readonly string? Value;
+    public readonly string Declaration;
+    public readonly string Summary;
+
+    public FieldSpec(IFieldSymbol symbol, Compilation comp)
+    {
+        Symbol = symbol;
+        Title = symbol.Name;
+        Value = symbol.ConstantValue?.ToString();
+        Declaration = $"```csharp\n{symbol.ToDecl(comp)}\n```";
+
+        var xml = symbol.DocXml();
+        Summary = xml.ToMd("summary", comp)!;
     }
 }
