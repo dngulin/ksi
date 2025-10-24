@@ -221,7 +221,7 @@ you can avoid that problem by passing the returning path to the `[RefPath]` attr
 public struct State { public RefList<Item> Items; }
 
 [RefPath("self", "Items", "[n]", "!")]
-public static ref RefList<Item> RefItemAt(this ref State self, int idx)
+public static ref Item RefItemAt(this ref State self, int idx)
 {
     return ref self.Items.RefAt(idx);
 }
