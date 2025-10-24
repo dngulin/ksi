@@ -11,6 +11,9 @@ public static class SymbolToDeclExtensions
     public static string ToDecl(this INamedTypeSymbol symbol, Compilation comp)
     {
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+        if (syntax is EnumDeclarationSyntax eds)
+            return $"{eds.Modifiers} {eds.EnumKeyword} {eds.Identifier} {eds.BaseList}";
+
         if (syntax is not TypeDeclarationSyntax tds)
             return "// No type declaration found";
 

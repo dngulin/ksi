@@ -10,5 +10,5 @@
 An enum indicating a slot state for open addressing hash tables with lazy deletion.
 
 ```csharp
-// No type declaration found
+public enum KsiHashTableSlotState 
 ```
