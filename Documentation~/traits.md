@@ -54,12 +54,14 @@ The trait also enables code generation that produces explicit copy extensions.
 Usage of the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) triggers
 code generation of `CopyTo` and `CopyFrom` methods for the marked type and possible containers:
 
-- `TStruct CopyTo(this in TStruct self, ref TStruct other)`
-- `TStruct CopyForm(this ref TStruct self, in TStruct other)`
-- `void CopyTo(this in TRefList<TStruct> self, ref TRefList<TStruct> other)`
-- `void CopyFrom(this ref TRefList<TStruct> self, in TRefList<TStruct> other)`
+- `(in TExpCopy).CopyTo(ref TExpCopy other)` — copies the current struct to another one
+- `(ref TExpCopy).CopyFrom(in TExpCopy other)` — copies another struct to the current one
+- `(in TRefList<TExpCopy>).CopyTo(ref TRefList<TExpCopy> other)` — copies all items
+  of the current list to another one
+- `(ref TRefList<TExpCopy>).CopyFrom(in TRefList<TExpCopy> other)` — copies all items
+  of another struct to the current one
 
-Where `TStruct` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
+Where `TExpCopy` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
 
 > [!IMPORTANT]
 > Explicit copy extension methods require access to the structure fields and their types:
@@ -154,16 +156,14 @@ public struc ParentStruct
 
 Usage of the [DeallocAttribute](api/T.DeallocAttribute.g.md) attribute triggers
 code generation of `Dealloc` and `Deallocated` methods for the marked type:
+- `(ref TDealloc).Dealloc()` — deallocates all data owned by the struct
+- `(ref TDealloc).Deallocated()` — deallocates the struct and returns a reference to it
+- `(ref TRefList<TDealloc>).Dealloc()` — deallocates all data owned by the list
+- `(ref TRefList<TDealloc>).Deallocated()` — deallocates the list and returns a reference to it
+- `(ref TRefList<TDealloc>).RemoveAt(int index)` — deallocates an item and removes it from the list
+- `(ref TRefList<TDealloc>).Clear()` — deallocates all items and clears the list
 
-- `void Dealloc(this ref TStruct self)` - deallocates all data owned by the struct
-- `ref TStruct Deallocated(this ref TStruct self)` - deallocate the struct and returns it as
-an _assignable_ reference (see the `DEALLOC04` diagnostic message)
-
-It also generates specialized API calls for [compatible collections](collections.md):
-- `void Dealloc(this in TRefList<TStruct> self)` - specialized version that deallocate collection items
-- `ref TRefList Deallocated(this ref TRefList<TStruct> self)` - wrapper around the specialized `Dealloc` extension
-- `void RemoveAt(this ref TRefList<TStruct> self, int index)` - specialized version that deallocate collection items
-- `void Clear(this ref TRefList<TStruct> self)` - specialized version that deallocate collection items
+Where `TDealloc` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
 
 > [!NOTE]
 > The `Dealloc` extension method is also generated for collections
