@@ -80,18 +80,18 @@ namespace Ksi
     /// <list type="bullet">
     /// <item>
     /// <description>
-    /// <c>[RefList]</c> corresponds to the reference path <c>MethodName()</c>, meaning it can reference any inner data
+    /// <c>[RefPath]</c> corresponds to the reference path <c>MethodName()</c>, meaning it can reference any inner data
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// <c>[RefList("self", "!")]</c> corresponds to the reference path <c>self!</c>,
+    /// <c>[RefPath("self", "!")]</c> corresponds to the reference path <c>self!</c>,
     /// meaning it doesn't contribute to the parent reference path
     /// </description>
     /// </item>
     /// <item>
     /// <description>
-    /// <c>[RefList("self", "Field", "!", "[n]")]</c> corresponds to the reference path <c>self.Field![n]</c>
+    /// <c>[RefPath("self", "Field", "!", "[n]")]</c> corresponds to the reference path <c>self.Field![n]</c>
     /// </description>
     /// </item>
     /// </list>
