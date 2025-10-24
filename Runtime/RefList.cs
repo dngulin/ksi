@@ -4,7 +4,7 @@
 namespace Ksi
 {
     /// <summary>
-    /// Dynamic array collection wrapping the <c>Persistent</c> allocator.
+    /// A dynamic array collection wrapping the <c>Persistent</c> allocator.
     /// Requires manual deallocation.
     /// </summary>
     [ExplicitCopy, DynSized, Dealloc, RefList]
@@ -15,7 +15,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Dynamic array collection wrapping the <c>Temp</c> allocator.
+    /// A dynamic array collection wrapping the <c>Temp</c> allocator.
     /// Can be stored only on stack.
     /// </summary>
     [ExplicitCopy, DynSized, TempAlloc, RefList]
@@ -26,7 +26,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Dynamic array collection wrapping a managed array.
+    /// A dynamic array collection wrapping a managed array.
     /// Can store structures containing reference types, but it is not compatible with <c>Burst</c>.
     /// </summary>
     [ExplicitCopy, DynSized, RefList]

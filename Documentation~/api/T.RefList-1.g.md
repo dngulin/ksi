@@ -7,7 +7,7 @@
 > \| **[API](index.g.md) / RefList\<T\>**
 > \]
 
-Dynamic array collection wrapping the `Persistent` allocator.
+A dynamic array collection wrapping the `Persistent` allocator.
 Requires manual deallocation.
 
 ```csharp

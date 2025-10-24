@@ -7,7 +7,7 @@
 > \| **[API](index.g.md) / ManagedRefList\<T\>**
 > \]
 
-Dynamic array collection wrapping a managed array.
+A dynamic array collection wrapping a managed array.
 Can store structures containing reference types, but it is not compatible with `Burst`.
 
 ```csharp

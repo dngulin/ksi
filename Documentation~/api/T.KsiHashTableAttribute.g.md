@@ -7,9 +7,10 @@
 > \| **[API](index.g.md) / KsiHashTableAttribute**
 > \]
 
-An attribute to mark type that can be either `HashSet` or `HashMap`
-with API provided by Roslyn code generator.
-It provides an open addressing hash table with linear single-step probing and lazy deletion.
+An attribute to mark a hashtable-based collection.
+It can be either `HashSet` or `HashMap` with API provided by Roslyn code generator.
+The generated implementation is based on the open addressing hash table with linear single-step probing
+and lazy deletion.
 
 Marked type should be a structure that defines: 
 - `internal TRefList<TSlot> HashTable` — inner hash table,

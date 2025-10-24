@@ -7,21 +7,20 @@
 > \| **[API](index.g.md) / KsiArchetypeAttribute**
 > \]
 
-An attribute to mark a type that represents a list of entities
-(set of the [KsiComponent](T.KsiComponentAttribute.g.md) types)
-within the [KsiDomain](T.KsiDomainAttribute.g.md) structure.
-Use it if you need the `Structure of Arrays` data layout.
+An attribute to mark a type that represents a sequence of entities.
+Can be stored in the [KsiDomain](T.KsiDomainAttribute.g.md) structure
+to provide the `Structure of Arrays` data layout.
 
 Requirements: 
-- All field types should be `TRefList<T>` types
+- All field types should be `TRefList<TComponent>` types
 with the [KsiComponent](T.KsiComponentAttribute.g.md) item type
 - All field types should be unique
 
 Triggers extension methods code generation to keep all inner lists with the same length: 
-- `(in T).Count()` — gets entity count
-- `(ref T).AppendDefault(int)` — adds a specified number of `default` components to each inner list
-- `(ref T).RemoveAt(int)` — removes an entity at the given index
-- `(ref T).Clear()` — clears all inner lists
+- `(in TArchetype).Count()` — gets entity count
+- `(ref TArchetype).AppendDefault(int count)` — adds a specified number of `default` components to each inner list
+- `(ref TArchetype).RemoveAt(int index)` — removes an entity at the given index
+- `(ref TArchetype).Clear()` — clears all inner lists
 
 ```csharp
 [AttributeUsage(AttributeTargets.Struct)]

@@ -7,8 +7,9 @@
 > \| **[API](index.g.md) / KsiComponentAttribute**
 > \]
 
-An attribute to mark a data type that can be queried
-with the [KsiQuery](T.KsiQueryAttribute.g.md) from the [KsiDomain](T.KsiDomainAttribute.g.md).
+An attribute to mark a component type.
+It can be queried with the [KsiQuery](T.KsiQueryAttribute.g.md)
+from the [KsiDomain](T.KsiDomainAttribute.g.md).
 
 ```csharp
 [AttributeUsage(AttributeTargets.Struct)]

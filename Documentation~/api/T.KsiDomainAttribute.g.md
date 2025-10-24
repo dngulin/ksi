@@ -7,7 +7,7 @@
 > \| **[API](index.g.md) / KsiDomainAttribute**
 > \]
 
-An attribute to mark a domain that can be extended with [KsiQuery](T.KsiQueryAttribute.g.md) methods.
+An attribute to mark a domain that can be queried by [KsiQuery](T.KsiQueryAttribute.g.md) methods.
 
 Should be a `partial struct` that has fields only of these types: 
 - `TRefList<T>` of the [KsiEntity](T.KsiEntityAttribute.g.md) type

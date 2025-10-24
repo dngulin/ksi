@@ -7,10 +7,10 @@
 > \| **[API](index.g.md) / KsiEntityAttribute**
 > \]
 
-An attribute to mark an entity type (set of the [KsiComponent](T.KsiComponentAttribute.g.md) types)
-that should be stored in the `TRefList<T>`
-within the [KsiDomain](T.KsiDomainAttribute.g.md) structure.
-Use it if you need the `Array of Structures` data layout.
+An attribute to mark an entity type.
+It should be a set of the [KsiComponent](T.KsiComponentAttribute.g.md) types.
+Can be stored in the [KsiDomain](T.KsiDomainAttribute.g.md) as the `TRefList<TEntity>`
+to provide the `Array of Structures` data layout.
 
 Requirements: 
 - All field types should be marked with the [KsiComponentAttribute](T.KsiComponentAttribute.g.md)

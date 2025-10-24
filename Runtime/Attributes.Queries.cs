@@ -3,8 +3,9 @@ using System;
 namespace Ksi
 {
     /// <summary>
-    /// An attribute to mark a data type that can be queried
-    /// with the <see cref="KsiQueryAttribute">KsiQuery</see> from the <see cref="KsiDomainAttribute">KsiDomain</see>.
+    /// An attribute to mark a component type.
+    /// It can be queried with the <see cref="KsiQueryAttribute">KsiQuery</see>
+    /// from the <see cref="KsiDomainAttribute">KsiDomain</see>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class KsiComponentAttribute : Attribute
@@ -13,10 +14,10 @@ namespace Ksi
 
     /// <summary>
     /// <para>
-    /// An attribute to mark an entity type (set of the <see cref="KsiComponentAttribute">KsiComponent</see> types)
-    /// that should be stored in the <c>TRefList&lt;T&gt;</c>
-    /// within the <see cref="KsiDomainAttribute">KsiDomain</see> structure.
-    /// Use it if you need the <c>Array of Structures</c> data layout.
+    /// An attribute to mark an entity type.
+    /// It should be a set of the <see cref="KsiComponentAttribute">KsiComponent</see> types.
+    /// Can be stored in the <see cref="KsiDomainAttribute">KsiDomain</see> as the <c>TRefList&lt;TEntity&gt;</c>
+    /// to provide the <c>Array of Structures</c> data layout.
     /// </para>
     /// <para>
     /// Requirements:
@@ -33,16 +34,15 @@ namespace Ksi
 
     /// <summary>
     /// <para>
-    /// An attribute to mark a type that represents a list of entities
-    /// (set of the <see cref="KsiComponentAttribute">KsiComponent</see> types)
-    /// within the <see cref="KsiDomainAttribute">KsiDomain</see> structure.
-    /// Use it if you need the <c>Structure of Arrays</c> data layout.
+    /// An attribute to mark a type that represents a sequence of entities.
+    /// Can be stored in the <see cref="KsiDomainAttribute">KsiDomain</see> structure
+    /// to provide the <c>Structure of Arrays</c> data layout.
     /// </para>
     /// <para>
     /// Requirements:
     /// <list type="bullet">
     /// <item><description>
-    /// All field types should be <c>TRefList&lt;T&gt;</c> types
+    /// All field types should be <c>TRefList&lt;TComponent&gt;</c> types
     /// with the <see cref="KsiComponentAttribute">KsiComponent</see> item type
     /// </description></item>
     /// <item><description>All field types should be unique</description></item>
@@ -51,10 +51,10 @@ namespace Ksi
     /// <para>
     /// Triggers extension methods code generation to keep all inner lists with the same length:
     /// <list type="bullet">
-    /// <item><description><c>(in T).Count()</c> — gets entity count</description></item>
-    /// <item><description><c>(ref T).AppendDefault(int)</c> — adds a specified number of <c>default</c> components to each inner list</description></item>
-    /// <item><description><c>(ref T).RemoveAt(int)</c> — removes an entity at the given index</description></item>
-    /// <item><description><c>(ref T).Clear()</c> — clears all inner lists</description></item>
+    /// <item><description><c>(in TArchetype).Count()</c> — gets entity count</description></item>
+    /// <item><description><c>(ref TArchetype).AppendDefault(int count)</c> — adds a specified number of <c>default</c> components to each inner list</description></item>
+    /// <item><description><c>(ref TArchetype).RemoveAt(int index)</c> — removes an entity at the given index</description></item>
+    /// <item><description><c>(ref TArchetype).Clear()</c> — clears all inner lists</description></item>
     /// </list>
     /// </para>
     /// </summary>
@@ -65,7 +65,7 @@ namespace Ksi
 
     /// <summary>
     /// <para>
-    /// An attribute to mark a domain that can be extended with <see cref="KsiQueryAttribute">KsiQuery</see> methods.
+    /// An attribute to mark a domain that can be queried by <see cref="KsiQueryAttribute">KsiQuery</see> methods.
     /// </para>
     /// <para>
     /// Should be a <c>partial struct</c> that has fields only of these types:
@@ -135,8 +135,8 @@ namespace Ksi
     }
 
     /// <summary>
-    /// An attribute to mark a <see cref="KsiQueryAttribute">KsiQuery</see> parameter that
-    /// is passed through from the generated extension method to the marked query method
+    /// An attribute to mark a <see cref="KsiQueryAttribute">KsiQuery</see> parameter.
+    /// It is passed through from the generated method to the marked one.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class KsiQueryParamAttribute : Attribute

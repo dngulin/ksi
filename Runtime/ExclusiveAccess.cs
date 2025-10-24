@@ -3,7 +3,7 @@ using System;
 namespace Ksi
 {
     /// <summary>
-    /// Container designed to provide exclusive access to inner data.
+    /// A container that provides exclusive access to inner data.
     /// It is achieved by maintaining only one active <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> wrapping inner data.
     /// Supposed to wrap <see cref="DynSizedAttribute">DynSized</see> structures.
     /// </summary>
@@ -59,7 +59,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Structure that provides mutable exclusive access to wrapped data.
+    /// A structure that provides mutable exclusive access to wrapped data.
     /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
     public readonly ref struct MutableAccessScope<T> where T : struct
@@ -89,7 +89,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Structure that provides readonly exclusive access to wrapped data.
+    /// A structure that provides readonly exclusive access to wrapped data.
     /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
     public readonly ref struct ReadOnlyAccessScope<T> where T : struct

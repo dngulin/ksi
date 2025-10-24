@@ -7,7 +7,7 @@
 > \| **[API](index.g.md) / MutableAccessScope\<T\>**
 > \]
 
-Structure that provides mutable exclusive access to wrapped data.
+A structure that provides mutable exclusive access to wrapped data.
 Should be disposed after usage to release access lock from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md) instance.
 
 ```csharp
