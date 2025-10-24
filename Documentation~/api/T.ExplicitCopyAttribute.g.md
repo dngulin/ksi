@@ -7,12 +7,19 @@
 > \| **[API](index.g.md) / ExplicitCopyAttribute**
 > \]
 
-Attribute that forbids structure implicit copying and provides explicit copy extension methods.
-Can be applied only to POD types without any methods and private fields.
+A trait attribute that forbids structure implicit copying.
 
 Should be added to a struct that contains fields of `ExplicitCopy` type.
 
 Can be also applied to a generic type parameter to make it compatible with `ExplicitCopy` types.
+
+Attribute triggers code generation for explicit copy extension methods: 
+- `(in TExpCopy).CopyTo(ref TExpCopy other)` — copies the current struct to another one
+- `(ref TExpCopy).CopyFrom(in TExpCopy other)` — copies another struct to the current one
+- `(in TRefList<TExpCopy>).CopyTo(ref TRefList<TExpCopy> other)` — copies all items
+of the current list to another one
+- `(ref TRefList<TExpCopy>).CopyFrom(in TRefList<TExpCopy> other)` — copies all items
+of another struct to the current one
 
 ```csharp
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]

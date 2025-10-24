@@ -7,8 +7,9 @@
 > \| **[API](index.g.md) / DynSizedAttribute**
 > \]
 
-Attribute to indicate an [ExplicitCopy](T.ExplicitCopyAttribute.g.md) type
-that contains a dynamically sized buffer that enables reference lifetime and aliasing diagnostics.
+An attribute to indicate an [ExplicitCopy](T.ExplicitCopyAttribute.g.md) type
+that contains a dynamically sized buffer.
+It enables reference lifetime and aliasing diagnostics for the marked struct.
 
 Should be added to a struct that contains fields of the `DynSized` type.
 

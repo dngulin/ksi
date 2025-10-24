@@ -7,9 +7,11 @@
 > \| **[API](index.g.md) / NonAllocatedResultAttribute**
 > \]
 
-Attribute to indicate a method that returns a reference to
-a deallocated instance of the [Dealloc](T.DeallocAttribute.g.md) type.
+An attribute to mark a method returning a deallocated [Dealloc](T.DeallocAttribute.g.md) type reference.
 Allows assigning a new value to the returned reference.
+
+Attribute usage is not verified by roslyn analyzers.
+Returning a non-deallocated instance can cause memory leaks.
 
 ```csharp
 [AttributeUsage(AttributeTargets.Method)]

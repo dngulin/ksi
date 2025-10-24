@@ -3,10 +3,28 @@ using System;
 namespace Ksi
 {
     /// <summary>
-    /// <para>Attribute that forbids structure implicit copying and provides explicit copy extension methods.
-    /// Can be applied only to POD types without any methods and private fields.</para>
+    /// <para>A trait attribute that forbids structure implicit copying.</para>
     /// <para>Should be added to a struct that contains fields of <c>ExplicitCopy</c> type.</para>
     /// <para>Can be also applied to a generic type parameter to make it compatible with <c>ExplicitCopy</c> types.</para>
+    /// <para>
+    /// Attribute triggers code generation for explicit copy extension methods:
+    /// <list type="bullet">
+    /// <item><description>
+    /// <c>(in TExpCopy).CopyTo(ref TExpCopy other)</c> — copies the current struct to another one
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TExpCopy).CopyFrom(in TExpCopy other)</c> — copies another struct to the current one
+    /// </description></item>
+    /// <item><description>
+    /// <c>(in TRefList&lt;TExpCopy&gt;).CopyTo(ref TRefList&lt;TExpCopy&gt; other)</c> — copies all items
+    /// of the current list to another one
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TRefList&lt;TExpCopy&gt;).CopyFrom(in TRefList&lt;TExpCopy&gt; other)</c> — copies all items
+    /// of another struct to the current one
+    /// </description></item>
+    /// </list>
+    /// </para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class ExplicitCopyAttribute : Attribute
@@ -14,8 +32,11 @@ namespace Ksi
     }
 
     /// <summary>
-    /// <para>Attribute to indicate an <see cref="ExplicitCopyAttribute">ExplicitCopy</see> type
-    /// that contains a dynamically sized buffer that enables reference lifetime and aliasing diagnostics.</para>
+    /// <para>
+    /// An attribute to indicate an <see cref="ExplicitCopyAttribute">ExplicitCopy</see> type
+    /// that contains a dynamically sized buffer.
+    /// It enables reference lifetime and aliasing diagnostics for the marked struct.
+    /// </para>
     /// <para>Should be added to a struct that contains fields of the <c>DynSized</c> type.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
@@ -24,8 +45,7 @@ namespace Ksi
     }
 
     /// <summary>
-    /// <para>Attribute that disallows any resizing operations
-    /// on a <see cref="DynSizedAttribute">DynSized</see> type instance.</para>
+    /// <para> An attribute to disallow resizing operations on a <see cref="DynSizedAttribute">DynSized</see> parameter.</para>
     /// <para>Hints the reference lifetime analyzer that any internal buffer cannot be resized.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
@@ -34,10 +54,35 @@ namespace Ksi
     }
 
     /// <summary>
-    /// <para>Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see>
-    /// type that requires manual deallocation.</para>
+    /// <para>
+    /// A trait attribute to indicate a <see cref="DynSizedAttribute">DynSized</see>
+    /// type that requires manual deallocation.
+    /// </para>
     /// <para>Should be added to a struct that contains fields of the <c>Dealloc</c> type.</para>
     /// <para>Can be also applied to a generic type parameter to make it compatible with <c>Dealloc</c> types.</para>
+    /// <para>
+    /// Attribute triggers code generation for deallocation extension methods:
+    /// <list type="bullet">
+    /// <item><description>
+    /// <c>(ref TDealloc).Dealloc()</c> — deallocates all data owned by the struct
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TDealloc).Deallocated()</c> — deallocates the struct and returns a reference to it
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TRefList&lt;TDealloc&gt;).Dealloc()</c> — deallocates all data owned by the list
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TRefList&lt;TDealloc&gt;).Deallocated()</c> — deallocates the list and returns a reference to it
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TRefList&lt;TDealloc&gt;).RemoveAt(int index)</c> — deallocates an item and removes it from the list
+    /// </description></item>
+    /// <item><description>
+    /// <c>(ref TRefList&lt;TDealloc&gt;).Clear()</c> — deallocates all items and clears the list
+    /// </description></item>
+    /// </list>
+    /// </para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class DeallocAttribute : Attribute
@@ -45,9 +90,14 @@ namespace Ksi
     }
 
     /// <summary>
-    /// Attribute to indicate a method that returns a reference to
-    /// a deallocated instance of the <see cref="DeallocAttribute">Dealloc</see> type.
+    /// <para>
+    /// An attribute to mark a method returning a deallocated <see cref="DeallocAttribute">Dealloc</see> type reference.
     /// Allows assigning a new value to the returned reference.
+    /// </para>
+    /// <para>
+    /// Attribute usage is not verified by roslyn analyzers.
+    /// Returning a non-deallocated instance can cause memory leaks.
+    /// </para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class NonAllocatedResultAttribute : Attribute
@@ -55,10 +105,15 @@ namespace Ksi
     }
 
     /// <summary>
-    /// <para>Attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type
-    /// that uses temporary allocator and should be created only on stack.
-    /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.</para>
-    /// <para>Should be added to a struct that contains fields of the <c>TempAlloc</c> type.</para>
+    /// <para>
+    /// A trait attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type that uses temporary allocator.
+    /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
+    /// </para>
+    /// <para>
+    /// Should be stored only on stack, that makes it similar to <c>ref</c> structures.
+    /// The main difference is that you can use it as a generic parameter of the <see cref="TempRefList{T}"/>.
+    /// </para>
+    /// <para>Required for structs that have fields of the <c>TempAlloc</c> type.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class TempAllocAttribute : Attribute

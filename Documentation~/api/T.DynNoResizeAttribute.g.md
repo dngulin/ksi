@@ -7,8 +7,7 @@
 > \| **[API](index.g.md) / DynNoResizeAttribute**
 > \]
 
-Attribute that disallows any resizing operations
-on a [DynSized](T.DynSizedAttribute.g.md) type instance.
+An attribute to disallow resizing operations on a [DynSized](T.DynSizedAttribute.g.md) parameter.
 
 Hints the reference lifetime analyzer that any internal buffer cannot be resized.
 
