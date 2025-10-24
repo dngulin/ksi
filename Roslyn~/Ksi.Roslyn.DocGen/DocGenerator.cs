@@ -53,7 +53,7 @@ public static class DocGenerator
 
         writer.WriteLine();
         foreach (var t in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
-            writer.WriteLine($"- [{t.Symbol.ToMd()}]({t.Symbol.MdFileName()})");
+            writer.WriteLine($"- [{t.Symbol.ToMd()}]({t.Symbol.MdFileName()}) — {t.Summary.Brief()}");
     }
 
     private static void WriteTypes(string path, ImmutableArray<TypeSpec> types)
@@ -105,11 +105,7 @@ public static class DocGenerator
         writer.WriteLine();
         writer.WriteLine(title);
         foreach (var (caption, desc) in entries)
-        {
-            var brief = desc.TrimEnd('.').Replace('\n', ' ').Split(". ").First().Decapitalize();
-            var frag = caption.ToMdFragment();
-            writer.WriteLine($"- [{caption}]({frag}) — {brief}");
-        }
+            writer.WriteLine($"- [{caption}]({caption.ToMdFragment()}) — {desc.Brief()}");
     }
 
     private static void WriteMethods(StreamWriter writer, IReadOnlyList<MethodSpec> methods, string title)

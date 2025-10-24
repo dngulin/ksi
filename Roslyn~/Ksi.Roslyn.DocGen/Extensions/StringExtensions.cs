@@ -47,4 +47,9 @@ public static class StringExtensions
             _ => char.ToLower(self[0]) + self[1..]
         };
     }
+
+    public static string Brief(this string self)
+    {
+        return self.TrimEnd('.').Replace('\n', ' ').Split(". ").First().Decapitalize();
+    }
 }
