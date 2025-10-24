@@ -20,6 +20,8 @@ Extension methods are grouped together with their target types.
 - [KsiDomainAttribute](T.KsiDomainAttribute.g.md)
 - [KsiQueryAttribute](T.KsiQueryAttribute.g.md)
 - [KsiQueryParamAttribute](T.KsiQueryParamAttribute.g.md)
+- [KsiHashTableAttribute](T.KsiHashTableAttribute.g.md)
+- [KsiHashTableSlotAttribute](T.KsiHashTableSlotAttribute.g.md)
 - [ExplicitCopyAttribute](T.ExplicitCopyAttribute.g.md)
 - [DynSizedAttribute](T.DynSizedAttribute.g.md)
 - [DynNoResizeAttribute](T.DynNoResizeAttribute.g.md)
@@ -38,6 +40,8 @@ Extension methods are grouped together with their target types.
 
 ## Other Types
 
+- [KsiPrimeUtil](T.KsiPrimeUtil.g.md)
+- [KsiHashTableSlotState](T.KsiHashTableSlotState.g.md)
 - [KsiExtensions](T.KsiExtensions.g.md)
 - [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md)
 - [MutableAccessScope\<T\>](T.MutableAccessScope-1.g.md)

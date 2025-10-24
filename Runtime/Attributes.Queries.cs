@@ -14,7 +14,7 @@ namespace Ksi
     /// <summary>
     /// <para>
     /// An attribute to mark an entity type (set of the <see cref="KsiComponentAttribute">KsiComponent</see> types)
-    /// that should be stored in the <c>RefList</c> collection
+    /// that should be stored in the <c>TRefList&lt;T&gt;</c>
     /// within the <see cref="KsiDomainAttribute">KsiDomain</see> structure.
     /// Use it if you need the <c>Array of Structures</c> data layout.
     /// </para>
@@ -42,7 +42,7 @@ namespace Ksi
     /// Requirements:
     /// <list type="bullet">
     /// <item><description>
-    /// All field types should be <c>RefList</c> collections
+    /// All field types should be <c>TRefList&lt;T&gt;</c> types
     /// with the <see cref="KsiComponentAttribute">KsiComponent</see> item type
     /// </description></item>
     /// <item><description>All field types should be unique</description></item>
@@ -71,7 +71,7 @@ namespace Ksi
     /// Should be a <c>partial struct</c> that has fields only of these types:
     /// <list type="bullet">
     /// <item><description>
-    /// <c>RefList</c> of the <see cref="KsiEntityAttribute">KsiEntity</see> type
+    /// <c>TRefList&lt;T&gt;</c> of the <see cref="KsiEntityAttribute">KsiEntity</see> type
     /// for the <c>Array of Structures</c> data layout
     /// </description></item>
     /// <item><description>

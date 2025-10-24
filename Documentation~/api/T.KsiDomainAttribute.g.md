@@ -10,7 +10,7 @@
 An attribute to mark a domain that can be extended with [KsiQuery](T.KsiQueryAttribute.g.md) methods.
 
 Should be a `partial struct` that has fields only of these types: 
-- `RefList` of the [KsiEntity](T.KsiEntityAttribute.g.md) type
+- `TRefList<T>` of the [KsiEntity](T.KsiEntityAttribute.g.md) type
 for the `Array of Structures` data layout
 - [KsiArchetype](T.KsiArchetypeAttribute.g.md) type for the `Structure of Arrays` data layout
 

@@ -19,6 +19,8 @@ and inherit different sets of [trait attributes](traits.md).
 | `TempRefList<T>`    | `unmanaged`     | Temp             | `ExplicitCopy`, `DynSized`, `TempAlloc` | Yes   |
 | `ManagedRefList<T>` | `struct`        | Runtime-provided | `ExplicitCopy`, `DynSized`              | No    |
 
+As a general term all these types referenced as the `TRefList<T>`.
+
 ## Default Value Safety
 
 All collections are safe to use in a `default` (zeroed) state.
@@ -60,8 +62,8 @@ See the full list of extension methods in the API reference:
 
 Diagnostics related to usage of the collections:
 
-| Diagnostic Id | Severity | Title                                      |
-|---------------|----------|--------------------------------------------|
-| `REFLIST01`   | Error    | Generic `[RefList]` type usage is unsafe   |
-| `REFLIST02`   | Error    | Jagged `[RefList]` types are not supported |
-| `REFLIST03`   | Error    | Non-specialized `[RefList]` API call       |
+| Diagnostic Id | Severity | Title                                           |
+|---------------|----------|-------------------------------------------------|
+| `REFLIST01`   | Error    | Generic `TRefList<T>` item type usage is unsafe |
+| `REFLIST02`   | Error    | Jagged `TRefList<T>` types are not supported    |
+| `REFLIST03`   | Error    | Non-specialized `TRefList<T>` API call          |

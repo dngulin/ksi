@@ -25,19 +25,19 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly DiagnosticDescriptor Rule01GenericItemType = Rule(01, DiagnosticSeverity.Error,
-        "Generic [RefList] type usage is unsafe",
-        "Usage of the [RefList] collection in generic context is not supported"
+        "Generic TRefList<T> item type usage is unsafe",
+        "Usage of the TRefList<T> with generic item types is not supported"
     );
 
     private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
-        "Jagged [RefList] types are not supported",
-        "Jagged [RefList] types are not supported. " +
+        "Jagged TRefList<T> types are not supported",
+        "Jagged TRefList<T> types are not supported. " +
         "Consider to wrap inner collection with a structure"
     );
 
     private static readonly DiagnosticDescriptor Rule03NonSpecializedCall = Rule(03, DiagnosticSeverity.Error,
-        "Non-specialized [RefList] API call",
-        "Using non-specialized API for [RefList] of `{0}`. Consider to use the specialized method version"
+        "Non-specialized TRefList API call",
+        "Using non-specialized API for TRefList<{0}>. Consider to use the specialized method version"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(

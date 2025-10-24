@@ -8,7 +8,7 @@
 > \]
 
 An attribute to mark an entity type (set of the [KsiComponent](T.KsiComponentAttribute.g.md) types)
-that should be stored in the `RefList` collection
+that should be stored in the `TRefList<T>`
 within the [KsiDomain](T.KsiDomainAttribute.g.md) structure.
 Use it if you need the `Array of Structures` data layout.
 

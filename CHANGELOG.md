@@ -17,11 +17,11 @@
 - Initial `CHANGELOG.md` file
 - README and LICENSE files
 - Move semantics extension
-- `[RefList]` types with different allocators:
-  - `RefList` - uses persistent allocator
-  - `TempRefList` - uses temporary allocator
-  - `ManagedRefList` - uses managed allocations & GC
-- Code generators to produce `[RefList]` public API
+- `TRefList<T>` types with different allocators:
+  - `RefList<T>` - uses persistent allocator
+  - `TempRefList<T>` - uses temporary allocator
+  - `ManagedRefList<T>` - uses managed allocations & GC
+- Code generators to produce `TRefList<T>` public API
 - Trait attribute system:
   - `[ExplicitCopy]` - basic trait to forbid implicit copies
   - `[DynSized]` - trait to indicate dynamically sized collections

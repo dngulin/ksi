@@ -68,7 +68,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule09GenericDeclaration = Rule(09,
             "Generic [ExplicitCopy] type declaration",
-            "Custom generic [ExplicitCopy] types are not allowed. Consider to use [RefList] collections instead"
+            "Custom generic [ExplicitCopy] types are not allowed. Consider to use TRefList<T> instead"
         );
 
         private static readonly DiagnosticDescriptor Rule10GenericArgument = Rule(10,
@@ -78,7 +78,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule11TypeArgument = Rule(11,
             "Passing [ExplicitCopy] type as a type argument",
-            "Passing [ExplicitCopy] type `{0}` as a type argument. Consider to use [RefList] collections instead"
+            "Passing [ExplicitCopy] type `{0}` as a type argument. Consider to use TRefList<T> instead"
         );
 
         private static readonly DiagnosticDescriptor Rule12SpanCopy = Rule(12,

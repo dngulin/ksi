@@ -5,7 +5,7 @@ using System;
 namespace Ksi
 {
     /// <summary>
-    /// Extension methods to represent <c>RefList</c> collection as <see cref="Span{T}"/> or <see cref="ReadOnlySpan{T}"/>.
+    /// Extension methods to represent <c>TRefList&lt;T&gt;</c> as <see cref="Span{T}"/> or <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
     public static class RefListSpanExtensions
     {

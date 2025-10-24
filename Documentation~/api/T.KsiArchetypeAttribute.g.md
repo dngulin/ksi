@@ -13,7 +13,7 @@ within the [KsiDomain](T.KsiDomainAttribute.g.md) structure.
 Use it if you need the `Structure of Arrays` data layout.
 
 Requirements: 
-- All field types should be `RefList` collections
+- All field types should be `TRefList<T>` types
 with the [KsiComponent](T.KsiComponentAttribute.g.md) item type
 - All field types should be unique
 

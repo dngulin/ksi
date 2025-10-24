@@ -105,7 +105,7 @@ public class DataOwner
 ## RefLike Types Support
 
 Reference safety analyzers support only these `ref struct` types:
-- `Span<T>` and `ReadOnlySpan<T>` derived from a `[RefList]` collection
+- `Span<T>` and `ReadOnlySpan<T>` derived from a `TRefList<T>`
 - [MutableAccessScope\<T\>](api/T.MutableAccessScope-1.g.md) and
 [ReadOnlyAccessScope\<T\>](api/T.ReadOnlyAccessScope-1.g.md) for top-level data access
 
@@ -127,7 +127,7 @@ A valid `RefPath` expression should be composed of:
 - Local variable reference
 - Parameter reference
 - Field reference (except `static` and `this` fields)
-- `[RefList]` API calls:
+- `TRefList<T>` API:
   - Indexing extension methods: `RefAt`, `ReferadOnlyAt`, `RefAdd`
   - Span representation methods: `AsSpan`, `AsReadOnlySpan`
   - Iterator items produced by: `RefIter`, `RefIterReversed`, `AsSpan`, `AsReadOnlySpan`

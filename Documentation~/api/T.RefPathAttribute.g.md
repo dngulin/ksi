@@ -15,10 +15,10 @@ Indexers should be indicated with the "[n]" segments.
 The "!" should be placed after the last [DynSized](T.DynSizedAttribute.g.md) segment.
 
 Examples: 
-- `[RefList]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
-- `[RefList("self", "!")]` corresponds to the reference path `self!`,
+- `[RefPath]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
+- `[RefPath("self", "!")]` corresponds to the reference path `self!`,
 meaning it doesn't contribute to the parent reference path
-- `[RefList("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
+- `[RefPath("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
 
 ```csharp
 [AttributeUsage(AttributeTargets.Method)]
