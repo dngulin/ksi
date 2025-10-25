@@ -69,10 +69,10 @@ public struct Archetype
 ```
 
 To keep all component arrays in a consistent state, helper extension methods are produced:
-- `(in T).Count()` — gets entity count
-- `(ref T).AppendDefault(int)` — adds a specified number of `default` components to each inner list
-- `(ref T).RemoveAt(int)` — removes an entity at the given index
-- `(ref T).Clear()` — clears all inner lists
+- `(in TArchetype).Count()` — gets entity count
+- `(ref TArchetype).AppendDefault(int count)` — adds a specified number of `default` components to each inner list
+- `(ref TArchetype).RemoveAt(int index)` — removes an entity at the given index
+- `(ref TArchetype).Clear()` — clears all inner lists
 
 ### Domains
 
