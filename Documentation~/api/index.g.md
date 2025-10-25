@@ -19,7 +19,7 @@ Extension methods are grouped together with their target types.
 - [DynNoResizeAttribute](T.DynNoResizeAttribute.g.md) — an attribute to disallow resizing operations on a [DynSized](T.DynSizedAttribute.g.md) parameter
 - [DeallocAttribute](T.DeallocAttribute.g.md) — a trait attribute to indicate a [DynSized](T.DynSizedAttribute.g.md) type that requires manual deallocation
 - [NonAllocatedResultAttribute](T.NonAllocatedResultAttribute.g.md) — an attribute to mark a method returning a deallocated [Dealloc](T.DeallocAttribute.g.md) type reference
-- [TempAllocAttribute](T.TempAllocAttribute.g.md) — a trait attribute to indicate a [DynSized](T.DynSizedAttribute.g.md) type that uses temporary allocator
+- [TempAllocAttribute](T.TempAllocAttribute.g.md) — a trait attribute to indicate a [DynSized](T.DynSizedAttribute.g.md) type that uses `Temp` allocator
 - [RefPathAttribute](T.RefPathAttribute.g.md) — a hint attribute for the reference path analyzer
 - [KsiHashTableAttribute](T.KsiHashTableAttribute.g.md) — an attribute to mark a hashtable-based collection
 - [KsiHashTableSlotAttribute](T.KsiHashTableSlotAttribute.g.md) — an attribute to mark a hash table slot type

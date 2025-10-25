@@ -204,12 +204,12 @@ Diagnostics related to the [DeallocAttribute](api/T.DeallocAttribute.g.md):
 
 ## TempAlloc Attribute
 
-The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) indicates a type that should be stored only on stack.
+The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) indicates a type with a lifetime limited by a frame time.
 It requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) and should be used for structures that have
 any `[TempAlloc]` fields like [TempRefList\<T\>](api/T.TempRefList-1.g.md).
 
-`[TempAlloc]` types are similar to `ref struct` types,
-but can be used as generic parameters of `[TempAlloc]` collections.
+Heap-allocated `[TempAlloc]` types can be allocated only with the `Temp` allocator in the `TempRefList<T>`.
+It means that the root `[TempAlloc]` structure can be stored only on stack similarly to a `ref struct`.
 
 Usage example:
 ```csharp

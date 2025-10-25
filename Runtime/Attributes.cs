@@ -106,14 +106,15 @@ namespace Ksi
 
     /// <summary>
     /// <para>
-    /// A trait attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type that uses temporary allocator.
+    /// A trait attribute to indicate a <see cref="DynSizedAttribute">DynSized</see> type that uses <c>Temp</c> allocator.
     /// Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
     /// </para>
     /// <para>
-    /// Should be stored only on stack, that makes it similar to <c>ref</c> structures.
-    /// The main difference is that you can use it as a generic parameter of the <see cref="TempRefList{T}"/>.
+    /// Heap-allocated <c>TempAlloc</c> structures can be allocated only with the <c>Temp</c> allocator.
+    /// In other words, they can be stored only in the <see cref="TempRefList{T}"/>.
+    /// It means that the root <c>TempAlloc</c> structure can be stored only on stack similarly to a <c>ref struct</c>.
     /// </para>
-    /// <para>Required for structs that have fields of the <c>TempAlloc</c> type.</para>
+    /// <para>Required for structs that have fields of the <c>TempAlloc</c> types.</para>
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct)]
     public sealed class TempAllocAttribute : Attribute

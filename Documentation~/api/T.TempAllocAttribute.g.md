@@ -7,13 +7,14 @@
 > \| **[API](index.g.md) / TempAllocAttribute**
 > \]
 
-A trait attribute to indicate a [DynSized](T.DynSizedAttribute.g.md) type that uses temporary allocator.
+A trait attribute to indicate a [DynSized](T.DynSizedAttribute.g.md) type that uses `Temp` allocator.
 Allows omitting manual deallocation in exchange for a lifetime limited by a frame time.
 
-Should be stored only on stack, that makes it similar to `ref` structures.
-The main difference is that you can use it as a generic parameter of the [TempRefList\<T\>](T.TempRefList-1.g.md).
+Heap-allocated `TempAlloc` structures can be allocated only with the `Temp` allocator.
+In other words, they can be stored only in the [TempRefList\<T\>](T.TempRefList-1.g.md).
+It means that the root `TempAlloc` structure can be stored only on stack similarly to a `ref struct`.
 
-Required for structs that have fields of the `TempAlloc` type.
+Required for structs that have fields of the `TempAlloc` types.
 
 ```csharp
 [AttributeUsage(AttributeTargets.Struct)]
