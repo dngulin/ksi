@@ -12,7 +12,7 @@ It should be a set of the [KsiComponent](T.KsiComponentAttribute.g.md) types.
 Can be stored in the [KsiDomain](T.KsiDomainAttribute.g.md) as the `TRefList<TEntity>`
 to provide the `Array of Structures` data layout.
 
-Requirements: 
+Requirements:
 - All field types should be marked with the [KsiComponentAttribute](T.KsiComponentAttribute.g.md)
 - All field types should be unique
 

@@ -13,7 +13,8 @@ public static class SymbolDocExtensions
         if (string.IsNullOrEmpty(xml))
             xml = FallbackDocString;
 
-        return XDocument.Parse(xml).Element("member") ?? XDocument.Parse(FallbackDocString).Element("member")!;
+        return XDocument.Parse(xml, LoadOptions.PreserveWhitespace).Element("member") ??
+               XDocument.Parse(FallbackDocString).Element("member")!;
     }
 
     public static string MdFileName(this INamedTypeSymbol self)

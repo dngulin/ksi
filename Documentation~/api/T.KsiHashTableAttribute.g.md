@@ -12,7 +12,7 @@ It can be either `HashSet` or `HashMap` with API provided by Roslyn code generat
 The generated implementation is based on the open addressing hash table with linear single-step probing
 and lazy deletion.
 
-Marked type should be a structure that defines: 
+Marked type should be a structure that defines:
 - `internal TRefList<TSlot> HashTable` — inner hash table,
 where `TSlot` should be marked with [KsiHashTableSlotAttribute](T.KsiHashTableSlotAttribute.g.md).
 Kind of the slot defines the collection kind (`HashSet` or `HashMap`)
@@ -23,14 +23,14 @@ Kind of the slot defines the collection kind (`HashSet` or `HashMap`)
 It is recommended to define hash tables in a separate assembly to make their internal state unavailable.
 Use only the generated API to modify the collection state.
 
-`HashSet` API: 
+`HashSet` API:
 - `(in THashSet).Count()` — returns number of keys
 - `(in THashSet).Capacity()` — returns the hash table size
 - `(in THashSet).Contains(in TKey key)` — checks if the key exists in the hash table
 - `(ref THashSet).Add(TKey key)` — adds a new key
 - `(ref THashSet).Remove(in TKey key)` — removes a key and returns a success flag
 
-`HashMap` API: 
+`HashMap` API:
 - `(in THashMap).Count()` — returns number of keys
 - `(in THashMap).Capacity()` — returns the hash table size
 - `(in THashMap).Contains(in TKey key, out int index)` — checks if the key exists in the hash table

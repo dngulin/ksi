@@ -14,7 +14,7 @@ Should be added to a struct that contains fields of the `Dealloc` type.
 
 Can be also applied to a generic type parameter to make it compatible with `Dealloc` types.
 
-Attribute triggers code generation for deallocation extension methods: 
+Attribute triggers code generation for deallocation extension methods:
 - `(ref TDealloc).Dealloc()` — deallocates all data owned by the struct
 - `(ref TDealloc).Deallocated()` — deallocates the struct and returns a reference to it
 - `(ref TRefList<TDealloc>).Dealloc()` — deallocates all data owned by the list

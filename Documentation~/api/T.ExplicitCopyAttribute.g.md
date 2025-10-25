@@ -13,7 +13,7 @@ Should be added to a struct that contains fields of `ExplicitCopy` type.
 
 Can be also applied to a generic type parameter to make it compatible with `ExplicitCopy` types.
 
-Attribute triggers code generation for explicit copy extension methods: 
+Attribute triggers code generation for explicit copy extension methods:
 - `(in TExpCopy).CopyTo(ref TExpCopy other)` — copies the current struct to another one
 - `(ref TExpCopy).CopyFrom(in TExpCopy other)` — copies another struct to the current one
 - `(in TRefList<TExpCopy>).CopyTo(ref TRefList<TExpCopy> other)` — copies all items

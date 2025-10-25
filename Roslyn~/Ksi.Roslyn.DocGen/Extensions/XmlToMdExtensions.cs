@@ -1,3 +1,4 @@
+using System.Text;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -26,18 +27,29 @@ public static class XmlToMdExtensions
             XElement element => element.ToMd(comp),
             XCData cdata => $"```\n{cdata.Value.Trim()}\n```",
             XComment comment => $"<!--{comment.Value.Trim()}-->",
-            XText text => text.Value.XmlTextToMd(self.PreviousNode != null, self.NextNode != null),
+            XText text => text.Value.XmlTextToMd(self.PreviousNode.IsInlineNode(), self.NextNode.IsInlineNode()),
             _ => ""
         };
     }
 
+    private static bool IsInlineNode(this XNode? self)
+    {
+        return self is XElement { Name.LocalName: "c" or "see" };
+    }
+
     private static string XmlTextToMd(this string self, bool keepLeadingSpace, bool keepTrailingSpace)
     {
-        var prefix = keepLeadingSpace && self.TrimStart('\n').StartsWith(' ') ? self[..1] : "";
-        var suffix = keepTrailingSpace && self.TrimEnd('\n').EndsWith(' ') ? self[^1..] : "";
+        if (self.Length == 0)
+            return self;
+
+        if (self.All(char.IsWhiteSpace))
+            return keepLeadingSpace && keepTrailingSpace ? self[..1] : "";
+
+        var prefix = keepLeadingSpace && char.IsWhiteSpace(self, 0) ? self[..1] : "";
+        var suffix = keepTrailingSpace && char.IsWhiteSpace(self, self.Length - 1) ? self[^1..] : "";
 
         const StringSplitOptions splitOpt = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-        var value = string.Join("\n", self.Split('\n', splitOpt));
+        var value = string.Join("\n", self.TrimStart().Split('\n', splitOpt));
 
         return $"{prefix}{value}{suffix}";
     }
@@ -54,14 +66,11 @@ public static class XmlToMdExtensions
             }
             case "see":
             {
-                return self.TryGetCref(comp, ref text, out var link) ?
-                    $"[{text}]({link})" :
-                    $"`{text}`";
+                return self.TryGetCref(comp, ref text, out var link) ? $"[{text}]({link})" : $"`{text}`";
             }
             case "para":
             {
-                var parSep = self.OptPrefix("\n\n");
-                return $"{parSep}{text}";
+                return $"{self.ParSep()}{text}";
             }
             case "item":
             {
@@ -88,14 +97,21 @@ public static class XmlToMdExtensions
 
     private static string ToMd(this IEnumerable<XNode> self, Compilation comp)
     {
-        return self.Aggregate("", (acc, e) => acc + e.ToMd(comp));
+        return self.Aggregate(new StringBuilder(1024), (sb, node) => sb.Append(node.ToMd(comp))).ToString();
     }
 
     private static string? Attr(this XElement self, string name) => self.Attribute(name)?.Value;
 
     private static string NameAttr(this XElement self) => self.Attr("name") ?? "???";
 
-    private static string OptPrefix(this XElement self, string value) => self.PreviousNode == null ? "" : value;
+    private static string ParSep(this XElement self)
+    {
+        var prev = self.PreviousNode;
+        if (prev is XText text)
+            prev = text.PreviousNode;
+
+        return prev is XElement { Name.LocalName: "para" } ? "\n\n" : "";
+    }
 
     private static bool TryGetCref(this XElement self, Compilation comp, ref string title, out string link)
     {

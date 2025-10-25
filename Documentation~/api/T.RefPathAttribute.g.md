@@ -14,7 +14,7 @@ otherwise omit them (that means the method can return any inner reference).
 Indexers should be indicated with the "[n]" segments.
 The "!" should be placed after the last [DynSized](T.DynSizedAttribute.g.md) segment.
 
-Examples: 
+Examples:
 - `[RefPath]` corresponds to the reference path `MethodName()`, meaning it can reference any inner data
 - `[RefPath("self", "!")]` corresponds to the reference path `self!`,
 meaning it doesn't contribute to the parent reference path
