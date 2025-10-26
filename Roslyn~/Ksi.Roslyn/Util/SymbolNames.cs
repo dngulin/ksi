@@ -27,5 +27,9 @@ public static class SymbolNames
     public const string KsiQuery = "KsiQuery";
     public const string KsiQueryParam = "KsiQueryParam";
 
+    public const string KsiHashTable = "KsiHashTable";
+    public const string KsiHashTableSlot = "KsiHashTableSlot";
+    public const string KsiHashTableSlotState = "KsiHashTableSlotState";
+
     public const string Attribute = "Attribute";
 }

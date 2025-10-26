@@ -198,6 +198,16 @@ public static class TypeSymbolExtensions
         return t.ContainingType is { IsGenericType: false } ct && ct.IsKsiDomain();
     }
 
+    public static bool IsKsiHastTableSlotState(this ITypeSymbol self)
+    {
+        return self is INamedTypeSymbol
+        {
+            TypeKind: TypeKind.Enum,
+            ContainingNamespace.Name: SymbolNames.Ksi,
+            Name: SymbolNames.KsiHashTableSlotState
+        };
+    }
+
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
         return self.GetAttributes().Any(attribute => attribute.Is(attributeName));

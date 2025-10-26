@@ -19,6 +19,8 @@ public static class SyntaxExtensions
     public static bool ContainsKsiArchetype(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiArchetype);
     public static bool ContainsKsiDomain(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiDomain);
     public static bool ContainsKsiQuery(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiQuery);
+    public static bool ContainsKsiHashTable(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiHashTable);
+    public static bool ContainsKsiHashTableSlot(this SyntaxList<AttributeListSyntax> self) => self.Contains(SymbolNames.KsiHashTableSlot);
 
     private static bool Contains(this SyntaxList<AttributeListSyntax> self, string attr)
     {
