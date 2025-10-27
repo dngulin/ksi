@@ -178,6 +178,9 @@ public static class TypeSymbolExtensions
     public static bool IsRefListOfEntities(this INamedTypeSymbol self)
         => self.IsRefList() && self.TypeArguments[0].IsKsiEntity();
 
+    public static bool IsRefListOfKsiHashTableSlot(this INamedTypeSymbol self)
+        => self.IsRefList() && self.TypeArguments[0].IsKsiHashTableSlot();
+
     private static bool IsSingleArgGenericStruct(this INamedTypeSymbol self)
         => self is { TypeKind: TypeKind.Struct, IsGenericType: true, TypeArguments.Length: 1 };
 
@@ -189,6 +192,7 @@ public static class TypeSymbolExtensions
     public static bool IsKsiEntity(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiEntity);
     public static bool IsKsiArchetype(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiArchetype);
     public static bool IsKsiDomain(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiDomain);
+    public static bool IsKsiHashTableSlot(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiHashTableSlot);
 
     public static bool IsKsiHandle(this ITypeSymbol self)
     {
