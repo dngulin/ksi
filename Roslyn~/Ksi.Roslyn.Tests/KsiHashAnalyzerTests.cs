@@ -95,6 +95,17 @@ public class KsiHashAnalyzerTests
                 public int Value;
                 public float {|KSIHASH02:FooBar|};
             }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct ExtraTableField
+            {
+                internal RefList<ExtraSlotField> HashTable;
+                internal int Count;
+                public int {|KSIHASH02:FooBar|};
+                internal static int Hash(in int key) => throw null;
+                internal static bool Eq(in int a, in int b) => throw null;
+            }
             """
         );
     }
