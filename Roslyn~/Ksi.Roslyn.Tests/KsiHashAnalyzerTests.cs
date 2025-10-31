@@ -189,6 +189,23 @@ public class KsiHashAnalyzerTests
                 private int {|KSIHASH04:Key|};
                 private int {|KSIHASH04:Value|};
             }
+            
+            [KsiHashTableSlot]
+            public struct HashSetSlot
+            {
+                internal KsiHashTableSlotState State;
+                internal int Key;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct InvalidHashTableMethods
+            {
+                private RefList<HashSetSlot> {|KSIHASH04:HashTable|};
+                private int {|KSIHASH04:Count|};
+                private static int {|KSIHASH04:Hash|}(in int key) => throw null;
+                private static bool {|KSIHASH04:Eq|}(in int a, in int b) => throw null;
+            }
             """
         );
     }
