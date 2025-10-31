@@ -31,5 +31,14 @@ public static class SymbolNames
     public const string KsiHashTableSlot = "KsiHashTableSlot";
     public const string KsiHashTableSlotState = "KsiHashTableSlotState";
 
+    public const string State = "State";
+    public const string Key = "Key";
+    public const string Value = "Value";
+
+    public const string HashTable = "HashTable";
+    public const string Count = "Count";
+    public const string Hash = "Hash";
+    public const string Eq = "Eq";
+
     public const string Attribute = "Attribute";
 }

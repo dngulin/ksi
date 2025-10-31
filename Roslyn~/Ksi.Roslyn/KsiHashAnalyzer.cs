@@ -37,7 +37,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule03InvalidSymbolSignature = Rule(03, DiagnosticSeverity.Error,
         "Invalid symbol signature",
-        "The {0} has a wrong signature. It should be a {1}"
+        "The {0} has a wrong signature. It should be {1}"
     );
 
     private static readonly DiagnosticDescriptor Rule04InvalidAccessibility = Rule(04, DiagnosticSeverity.Error,
@@ -102,32 +102,40 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         var fields = SlotFields.None;
         const string attr = SymbolNames.KsiHashTableSlot;
 
+        const string stateField = SymbolNames.State + " field";
+        const string keyField = SymbolNames.Key + " field";
+        const string valueField = SymbolNames.Value + " field";
+
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
         {
             var fl = f.Locations.First();
 
-            if (f is { DeclaredAccessibility: < Accessibility.Internal, Name: "State" or "Key" or "Value" })
+            if (f is
+                {
+                    DeclaredAccessibility: < Accessibility.Internal,
+                    Name: SymbolNames.State or SymbolNames.Key or SymbolNames.Value
+                })
                 ctx.Report(fl, Rule04InvalidAccessibility, $"{f.Name} field");
 
             var invSym = Rule03InvalidSymbolSignature;
             switch (f.Name)
             {
-                case "State":
+                case SymbolNames.State:
                     fields |= SlotFields.State;
                     if (f.IsStatic || !f.Type.IsKsiHastTableSlotState())
-                        ctx.Report(fl, invSym, "State field", "non-static field of KsiHastTableSlotState type");
+                        ctx.Report(fl, invSym, stateField, "a non-static field of KsiHastTableSlotState type");
                     break;
 
-                case "Key":
+                case SymbolNames.Key:
                     fields |= SlotFields.Key;
                     if (f.IsStatic || !f.Type.IsStruct())
-                        ctx.Report(fl, invSym, "Key field", "non-static value type field");
+                        ctx.Report(fl, invSym, keyField, "a non-static value type field");
                     break;
 
-                case "Value":
+                case SymbolNames.Value:
                     fields |= SlotFields.Value;
                     if (f.IsStatic || !f.Type.IsStruct())
-                        ctx.Report(fl, invSym, "Value field", "non-static value type field");
+                        ctx.Report(fl, invSym, valueField, "a non-static value type field");
                     break;
 
                 default:
@@ -137,18 +145,20 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         }
 
         if ((fields & SlotFields.State) == SlotFields.None)
-            ctx.Report(loc, Rule01MissingSymbol, attr, "State field");
+            ctx.Report(loc, Rule01MissingSymbol, attr, stateField);
 
         if ((fields & SlotFields.Key) == SlotFields.None)
-            ctx.Report(loc, Rule01MissingSymbol, attr, "Key field");
+            ctx.Report(loc, Rule01MissingSymbol, attr, keyField);
     }
 
     [Flags]
-    private enum CollectionFields
+    private enum CollectionSymbols
     {
         None = 0,
-        HashTable = 1 << 0,
-        Count = 1 << 1,
+        HashTableFiled = 1 << 0,
+        CountField = 1 << 1,
+        HashMethod = 1 << 2,
+        EqMethod = 1 << 3,
     }
 
     private static void AnalyzeHashTable(SyntaxNodeAnalysisContext ctx, StructDeclarationSyntax sds)
@@ -157,8 +167,12 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         if (t == null)
             return;
 
-        var fields = CollectionFields.None;
+        var symbols = CollectionSymbols.None;
         const string attr = SymbolNames.KsiHashTable;
+        const string hashTableField = SymbolNames.HashTable + " field";
+        const string countField = SymbolNames.Count + " field";
+        const string hashMethod = SymbolNames.Hash + " method";
+        const string eqMethod = SymbolNames.Eq + " method";
 
         var loc = sds.Identifier.GetLocation();
         if (t.InAssemblyAccessibility() < Accessibility.Internal)
@@ -167,26 +181,33 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         if (!sds.Modifiers.Any(SyntaxKind.PartialKeyword) || !t.IsTopLevel())
             ctx.Report(loc, Rule05InvalidHashTableDecl);
 
+        INamedTypeSymbol? tSlot = null;
+
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
         {
             var fl = f.Locations.First();
 
-            if (f is { DeclaredAccessibility: < Accessibility.Internal, Name: "HashTable" or "Count" })
+            if (f is
+                {
+                    DeclaredAccessibility: < Accessibility.Internal, Name: SymbolNames.HashTable or SymbolNames.Count
+                })
                 ctx.Report(fl, Rule04InvalidAccessibility, $"{f.Name} field");
 
             var invSym = Rule03InvalidSymbolSignature;
             switch (f.Name)
             {
                 case "HashTable":
-                    fields |= CollectionFields.HashTable;
+                    symbols |= CollectionSymbols.HashTableFiled;
                     if (f.IsStatic || f.Type is not INamedTypeSymbol nt || !nt.IsRefListOfKsiHashTableSlot())
-                        ctx.Report(fl, invSym, "HashTable field", "non-static TRefList<THashTableSlot> field");
+                        ctx.Report(fl, invSym, hashTableField, "a non-static TRefList<THashTableSlot> field");
+                    else
+                        tSlot = nt.TypeArguments.First() as INamedTypeSymbol;
                     break;
 
                 case "Count":
-                    fields |= CollectionFields.Count;
+                    symbols |= CollectionSymbols.CountField;
                     if (f.IsStatic || f.Type.SpecialType != SpecialType.System_Int32)
-                        ctx.Report(fl, invSym, "Count field", "non-static int field");
+                        ctx.Report(fl, invSym, countField, "a non-static int field");
                     break;
 
                 default:
@@ -195,10 +216,97 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        if ((fields & CollectionFields.HashTable) == CollectionFields.None)
-            ctx.Report(loc, Rule01MissingSymbol, attr, "HashTable field");
+        if ((symbols & CollectionSymbols.HashTableFiled) == CollectionSymbols.None)
+            ctx.Report(loc, Rule01MissingSymbol, attr, hashTableField);
 
-        if ((fields & CollectionFields.Count) == CollectionFields.None)
-            ctx.Report(loc, Rule01MissingSymbol, attr, "Count field");
+        if ((symbols & CollectionSymbols.CountField) == CollectionSymbols.None)
+            ctx.Report(loc, Rule01MissingSymbol, attr, countField);
+
+        var tKey = tSlot?
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .FirstOrDefault(f => !f.IsStatic && f.Type.IsStruct() && f.Name == "Key")?
+            .Type as INamedTypeSymbol;
+
+        foreach (var m in t.GetMembers().OfType<IMethodSymbol>())
+        {
+            var ml = m.Locations.First();
+
+            if (m is { DeclaredAccessibility: < Accessibility.Internal, Name: SymbolNames.Hash or SymbolNames.Eq })
+                ctx.Report(ml, Rule04InvalidAccessibility, $"{m.Name} field");
+
+            var invSym = Rule03InvalidSymbolSignature;
+            switch (m.Name)
+            {
+                case SymbolNames.Hash:
+                    symbols |= CollectionSymbols.HashMethod;
+                    if (!IsHashMethod(m, tKey))
+                        ctx.Report(ml, invSym, hashMethod, $"the `static uint {SymbolNames.Hash}(in TKey key)`");
+                    break;
+
+                case SymbolNames.Eq:
+                    symbols |= CollectionSymbols.EqMethod;
+                    if (!IsEqMethod(m, tKey))
+                        ctx.Report(ml, invSym, eqMethod, $"the `static bool {SymbolNames.Eq}(in TKey a, in TKey b)`");
+                    break;
+            }
+        }
+
+        if ((symbols & CollectionSymbols.HashMethod) == CollectionSymbols.None)
+            ctx.Report(loc, Rule01MissingSymbol, attr, hashMethod);
+
+        if ((symbols & CollectionSymbols.EqMethod) == CollectionSymbols.None)
+            ctx.Report(loc, Rule01MissingSymbol, attr, eqMethod);
+    }
+
+    private static bool IsHashMethod(IMethodSymbol m, INamedTypeSymbol? tKey)
+    {
+        if (tKey == null)
+            return false;
+
+        var match = m is
+        {
+            IsStatic: true,
+            ReturnType.SpecialType: SpecialType.System_Int32,
+            RefKind: RefKind.None,
+            Name: SymbolNames.Hash,
+            Parameters.Length: 1
+        };
+
+        if (!match)
+            return false;
+
+        if (m.Parameters[0] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t })
+            return false;
+
+        var eqc = SymbolEqualityComparer.Default;
+        return eqc.Equals(t, tKey);
+    }
+
+    private static bool IsEqMethod(IMethodSymbol m, INamedTypeSymbol? tKey)
+    {
+        if (tKey == null)
+            return false;
+
+        var match = m is
+        {
+            IsStatic: true,
+            ReturnType.SpecialType: SpecialType.System_Boolean,
+            RefKind: RefKind.None,
+            Name: SymbolNames.Eq,
+            Parameters.Length: 2
+        };
+
+        if (!match)
+            return false;
+
+        if (m.Parameters[0] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t0 })
+            return false;
+
+        if (m.Parameters[1] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t1 })
+            return false;
+
+        var eqc = SymbolEqualityComparer.Default;
+        return eqc.Equals(t0, tKey) && eqc.Equals(t1, tKey);
     }
 }
