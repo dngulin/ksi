@@ -209,4 +209,45 @@ public class KsiHashAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task Rule05InvalidHashTableDecl()
+    {
+        await KsiHashAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [KsiHashTableSlot]
+            public struct HashSetSlot
+            {
+                internal KsiHashTableSlotState State;
+                internal int Key;
+            }
+
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct {|KSIHASH05:NonPartial|}
+            {
+                internal RefList<HashSetSlot> HashTable;
+                internal int Count;
+                internal static int Hash(in int key) => throw null;
+                internal static bool Eq(in int a, in int b) => throw null;
+            }
+            
+            public static class TopLevel
+            {
+                [KsiHashTable]
+                [ExplicitCopy, DynSized, Dealloc]
+                public partial struct {|KSIHASH05:NonTopLevel|}
+                {
+                    internal RefList<HashSetSlot> HashTable;
+                    internal int Count;
+                    internal static int Hash(in int key) => throw null;
+                    internal static bool Eq(in int a, in int b) => throw null;
+                }
+            }
+            """
+        );
+    }
 }
