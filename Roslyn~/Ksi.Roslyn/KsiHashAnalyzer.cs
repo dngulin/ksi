@@ -110,11 +110,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         {
             var fl = f.Locations.First();
 
-            if (f is
-                {
-                    DeclaredAccessibility: < Accessibility.Internal,
-                    Name: SymbolNames.State or SymbolNames.Key or SymbolNames.Value
-                })
+            if (IsInaccessibleHashTableSlotField(f))
                 ctx.Report(fl, Rule04InvalidAccessibility, $"{f.Name} field");
 
             var invSym = Rule03InvalidSymbolSignature;
@@ -149,6 +145,15 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
 
         if ((fields & SlotFields.Key) == SlotFields.None)
             ctx.Report(loc, Rule01MissingSymbol, attr, keyField);
+    }
+
+    private static bool IsInaccessibleHashTableSlotField(IFieldSymbol f)
+    {
+        return f is
+        {
+            DeclaredAccessibility: < Accessibility.Internal,
+            Name: SymbolNames.State or SymbolNames.Key or SymbolNames.Value
+        };
     }
 
     [Flags]
@@ -187,10 +192,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         {
             var fl = f.Locations.First();
 
-            if (f is
-                {
-                    DeclaredAccessibility: < Accessibility.Internal, Name: SymbolNames.HashTable or SymbolNames.Count
-                })
+            if (IsInaccessibleHashTableField(f))
                 ctx.Report(fl, Rule04InvalidAccessibility, $"{f.Name} field");
 
             var invSym = Rule03InvalidSymbolSignature;
@@ -257,6 +259,15 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
 
         if ((symbols & CollectionSymbols.EqMethod) == CollectionSymbols.None)
             ctx.Report(loc, Rule01MissingSymbol, attr, eqMethod);
+    }
+
+    private static bool IsInaccessibleHashTableField(IFieldSymbol f)
+    {
+        return f is
+        {
+            DeclaredAccessibility: < Accessibility.Internal,
+            Name: SymbolNames.HashTable or SymbolNames.Count
+        };
     }
 
     private static bool IsHashMethod(IMethodSymbol m, INamedTypeSymbol? tKey)
