@@ -28,6 +28,53 @@ public class KsiHashAnalyzerTests
                 internal KsiHashTableSlotState State;
                 public int Key;
             }
+            
+            [KsiHashTable]
+            public partial struct {|KSIHASH01:MissingHashTable|}
+            {
+                internal int Count;
+                
+                // Method signatures are not valid because the TKey is not known 
+                internal static int {|KSIHASH03:Hash|}(in int key) => throw null;
+                internal static bool {|KSIHASH03:Eq|}(in int a, in int b) => throw null;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct {|KSIHASH01:MissingCount|}
+            {
+                internal RefList<ValidHashSetSlot> HashTable;
+                internal static int Hash(in int key) => throw null;
+                internal static bool Eq(in int a, in int b) => throw null;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct {|KSIHASH01:MissingHash|}
+            {
+                internal RefList<ValidHashSetSlot> HashTable;
+                internal int Count;
+                internal static bool Eq(in int a, in int b) => throw null;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct {|KSIHASH01:MissingEq|}
+            {
+                internal RefList<ValidHashSetSlot> HashTable;
+                internal int Count;
+                internal static int Hash(in int key) => throw null;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct ValidHashSet
+            {
+                internal RefList<ValidHashSetSlot> HashTable;
+                internal int Count;
+                internal static int Hash(in int key) => throw null;
+                internal static bool Eq(in int a, in int b) => throw null;
+            }
             """
         );
     }
