@@ -111,7 +111,7 @@ public class KsiHashAnalyzerTests
     }
 
     [Fact]
-    public async Task Rule03InvalidFieldSignature()
+    public async Task Rule03InvalidSymbolSignature()
     {
         await KsiHashAnalyzerTest.RunAsync(
             // language=cs
@@ -132,6 +132,32 @@ public class KsiHashAnalyzerTests
                 internal static KsiHashTableSlotState {|KSIHASH03:State|};
                 public static int {|KSIHASH03:Key|};
                 public static int {|KSIHASH03:Value|};
+            }
+            
+            [KsiHashTable]
+            public partial struct InvalidHashTableSymbols
+            {
+                internal int {|KSIHASH03:HashTable|};
+                internal bool {|KSIHASH03:Count|};
+                internal static int {|KSIHASH03:Hash|}(in int key) => throw null;
+                internal static bool {|KSIHASH03:Eq|}(in int a, in int b) => throw null;
+            }
+            
+            [KsiHashTableSlot]
+            public struct HashSetSlot
+            {
+                internal KsiHashTableSlotState State;
+                internal int Key;
+            }
+            
+            [KsiHashTable]
+            [ExplicitCopy, DynSized, Dealloc]
+            public partial struct InvalidHashTableMethods
+            {
+                internal RefList<HashSetSlot> HashTable;
+                internal int Count;
+                internal static int {|KSIHASH03:Hash|}(in float key) => throw null;
+                internal static bool {|KSIHASH03:Eq|}(in float a, in float b) => throw null;
             }
             """
         );
