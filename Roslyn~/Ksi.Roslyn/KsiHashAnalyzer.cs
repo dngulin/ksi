@@ -124,13 +124,13 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
 
                 case SymbolNames.Key:
                     fields |= SlotFields.Key;
-                    if (f.IsStatic || !f.Type.IsStruct())
+                    if (f.IsStatic || !f.Type.IsValueType())
                         ctx.Report(fl, invSym, keyField, "a non-static value type field");
                     break;
 
                 case SymbolNames.Value:
                     fields |= SlotFields.Value;
-                    if (f.IsStatic || !f.Type.IsStruct())
+                    if (f.IsStatic || !f.Type.IsValueType())
                         ctx.Report(fl, invSym, valueField, "a non-static value type field");
                     break;
 

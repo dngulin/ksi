@@ -219,6 +219,9 @@ public static class TypeSymbolExtensions
     }
 
     public static bool IsStruct(this ITypeSymbol self) => self.TypeKind == TypeKind.Struct;
+    public static bool IsValueType(this ITypeSymbol self) => self.TypeKind is TypeKind.Struct or TypeKind.Enum;
+
+
     public static bool IsStructOrTypeParameter(this ITypeSymbol self)
     {
         return self.TypeKind switch
