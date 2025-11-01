@@ -20,9 +20,7 @@ public static class SymbolExtensions
     {
         var s = self.DeclaringSyntaxReferences.First().GetSyntax(ct);
 
-        return s.Parent is VariableDeclarationSyntax d ?
-            d.Type.GetLocation() :
-            self.Locations.First();
+        return s.Parent is VariableDeclarationSyntax d ? d.Type.GetLocation() : self.Locations.First();
     }
 
     public static bool IsPublic(this ISymbol self) => self.DeclaredAccessibility == Accessibility.Public;
@@ -42,5 +40,18 @@ public static class SymbolExtensions
         }
 
         return string.Join(".", segments);
+    }
+
+    public static bool IsKsiValueTypeField(this IFieldSymbol self)
+    {
+        return self is
+        {
+            IsStatic: false,
+            DeclaredAccessibility: >= Accessibility.Internal,
+            Type: INamedTypeSymbol
+            {
+                TypeKind: TypeKind.Struct or TypeKind.Enum
+            }
+        };
     }
 }

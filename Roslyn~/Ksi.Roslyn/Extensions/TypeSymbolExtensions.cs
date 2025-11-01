@@ -192,6 +192,7 @@ public static class TypeSymbolExtensions
     public static bool IsKsiEntity(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiEntity);
     public static bool IsKsiArchetype(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiArchetype);
     public static bool IsKsiDomain(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiDomain);
+    public static bool IsKsiHashTable(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiHashTable);
     public static bool IsKsiHashTableSlot(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiHashTableSlot);
 
     public static bool IsKsiHandle(this ITypeSymbol self)

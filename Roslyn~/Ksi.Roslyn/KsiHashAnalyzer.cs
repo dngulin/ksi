@@ -198,7 +198,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
             var invSym = Rule03InvalidSymbolSignature;
             switch (f.Name)
             {
-                case "HashTable":
+                case SymbolNames.HashTable:
                     symbols |= CollectionSymbols.HashTableFiled;
                     if (f.IsStatic || f.Type is not INamedTypeSymbol nt || !nt.IsRefListOfKsiHashTableSlot())
                         ctx.Report(fl, invSym, hashTableField, "a non-static TRefList<THashTableSlot> field");
@@ -206,7 +206,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
                         tSlot = nt.TypeArguments.First() as INamedTypeSymbol;
                     break;
 
-                case "Count":
+                case SymbolNames.Count:
                     symbols |= CollectionSymbols.CountField;
                     if (f.IsStatic || f.Type.SpecialType != SpecialType.System_Int32)
                         ctx.Report(fl, invSym, countField, "a non-static int field");
@@ -319,5 +319,108 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
 
         var eqc = SymbolEqualityComparer.Default;
         return eqc.Equals(t0, tKey) && eqc.Equals(t1, tKey);
+    }
+
+    public static bool IsValidTable(INamedTypeSymbol t, StructDeclarationSyntax sds, out INamedTypeSymbol? tSlot)
+    {
+        tSlot = null;
+
+        if (!t.IsKsiHashTable() || !t.IsTopLevel() || !sds.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
+            return false;
+
+        var symbols = CollectionSymbols.None;
+        foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
+        {
+            if (!f.IsKsiValueTypeField())
+                return false;
+
+            var ft = (INamedTypeSymbol)f.Type;
+            switch (f.Name)
+            {
+                case SymbolNames.HashTable when ft.IsRefListOfKsiHashTableSlot():
+                    symbols |= CollectionSymbols.HashTableFiled;
+                    tSlot = (INamedTypeSymbol)ft.TypeArguments[0];
+                    break;
+                case SymbolNames.Count:
+                    symbols |= CollectionSymbols.CountField;
+                    break;
+                default:
+                    return false;
+            }
+        }
+
+        const CollectionSymbols fields = CollectionSymbols.HashTableFiled | CollectionSymbols.CountField;
+        if ((symbols & fields) != fields)
+            return false;
+
+        var tKey = tSlot?
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .FirstOrDefault(f => f.IsKsiValueTypeField() && f.Name == SymbolNames.Key)?
+            .Type as INamedTypeSymbol;
+
+        if (tKey == null)
+            return false;
+
+        foreach (var m in t.GetMembers().OfType<IMethodSymbol>())
+        {
+            var isVisible = m.DeclaredAccessibility >= Accessibility.Internal;
+            switch (m.Name)
+            {
+                case SymbolNames.Hash when isVisible && IsHashMethod(m, tKey):
+                    symbols |= CollectionSymbols.HashMethod;
+                    break;
+
+                case SymbolNames.Eq when isVisible && IsEqMethod(m, tKey):
+                    symbols |= CollectionSymbols.EqMethod;
+                    break;
+
+                case SymbolNames.Hash:
+                case SymbolNames.Eq:
+                    return false;
+            }
+        }
+
+        const CollectionSymbols methods = CollectionSymbols.HashMethod | CollectionSymbols.EqMethod;
+        return (symbols & methods) == methods;
+    }
+
+    public static bool IsValidSlot(ITypeSymbol t, out INamedTypeSymbol? tKey, out INamedTypeSymbol? tValue)
+    {
+        tKey = null;
+        tValue = null;
+
+        if (t is not INamedTypeSymbol { TypeKind: TypeKind.Struct } tSlot)
+            return false;
+
+        if (!tSlot.IsKsiHashTableSlot())
+            return false;
+
+        var fields = SlotFields.None;
+        foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
+        {
+            if (!f.IsKsiValueTypeField())
+                return false;
+
+            switch (f.Name)
+            {
+                case SymbolNames.State when f.Type.IsKsiHastTableSlotState():
+                    fields |= SlotFields.State;
+                    break;
+                case SymbolNames.Key:
+                    fields |= SlotFields.Key;
+                    tKey = (INamedTypeSymbol)f.Type;
+                    break;
+                case SymbolNames.Value:
+                    fields |= SlotFields.Value;
+                    tValue = (INamedTypeSymbol)f.Type;
+                    break;
+                default:
+                    return false;
+            }
+        }
+
+        const SlotFields mask = SlotFields.State | SlotFields.Key;
+        return (fields & mask) == mask;
     }
 }
