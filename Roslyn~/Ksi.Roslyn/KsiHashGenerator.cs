@@ -114,7 +114,7 @@ public class KsiHashGenerator : IIncrementalGenerator
         var code = KsiHashTemplates.HashSetApi
             .ToStringBuilder()
             .Replace("|accessibility|", accessibility)
-            .Replace("|THashTable|", h.Type.Name)
+            .Replace("|THashSet|", h.Type.Name)
             .Replace("|TKey|", h.KeyType.FullTypeName())
             .Unwrap("[in ]", !keyIsExpCopy)
             .Unwrap("[.Move()]", keyIsExpCopy)

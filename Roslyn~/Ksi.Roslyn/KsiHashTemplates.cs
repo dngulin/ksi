@@ -5,17 +5,17 @@ namespace Ksi.Roslyn
         public const string HashSetApi =
             // language=cs
             """
-            |accessibility| partial struct |THashTable|
+            |accessibility| partial struct |THashSet|
             {
                 /// <summary>
                 /// Returns an empty HashSet instance.
                 /// </summary>
-                public static |THashTable| Empty => default;
+                public static |THashSet| Empty => default;
             
                 /// <summary>
                 /// Returns a HashSet instance with a capacity equal or greater of the given one.
                 /// </summary>
-                public static |THashTable| WithMinCapacity(int capacity)
+                public static |THashSet| WithMinCapacity(int capacity)
                 {
                     var set = Empty;
                     set.HashTable.AppendDefault(KsiPrimeUtil.EqualOrNextPrime(capacity));
@@ -23,20 +23,20 @@ namespace Ksi.Roslyn
                 }
             }
 
-            |accessibility| static class |THashTable|_KsiHashSetExtensions
+            |accessibility| static class |THashSet|_KsiHashSetExtensions
             {
-                public static int Count(in this |THashTable| self) => self.Count;
+                public static int Count(in this |THashSet| self) => self.Count;
                 
-                public static int Capacity(in this |THashTable| self) => self.HashTable.Count();
+                public static int Capacity(in this |THashSet| self) => self.HashTable.Count();
             
-                public static bool Contains(in this |THashTable| self, in |TKey| key)
+                public static bool Contains(in this |THashSet| self, in |TKey| key)
                 {
                     return self.Count > 0 && self.SearchKey(key, out _);
                 }
             
-                public static void Rebuild(ref this |THashTable| self, int minCapacity)
+                public static void Rebuild(ref this |THashSet| self, int minCapacity)
                 {
-                    var set = |THashTable|.WithMinCapacity(System.Math.Min(minCapacity, self.Count));
+                    var set = |THashSet|.WithMinCapacity(System.Math.Min(minCapacity, self.Count));
             
                     foreach (ref var slot in self.HashTable.RefIter())
                     {
@@ -47,12 +47,12 @@ namespace Ksi.Roslyn
                     self.Deallocated() = set.Move();
                 }
             
-                private static int GetStartIndex(this in |THashTable| self, in |TKey| key)
+                private static int GetStartIndex(this in |THashSet| self, in |TKey| key)
                 {
-                    return (int)((uint)|THashTable|.Hash(key) % (uint)self.Capacity());
+                    return (int)((uint)|THashSet|.Hash(key) % (uint)self.Capacity());
                 }
             
-                public static bool Add(ref this |THashTable| self, [in ]|TKey| key)
+                public static bool Add(ref this |THashSet| self, [in ]|TKey| key)
                 {
                     if (self.Count == self.Capacity())
                         self.Rebuild(self.Capacity() * 2);
@@ -69,7 +69,7 @@ namespace Ksi.Roslyn
                                 slot.State = KsiHashTableSlotState.Occupied;
                                 self.Count++;
                                 return true;
-                            case KsiHashTableSlotState.Occupied when |THashTable|.Eq(key, slot.Key):
+                            case KsiHashTableSlotState.Occupied when |THashSet|.Eq(key, slot.Key):
                                 [key.Dealloc();
                                 ]return false;
                         }
@@ -78,7 +78,7 @@ namespace Ksi.Roslyn
                     throw new System.Exception("Unreachable state on adding an item");
                 }
             
-                public static bool Remove(ref this |THashTable| self, in |TKey| key)
+                public static bool Remove(ref this |THashSet| self, in |TKey| key)
                 {
                     if (self.Count <= 0 || !self.SearchKey(key, out var idx))
                         return false;
@@ -96,7 +96,7 @@ namespace Ksi.Roslyn
                     return true;
                 }
             
-                private static bool SearchKey(this in |THashTable| self, in |TKey| key, out int idx)
+                private static bool SearchKey(this in |THashSet| self, in |TKey| key, out int idx)
                 {
                     idx = 0;
                     var slotCount = self.Capacity();
@@ -112,7 +112,7 @@ namespace Ksi.Roslyn
                         {
                             case KsiHashTableSlotState.Empty:
                                 return false;
-                            case KsiHashTableSlotState.Occupied when |THashTable|.Eq(key, slot.Key):
+                            case KsiHashTableSlotState.Occupied when |THashSet|.Eq(key, slot.Key):
                                 return true;
                         }
                     }
@@ -120,7 +120,7 @@ namespace Ksi.Roslyn
                     return false;
                 }
             
-                private static void TrimDeletedSlotsChain([DynNoResize] ref this |THashTable| self, int startIdx)
+                private static void TrimDeletedSlotsChain([DynNoResize] ref this |THashSet| self, int startIdx)
                 {
                     startIdx -= 1;
             
