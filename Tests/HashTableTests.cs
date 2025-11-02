@@ -2,11 +2,6 @@ using NUnit.Framework;
 
 namespace Ksi.Tests
 {
-    internal struct Foo
-    {
-        public int Value;
-    }
-
     [KsiHashTableSlot]
     internal struct IntSetSlot
     {
