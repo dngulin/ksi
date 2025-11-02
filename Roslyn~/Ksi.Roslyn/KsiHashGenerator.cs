@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Ksi.Roslyn.Extensions;
+using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,7 +56,6 @@ public class KsiHashGenerator : IIncrementalGenerator
         );
 
         var collected = query.Collect();
-
         initCtx.RegisterSourceOutput(collected, (ctx, typeInfos) =>
         {
             var sb = new StringBuilder(16 * 1024);
@@ -62,20 +65,57 @@ public class KsiHashGenerator : IIncrementalGenerator
                 if (typeInfo == null)
                     continue;
 
-                if (typeInfo.TValue == null)
+                using (var file = AppendScope.Root(sb))
                 {
-                    // OutHashSet
-                }
-                else
-                {
-                    // OutHashMap
+                    AddUsings(file, typeInfo);
+                    using (var ns = file.OptNamespace(typeInfo.Type.ContainingNamespace.FullyQualifiedName()))
+                    {
+                        if (typeInfo.TValue == null)
+                        {
+                            WriteHashSet(ns, typeInfo);
+                        }
+                        else
+                        {
+                            // OutHashMap
+                        }
+                    }
                 }
 
-                sb.AppendLine("// FOO");
-                ctx.AddSource($"{typeInfo.Type.MetadataName}.KsiHashTable.g.cs", sb.ToString());
-
-                sb.Clear();
+                ctx.AddSource($"{typeInfo.Type.Name}.KsiHashTable.g.cs", sb.ToString());
             }
         });
+    }
+
+    private static void AddUsings(AppendScope file, HashTableInfo h)
+    {
+        var namespaces = new HashSet<string>()
+        {
+            "Ksi",
+            h.TSlot.ContainingNamespace.FullyQualifiedName(),
+            h.TKey.ContainingNamespace.FullyQualifiedName()
+        };
+
+        namespaces.Remove("");
+        namespaces.Remove(h.Type.ContainingNamespace.FullyQualifiedName());
+
+        if (namespaces.Count == 0)
+            return;
+
+        var usings = namespaces.ToArray();
+        Array.Sort(usings);
+
+        foreach (var u in usings)
+            file.AppendLine($"using {u};");
+
+        file.AppendLine("");
+    }
+
+    private static void WriteHashSet(AppendScope ns, HashTableInfo h)
+    {
+        var acc = SyntaxFacts.GetText(h.Type.InAssemblyAccessibility());
+        var dealloc = h.TSlot.IsDealloc() ? ".Deallocated()" : "";
+        var t = h.Type.Name;
+        var tKey = h.TKey.FullTypeName();
+        ns.AppendLine(string.Format(KsiHashTemplates.HashSetApi, acc, t, tKey, dealloc));
     }
 }
