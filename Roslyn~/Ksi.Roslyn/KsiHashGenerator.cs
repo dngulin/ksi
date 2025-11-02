@@ -15,17 +15,14 @@ public class KsiHashGenerator : IIncrementalGenerator
 {
     private class HashTableInfo(
         INamedTypeSymbol t,
-        TypeDeclarationSyntax tds,
-        INamedTypeSymbol tSlot,
-        INamedTypeSymbol tKey,
-        INamedTypeSymbol? tValue)
+        INamedTypeSymbol slotType,
+        INamedTypeSymbol keyType,
+        INamedTypeSymbol? valueType)
     {
         public readonly INamedTypeSymbol Type = t;
-        public readonly string PartialTypeName = tds.PartialTypeName();
-
-        public readonly INamedTypeSymbol TSlot = tSlot;
-        public readonly INamedTypeSymbol TKey = tKey;
-        public readonly INamedTypeSymbol? TValue = tValue;
+        public readonly INamedTypeSymbol SlotType = slotType;
+        public readonly INamedTypeSymbol KeyType = keyType;
+        public readonly INamedTypeSymbol? ValueType = valueType;
     }
 
     public void Initialize(IncrementalGeneratorInitializationContext initCtx)
@@ -51,7 +48,7 @@ public class KsiHashGenerator : IIncrementalGenerator
                 if (!KsiHashAnalyzer.IsValidSlot(tSlot, out var tKey, out var tValue) || tKey == null)
                     return null;
 
-                return new HashTableInfo(t, sds, tSlot, tKey, tValue);
+                return new HashTableInfo(t, tSlot, tKey, tValue);
             }
         );
 
@@ -70,7 +67,7 @@ public class KsiHashGenerator : IIncrementalGenerator
                     AddUsings(file, typeInfo);
                     using (var ns = file.OptNamespace(typeInfo.Type.ContainingNamespace.FullyQualifiedName()))
                     {
-                        if (typeInfo.TValue == null)
+                        if (typeInfo.ValueType == null)
                         {
                             WriteHashSet(ns, typeInfo);
                         }
@@ -91,8 +88,8 @@ public class KsiHashGenerator : IIncrementalGenerator
         var namespaces = new HashSet<string>()
         {
             "Ksi",
-            h.TSlot.ContainingNamespace.FullyQualifiedName(),
-            h.TKey.ContainingNamespace.FullyQualifiedName()
+            h.SlotType.ContainingNamespace.FullyQualifiedName(),
+            h.KeyType.ContainingNamespace.FullyQualifiedName()
         };
 
         namespaces.Remove("");
@@ -112,10 +109,18 @@ public class KsiHashGenerator : IIncrementalGenerator
 
     private static void WriteHashSet(AppendScope ns, HashTableInfo h)
     {
-        var acc = SyntaxFacts.GetText(h.Type.InAssemblyAccessibility());
-        var dealloc = h.TSlot.IsDealloc() ? ".Deallocated()" : "";
-        var t = h.Type.Name;
-        var tKey = h.TKey.FullTypeName();
-        ns.AppendLine(string.Format(KsiHashTemplates.HashSetApi, acc, t, tKey, dealloc));
+        var accessibility = SyntaxFacts.GetText(h.Type.InAssemblyAccessibility());
+        var keyIsExpCopy = h.KeyType.IsExplicitCopy();
+        var code = KsiHashTemplates.HashSetApi
+            .ToStringBuilder()
+            .Replace("|accessibility|", accessibility)
+            .Replace("|THashTable|", h.Type.Name)
+            .Replace("|TKey|", h.KeyType.FullTypeName())
+            .Unwrap("[in ]", !keyIsExpCopy)
+            .Unwrap("[.Move()]", keyIsExpCopy)
+            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDealloc())
+            .Unwrap("[.Deallocated()]", h.SlotType.IsDealloc())
+            .ToString();
+        ns.AppendLine(code);
     }
 }

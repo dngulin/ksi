@@ -116,8 +116,11 @@ public static class TypeSymbolExtensions
         return nt.IsReadOnlyAccessScope();
     }
 
-    public static bool IsMutableAccessScope(this INamedTypeSymbol self) => self.IsRefLikeGeneric("Ksi", "MutableAccessScope");
-    private static bool IsReadOnlyAccessScope(this INamedTypeSymbol self) => self.IsRefLikeGeneric("Ksi", "AccessScope");
+    public static bool IsMutableAccessScope(this INamedTypeSymbol self) =>
+        self.IsRefLikeGeneric("Ksi", "MutableAccessScope");
+
+    private static bool IsReadOnlyAccessScope(this INamedTypeSymbol self) =>
+        self.IsRefLikeGeneric("Ksi", "AccessScope");
 
     private static bool IsRefLikeGeneric(this INamedTypeSymbol self, string ns, string name)
     {
@@ -193,7 +196,9 @@ public static class TypeSymbolExtensions
     public static bool IsKsiArchetype(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiArchetype);
     public static bool IsKsiDomain(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiDomain);
     public static bool IsKsiHashTable(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiHashTable);
-    public static bool IsKsiHashTableSlot(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiHashTableSlot);
+
+    public static bool IsKsiHashTableSlot(this ITypeSymbol self) =>
+        self.IsStruct() && self.Is(SymbolNames.KsiHashTableSlot);
 
     public static bool IsKsiHandle(this ITypeSymbol self)
     {
@@ -232,24 +237,13 @@ public static class TypeSymbolExtensions
         };
     }
 
-    public static string FullTypeName(this INamedTypeSymbol self)
-    {
-        if (self.ContainingType == null)
-            return self.Name;
+    private static readonly SymbolDisplayFormat FullNameFormat = new SymbolDisplayFormat(
+        typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypes,
+        genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+        miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+    );
 
-        var segments = new List<string>(8);
-
-        while (true)
-        {
-            segments.Insert(0, self.Name);
-            if (self.ContainingType == null)
-                break;
-
-            self = self.ContainingType;
-        }
-
-        return string.Join(".", segments);
-    }
+    public static string FullTypeName(this INamedTypeSymbol self) => self.ToDisplayString(FullNameFormat);
 
     public static Accessibility InAssemblyAccessibility(this ITypeSymbol self)
     {
