@@ -29,7 +29,7 @@ namespace Ksi.Roslyn
                 
                 public static int Capacity(in this |THashSet| self) => self.HashTable.Count();
             
-                public static bool Contains(in this |THashSet| self, in |TKey| key)
+                public static bool Contains(in this |THashSet| self, [in ]|TKey| key)
                 {
                     return self.Count > 0 && self.SearchKey(key, out _);
                 }
@@ -47,12 +47,12 @@ namespace Ksi.Roslyn
                     self.Deallocated() = set.Move();
                 }
             
-                private static int GetStartIndex(this in |THashSet| self, in |TKey| key)
+                private static int GetStartIndex(this in |THashSet| self, [in ]|TKey| key)
                 {
                     return (int)((uint)|THashSet|.Hash(key) % (uint)self.Capacity());
                 }
             
-                public static bool Add(ref this |THashSet| self, [in ]|TKey| key)
+                public static bool Add(ref this |THashSet| self, [in `insertion]|TKey| key)
                 {
                     if (self.Count == self.Capacity())
                         self.Rebuild(self.Capacity() * 2);
@@ -78,7 +78,7 @@ namespace Ksi.Roslyn
                     throw new System.Exception("Unreachable state on adding an item");
                 }
             
-                public static bool Remove(ref this |THashSet| self, in |TKey| key)
+                public static bool Remove(ref this |THashSet| self, [in ]|TKey| key)
                 {
                     if (self.Count <= 0 || !self.SearchKey(key, out var idx))
                         return false;
@@ -96,7 +96,7 @@ namespace Ksi.Roslyn
                     return true;
                 }
             
-                private static bool SearchKey(this in |THashSet| self, in |TKey| key, out int idx)
+                private static bool SearchKey(this in |THashSet| self, [in ]|TKey| key, out int idx)
                 {
                     idx = 0;
                     var slotCount = self.Capacity();

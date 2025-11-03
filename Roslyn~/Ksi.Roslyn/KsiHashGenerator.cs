@@ -17,11 +17,13 @@ public class KsiHashGenerator : IIncrementalGenerator
         INamedTypeSymbol t,
         INamedTypeSymbol slotType,
         INamedTypeSymbol keyType,
+        bool passKeyByRef,
         INamedTypeSymbol? valueType)
     {
         public readonly INamedTypeSymbol Type = t;
         public readonly INamedTypeSymbol SlotType = slotType;
         public readonly INamedTypeSymbol KeyType = keyType;
+        public readonly bool PassKeyByRef = passKeyByRef;
         public readonly INamedTypeSymbol? ValueType = valueType;
     }
 
@@ -42,13 +44,13 @@ public class KsiHashGenerator : IIncrementalGenerator
                 if (t == null)
                     return null;
 
-                if (!KsiHashAnalyzer.IsValidTable(t, sds, out var tSlot) || tSlot == null)
+                if (!KsiHashAnalyzer.IsValidTable(t, sds, out var tSlot, out var passKeyByRef) || tSlot == null)
                     return null;
 
                 if (!KsiHashAnalyzer.IsValidSlot(tSlot, out var tKey, out var tValue) || tKey == null)
                     return null;
 
-                return new HashTableInfo(t, tSlot, tKey, tValue);
+                return new HashTableInfo(t, tSlot, tKey, passKeyByRef, tValue);
             }
         );
 
@@ -116,7 +118,8 @@ public class KsiHashGenerator : IIncrementalGenerator
             .Replace("|accessibility|", accessibility)
             .Replace("|THashSet|", h.Type.Name)
             .Replace("|TKey|", h.KeyType.FullTypeName())
-            .Unwrap("[in ]", !keyIsExpCopy)
+            .Unwrap("[in ]", h.PassKeyByRef)
+            .Unwrap("[in `insertion]", h.PassKeyByRef && !keyIsExpCopy)
             .Unwrap("[.Move()]", keyIsExpCopy)
             .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDealloc())
             .Unwrap("[.Deallocated()]", h.SlotType.IsDealloc())

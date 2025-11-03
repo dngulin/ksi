@@ -14,6 +14,13 @@ public static class StringExtensions
 
     public static StringBuilder Unwrap(this StringBuilder self, string pattern, bool condition)
     {
-        return self.Replace(pattern, condition ? pattern.Substring(1, pattern.Length - 2) : "");
+        return self.Replace(pattern, condition ? pattern.Unwrapped() : "");
+    }
+
+    private static string Unwrapped(this string self)
+    {
+        var idx = self.LastIndexOf('`');
+        var len = idx >= 0 ? idx : self.Length - 1;
+        return self.Substring(1, len - 1);
     }
 }

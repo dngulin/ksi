@@ -345,9 +345,10 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         };
     }
 
-    public static bool IsValidTable(INamedTypeSymbol t, StructDeclarationSyntax sds, out INamedTypeSymbol? tSlot)
+    public static bool IsValidTable(INamedTypeSymbol t, StructDeclarationSyntax sds, out INamedTypeSymbol? tSlot, out bool passkeyByRef)
     {
         tSlot = null;
+        passkeyByRef = false;
 
         if (!t.IsKsiHashTable() || !t.IsTopLevel() || !sds.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
             return false;
@@ -393,6 +394,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
             {
                 case SymbolNames.Hash when isVisible && IsHashMethod(m, tKey):
                     symbols |= CollectionSymbols.HashMethod;
+                    passkeyByRef = m.Parameters[0].RefKind != RefKind.None;
                     break;
 
                 case SymbolNames.Eq when isVisible && IsEqMethod(m, tKey):

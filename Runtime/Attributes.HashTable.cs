@@ -24,7 +24,12 @@ namespace Ksi
     /// </para>
     /// <para>
     /// You can receive <c>HashCode</c> and <c>AreEqual</c> parameters both by <c>in</c> and by value
-    /// (except <see cref="ExplicitCopyAttribute">ExplicitCopy</see> types, that should be passed only by <c>in</c>).
+    /// (except <see cref="ExplicitCopyAttribute">ExplicitCopy</see> keys, that should be passed only by <c>in</c>).
+    /// </para>
+    /// <para>
+    /// Parameter reference kind used in the <c>HashCode</c> method is inherited by generated API.
+    /// But for <see cref="ExplicitCopyAttribute">ExplicitCopy</see> keys in insertion methods
+    /// it is always a <c>by value</c> parameter to enforce moving the key into the collection.
     /// </para>
     /// <para>
     /// It is recommended to define hash tables in a separate assembly to make their internal state unavailable.
@@ -36,8 +41,8 @@ namespace Ksi
     /// <item><description><c>(in THashSet).Count()</c> — returns number of keys</description></item>
     /// <item><description><c>(in THashSet).Capacity()</c> — returns the hash table size</description></item>
     /// <item><description><c>(in THashSet).Contains(in TKey key)</c> — checks if the key exists in the hash table</description></item>
-    /// <item><description><c>(ref THashSet).Add(TKey key)</c> — adds a new key</description></item>
-    /// <item><description><c>(ref THashSet).Remove(in TKey key)</c> — removes a key and returns a success flag</description></item>
+    /// <item><description><c>(ref THashSet).Add([in ]TKey key)</c> — adds a new key</description></item>
+    /// <item><description><c>(ref THashSet).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
     /// </list>
     /// </para>
     /// <para>
@@ -46,12 +51,12 @@ namespace Ksi
     /// <item><description><c>(in THashMap).Count()</c> — returns number of keys</description></item>
     /// <item><description><c>(in THashMap).Capacity()</c> — returns the hash table size</description></item>
     /// <item><description><c>(in THashMap).Contains(in TKey key, out int index)</c> — checks if the key exists in the hash table</description></item>
-    /// <item><description><c>(in THashMap).RefReadonlyGet(in TKey key)</c> — returns a readonly <c>TValue</c> reference</description></item>
+    /// <item><description><c>(in THashMap).RefReadonlyGet([in ]TKey key)</c> — returns a readonly <c>TValue</c> reference</description></item>
     /// <item><description><c>(in THashMap).RefReadonlyGetByIndex(int index)</c> — returns a readonly <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).RefSet(TKey key)</c> — finds an entry or creates a new one and returns a mutable <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).RefGet(in TKey key)</c> — returns a mutable <c>TValue</c> reference</description></item>
+    /// <item><description><c>(ref THashMap).RefSet([in ]TKey key)</c> — finds an entry or creates a new one and returns a mutable <c>TValue</c> reference</description></item>
+    /// <item><description><c>(ref THashMap).RefGet([in ]TKey key)</c> — returns a mutable <c>TValue</c> reference</description></item>
     /// <item><description><c>(ref THashMap).RefGetByIndex(int index)</c> — returns a mutable <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).Remove(in TKey key)</c> — removes a key and returns a success flag</description></item>
+    /// <item><description><c>(ref THashMap).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
     /// </list>
     /// </para>
     /// </summary>

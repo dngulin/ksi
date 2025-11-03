@@ -21,7 +21,11 @@ Kind of the slot defines the collection kind (`HashSet` or `HashMap`)
 - `internal int AreEqual([in ]TKey l, [in ]TKey r)` — checks keys equality
 
 You can receive `HashCode` and `AreEqual` parameters both by `in` and by value
-(except [ExplicitCopy](T.ExplicitCopyAttribute.g.md) types, that should be passed only by `in`).
+(except [ExplicitCopy](T.ExplicitCopyAttribute.g.md) keys, that should be passed only by `in`).
+
+Parameter reference kind used in the `HashCode` method is inherited by generated API.
+But for [ExplicitCopy](T.ExplicitCopyAttribute.g.md) keys in insertion methods
+it is always a `by value` parameter to enforce moving the key into the collection.
 
 It is recommended to define hash tables in a separate assembly to make their internal state unavailable.
 Use only the generated API to modify the collection state.
@@ -30,19 +34,19 @@ Use only the generated API to modify the collection state.
 - `(in THashSet).Count()` — returns number of keys
 - `(in THashSet).Capacity()` — returns the hash table size
 - `(in THashSet).Contains(in TKey key)` — checks if the key exists in the hash table
-- `(ref THashSet).Add(TKey key)` — adds a new key
-- `(ref THashSet).Remove(in TKey key)` — removes a key and returns a success flag
+- `(ref THashSet).Add([in ]TKey key)` — adds a new key
+- `(ref THashSet).Remove([in ]TKey key)` — removes a key and returns a success flag
 
 `HashMap` API:
 - `(in THashMap).Count()` — returns number of keys
 - `(in THashMap).Capacity()` — returns the hash table size
 - `(in THashMap).Contains(in TKey key, out int index)` — checks if the key exists in the hash table
-- `(in THashMap).RefReadonlyGet(in TKey key)` — returns a readonly `TValue` reference
+- `(in THashMap).RefReadonlyGet([in ]TKey key)` — returns a readonly `TValue` reference
 - `(in THashMap).RefReadonlyGetByIndex(int index)` — returns a readonly `TValue` reference
-- `(ref THashMap).RefSet(TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
-- `(ref THashMap).RefGet(in TKey key)` — returns a mutable `TValue` reference
+- `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
+- `(ref THashMap).RefGet([in ]TKey key)` — returns a mutable `TValue` reference
 - `(ref THashMap).RefGetByIndex(int index)` — returns a mutable `TValue` reference
-- `(ref THashMap).Remove(in TKey key)` — removes a key and returns a success flag
+- `(ref THashMap).Remove([in ]TKey key)` — removes a key and returns a success flag
 
 ```csharp
 public class KsiHashTableAttribute : Attribute
