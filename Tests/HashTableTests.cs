@@ -16,8 +16,8 @@ namespace Ksi.Tests
         public RefList<IntSetSlot> HashTable;
         public int Count;
 
-        public static int Hash(in int key) => key;
-        public static bool Eq(in int l, in int r) => l == r;
+        public static int Hash(int key) => key;
+        public static bool Eq(int l, int r) => l == r;
     }
 
     [TestFixture]

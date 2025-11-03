@@ -229,6 +229,7 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
             .OfType<IFieldSymbol>()
             .FirstOrDefault(f => !f.IsStatic && f.Type.IsStruct() && f.Name == "Key")?
             .Type as INamedTypeSymbol;
+        var expCopyKey = tKey?.IsExplicitCopy() ?? false;
 
         foreach (var m in t.GetMembers().OfType<IMethodSymbol>())
         {
@@ -243,13 +244,23 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
                 case SymbolNames.Hash:
                     symbols |= CollectionSymbols.HashMethod;
                     if (!IsHashMethod(m, tKey))
-                        ctx.Report(ml, invSym, hashMethod, $"the `static uint {SymbolNames.Hash}(in TKey key)`");
+                    {
+                        var what = expCopyKey
+                            ? $"the `static int {SymbolNames.Hash}(in TKey key)`"
+                            : $"the `static int {SymbolNames.Hash}([in ]TKey key)`";
+                        ctx.Report(ml, invSym, hashMethod, what);
+                    }
                     break;
 
                 case SymbolNames.Eq:
                     symbols |= CollectionSymbols.EqMethod;
                     if (!IsEqMethod(m, tKey))
-                        ctx.Report(ml, invSym, eqMethod, $"the `static bool {SymbolNames.Eq}(in TKey a, in TKey b)`");
+                    {
+                        var what = expCopyKey
+                            ? $"the `static bool {SymbolNames.Eq}(in TKey a, in TKey b)`"
+                            : $"the `static bool {SymbolNames.Eq}([in ]TKey a, [in ]TKey b)`";
+                        ctx.Report(ml, invSym, eqMethod, what);
+                    }
                     break;
             }
         }
@@ -287,11 +298,12 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         if (!match)
             return false;
 
-        if (m.Parameters[0] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t })
+        var p = m.Parameters[0];
+        if (!IsValidKeyParam(p))
             return false;
 
         var eqc = SymbolEqualityComparer.Default;
-        return eqc.Equals(t, tKey);
+        return eqc.Equals(p.Type as INamedTypeSymbol, tKey);
     }
 
     private static bool IsEqMethod(IMethodSymbol m, INamedTypeSymbol? tKey)
@@ -311,14 +323,26 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
         if (!match)
             return false;
 
-        if (m.Parameters[0] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t0 })
-            return false;
-
-        if (m.Parameters[1] is not { RefKind: RefKind.In, Type: INamedTypeSymbol { TypeKind: TypeKind.Struct } t1 })
+        var (p0, p1) = (m.Parameters[0], m.Parameters[1]);
+        if (!IsValidKeyParam(p0) || !IsValidKeyParam(p1))
             return false;
 
         var eqc = SymbolEqualityComparer.Default;
-        return eqc.Equals(t0, tKey) && eqc.Equals(t1, tKey);
+        return eqc.Equals(p0.Type as INamedTypeSymbol, tKey) && eqc.Equals(p1.Type as INamedTypeSymbol, tKey);
+    }
+
+    private static bool IsValidKeyParam(IParameterSymbol p)
+    {
+        var t = p.Type;
+        if (t.Kind != SymbolKind.NamedType || !t.IsValueType())
+            return false;
+
+        return p.RefKind switch
+        {
+            RefKind.None when !t.IsExplicitCopy() => true,
+            RefKind.In => true,
+            _ => false
+        };
     }
 
     public static bool IsValidTable(INamedTypeSymbol t, StructDeclarationSyntax sds, out INamedTypeSymbol? tSlot)

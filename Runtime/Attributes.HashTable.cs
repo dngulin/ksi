@@ -18,9 +18,13 @@ namespace Ksi
     /// Kind of the slot defines the collection kind (<c>HashSet</c> or <c>HashMap</c>)
     /// </description></item>
     /// <item><description><c>internal int Count</c> — count of occupied slots in the hash table</description></item>
-    /// <item><description><c>internal int HashCode(in TKey)</c> — computes hash code for the key defined in the <c>TSlot</c></description></item>
-    /// <item><description><c>internal int AreEqual(in TKey l, in TKey r)</c> — checks keys equality</description></item>
+    /// <item><description><c>internal int HashCode([in ]TKey key)</c> — computes hash code for the key defined in the <c>TSlot</c></description></item>
+    /// <item><description><c>internal int AreEqual([in ]TKey l, [in ]TKey r)</c> — checks keys equality</description></item>
     /// </list>
+    /// </para>
+    /// <para>
+    /// You can receive <c>HashCode</c> and <c>AreEqual</c> parameters both by <c>in</c> and by value
+    /// (except <see cref="ExplicitCopyAttribute">ExplicitCopy</see> types, that should be passed only by <c>in</c>).
     /// </para>
     /// <para>
     /// It is recommended to define hash tables in a separate assembly to make their internal state unavailable.

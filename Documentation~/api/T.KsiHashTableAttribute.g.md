@@ -17,8 +17,11 @@ Marked type should be a structure that defines:
 where `TSlot` should be marked with [KsiHashTableSlotAttribute](T.KsiHashTableSlotAttribute.g.md).
 Kind of the slot defines the collection kind (`HashSet` or `HashMap`)
 - `internal int Count` — count of occupied slots in the hash table
-- `internal int HashCode(in TKey)` — computes hash code for the key defined in the `TSlot`
-- `internal int AreEqual(in TKey l, in TKey r)` — checks keys equality
+- `internal int HashCode([in ]TKey key)` — computes hash code for the key defined in the `TSlot`
+- `internal int AreEqual([in ]TKey l, [in ]TKey r)` — checks keys equality
+
+You can receive `HashCode` and `AreEqual` parameters both by `in` and by value
+(except [ExplicitCopy](T.ExplicitCopyAttribute.g.md) types, that should be passed only by `in`).
 
 It is recommended to define hash tables in a separate assembly to make their internal state unavailable.
 Use only the generated API to modify the collection state.
