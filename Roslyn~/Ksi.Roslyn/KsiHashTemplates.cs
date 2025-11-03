@@ -44,7 +44,7 @@ namespace Ksi.Roslyn
                             set.Add(slot.Key.Move());
                     }
             
-                    self.Deallocated() = set.Move();
+                    self[.Deallocated()`self] = set.Move();
                 }
             
                 private static int GetStartIndex(this in |THashSet| self, [in ]|TKey| key)
@@ -84,7 +84,7 @@ namespace Ksi.Roslyn
                         return false;
             
                     ref var slot = ref self.HashTable.RefAt(idx);
-                    slot[.Deallocated()] = default;
+                    slot[.Deallocated()`slot] = default;
                     self.Count--;
             
                     var nextIdx = (idx + 1) % self.Capacity();
