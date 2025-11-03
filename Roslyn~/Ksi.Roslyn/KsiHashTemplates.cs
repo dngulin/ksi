@@ -90,6 +90,13 @@ namespace Ksi.Roslyn
                 
                     self[.Deallocated()`self] = set.Move();
                 }
+                
+                public static void Clear(ref this |THashSet| self)
+                {
+                    self.HashTable.Clear();
+                    self.HashTable.AppendDefault(self.HashTable.Capacity());
+                    self.Count = 0;
+                }
             
                 private static bool SearchKey(this in |THashSet| self, [in ]|TKey| key, out int idx)
                 {
@@ -285,6 +292,13 @@ namespace Ksi.Roslyn
                     }
                 
                     self[.Deallocated()`self] = map.Move();
+                }
+                
+                public static void Clear(ref this |THashMap| self)
+                {
+                    self.HashTable.Clear();
+                    self.HashTable.AppendDefault(self.HashTable.Capacity());
+                    self.Count = 0;
                 }
                 
                 private static int GetStartIndex(this in |THashMap| self, [in ]|TKey| key)

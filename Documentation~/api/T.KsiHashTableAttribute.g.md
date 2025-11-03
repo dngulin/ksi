@@ -37,6 +37,7 @@ Use only the generated API to modify the collection state.
 - `(ref THashSet).Add([in ]TKey key)` — adds a new key
 - `(ref THashSet).Remove([in ]TKey key)` — removes a key and returns a success flag
 - `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
+- `(ref THashSet).Clear()` — clears the hash set
 
 `HashMap` API:
 - `(in THashMap).Count()` — returns number of keys
@@ -49,6 +50,7 @@ Use only the generated API to modify the collection state.
 - `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
 - `(ref THashMap).Remove([in ]TKey key)` — removes a key and returns a success flag
 - `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
+- `(ref THashSet).Clear()` — clears the hash map
 
 ```csharp
 public class KsiHashTableAttribute : Attribute
