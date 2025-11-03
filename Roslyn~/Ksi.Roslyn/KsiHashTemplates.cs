@@ -41,7 +41,7 @@ namespace Ksi.Roslyn
                     foreach (ref var slot in self.HashTable.RefIter())
                     {
                         if (slot.State == KsiHashTableSlotState.Occupied)
-                            set.Add(slot.Key.Move());
+                            set.Add(slot.Key[.Move()]);
                     }
             
                     self[.Deallocated()`self] = set.Move();
