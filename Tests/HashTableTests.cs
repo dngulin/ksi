@@ -55,8 +55,9 @@ namespace Ksi.Tests
 
             set.Remove(1);
             Assert.That(!set.Contains(1));
-
             Assert.That(set.Count(), Is.EqualTo(1));
+
+            set.Dealloc();
         }
 
         [Test]
@@ -74,6 +75,8 @@ namespace Ksi.Tests
             map.Remove(1);
             Assert.That(!map.Contains(1, out _));
             Assert.That(map.Count(), Is.EqualTo(1));
+
+            map.Dealloc();
         }
     }
 }
