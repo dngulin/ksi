@@ -42,7 +42,7 @@ Use only the generated API to modify the collection state.
 `HashMap` API:
 - `(in THashMap).Count()` — returns number of keys
 - `(in THashMap).Capacity()` — returns the hash table size
-- `(in THashMap).Contains(in TKey key, out int index)` — checks if the key exists in the hash table
+- `(in THashMap).Contains([in ]TKey key, out int index)` — checks if the key exists in the hash table
 - `(in THashMap).RefReadonlyGet([in ]TKey key)` — returns a readonly `TValue` reference
 - `(in THashMap).RefReadonlyGetByIndex(int index)` — returns a readonly `TValue` reference
 - `(ref THashMap).RefGet([in ]TKey key)` — returns a mutable `TValue` reference

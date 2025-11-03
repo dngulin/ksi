@@ -52,7 +52,7 @@ namespace Ksi
     /// <list type="bullet">
     /// <item><description><c>(in THashMap).Count()</c> — returns number of keys</description></item>
     /// <item><description><c>(in THashMap).Capacity()</c> — returns the hash table size</description></item>
-    /// <item><description><c>(in THashMap).Contains(in TKey key, out int index)</c> — checks if the key exists in the hash table</description></item>
+    /// <item><description><c>(in THashMap).Contains([in ]TKey key, out int index)</c> — checks if the key exists in the hash table</description></item>
     /// <item><description><c>(in THashMap).RefReadonlyGet([in ]TKey key)</c> — returns a readonly <c>TValue</c> reference</description></item>
     /// <item><description><c>(in THashMap).RefReadonlyGetByIndex(int index)</c> — returns a readonly <c>TValue</c> reference</description></item>
     /// <item><description><c>(ref THashMap).RefGet([in ]TKey key)</c> — returns a mutable <c>TValue</c> reference</description></item>
