@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi", "Ksi\Ksi.csproj", "{0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Roslyn.DocGen", "Ksi.Roslyn.DocGen\Ksi.Roslyn.DocGen.csproj", "{94AB9BB0-F690-49B3-8B82-3DC5D4700EC6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ksi.Tests", "Ksi.Tests\Ksi.Tests.csproj", "{9B33EAEA-6F91-4C0B-AC62-8D079DFBAA3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{94AB9BB0-F690-49B3-8B82-3DC5D4700EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94AB9BB0-F690-49B3-8B82-3DC5D4700EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94AB9BB0-F690-49B3-8B82-3DC5D4700EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B33EAEA-6F91-4C0B-AC62-8D079DFBAA3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B33EAEA-6F91-4C0B-AC62-8D079DFBAA3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B33EAEA-6F91-4C0B-AC62-8D079DFBAA3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B33EAEA-6F91-4C0B-AC62-8D079DFBAA3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -7,7 +7,7 @@ namespace Ksi
     internal static class UnsafeArrayExtensions
     {
         public static unsafe void Clear<T>(this ref UnsafeArray<T> self, int len)
-            where T : unmanaged => MemSet(self.Buffer, 0, sizeof(T) * len);
+            where T : unmanaged => MemClear(self.Buffer, sizeof(T) * len);
 
         public static unsafe void CopyFrom<T>(this ref UnsafeArray<T> self, in UnsafeArray<T> other, int len)
             where T : unmanaged => MemCpy(self.Buffer, other.Buffer, sizeof(T) * len);
@@ -33,7 +33,7 @@ namespace Ksi
                 MemCpy(buffer, self.Buffer, sizeof(T) * copyLen);
 
                 var reminder = len - copyLen;
-                MemSet(&buffer[copyLen], 0, sizeof(T) * reminder);
+                MemClear(&buffer[copyLen], sizeof(T) * reminder);
             }
 
             if (self.Buffer != null)

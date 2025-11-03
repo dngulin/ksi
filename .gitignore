@@ -7,4 +7,6 @@
 /Roslyn~/Ksi.Roslyn.DocGen/obj/
 /Roslyn~/Ksi.Roslyn.Tests/bin/
 /Roslyn~/Ksi.Roslyn.Tests/obj/
+/Roslyn~/Ksi.Tests/bin/
+/Roslyn~/Ksi.Tests/obj/
 *.DotSettings.user
