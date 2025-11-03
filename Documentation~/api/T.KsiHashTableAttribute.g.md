@@ -36,6 +36,7 @@ Use only the generated API to modify the collection state.
 - `(in THashSet).Contains(in TKey key)` — checks if the key exists in the hash table
 - `(ref THashSet).Add([in ]TKey key)` — adds a new key
 - `(ref THashSet).Remove([in ]TKey key)` — removes a key and returns a success flag
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
 
 `HashMap` API:
 - `(in THashMap).Count()` — returns number of keys
@@ -43,10 +44,11 @@ Use only the generated API to modify the collection state.
 - `(in THashMap).Contains(in TKey key, out int index)` — checks if the key exists in the hash table
 - `(in THashMap).RefReadonlyGet([in ]TKey key)` — returns a readonly `TValue` reference
 - `(in THashMap).RefReadonlyGetByIndex(int index)` — returns a readonly `TValue` reference
-- `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
 - `(ref THashMap).RefGet([in ]TKey key)` — returns a mutable `TValue` reference
 - `(ref THashMap).RefGetByIndex(int index)` — returns a mutable `TValue` reference
+- `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
 - `(ref THashMap).Remove([in ]TKey key)` — removes a key and returns a success flag
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
 
 ```csharp
 public class KsiHashTableAttribute : Attribute

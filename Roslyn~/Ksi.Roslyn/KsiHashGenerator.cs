@@ -75,7 +75,7 @@ public class KsiHashGenerator : IIncrementalGenerator
                         }
                         else
                         {
-                            // OutHashMap
+                            WriteHashMap(ns, typeInfo);
                         }
                     }
                 }
@@ -126,5 +126,44 @@ public class KsiHashGenerator : IIncrementalGenerator
             .Unwrap("[.Deallocated()`slot]", h.SlotType.IsDealloc())
             .ToString();
         ns.AppendLine(code);
+    }
+
+    private static void WriteHashMap(AppendScope ns, HashTableInfo h)
+    {
+        var accessibility = SyntaxFacts.GetText(h.Type.InAssemblyAccessibility());
+        var keyIsExpCopy = h.KeyType.IsExplicitCopy();
+        var code = KsiHashTemplates.HashMapApi
+            .ToStringBuilder()
+            .Replace("|accessibility|", accessibility)
+            .Replace("|THashMap|", h.Type.Name)
+            .Replace("|TKey|", h.KeyType.FullTypeName())
+            .Replace("|TValue|", h.ValueType!.FullTypeName())
+            .Replace("|RefPathSuffix|", GetRefPathSuffix(h))
+            .Unwrap("[in ]", h.PassKeyByRef)
+            .Unwrap("[in `insertion]", h.PassKeyByRef && !keyIsExpCopy)
+            .Unwrap("[.Move()`key]", keyIsExpCopy)
+            .Unwrap("[.Move()`value]", h.ValueType!.IsExplicitCopy())
+            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDealloc())
+            .Unwrap("[.Deallocated()`self]", h.Type.IsDealloc())
+            .Unwrap("[.Deallocated()`slot]", h.SlotType.IsDealloc())
+            .ToString();
+        ns.AppendLine(code);
+    }
+
+    private static string GetRefPathSuffix(HashTableInfo h)
+    {
+        if (h.ValueType!.IsDynSized())
+            return """
+                   "[n]", "Value", "!"
+                   """;
+
+        if (h.SlotType.IsDynSized())
+            return """
+                   "[n]", "!", "Value"
+                   """;
+
+        return """
+               "!", "[n]", "Value"
+               """;
     }
 }
