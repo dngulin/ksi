@@ -33,7 +33,7 @@ Use only the generated API to modify the collection state.
 `HashSet` API:
 - `(in THashSet).Count()` — returns number of keys
 - `(in THashSet).Capacity()` — returns the hash table size
-- `(in THashSet).Contains(in TKey key)` — checks if the key exists in the hash table
+- `(in THashSet).Contains([in ]TKey key)` — checks if the key exists in the hash table
 - `(ref THashSet).Add([in ]TKey key)` — adds a new key
 - `(ref THashSet).Remove([in ]TKey key)` — removes a key and returns a success flag
 - `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size

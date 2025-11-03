@@ -40,7 +40,7 @@ namespace Ksi
     /// <list type="bullet">
     /// <item><description><c>(in THashSet).Count()</c> — returns number of keys</description></item>
     /// <item><description><c>(in THashSet).Capacity()</c> — returns the hash table size</description></item>
-    /// <item><description><c>(in THashSet).Contains(in TKey key)</c> — checks if the key exists in the hash table</description></item>
+    /// <item><description><c>(in THashSet).Contains([in ]TKey key)</c> — checks if the key exists in the hash table</description></item>
     /// <item><description><c>(ref THashSet).Add([in ]TKey key)</c> — adds a new key</description></item>
     /// <item><description><c>(ref THashSet).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
     /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash set with a given hash table size</description></item>
