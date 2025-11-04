@@ -60,6 +60,126 @@ See the full list of extension methods in the API reference:
 - [TempRefList\<T\>](api/T.TempRefList-1.g.md)
 - [ManagedRefList\<T\>](api/T.ManagedRefList-1.g.md)
 
+## HashSet and HashMap
+
+ѯ-Framework also provides a method to wrap a `TRefList<T>` into a struct that provides a `HashSet` or `HashMap` API.
+It requires defining a data layout and using the [KsiHashTable](api/T.KsiHashTableAttribute.g.md)
+and [KsiHashTableSlot](api/T.KsiHashTableSlotAttribute.g.md) attributes.
+
+In short, you need to define the data structure and the ѯ-Framework will generate extension methods based API.
+
+First, you need to declare your hash table slot type.
+It should be a [KsiHashTableSlot](api/T.KsiHashTableSlotAttribute.g.md) structure with the following fields:
+- `State` — a [KsiHashTableSlotState](api/T.KsiHashTableSlotState.g.md) field that is used internally by the collection code
+- `Key` — a value type field that represents a key stored in the collection
+- `Value` (optional) — a value type field that represents a value stored in the collection. This field is required for `HashMap` collections.
+
+Mark your slot type with the `[KsiHashTableSlot]` and analyzers will hint you what is missing.
+Example:
+```csharp
+[KsiHashTableSlot]
+internal struct IntSetSlot
+{
+    internal KsiHashTableSlotState State;
+    internal int Key;
+}
+
+[KsiHashTableSlot]
+internal struct IntToIntMapSlot
+{
+    internal KsiHashTableSlotState State;
+    internal int Key;
+    internal int Value;
+}
+```
+
+After that you need to declare the collection itself.
+It should be a top-level partial [KsiHashTable](api/T.KsiHashTableAttribute.g.md) structure with the following fields:
+- `HashTable` — a `TRefList<TSlot>` field that represents the hash table itself
+- `Count` — an `int` field that stores count of items in the collection
+
+You also need to declare key hashing and equality comparison methods:
+- `static int Hash(TKey key)` — a method to get a kay hash code
+- `static bool Eq(TKey l, TKey r)` — a method to compare two keys for equality
+
+For both methods `TKey` can be also passed by readonly reference.
+
+Similarly to the slot, you need to mark the collection with the `[KsiHashTable]`
+and follow the analyzer hints. Example:
+```csharp
+[KsiHashTableSlot]
+[ExplicitCopy, Dealloc, DynSized]
+public struct IntSet
+{
+    internal RefList<IntSetSlot> HashTable;
+    internal int Count;
+    
+    internal static int Hash(int key) => key;
+    internal static bool Eq(int l, int r) => l == r;
+}
+
+[KsiHashTableSlot]
+[ExplicitCopy, Dealloc, DynSized]
+public struct IntToIntMap
+{
+    internal RefList<IntToIntMapSlot> HashTable;
+    internal int Count;
+    
+    internal static int Hash(int key) => key;
+    internal static bool Eq(int l, int r) => l == r;
+}
+```
+
+If everything is properly declared, you will get the following API:
+
+`HashSet` API:
+- `THashSet.Empty { get; }` — returns an empty hash set instance
+- `HashSet.WithMinCapacity(int capacity)` — returns a new hash set instance with a capacity equal or greater of the given one
+- `(in THashSet).Count()` — returns the number of keys stored in the hash set
+- `(in THashSet).Capacity()` — returns the hash set capacity
+- `(in THashSet).Contains([in ]TKey key)` — determines if the hash set contains a given key
+- `(ref THashSet).Add([in ]TKey key)` — adds a new key to the hash set
+- `(ref THashSet).Remove([in ]TKey key)` — removes a key from the hash set
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given minimal capacity
+- `(ref THashSet).Clear()` — clears the hash set
+
+`HashMap` API:
+- `THashMap.Empty { get; }` — returns an empty hash map instance
+- `THashMap.WithMinCapacity(int capacity)` — returns a new hash map instance with a capacity equal or greater of the given one
+- `(in THashMap).Count()` — returns the number of keys stored in the hash map
+- `(in THashMap).Capacity()` — returns the hash map capacity
+- `(in THashMap).Contains([in ]TKey key, out int index)` — determines if the hash map contains a given key
+- `(in THashMap).RefReadonlyGet([in ]TKey key)` — gets a readonly value reference stored in the hash map
+- `(in THashMap).RefReadonlyGetByIndex(int index)` — gets a readonly value reference stored in the hash map
+- `(ref THashMap).RefGet([in ]TKey key)` — gets a mutable value reference stored in the hash map
+- `(ref THashMap).RefGetByIndex(int index)` — gets a mutable value reference stored in the hash map
+- `(ref THashMap).RefSet([in ]TKey key)` — optionally inserts a new key and returns a mutable reference to the associated value
+- `(ref THashMap).Remove([in ]TKey key)` — removes a key from the hash map
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash map with a given minimal capacity
+- `(ref THashSet).Clear()` — clears the hash map
+
+See usage examples in the [HashSet](../Tests/KsiHashSetTests.cs) and [HashMap](../Tests/KsiHashMapTests.cs) unit tests.
+
+### Encapsulation
+
+It is generally unsafe to modify the internal state of the collection without using the provided API.
+To make it impossible, you can declare the collection in a separate assembly
+and declare its fields with the `internal` access modifier.
+
+> [!NOTE]
+> The same technique is used for `TRefList<T>` types.
+
+### Iterators
+
+ѯ-Framework doesn't provide any iterators for hash tables,
+but you can declare your own extension methods to get keys at a given index.
+
+In your extension methods don't modify and don't provide mutable access to these fields:
+- `THashMapOrSet.HashTable`
+- `THashMapOrSet.Count`
+- `TSlot.State`
+- `TSlot.Key`
+
 ## Diagnostics
 
 Diagnostics related to usage of the collections:
