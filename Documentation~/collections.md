@@ -60,6 +60,9 @@ See the full list of extension methods in the API reference:
 - [TempRefList\<T\>](api/T.TempRefList-1.g.md)
 - [ManagedRefList\<T\>](api/T.ManagedRefList-1.g.md)
 
+See usage examples in the [RefList\<T\>](../Tests/RefListTests.cs)
+and [ManagedRefList\<T\>](../Tests/ManagedRefListTests.cs) unit tests.
+
 ## HashSet and HashMap
 
 ѯ-Framework also provides a method to wrap a `TRefList<T>` into a struct that provides a `HashSet` or `HashMap` API.
