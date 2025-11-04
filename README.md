@@ -16,14 +16,14 @@ and extensively uses Roslyn analyzers and code generators.
 Key features:
 
 - Fully Burst-compatible
-- Dynamic collections with by-reference data access
+- [Dynamic collections](Documentation~/collections.md#collections) with by-reference data access
   ```csharp
   var list = RefList.Empty<int>();
   ref var x = ref list.RefAdd();
   x = 3;
   list.RefAt(0) = 0; // Same as the `x = 0`
   ```
-- Data access control based on the data mutability
+- [Data access control](Documentation~/collections.md#data-access-control) based on the data mutability
   ```csharp
   // This API call is possible if you have ANY REFERENCE to the data
   public static ref readonly T RefReadonlyAt<T>(this in RefList<T> self, int index);
@@ -31,7 +31,7 @@ Key features:
   // This API call is possible only if you have a MUTABLE REFERENCE to the data
   public static ref T RefAt<T>(this ref RefList<T> self, int index);
   ```
-- Deallocation management
+- Deallocation [management](Documentation~/traits.md#dealloc-attribute)
   ```csharp
   [ExplicitCopy, DynSized, Dealloc]
   public struct Node { public RefList<Node> Children; }
@@ -40,7 +40,7 @@ Key features:
   BuildTree(ref root);
   root.Dealloc(); // This extension method deallocate the full tree
   ```
-- Compile time memory safety checks
+- Compile time [memory safety checks](Documentation~/borrow-checker-at-home.md)
   ```csharp
   var list = RefList.Empty<int>();
   ref var x = ref list.RefAdd();
@@ -60,7 +60,7 @@ Key features:
   // `list[n]!` as arguments invalidates memory safety rules within the calling method.
   // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
   ```
-- ECS-like data composition and queries
+- ECS-like [data composition and queries](Documentation~/ecs.md)
   ```csharp
   // ѯ-Framework generates `public static void Tick(ref Domain domain, ref SomeData d)`
   // that iterates over entities in the domain and passes them to the method below
@@ -75,7 +75,7 @@ Key features:
       // Modify components here
   }
   ```
-- HashSet and HashMap collections
+- HashSet and HashMap [collections](Documentation~/collections.md#hashset-and-hashmap)
   ```csharp
   [KsiHashTable]
   public partial struct MyHashMap { ... }
