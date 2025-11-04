@@ -75,9 +75,17 @@ Key features:
       // Modify components here
   }
   ```
+- HashSet and HashMap collections
+  ```csharp
+  [KsiHashTable]
+  public partial struct MyHashMap { ... }
+  
+  var map = MyHashMap.Empty;
+  map.RefSet(key) = value;
+  ref var valRef = ref map.RefGet(key);
+  ```
 
 TODO:
-- `HashSet` / `HashMap` types
 - Binary serialization
 
 ## Documentation
