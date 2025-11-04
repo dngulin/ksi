@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -274,5 +275,30 @@ public static class TypeSymbolExtensions
     {
         var types = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         return self.All(t => types.Add(t));
+    }
+
+    public static bool IsGloballyVisible(this ITypeSymbol self)
+    {
+        return self.SpecialType switch
+        {
+            SpecialType.System_Object => true,
+            SpecialType.System_Enum => true,
+            SpecialType.System_Void => true,
+            SpecialType.System_Boolean => true,
+            SpecialType.System_Char => true,
+            SpecialType.System_SByte => true,
+            SpecialType.System_Byte => true,
+            SpecialType.System_Int16 => true,
+            SpecialType.System_UInt16 => true,
+            SpecialType.System_Int32 => true,
+            SpecialType.System_UInt32 => true,
+            SpecialType.System_Int64 => true,
+            SpecialType.System_UInt64 => true,
+            SpecialType.System_Decimal => true,
+            SpecialType.System_Single => true,
+            SpecialType.System_Double => true,
+            SpecialType.System_String => true,
+            _ => false
+        };
     }
 }

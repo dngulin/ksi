@@ -87,12 +87,13 @@ public class KsiHashGenerator : IIncrementalGenerator
 
     private static void AddUsings(AppendScope file, HashTableInfo h)
     {
-        var namespaces = new HashSet<string>()
-        {
-            "Ksi",
-            h.SlotType.ContainingNamespace.FullyQualifiedName(),
-            h.KeyType.ContainingNamespace.FullyQualifiedName()
-        };
+        var namespaces = new HashSet<string> { "Ksi" };
+
+        if (!h.SlotType.IsGloballyVisible())
+            namespaces.Add(h.SlotType.ContainingNamespace.FullyQualifiedName());
+
+        if (!h.KeyType.IsGloballyVisible())
+            namespaces.Add(h.KeyType.ContainingNamespace.FullyQualifiedName());
 
         namespaces.Remove("");
         namespaces.Remove(h.Type.ContainingNamespace.FullyQualifiedName());

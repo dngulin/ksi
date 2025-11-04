@@ -45,7 +45,6 @@ public class KsiHashGeneratorTests
                 .AppendLine(
                     """
                     using Ksi;
-                    using System;
 
                     """)
                 .AppendLine(KsiHashTemplates.HashSetApi)
@@ -100,7 +99,6 @@ public class KsiHashGeneratorTests
                 .AppendLine(
                     """
                     using Ksi;
-                    using System;
 
                     """)
                 .AppendLine(KsiHashTemplates.HashMapApi)
