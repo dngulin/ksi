@@ -100,7 +100,7 @@ See also [package unit tests](Tests) and [roslyn unit tests](Roslyn~/Ksi.Roslyn.
 
 ## Installation
 
-- Ensure that the .NET API compatibility level provides `Netstandard 2.1` APIs (Unity 2021.2+)
+- Ensure that the .NET API compatibility level provides `Netstandard 2.1` API (Unity 2021.2+)
 - Add the package to your `manifest.json`:
     ```json
     {
