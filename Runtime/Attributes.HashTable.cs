@@ -52,19 +52,19 @@ namespace Ksi
     /// <para>
     /// <c>HashMap</c> API:
     /// <list type="bullet">
-    /// <item><description><c>THashMap.Empty { get; }</c> — returns an empty map instance</description></item>
-    /// <item><description><c>THashMap.WithMinCapacity(int capacity)</c> — returns a new map instance with a capacity equal or greater of the given one</description></item>
-    /// <item><description><c>(in THashMap).Count()</c> — returns number of keys</description></item>
-    /// <item><description><c>(in THashMap).Capacity()</c> — returns the hash table size</description></item>
-    /// <item><description><c>(in THashMap).Contains([in ]TKey key, out int index)</c> — checks if the key exists in the hash table</description></item>
-    /// <item><description><c>(in THashMap).RefReadonlyGet([in ]TKey key)</c> — returns a readonly <c>TValue</c> reference</description></item>
-    /// <item><description><c>(in THashMap).RefReadonlyGetByIndex(int index)</c> — returns a readonly <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).RefGet([in ]TKey key)</c> — returns a mutable <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).RefGetByIndex(int index)</c> — returns a mutable <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).RefSet([in ]TKey key)</c> — finds an entry or creates a new one and returns a mutable <c>TValue</c> reference</description></item>
-    /// <item><description><c>(ref THashMap).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
-    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash table with a given size</description></item>
-    /// <item><description><c>(ref THashSet).Clear()</c> — clears the hash table</description></item>
+    /// <item><description><c>THashMap.Empty { get; }</c> — returns an empty hash map instance</description></item>
+    /// <item><description><c>THashMap.WithMinCapacity(int capacity)</c> — returns a new hash map instance with a capacity equal or greater of the given one</description></item>
+    /// <item><description><c>(in THashMap).Count()</c> — returns the number of keys stored in the hash map</description></item>
+    /// <item><description><c>(in THashMap).Capacity()</c> — returns the hash map capacity</description></item>
+    /// <item><description><c>(in THashMap).Contains([in ]TKey key, out int index)</c> — determines if the hash map contains a given key</description></item>
+    /// <item><description><c>(in THashMap).RefReadonlyGet([in ]TKey key)</c> — gets a readonly value reference stored in the hash map</description></item>
+    /// <item><description><c>(in THashMap).RefReadonlyGetByIndex(int index)</c> — gets a readonly value reference stored in the hash map</description></item>
+    /// <item><description><c>(ref THashMap).RefGet([in ]TKey key)</c> — gets a mutable value reference stored in the hash map</description></item>
+    /// <item><description><c>(ref THashMap).RefGetByIndex(int index)</c> — gets a mutable value reference stored in the hash map</description></item>
+    /// <item><description><c>(ref THashMap).RefSet([in ]TKey key)</c> — optionally inserts a new key and returns a mutable reference to the associated value</description></item>
+    /// <item><description><c>(ref THashMap).Remove([in ]TKey key)</c> — removes a key from the hash map</description></item>
+    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash map with a given minimal capacity</description></item>
+    /// <item><description><c>(ref THashSet).Clear()</c> — clears the hash map</description></item>
     /// </list>
     /// </para>
     /// </summary>

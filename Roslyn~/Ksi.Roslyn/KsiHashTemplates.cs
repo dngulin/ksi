@@ -28,7 +28,7 @@ namespace Ksi.Roslyn
                 /// <summary>
                 /// Returns the number of keys stored in the hash set.
                 /// </summary>
-                /// <param name="self">The hash set to get keys count</param>
+                /// <param name="self">The hash set to get key count</param>
                 /// <returns>The number of keys stored in the hash set.</returns>
                 public static int Count(in this |THashSet| self) => self.Count;
                 
@@ -188,12 +188,12 @@ namespace Ksi.Roslyn
             |accessibility| partial struct |THashMap|
             {
                 /// <summary>
-                /// Returns an empty HashMap instance.
+                /// Returns an empty hash map instance.
                 /// </summary>
                 public static |THashMap| Empty => default;
             
                 /// <summary>
-                /// Returns a HashMap instance with a capacity equal or greater of the given one.
+                /// Returns a new hash map instance with a capacity equal or greater of the given one.
                 /// </summary>
                 public static |THashMap| WithMinCapacity(int capacity)
                 {
@@ -205,10 +205,27 @@ namespace Ksi.Roslyn
 
             |accessibility| static class |THashMap|_KsiHashMapExtensions
             {
+                /// <summary>
+                /// Returns the number of keys stored in the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to get key count</param>
+                /// <returns>The number of keys stored in the hash map.</returns>
                 public static int Count(in this |THashMap| self) => self.Count;
                 
+                /// <summary>
+                /// Returns the hash map capacity.
+                /// </summary>
+                /// <param name="self">The hash map to get capacity</param>
+                /// <returns>The number of slots allocated in the internal hash table.</returns>
                 public static int Capacity(in this |THashMap| self) => self.HashTable.Count();
             
+                /// <summary>
+                /// Determines if the hash map contains a given key.
+                /// </summary>
+                /// <param name="self">The hash map to locate the key</param>
+                /// <param name="key">The key to locate in the hash map</param>
+                /// <param name="index">Index of the slot containing the key</param>
+                /// <returns><c>true</c> if the key exists in the hash map; otherwise, <c>false</c>.</returns>
                 public static bool Contains(in this |THashMap| self, [in ]|TKey| key, out int index)
                 {
                     index = 0;
@@ -233,6 +250,15 @@ namespace Ksi.Roslyn
                     return false;
                 }
                 
+                /// <summary>
+                /// Gets a readonly value reference stored in the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to get the value</param>
+                /// <param name="key">The key to locate in the hash map</param>
+                /// <returns>A readonly reference to the value associated with the key.</returns>
+                /// <exception cref="System.Collections.Generic.KeyNotFoundException">
+                /// If the key is not located in the hash map.
+                /// </exception>
                 [RefPath("self", "HashTable", |RefPathSuffix|)]
                 public static ref readonly |TValue| RefReadonlyGet(in this |THashMap| self, [in ]|TKey| key)
                 {
@@ -242,6 +268,18 @@ namespace Ksi.Roslyn
                     throw new System.Collections.Generic.KeyNotFoundException();
                 }
                 
+                /// <summary>
+                /// Gets a readonly value reference stored in the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to get the value</param>
+                /// <param name="index">The index in the internal hash table to get the key</param>
+                /// <returns>A readonly reference to the value stored in the hash map.</returns>
+                /// <exception cref="System.IndexOutOfRangeException">
+                /// If the index is out of bounds of the internal hash table.
+                /// </exception>
+                /// <exception cref="System.Collections.Generic.KeyNotFoundException">
+                /// If the index doesn't point to an occupied slot.
+                /// </exception>
                 [RefPath("self", "HashTable", |RefPathSuffix|)]
                 public static ref readonly |TValue| RefReadonlyGetByIndex(in this |THashMap| self, int index)
                 {
@@ -253,6 +291,15 @@ namespace Ksi.Roslyn
                     return ref slot.Value;
                 }
                 
+                /// <summary>
+                /// Gets a mutable value reference stored in the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to get the value</param>
+                /// <param name="key">The key to locate in the hash map</param>
+                /// <returns>A mutable reference to the value associated with the key.</returns>
+                /// <exception cref="System.Collections.Generic.KeyNotFoundException">
+                /// If the key is not located in the hash map.
+                /// </exception>
                 [RefPath("self", "HashTable", |RefPathSuffix|)]
                 public static ref |TValue| RefGet([DynNoResize] ref this |THashMap| self, [in ]|TKey| key)
                 {
@@ -262,6 +309,18 @@ namespace Ksi.Roslyn
                     throw new System.Collections.Generic.KeyNotFoundException();
                 }
             
+                /// <summary>
+                /// Gets a mutable value reference stored in the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to get the value</param>
+                /// <param name="index">The index in the internal hash table to get the key</param>
+                /// <returns>A mutable reference to the value stored in the hash map.</returns>
+                /// <exception cref="System.IndexOutOfRangeException">
+                /// If the index is out of bounds of the internal hash table.
+                /// </exception>
+                /// <exception cref="System.Collections.Generic.KeyNotFoundException">
+                /// If the index doesn't point to an occupied slot.
+                /// </exception>
                 [RefPath("self", "HashTable", |RefPathSuffix|)]
                 public static ref |TValue| RefGetByIndex([DynNoResize] ref this |THashMap| self, int index)
                 {
@@ -273,6 +332,12 @@ namespace Ksi.Roslyn
                     return ref slot.Value;
                 }
             
+                /// <summary>
+                /// Optionally inserts a new key and returns a mutable reference to the associated value.
+                /// </summary>
+                /// <param name="self">The hash map to get the value</param>
+                /// <param name="key">The key to locate or insert to the hash map</param>
+                /// <returns>A mutable reference to the value associated with the key.</returns>
                 [RefPath("self", "HashTable", |RefPathSuffix|)]
                 public static ref |TValue| RefSet(ref this |THashMap| self, [in `insertion]|TKey| key)
                 {
@@ -300,6 +365,12 @@ namespace Ksi.Roslyn
                     throw new System.Exception("Unreachable state on insertion");
                 }
             
+                /// <summary>
+                /// Removes a key from the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to remove the key</param>
+                /// <param name="key">The key to remove from the hash map</param>
+                /// <returns><c>true</c> if the key was removed from the hash map; otherwise, <c>false</c>.</returns>
                 public static bool Remove(ref this |THashMap| self, [in ]|TKey| key)
                 {
                     if (self.Count <= 0 || !self.Contains(key, out var idx))
@@ -318,6 +389,11 @@ namespace Ksi.Roslyn
                     return true;
                 }
                 
+                /// <summary>
+                /// Reallocates the hash map with a given minimal capacity.
+                /// </summary>
+                /// <param name="self">The hash map to rebuild</param>
+                /// <param name="minCapacity">Minimal capacity</param>
                 public static void Rebuild(ref this |THashMap| self, int minCapacity)
                 {
                     var map = |THashMap|.WithMinCapacity(System.Math.Min(minCapacity, self.Count));
@@ -331,6 +407,10 @@ namespace Ksi.Roslyn
                     self[.Deallocated()`self] = map.Move();
                 }
                 
+                /// <summary>
+                /// Clears the hash map.
+                /// </summary>
+                /// <param name="self">The hash map to clear</param>
                 public static void Clear(ref this |THashMap| self)
                 {
                     self.HashTable.Clear();

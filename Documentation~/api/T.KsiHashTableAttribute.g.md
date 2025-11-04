@@ -42,19 +42,19 @@ Use only the generated API to modify the collection state.
 - `(ref THashSet).Clear()` — clears the hash set
 
 `HashMap` API:
-- `THashMap.Empty { get; }` — returns an empty map instance
-- `THashMap.WithMinCapacity(int capacity)` — returns a new map instance with a capacity equal or greater of the given one
-- `(in THashMap).Count()` — returns number of keys
-- `(in THashMap).Capacity()` — returns the hash table size
-- `(in THashMap).Contains([in ]TKey key, out int index)` — checks if the key exists in the hash table
-- `(in THashMap).RefReadonlyGet([in ]TKey key)` — returns a readonly `TValue` reference
-- `(in THashMap).RefReadonlyGetByIndex(int index)` — returns a readonly `TValue` reference
-- `(ref THashMap).RefGet([in ]TKey key)` — returns a mutable `TValue` reference
-- `(ref THashMap).RefGetByIndex(int index)` — returns a mutable `TValue` reference
-- `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
-- `(ref THashMap).Remove([in ]TKey key)` — removes a key and returns a success flag
-- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash table with a given size
-- `(ref THashSet).Clear()` — clears the hash table
+- `THashMap.Empty { get; }` — returns an empty hash map instance
+- `THashMap.WithMinCapacity(int capacity)` — returns a new hash map instance with a capacity equal or greater of the given one
+- `(in THashMap).Count()` — returns the number of keys stored in the hash map
+- `(in THashMap).Capacity()` — returns the hash map capacity
+- `(in THashMap).Contains([in ]TKey key, out int index)` — determines if the hash map contains a given key
+- `(in THashMap).RefReadonlyGet([in ]TKey key)` — gets a readonly value reference stored in the hash map
+- `(in THashMap).RefReadonlyGetByIndex(int index)` — gets a readonly value reference stored in the hash map
+- `(ref THashMap).RefGet([in ]TKey key)` — gets a mutable value reference stored in the hash map
+- `(ref THashMap).RefGetByIndex(int index)` — gets a mutable value reference stored in the hash map
+- `(ref THashMap).RefSet([in ]TKey key)` — optionally inserts a new key and returns a mutable reference to the associated value
+- `(ref THashMap).Remove([in ]TKey key)` — removes a key from the hash map
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash map with a given minimal capacity
+- `(ref THashSet).Clear()` — clears the hash map
 
 ```csharp
 public class KsiHashTableAttribute : Attribute
