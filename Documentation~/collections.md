@@ -21,6 +21,8 @@ and inherit different sets of [trait attributes](traits.md).
 
 As a general term all these types referenced as the `TRefList<T>`.
 
+The `TRefList<T>` types are only [ExplicitCopy](api/T.ExplicitCopyAttribute.g.md) types that can be generic
+
 ## Default Value Safety
 
 All collections are safe to use in a `default` (zeroed) state.

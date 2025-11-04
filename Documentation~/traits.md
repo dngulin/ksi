@@ -61,12 +61,16 @@ code generation of `CopyTo` and `CopyFrom` methods for the marked type and possi
 - `(ref TRefList<TExpCopy>).CopyFrom(in TRefList<TExpCopy> other)` — copies all items
   of another struct to the current one
 
-Where `TExpCopy` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
+Where `TExpCopy` is the structure name and `TRefList<T>` is a [compatible collection](collections.md) name.
 
 > [!IMPORTANT]
-> Explicit copy extension methods require access to the structure fields and their types:
-> - the structure cannot have private fields
-> - the structure cannot be generic
+> Explicit copy extension methods require access to the structure fields and their types.
+> The `ExplicitCopy` type:
+> - should be accessible within the assembly
+> - cannot have `private` fields
+> - **cannot be generic**
+
+Note that the `TRefList<T>` types are only `ExplicitCopy` types that can be generic. 
 
 ### ExplicitCopy Diagnostics
 
