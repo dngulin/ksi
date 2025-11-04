@@ -33,3 +33,5 @@
 - ECS-like data processing:
   - Data layout attributes: `[KsiComponent]`, `[KsiEntity]`, `[KsiArchetype]`, `[KsiDomain]`
   - Data querying attributes: `[KsiQuery]`, `[KsiQueryParam]`
+- `HashSet` and `HashMap` API generation
+  - `[KsiHashTable]` and `[KsiHashTableSlot]` attributes
