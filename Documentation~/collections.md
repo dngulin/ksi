@@ -69,3 +69,8 @@ Diagnostics related to usage of the collections:
 | `REFLIST01`   | Error    | Generic `TRefList<T>` item type usage is unsafe |
 | `REFLIST02`   | Error    | Jagged `TRefList<T>` types are not supported    |
 | `REFLIST03`   | Error    | Non-specialized `TRefList<T>` API call          |
+| `KSIHASH01`   | Error    | Missing `KsiHash` symbol                        |
+| `KSIHASH02`   | Error    | Invalid `KsiHash` field                         |
+| `KSIHASH03`   | Error    | Invalid `KsiHash` symbol signature              |
+| `KSIHASH04`   | Error    | Invalid `KsiHash` symbol accessibility          |
+| `KSIHASH05`   | Error    | Invalid `KsiHashTable` declaration              |

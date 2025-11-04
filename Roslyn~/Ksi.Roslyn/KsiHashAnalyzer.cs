@@ -26,22 +26,22 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly DiagnosticDescriptor Rule01MissingSymbol = Rule(01, DiagnosticSeverity.Error,
-        "Missing symbol",
+        "Missing KsiHash symbol",
         "Type is marked with {0} and should declare the {1}"
     );
 
     private static readonly DiagnosticDescriptor Rule02InvalidField = Rule(02, DiagnosticSeverity.Error,
-        "Invalid field",
+        "Invalid KsiHash field",
         "Type is marked with {0} and shouldn't declare the {1} field"
     );
 
     private static readonly DiagnosticDescriptor Rule03InvalidSymbolSignature = Rule(03, DiagnosticSeverity.Error,
-        "Invalid symbol signature",
+        "Invalid KsiHash  symbol signature",
         "The {0} has a wrong signature. It should be {1}"
     );
 
     private static readonly DiagnosticDescriptor Rule04InvalidAccessibility = Rule(04, DiagnosticSeverity.Error,
-        "Invalid accessibility",
+        "Invalid KsiHash symbol accessibility",
         "Accessibility of the {0} is to low. It should be at least internal"
     );
 
