@@ -31,15 +31,19 @@ It is recommended to define hash tables in a separate assembly to make their int
 Use only the generated API to modify the collection state.
 
 `HashSet` API:
-- `(in THashSet).Count()` — returns number of keys
-- `(in THashSet).Capacity()` — returns the hash table size
-- `(in THashSet).Contains([in ]TKey key)` — checks if the key exists in the hash table
-- `(ref THashSet).Add([in ]TKey key)` — adds a new key
-- `(ref THashSet).Remove([in ]TKey key)` — removes a key and returns a success flag
-- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
+- `THashSet.Empty { get; }` — returns an empty hash set instance
+- `HashSet.WithMinCapacity(int capacity)` — returns a new hash set instance with a capacity equal or greater of the given one
+- `(in THashSet).Count()` — returns the number of keys stored in the hash set
+- `(in THashSet).Capacity()` — returns the hash set capacity
+- `(in THashSet).Contains([in ]TKey key)` — determines if the hash set contains a given key
+- `(ref THashSet).Add([in ]TKey key)` — adds a new key to the hash set
+- `(ref THashSet).Remove([in ]TKey key)` — removes a key from the hash set
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given minimal capacity
 - `(ref THashSet).Clear()` — clears the hash set
 
 `HashMap` API:
+- `THashMap.Empty { get; }` — returns an empty map instance
+- `THashMap.WithMinCapacity(int capacity)` — returns a new map instance with a capacity equal or greater of the given one
 - `(in THashMap).Count()` — returns number of keys
 - `(in THashMap).Capacity()` — returns the hash table size
 - `(in THashMap).Contains([in ]TKey key, out int index)` — checks if the key exists in the hash table
@@ -49,8 +53,8 @@ Use only the generated API to modify the collection state.
 - `(ref THashMap).RefGetByIndex(int index)` — returns a mutable `TValue` reference
 - `(ref THashMap).RefSet([in ]TKey key)` — finds an entry or creates a new one and returns a mutable `TValue` reference
 - `(ref THashMap).Remove([in ]TKey key)` — removes a key and returns a success flag
-- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash set with a given hash table size
-- `(ref THashSet).Clear()` — clears the hash map
+- `(ref THashSet).Rebuild(int capacity)` — reallocates the hash table with a given size
+- `(ref THashSet).Clear()` — clears the hash table
 
 ```csharp
 public class KsiHashTableAttribute : Attribute

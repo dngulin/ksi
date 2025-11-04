@@ -38,18 +38,22 @@ namespace Ksi
     /// <para>
     /// <c>HashSet</c> API:
     /// <list type="bullet">
-    /// <item><description><c>(in THashSet).Count()</c> — returns number of keys</description></item>
-    /// <item><description><c>(in THashSet).Capacity()</c> — returns the hash table size</description></item>
-    /// <item><description><c>(in THashSet).Contains([in ]TKey key)</c> — checks if the key exists in the hash table</description></item>
-    /// <item><description><c>(ref THashSet).Add([in ]TKey key)</c> — adds a new key</description></item>
-    /// <item><description><c>(ref THashSet).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
-    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash set with a given hash table size</description></item>
+    /// <item><description><c>THashSet.Empty { get; }</c> — returns an empty hash set instance</description></item>
+    /// <item><description><c>HashSet.WithMinCapacity(int capacity)</c> — returns a new hash set instance with a capacity equal or greater of the given one</description></item>
+    /// <item><description><c>(in THashSet).Count()</c> — returns the number of keys stored in the hash set</description></item>
+    /// <item><description><c>(in THashSet).Capacity()</c> — returns the hash set capacity</description></item>
+    /// <item><description><c>(in THashSet).Contains([in ]TKey key)</c> — determines if the hash set contains a given key</description></item>
+    /// <item><description><c>(ref THashSet).Add([in ]TKey key)</c> — adds a new key to the hash set</description></item>
+    /// <item><description><c>(ref THashSet).Remove([in ]TKey key)</c> — removes a key from the hash set</description></item>
+    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash set with a given minimal capacity</description></item>
     /// <item><description><c>(ref THashSet).Clear()</c> — clears the hash set</description></item>
     /// </list>
     /// </para>
     /// <para>
     /// <c>HashMap</c> API:
     /// <list type="bullet">
+    /// <item><description><c>THashMap.Empty { get; }</c> — returns an empty map instance</description></item>
+    /// <item><description><c>THashMap.WithMinCapacity(int capacity)</c> — returns a new map instance with a capacity equal or greater of the given one</description></item>
     /// <item><description><c>(in THashMap).Count()</c> — returns number of keys</description></item>
     /// <item><description><c>(in THashMap).Capacity()</c> — returns the hash table size</description></item>
     /// <item><description><c>(in THashMap).Contains([in ]TKey key, out int index)</c> — checks if the key exists in the hash table</description></item>
@@ -59,8 +63,8 @@ namespace Ksi
     /// <item><description><c>(ref THashMap).RefGetByIndex(int index)</c> — returns a mutable <c>TValue</c> reference</description></item>
     /// <item><description><c>(ref THashMap).RefSet([in ]TKey key)</c> — finds an entry or creates a new one and returns a mutable <c>TValue</c> reference</description></item>
     /// <item><description><c>(ref THashMap).Remove([in ]TKey key)</c> — removes a key and returns a success flag</description></item>
-    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash set with a given hash table size</description></item>
-    /// <item><description><c>(ref THashSet).Clear()</c> — clears the hash map</description></item>
+    /// <item><description><c>(ref THashSet).Rebuild(int capacity)</c> — reallocates the hash table with a given size</description></item>
+    /// <item><description><c>(ref THashSet).Clear()</c> — clears the hash table</description></item>
     /// </list>
     /// </para>
     /// </summary>

@@ -8,12 +8,12 @@ namespace Ksi.Roslyn
             |accessibility| partial struct |THashSet|
             {
                 /// <summary>
-                /// Returns an empty HashSet instance.
+                /// Returns an empty hash set instance.
                 /// </summary>
                 public static |THashSet| Empty => default;
             
                 /// <summary>
-                /// Returns a HashSet instance with a capacity equal or greater of the given one.
+                /// Returns a new hash set instance with a capacity equal or greater of the given one.
                 /// </summary>
                 public static |THashSet| WithMinCapacity(int capacity)
                 {
@@ -25,15 +25,37 @@ namespace Ksi.Roslyn
 
             |accessibility| static class |THashSet|_KsiHashSetExtensions
             {
+                /// <summary>
+                /// Returns the number of keys stored in the hash set.
+                /// </summary>
+                /// <param name="self">The hash set to get keys count</param>
+                /// <returns>The number of keys stored in the hash set.</returns>
                 public static int Count(in this |THashSet| self) => self.Count;
                 
+                /// <summary>
+                /// Returns the hash set capacity.
+                /// </summary>
+                /// <param name="self">The hash set to get capacity</param>
+                /// <returns>The number of slots allocated in the internal hash table.</returns>
                 public static int Capacity(in this |THashSet| self) => self.HashTable.Count();
             
+                /// <summary>
+                /// Determines if the hash set contains a given key.
+                /// </summary>
+                /// <param name="self">The hash set to locate the key</param>
+                /// <param name="key">The key to locate in the hash set</param>
+                /// <returns><c>true</c> if the key exists in the hash set; otherwise, <c>false</c>.</returns>
                 public static bool Contains(in this |THashSet| self, [in ]|TKey| key)
                 {
                     return self.Count > 0 && self.SearchKey(key, out _);
                 }
             
+                /// <summary>
+                /// Adds a new key to the hash set.
+                /// </summary>
+                /// <param name="self">The hash set to add the key</param>
+                /// <param name="key">The key to add to the hash set</param>
+                /// <returns><c>true</c> if the key was added to the hash set; otherwise, <c>false</c>.</returns>
                 public static bool Add(ref this |THashSet| self, [in `insertion]|TKey| key)
                 {
                     if (self.Count == self.Capacity())
@@ -60,6 +82,12 @@ namespace Ksi.Roslyn
                     throw new System.Exception("Unreachable state on insertion");
                 }
             
+                /// <summary>
+                /// Removes a key from the hash set.
+                /// </summary>
+                /// <param name="self">The hash set to remove the key</param>
+                /// <param name="key">The key to remove from the hash set</param>
+                /// <returns><c>true</c> if the key was removed from the hash set; otherwise, <c>false</c>.</returns>
                 public static bool Remove(ref this |THashSet| self, [in ]|TKey| key)
                 {
                     if (self.Count <= 0 || !self.SearchKey(key, out var idx))
@@ -78,6 +106,11 @@ namespace Ksi.Roslyn
                     return true;
                 }
                 
+                /// <summary>
+                /// Reallocates the hash set with a given minimal capacity.
+                /// </summary>
+                /// <param name="self">The hash set to rebuild</param>
+                /// <param name="minCapacity">Minimal capacity</param>
                 public static void Rebuild(ref this |THashSet| self, int minCapacity)
                 {
                     var set = |THashSet|.WithMinCapacity(System.Math.Min(minCapacity, self.Count));
@@ -91,6 +124,10 @@ namespace Ksi.Roslyn
                     self[.Deallocated()`self] = set.Move();
                 }
                 
+                /// <summary>
+                /// Clears the hash set.
+                /// </summary>
+                /// <param name="self">The hash set to clear</param>
                 public static void Clear(ref this |THashSet| self)
                 {
                     self.HashTable.Clear();
