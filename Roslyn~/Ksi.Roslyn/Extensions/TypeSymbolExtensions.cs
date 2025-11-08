@@ -120,7 +120,7 @@ public static class TypeSymbolExtensions
         self.IsRefLikeGeneric("Ksi", "MutableAccessScope");
 
     private static bool IsReadOnlyAccessScope(this INamedTypeSymbol self) =>
-        self.IsRefLikeGeneric("Ksi", "AccessScope");
+        self.IsRefLikeGeneric("Ksi", "ReadOnlyAccessScope");
 
     private static bool IsRefLikeGeneric(this INamedTypeSymbol self, string ns, string name)
     {

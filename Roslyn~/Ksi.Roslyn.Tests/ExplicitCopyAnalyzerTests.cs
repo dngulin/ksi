@@ -275,11 +275,14 @@ public class ExplicitCopyAnalyzerTests
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
             """
-            [Ksi.ExplicitCopy]
+            using Ksi;
+            using System;
+            
+            [ExplicitCopy]
             public struct MyStruct { public int Field; }
             public struct Generic<T> { public T Field; }
             
-            [Ksi.ExplicitCopy]
+            [ExplicitCopy]
             public struct Test
             {
                 public {|EXPCOPY11:Generic<MyStruct>|} Field;
@@ -289,6 +292,19 @@ public class ExplicitCopyAnalyzerTests
                     {|EXPCOPY11:Generic<MyStruct>|} a = default;
                     {|EXPCOPY11:var|} b = new {|EXPCOPY11:Generic<MyStruct>|}();
                     {|EXPCOPY11:var|} c = new {|EXPCOPY11:MyStruct[10]|};
+                }
+                
+                public static void ValidGenerics(
+                    in RefList<MyStruct> refList,
+                    in TempRefList<MyStruct> tempRefList,
+                    in ManagedRefList<MyStruct> managedRefList,
+                    Span<MyStruct> rwSpan,
+                    ReadOnlySpan<MyStruct> roSpan,
+                    ExclusiveAccess<MyStruct> exAcc,
+                    MutableAccessScope<MyStruct> rwScope,
+                    ReadOnlyAccessScope<MyStruct> roScope
+                )
+                {
                 }
             }
             """
