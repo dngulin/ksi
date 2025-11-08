@@ -17,6 +17,6 @@ It means that the root `TempAlloc` structure can be stored only on stack similar
 Required for structs that have fields of the `TempAlloc` types.
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
+[AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
 public sealed class TempAllocAttribute : Attribute
 ```

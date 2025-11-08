@@ -11,7 +11,7 @@ namespace Ksi
         /// </summary>
         /// <param name="self">instance to be moved</param>
         /// <returns>A moved structure instance</returns>
-        public static T Move<[ExplicitCopy, Dealloc] T>(this ref T self) where T : struct
+        public static T Move<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref T self) where T : struct
         {
 #pragma warning disable EXPCOPY04
             var moved = self;

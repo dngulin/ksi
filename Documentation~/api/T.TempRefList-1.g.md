@@ -96,7 +96,7 @@ Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/
 Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
 ```csharp
-public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> self) where T : unmanaged
+public static unsafe ReadOnlySpan<T> AsReadOnlySpan<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self) where T : unmanaged
 ```
 
 
@@ -105,7 +105,7 @@ public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in TempRefList<T> se
 Returns capacity of the list.
 
 ```csharp
-public static int Capacity<T>(this in TempRefList<T> self) where T : unmanaged
+public static int Capacity<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -133,7 +133,7 @@ Parameters
 Returns item count in the list.
 
 ```csharp
-public static int Count<T>(this in TempRefList<T> self) where T : unmanaged
+public static int Count<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -149,7 +149,7 @@ Returns a readonly reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref readonly T RefReadonlyAt<T>(this in TempRefList<T> self, int index) where T : unmanaged
+public static ref readonly T RefReadonlyAt<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters
@@ -168,7 +168,7 @@ Returns a readonly reference to a list item at the given index.
 Creates a readonly reversed by-ref iterator for the list.
 
 ```csharp
-public static TempRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in TempRefList<T> self) where T : unmanaged
+public static TempRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -182,7 +182,7 @@ Returns the iterator to use in the foreach loop.
 Creates a readonly by-ref iterator for the list.
 
 ```csharp
-public static TempRefListReadOnlyIterator<T> RefReadonlyIter<T>(this in TempRefList<T> self) where T : unmanaged
+public static TempRefListReadOnlyIterator<T> RefReadonlyIter<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -224,7 +224,7 @@ Returns the string created from bytes.
 Adds a new item to the list.
 
 ```csharp
-public static void Add<T>(this ref TempRefList<T> self, T item) where T : unmanaged
+public static void Add<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref TempRefList<T> self, T item) where T : unmanaged
 ```
 
 Parameters
@@ -237,7 +237,7 @@ Parameters
 Adds a specified number of `default` items.
 
 ```csharp
-public static void AppendDefault<T>(this ref TempRefList<T> self, int count) where T : unmanaged
+public static void AppendDefault<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref TempRefList<T> self, int count) where T : unmanaged
 ```
 
 Parameters
@@ -256,7 +256,7 @@ Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/a
 Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
 ```csharp
-public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> self) where T : unmanaged
+public static unsafe Span<T> AsSpan<[ExplicitCopy, Dealloc, TempAlloc] T>([DynNoResize] this ref TempRefList<T> self) where T : unmanaged
 ```
 
 
@@ -265,7 +265,7 @@ public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref TempRefList<T> sel
 Removes all items from the list.
 
 ```csharp
-public static void Clear<T>(this ref TempRefList<T> self) where T : unmanaged
+public static void Clear<[ExplicitCopy, TempAlloc] T>(this ref TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -294,7 +294,7 @@ Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 [NonAllocatedResult]
-public static ref T RefAdd<T>(this ref TempRefList<T> self) where T : unmanaged
+public static ref T RefAdd<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -310,7 +310,7 @@ Returns a mutable reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref T RefAt<T>([DynNoResize] this ref TempRefList<T> self, int index) where T : unmanaged
+public static ref T RefAt<[ExplicitCopy, Dealloc, TempAlloc] T>([DynNoResize] this ref TempRefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters
@@ -325,7 +325,7 @@ Returns a mutable reference to a list item at the given index.
 Creates a mutable reversed by-ref iterator for the list.
 
 ```csharp
-public static TempRefListIteratorReversed<T> RefIterReversed<T>(this ref TempRefList<T> self) where T : unmanaged
+public static TempRefListIteratorReversed<T> RefIterReversed<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -339,7 +339,7 @@ Returns the iterator to use in the foreach loop.
 Creates a mutable by-ref iterator for the list.
 
 ```csharp
-public static TempRefListIterator<T> RefIter<T>(this ref TempRefList<T> self) where T : unmanaged
+public static TempRefListIterator<T> RefIter<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref TempRefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -353,7 +353,7 @@ Returns the iterator to use in the foreach loop.
 Removes an item from the list at the given index.
 
 ```csharp
-public static void RemoveAt<T>(this ref TempRefList<T> self, int index) where T : unmanaged
+public static void RemoveAt<[ExplicitCopy, TempAlloc] T>(this ref TempRefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters

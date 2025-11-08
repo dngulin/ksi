@@ -5,25 +5,76 @@ using RefListAnalyzerTest = Util.KsiAnalyzerTest<RefListAnalyzer>;
 public class RefListAnalyzerTests
 {
     [Fact]
-    public async Task RefList01GenericItemType()
+    public async Task RefList01IncompatibleItemTypeTraits()
+    {
+        await RefListAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            [ExplicitCopy] public struct ExpCopyType {}
+            [ExplicitCopy, Dealloc] public struct DeallocType {}
+
+            public static class Test
+            {
+                public static void NonTrait(in RefList<int> list)
+                {
+                    Generic(list);
+                    ExpCopyGeneric(list);
+                    DeallocGeneric(list);
+                }
+            
+                public static void ExpCopy(in RefList<ExpCopyType> list)
+                {
+                    Generic({|REFLIST01:list|});
+                    ExpCopyGeneric(list);
+                    DeallocGeneric(list);
+                }
+                
+                public static void Dealloc(in RefList<DeallocType> list)
+                {
+                    Generic({|REFLIST01:list|});
+                    ExpCopyGeneric({|REFLIST01:list|});
+                    DeallocGeneric(list);
+                }
+                
+                public static void Generic<T>(in RefList<T> list) where T : unmanaged => throw null;
+                public static void ExpCopyGeneric<[ExplicitCopy] T>(in RefList<T> list) where T : unmanaged => throw null;
+                public static void DeallocGeneric<[ExplicitCopy, Dealloc] T>(in RefList<T> list) where T : unmanaged => throw null;
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task RefList01NonSpecializedCall()
     {
         await RefListAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
 
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct
+            {
+                public RefList<int> List;
+            }
+
             public static class Test
             {
-                public static void Method<T>(ref {|REFLIST01:RefList<T>|} param) where T : unmanaged
+                public static void Method()
                 {
-                    {|REFLIST01:RefList<T>|} a = default;
-                    {|REFLIST01:var|} b = RefList.Empty<T>();
+                    var a = RefList.Empty<TestStruct>();
+                    var b = RefList.Empty<TestStruct>();
+                    
+                    // Use generic non-specialized API:
+                    {|REFLIST01:a|}.CopyTo<TestStruct>({|REFLIST01:ref b|});
+                    {|REFLIST01:a|}.CopyFrom<TestStruct>({|REFLIST01:b|});
+                    
+                    {|REFLIST01:a|}.Dealloc<TestStruct>();
+                    {|REFLIST01:a|}.Deallocated<TestStruct>() = default;
+                    {|REFLIST01:a|}.Clear<TestStruct>();
+                    {|REFLIST01:a|}.RemoveAt<TestStruct>(0);
                 }
-            }
-            
-            public class Generic<T> where T : unmanaged
-            {
-                private ExclusiveAccess<{|REFLIST01:RefList<T>|}> _listAccess;
             }
             """
         );
@@ -55,41 +106,6 @@ public class RefListAnalyzerTests
             public class TestClass
             {
                 private ExclusiveAccess<{|REFLIST02:RefList<RefList<int>>|}> _listAccess;
-            }
-            """
-        );
-    }
-
-    [Fact]
-    public async Task RefList03NonSpecializedCall()
-    {
-        await RefListAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            using Ksi;
-            
-            [ExplicitCopy, DynSized, Dealloc]
-            public struct TestStruct
-            {
-                public RefList<int> List;
-            }
-
-            public static class Test
-            {
-                public static void Method()
-                {
-                    var a = RefList.Empty<TestStruct>();
-                    var b = RefList.Empty<TestStruct>();
-                    
-                    // Use generic non-specialized API:
-                    {|REFLIST03:a.CopyTo<TestStruct>(ref b)|};
-                    {|REFLIST03:a.CopyFrom<TestStruct>(b)|};
-                    
-                    {|REFLIST03:a.Dealloc<TestStruct>()|};
-                    {|REFLIST03:a.Deallocated<TestStruct>()|} = default;
-                    {|REFLIST03:a.Clear<TestStruct>()|};
-                    {|REFLIST03:a.RemoveAt<TestStruct>(0)|};
-                }
             }
             """
         );

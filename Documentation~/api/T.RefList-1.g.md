@@ -98,7 +98,7 @@ Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/
 Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
 ```csharp
-public static unsafe ReadOnlySpan<T> AsReadOnlySpan<T>(this in RefList<T> self) where T : unmanaged
+public static unsafe ReadOnlySpan<T> AsReadOnlySpan<[ExplicitCopy, Dealloc] T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
@@ -109,7 +109,7 @@ Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/Syste
 Returns capacity of the list.
 
 ```csharp
-public static int Capacity<T>(this in RefList<T> self) where T : unmanaged
+public static int Capacity<[ExplicitCopy, Dealloc] T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -137,7 +137,7 @@ Parameters
 Returns item count in the list.
 
 ```csharp
-public static int Count<T>(this in RefList<T> self) where T : unmanaged
+public static int Count<[ExplicitCopy, Dealloc] T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -153,7 +153,7 @@ Returns a readonly reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref readonly T RefReadonlyAt<T>(this in RefList<T> self, int index) where T : unmanaged
+public static ref readonly T RefReadonlyAt<[ExplicitCopy, Dealloc] T>(this in RefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters
@@ -172,7 +172,7 @@ Returns a readonly reference to a list item at the given index.
 Creates a readonly reversed by-ref iterator for the list.
 
 ```csharp
-public static RefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<T>(this in RefList<T> self) where T : unmanaged
+public static RefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<[ExplicitCopy, Dealloc] T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -186,7 +186,7 @@ Returns the iterator to use in the foreach loop.
 Creates a readonly by-ref iterator for the list.
 
 ```csharp
-public static RefListReadOnlyIterator<T> RefReadonlyIter<T>(this in RefList<T> self) where T : unmanaged
+public static RefListReadOnlyIterator<T> RefReadonlyIter<[ExplicitCopy, Dealloc] T>(this in RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -228,7 +228,7 @@ Returns the string created from bytes.
 Adds a new item to the list.
 
 ```csharp
-public static void Add<T>(this ref RefList<T> self, T item) where T : unmanaged
+public static void Add<[ExplicitCopy, Dealloc] T>(this ref RefList<T> self, T item) where T : unmanaged
 ```
 
 Parameters
@@ -241,7 +241,7 @@ Parameters
 Adds a specified number of `default` items.
 
 ```csharp
-public static void AppendDefault<T>(this ref RefList<T> self, int count) where T : unmanaged
+public static void AppendDefault<[ExplicitCopy, Dealloc] T>(this ref RefList<T> self, int count) where T : unmanaged
 ```
 
 Parameters
@@ -260,7 +260,7 @@ Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/a
 Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
 ```csharp
-public static unsafe Span<T> AsSpan<T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
+public static unsafe Span<T> AsSpan<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref RefList<T> self) where T : unmanaged
 ```
 
 Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
@@ -271,7 +271,7 @@ Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1
 Removes all items from the list.
 
 ```csharp
-public static void Clear<T>(this ref RefList<T> self) where T : unmanaged
+public static void Clear<[ExplicitCopy] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -298,7 +298,7 @@ Deallocate the list.
 After deallocating the structure becomes zeroed.
 
 ```csharp
-public static void Dealloc<T>(this ref RefList<T> self) where T : unmanaged
+public static void Dealloc<[ExplicitCopy] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -313,7 +313,7 @@ Does not add any segments to `RefPath`.
 
 ```csharp
 [RefPath("self", "!"), NonAllocatedResult]
-public static ref RefList<T> Deallocated<T>(this ref RefList<T> self) where T : unmanaged
+public static ref RefList<T> Deallocated<[ExplicitCopy] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -330,7 +330,7 @@ Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 [NonAllocatedResult]
-public static ref T RefAdd<T>(this ref RefList<T> self) where T : unmanaged
+public static ref T RefAdd<[ExplicitCopy, Dealloc] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -346,7 +346,7 @@ Returns a mutable reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref T RefAt<T>([DynNoResize] this ref RefList<T> self, int index) where T : unmanaged
+public static ref T RefAt<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref RefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters
@@ -361,7 +361,7 @@ Returns a mutable reference to a list item at the given index.
 Creates a mutable reversed by-ref iterator for the list.
 
 ```csharp
-public static RefListIteratorReversed<T> RefIterReversed<T>(this ref RefList<T> self) where T : unmanaged
+public static RefListIteratorReversed<T> RefIterReversed<[ExplicitCopy, Dealloc] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -375,7 +375,7 @@ Returns the iterator to use in the foreach loop.
 Creates a mutable by-ref iterator for the list.
 
 ```csharp
-public static RefListIterator<T> RefIter<T>(this ref RefList<T> self) where T : unmanaged
+public static RefListIterator<T> RefIter<[ExplicitCopy, Dealloc] T>(this ref RefList<T> self) where T : unmanaged
 ```
 
 Parameters
@@ -389,7 +389,7 @@ Returns the iterator to use in the foreach loop.
 Removes an item from the list at the given index.
 
 ```csharp
-public static void RemoveAt<T>(this ref RefList<T> self, int index) where T : unmanaged
+public static void RemoveAt<[ExplicitCopy] T>(this ref RefList<T> self, int index) where T : unmanaged
 ```
 
 Parameters

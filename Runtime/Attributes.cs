@@ -116,7 +116,7 @@ namespace Ksi
     /// </para>
     /// <para>Required for structs that have fields of the <c>TempAlloc</c> types.</para>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class TempAllocAttribute : Attribute
     {
     }

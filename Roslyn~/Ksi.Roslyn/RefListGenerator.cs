@@ -1,4 +1,5 @@
 ﻿using Ksi.Roslyn.Extensions;
+using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,15 +51,33 @@ namespace Ksi.Roslyn
             {
                 foreach (var (t, c) in entries)
                 {
-                    ctx.AddSource($"{t}.g.cs", string.Format(RefListTemplates.StaticApi, t, c));
-                    ctx.AddSource($"{t}.Api.g.cs", string.Format(RefListTemplates.InstanceApi, t, c));
-                    ctx.AddSource($"{t}.Iterators.g.cs", string.Format(RefListTemplates.Iterators, t, c));
-                    ctx.AddSource($"{t}.StringExt.g.cs", string.Format(RefListTemplates.StringExt, t));
+                    ctx.AddSource($"{t}.g.cs", FillTemplate(RefListTemplates.StaticApi, t, c));
+                    ctx.AddSource($"{t}.Api.g.cs", FillTemplate(RefListTemplates.InstanceApi, t, c));
+                    ctx.AddSource($"{t}.Iterators.g.cs", FillTemplate(RefListTemplates.Iterators, t, c));
+                    ctx.AddSource($"{t}.StringExt.g.cs", FillTemplate(RefListTemplates.StringExt, t, c));
 
-                    if (t == "RefList")
-                        ctx.AddSource($"{t}.Dealloc.g.cs", string.Format(RefListTemplates.Dealloc, t, c));
+                    if (t == SymbolNames.RefList)
+                        ctx.AddSource($"{t}.Dealloc.g.cs", FillTemplate(RefListTemplates.Dealloc, t, c));
                 }
             });
+        }
+
+        private static string FillTemplate(string template, string typeName, string constraint)
+        {
+            var traitsAll = typeName == SymbolNames.TempRefList
+                ? "ExplicitCopy, Dealloc, TempAlloc"
+                : "ExplicitCopy, Dealloc";
+            var traitsExceptDealloc = typeName == SymbolNames.TempRefList
+                ? "ExplicitCopy, TempAlloc"
+                : "ExplicitCopy";
+
+            return template
+                .ToStringBuilder()
+                .Replace("|TRefList|", typeName)
+                .Replace("|constraint|", constraint)
+                .Replace("|TraitsAll|", traitsAll)
+                .Replace("|TraitsExceptDealloc|", traitsExceptDealloc)
+                .ToString();
         }
     }
 }

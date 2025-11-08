@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -24,9 +23,9 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor Rule01GenericItemType = Rule(01, DiagnosticSeverity.Error,
-        "Generic TRefList<T> item type usage is unsafe",
-        "Usage of the TRefList<T> with generic item types is not supported"
+    private static readonly DiagnosticDescriptor Rule01IncompatibleItemTypeTraits = Rule(01, DiagnosticSeverity.Error,
+        "Passing TRefList<T> argument with incompatible item type traits",
+        "Passing TRefList<T> argument with incompatible item type traits"
     );
 
     private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
@@ -35,14 +34,9 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         "Consider to wrap inner collection with a structure"
     );
 
-    private static readonly DiagnosticDescriptor Rule03NonSpecializedCall = Rule(03, DiagnosticSeverity.Error,
-        "Non-specialized TRefList API call",
-        "Using non-specialized API for TRefList<{0}>. Consider to use the specialized method version"
-    );
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        Rule02JaggedRefList,
-        Rule03NonSpecializedCall
+        Rule01IncompatibleItemTypeTraits,
+        Rule02JaggedRefList
     );
 
     public override void Initialize(AnalysisContext context)
@@ -54,7 +48,7 @@ public class RefListAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
-        context.RegisterOperationAction(AnalyzeExtensionInvocation, OperationKind.Invocation);
+        context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
     }
 
     private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
@@ -89,42 +83,27 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         return gt.IsRefList();
     }
 
-    private static void AnalyzeExtensionInvocation(OperationAnalysisContext ctx)
+    private static void AnalyzeArgument(OperationAnalysisContext ctx)
     {
-        var i = (IInvocationOperation)ctx.Operation;
-        if (i.IsVirtual)
+        var a = (IArgumentOperation)ctx.Operation;
+        var p = a.Parameter;
+
+        if (a.Value.Type is not INamedTypeSymbol at || !at.IsSupportedGenericType())
             return;
 
-        var m = i.TargetMethod;
-        if (m.IsAsync || !m.IsExtensionMethod || !m.IsGenericMethod || m.TypeArguments.Length != 1)
+        if (p?.OriginalDefinition.Type is not INamedTypeSymbol pt || !pt.IsSupportedGenericType())
             return;
 
-        var p = m.Parameters;
-        if (p.Length == 0 || p[0].Type is not INamedTypeSymbol t)
+        var gat = at.TypeArguments[0];
+
+        if (pt.TypeArguments[0] is not ITypeParameterSymbol gpt)
             return;
 
-        if (!t.IsRefList())
-            return;
-
-        if (t.TypeArguments[0] is not INamedTypeSymbol gt)
-            return;
-
-        var loc = i.Syntax.GetLocation();
-
-        if (gt.IsDealloc())
-        {
-            ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
-            ReportCalls(ctx, m, loc, DeallocTemplates.RefListExtensionNames);
-        }
-        else if (gt.IsExplicitCopy())
-        {
-            ReportCalls(ctx, m, loc, ExplicitCopyTemplates.RefListExtensionNames);
-        }
+        if (!CheckExpCopy(gat, gpt) || !CheckDealloc(gat, gpt) || !CheckTempAlloc(gat, gpt))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01IncompatibleItemTypeTraits, a.Syntax.GetLocation()));
     }
 
-    private static void ReportCalls(OperationAnalysisContext ctx, IMethodSymbol m, Location loc, string[] names)
-    {
-        if (names.Contains(m.Name))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule03NonSpecializedCall, loc));
-    }
+    private static bool CheckExpCopy(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsExplicitCopy() || p.IsExplicitCopy();
+    private static bool CheckDealloc(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsDealloc() || p.IsDealloc();
+    private static bool CheckTempAlloc(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsTempAlloc() || p.IsTempAlloc();
 }

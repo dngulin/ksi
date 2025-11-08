@@ -19,6 +19,9 @@ public static class SymbolNames
     public const string RefList = "RefList";
     public const string RefListIndexer = "RefListIndexer";
 
+    public const string TempRefList = "TempRefList";
+    public const string ManagedRefList = "ManagedRefList";
+
     public const string KsiComponent = "KsiComponent";
     public const string KsiEntity = "KsiEntity";
     public const string KsiArchetype = "KsiArchetype";
