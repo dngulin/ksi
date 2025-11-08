@@ -1,13 +1,13 @@
 namespace Ksi.Roslyn.Tests;
 
-using RefListAnalyzerTest = Util.KsiAnalyzerTest<RefListAnalyzer>;
+using KsiGenericAnalyzerTest = Util.KsiAnalyzerTest<KsiGenericAnalyzer>;
 
-public class RefListAnalyzerTests
+public class KsiGenericAnalyzerTests
 {
     [Fact]
     public async Task RefList01IncompatibleItemTypeTraits()
     {
-        await RefListAnalyzerTest.RunAsync(
+        await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
@@ -25,15 +25,15 @@ public class RefListAnalyzerTests
             
                 public static void ExpCopy(in RefList<ExpCopyType> list)
                 {
-                    Generic({|REFLIST01:list|});
+                    Generic({|KSIGENERIC01:list|});
                     ExpCopyGeneric(list);
                     DeallocGeneric(list);
                 }
                 
                 public static void Dealloc(in RefList<DeallocType> list)
                 {
-                    Generic({|REFLIST01:list|});
-                    ExpCopyGeneric({|REFLIST01:list|});
+                    Generic({|KSIGENERIC01:list|});
+                    ExpCopyGeneric({|KSIGENERIC01:list|});
                     DeallocGeneric(list);
                 }
                 
@@ -48,7 +48,7 @@ public class RefListAnalyzerTests
     [Fact]
     public async Task RefList01NonSpecializedCall()
     {
-        await RefListAnalyzerTest.RunAsync(
+        await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
@@ -67,13 +67,13 @@ public class RefListAnalyzerTests
                     var b = RefList.Empty<TestStruct>();
                     
                     // Use generic non-specialized API:
-                    {|REFLIST01:a|}.CopyTo<TestStruct>({|REFLIST01:ref b|});
-                    {|REFLIST01:a|}.CopyFrom<TestStruct>({|REFLIST01:b|});
+                    {|KSIGENERIC01:a|}.CopyTo<TestStruct>({|KSIGENERIC01:ref b|});
+                    {|KSIGENERIC01:a|}.CopyFrom<TestStruct>({|KSIGENERIC01:b|});
                     
-                    {|REFLIST01:a|}.Dealloc<TestStruct>();
-                    {|REFLIST01:a|}.Deallocated<TestStruct>() = default;
-                    {|REFLIST01:a|}.Clear<TestStruct>();
-                    {|REFLIST01:a|}.RemoveAt<TestStruct>(0);
+                    {|KSIGENERIC01:a|}.Dealloc<TestStruct>();
+                    {|KSIGENERIC01:a|}.Deallocated<TestStruct>() = default;
+                    {|KSIGENERIC01:a|}.Clear<TestStruct>();
+                    {|KSIGENERIC01:a|}.RemoveAt<TestStruct>(0);
                 }
             }
             """
@@ -83,29 +83,29 @@ public class RefListAnalyzerTests
     [Fact]
     public async Task RefList02JaggedRefList()
     {
-        await RefListAnalyzerTest.RunAsync(
+        await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
             """
             using Ksi;
 
             public static class Test
             {
-                public static void Method(ref {|REFLIST02:RefList<RefList<int>>|} param)
+                public static void Method(ref {|KSIGENERIC02:RefList<RefList<int>>|} param)
                 {
-                    {|REFLIST02:RefList<RefList<int>>|} a = default;
-                    {|REFLIST02:var|} b = RefList.Empty<RefList<int>>();
+                    {|KSIGENERIC02:RefList<RefList<int>>|} a = default;
+                    {|KSIGENERIC02:var|} b = RefList.Empty<RefList<int>>();
                 }
             }
             
             [ExplicitCopy, DynSized, Dealloc]
             public struct TestStruct
             {
-                public {|REFLIST02:RefList<RefList<int>>|} Jagged;
+                public {|KSIGENERIC02:RefList<RefList<int>>|} Jagged;
             }
 
             public class TestClass
             {
-                private ExclusiveAccess<{|REFLIST02:RefList<RefList<int>>|}> _listAccess;
+                private ExclusiveAccess<{|KSIGENERIC02:RefList<RefList<int>>|}> _listAccess;
             }
             """
         );

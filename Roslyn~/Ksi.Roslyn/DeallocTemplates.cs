@@ -18,9 +18,9 @@ namespace Ksi.Roslyn
                 foreach(ref var item in self.RefIter())
                     item.Dealloc();
 
-                #pragma warning disable REFLIST01
+                #pragma warning disable KSIGENERIC01
                 self.Dealloc<{1}>();
-                #pragma warning restore REFLIST01
+                #pragma warning restore KSIGENERIC01
             }}
             """;
 
@@ -71,9 +71,9 @@ namespace Ksi.Roslyn
                 foreach(ref var item in self.RefIter())
                     item.Dealloc();
 
-                #pragma warning disable REFLIST01
+                #pragma warning disable KSIGENERIC01
                 self.Clear<{1}>();
-                #pragma warning restore REFLIST01
+                #pragma warning restore KSIGENERIC01
             }}
 
             /// <summary>
@@ -85,9 +85,9 @@ namespace Ksi.Roslyn
             {{
                 self.RefAt(index).Dealloc();
 
-                #pragma warning disable REFLIST01
+                #pragma warning disable KSIGENERIC01
                 self.RemoveAt<{1}>(index);
-                #pragma warning restore REFLIST01
+                #pragma warning restore KSIGENERIC01
             }}
             """;
 

@@ -5,7 +5,7 @@ public static class RefListTemplates
     public const string StaticApi =
         // language=cs
         """
-        #pragma warning disable REFLIST01
+        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {
@@ -52,7 +52,7 @@ public static class RefListTemplates
         """
         using System;
 
-        #pragma warning disable REFLIST01
+        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {
@@ -224,7 +224,7 @@ public static class RefListTemplates
         """
         using System;
 
-        #pragma warning disable REFLIST01
+        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {
@@ -261,7 +261,7 @@ public static class RefListTemplates
         """
         using System;
 
-        #pragma warning disable REFLIST01
+        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {

@@ -9,12 +9,12 @@ using Microsoft.CodeAnalysis.Operations;
 namespace Ksi.Roslyn;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class RefListAnalyzer : DiagnosticAnalyzer
+public class KsiGenericAnalyzer : DiagnosticAnalyzer
 {
     private static DiagnosticDescriptor Rule(int id, DiagnosticSeverity severity, string title, string msg)
     {
         return new DiagnosticDescriptor(
-            id: $"REFLIST{id:D2}",
+            id: $"KSIGENERIC{id:D2}",
             title: title,
             messageFormat: msg,
             category: "Ksi",
