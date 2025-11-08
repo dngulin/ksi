@@ -243,33 +243,6 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy10GenericArgument()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            [Ksi.ExplicitCopy]
-            public struct MyStruct { public int Field; }
-            
-            public static class Test
-            {
-                public static void GenericMethod<T>(in T value) {}
-                public static void GenericValMethod<T>(T value) {}
-                public static void SafeGenericMethod<[Ksi.ExplicitCopy] T>(in T value) {}
-            
-                public static void Caller()
-                {
-                    var a = new MyStruct();
-                    GenericMethod({|EXPCOPY10:a|});
-                    GenericValMethod({|EXPCOPY10:default(MyStruct)|});
-                    SafeGenericMethod(a);
-                }
-            }
-            """
-        );
-    }
-
-    [Fact]
     public async Task ExpCopy11TypeArgument()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(

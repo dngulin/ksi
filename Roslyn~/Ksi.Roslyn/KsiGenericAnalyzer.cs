@@ -24,8 +24,8 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     }
 
     private static readonly DiagnosticDescriptor Rule01IncompatibleGenericTypeTraits = Rule(01, DiagnosticSeverity.Error,
-        "Passing TRefList<T> argument with incompatible item type traits",
-        "Passing TRefList<T> argument with incompatible item type traits"
+        "Generic argument traits are not compatible with generic parameter traits",
+        "Generic argument traits are not compatible with generic parameter traits"
     );
 
     private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
@@ -87,12 +87,34 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeArgument(OperationAnalysisContext ctx)
     {
         var a = (IArgumentOperation)ctx.Operation;
-        var p = a.Parameter;
+        AnalyzeGenericArg(ctx, a);
+        AnalyzeInnerGenericArg(ctx, a);
+    }
 
+    private static void AnalyzeGenericArg(OperationAnalysisContext ctx, IArgumentOperation a)
+    {
+        if (a.Value.Type is not INamedTypeSymbol at)
+            return;
+
+        if (a.Parameter?.OriginalDefinition.Type is not ITypeParameterSymbol pt)
+            return;
+
+        if (a.Parameter.RefKind == RefKind.Out)
+            return;
+
+        if (!CheckExpCopy(at, pt) || !CheckDealloc(at, pt) || !CheckTempAlloc(at, pt))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01IncompatibleGenericTypeTraits, a.Syntax.GetLocation()));
+    }
+
+    private static void AnalyzeInnerGenericArg(OperationAnalysisContext ctx, IArgumentOperation a)
+    {
         if (a.Value.Type is not INamedTypeSymbol at || !at.IsSupportedGenericType())
             return;
 
-        if (p?.OriginalDefinition.Type is not INamedTypeSymbol pt || !pt.IsSupportedGenericType())
+        if (a.Parameter?.OriginalDefinition.Type is not INamedTypeSymbol pt || !pt.IsSupportedGenericType())
+            return;
+
+        if (a.Parameter.RefKind == RefKind.Out)
             return;
 
         var gat = at.TypeArguments[0];

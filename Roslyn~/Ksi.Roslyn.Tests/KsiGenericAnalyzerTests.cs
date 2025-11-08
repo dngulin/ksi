@@ -11,10 +11,38 @@ public class KsiGenericAnalyzerTests
             // language=cs
             """
             using Ksi;
-            [ExplicitCopy] public struct ExpCopyType {}
-            [ExplicitCopy, Dealloc] public struct DeallocType {}
+            [ExplicitCopy] public struct ExpCopyType { public int Value; }
+            [ExplicitCopy, DynSized, Dealloc] public struct DeallocType { public RefList<int> Value; }
+            
+            public static class GenericTest
+            {
+                public static void NonTrait(in int value)
+                {
+                    Generic(value);
+                    ExpCopyGeneric(value);
+                    DeallocGeneric(value);
+                }
+            
+                public static void ExpCopy(in ExpCopyType value)
+                {
+                    Generic({|KSIGENERIC01:value|});
+                    ExpCopyGeneric(value);
+                    DeallocGeneric(value);
+                }
+                
+                public static void Dealloc(in DeallocType value)
+                {
+                    Generic({|KSIGENERIC01:value|});
+                    ExpCopyGeneric({|KSIGENERIC01:value|});
+                    DeallocGeneric(value);
+                }
+                
+                public static void Generic<T>(in T value) where T : unmanaged => throw null;
+                public static void ExpCopyGeneric<[ExplicitCopy] T>(in T value) where T : unmanaged => throw null;
+                public static void DeallocGeneric<[ExplicitCopy, Dealloc] T>(in T value) where T : unmanaged => throw null;
+            }
 
-            public static class Test
+            public static class InnerGenericTest
             {
                 public static void NonTrait(in RefList<int> list)
                 {

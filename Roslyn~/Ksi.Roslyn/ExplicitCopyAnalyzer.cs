@@ -71,11 +71,6 @@ namespace Ksi.Roslyn
             "Custom generic [ExplicitCopy] types are not allowed. Consider to use TRefList<T> instead"
         );
 
-        private static readonly DiagnosticDescriptor Rule10GenericArgument = Rule(10,
-            "Passing [ExplicitCopy] instance as a generic argument",
-            "Passing an instance of the [ExplicitCopy] type as a generic argument that is not marked as [ExplicitCopy]"
-        );
-
         private static readonly DiagnosticDescriptor Rule11TypeArgument = Rule(11,
             "Passing [ExplicitCopy] type as a type argument",
             "Passing [ExplicitCopy] type `{0}` as a type argument. Consider to use TRefList<T> instead"
@@ -102,7 +97,6 @@ namespace Ksi.Roslyn
             Rule07Boxing,
             Rule08PrivateField,
             Rule09GenericDeclaration,
-            Rule10GenericArgument,
             Rule11TypeArgument,
             Rule12SpanCopy,
             Rule13LowAccessibility
@@ -145,18 +139,8 @@ namespace Ksi.Roslyn
             if (p == null || t == null || !t.IsExplicitCopy())
                 return;
 
-            var loc = arg.Value.Syntax.GetLocation();
-            switch (p.RefKind)
-            {
-                case RefKind.None when !IsNotExistingValue(arg.Value):
-                    ctx.ReportDiagnostic(Diagnostic.Create(Rule02ArgumentCopy, loc));
-                    break;
-                case RefKind.None or RefKind.Ref or RefKind.In:
-                    var ot = p.OriginalDefinition.Type;
-                    if (ot is ITypeParameterSymbol && !ot.IsExplicitCopy())
-                        ctx.ReportDiagnostic(Diagnostic.Create(Rule10GenericArgument, loc, t.Name));
-                    break;
-            }
+            if (p.RefKind == RefKind.None && !IsNotExistingValue(arg.Value))
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule02ArgumentCopy, arg.Value.Syntax.GetLocation()));
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)

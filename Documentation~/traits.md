@@ -87,7 +87,6 @@ Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g
 | `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance            |
 | `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type   |
 | `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration                |
-| `EXPCOPY10`   | Error    | Passing `[ExplicitCopy]` instance as a generic argument  |
 | `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument         |
 | `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items       |
 | `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility |
@@ -204,7 +203,6 @@ Diagnostics related to the [DeallocAttribute](api/T.DeallocAttribute.g.md):
 | `DEALLOC03`   | Warning  | Redundant `[Dealloc]` attribute                    |
 | `DEALLOC04`   | Error    | Overwriting `[Dealloc]` instance                   |
 | `DEALLOC05`   | Error    | Unused `[Dealloc]` instance                        |
-| `DEALLOC06`   | Error    | Passing `[Dealloc]` instance as a generic argument |
 
 ## TempAlloc Attribute
 

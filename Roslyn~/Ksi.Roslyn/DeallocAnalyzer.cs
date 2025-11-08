@@ -51,18 +51,12 @@ namespace Ksi.Roslyn
             "[Dealloc] instance returned by operation is not used and won't be deallocated"
         );
 
-        private static readonly DiagnosticDescriptor Rule06GenericArgument = Rule(06, DiagnosticSeverity.Error,
-            "Passing [Dealloc] instance as a generic argument",
-            "Passing an instance of the [Dealloc] type as a generic argument that is not marked as [Dealloc]"
-        );
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Rule01MissingAttribute,
             Rule02MissingDynSized,
             Rule03RedundantAttribute,
             Rule04Overwrite,
-            Rule05UnusedInstance,
-            Rule06GenericArgument
+            Rule05UnusedInstance
         );
 
         public override void Initialize(AnalysisContext context)
@@ -77,7 +71,6 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterOperationAction(AnalyzeInvocationAssignment, OperationKind.Invocation);
             context.RegisterOperationAction(AnalyzeInvocationSafety, OperationKind.Invocation);
-            context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
         }
 
         private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -170,30 +163,6 @@ namespace Ksi.Roslyn
 
             if (i.TargetMethod.Name == "Clear")
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule04Overwrite, i.Syntax.GetLocation()));
-        }
-
-        private static void AnalyzeArgument(OperationAnalysisContext ctx)
-        {
-            var arg = (IArgumentOperation)ctx.Operation;
-            var p = arg.Parameter;
-            var t = arg.Value.Type;
-
-            if (p == null || t == null || !t.IsDeallocOrRefListOverDealloc())
-                return;
-
-            if (p.RefKind is not (RefKind.Ref or RefKind.In))
-                return;
-
-            var ot = p.OriginalDefinition.Type;
-            if (ot is not ITypeParameterSymbol)
-                return;
-
-            // Handled by ExplicitCopy analyzer or already compatible
-            if (!ot.IsExplicitCopy() || ot.IsDealloc())
-                return;
-
-            var loc = arg.Value.Syntax.GetLocation();
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule06GenericArgument, loc, t.Name));
         }
     }
 }
