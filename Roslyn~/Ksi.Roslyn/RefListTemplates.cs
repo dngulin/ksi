@@ -5,8 +5,6 @@ public static class RefListTemplates
     public const string StaticApi =
         // language=cs
         """
-        #pragma warning disable KSIGENERIC01
-
         namespace Ksi
         {
             /// <summary>
@@ -51,8 +49,6 @@ public static class RefListTemplates
         // language=cs
         """
         using System;
-
-        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {
@@ -141,7 +137,9 @@ public static class RefListTemplates
                        return;
 
                     var newSize = Math.Max(self.Capacity() * 2, 1);
+                    #pragma warning disable KSIGENERIC01
                     self.SetBufferSize(newSize);
+                    #pragma warning restore KSIGENERIC01
                 }
 
                 /// <summary>
@@ -156,7 +154,11 @@ public static class RefListTemplates
                         throw new IndexOutOfRangeException();
 
                     self.Count--;
+                        
+                    #pragma warning disable KSIGENERIC01
                     self.CopyWithinBuffer(index + 1, index, self.Count - index);
+                    #pragma warning restore KSIGENERIC01
+                    
                     self.IndexBufferMut(self.Count) = default;
                 }
 
@@ -187,7 +189,9 @@ public static class RefListTemplates
                     var newCount = self.Count + count;
 
                     if (self.Capacity() < newCount)
+                        #pragma warning disable KSIGENERIC01
                         self.SetBufferSize(newCount);
+                        #pragma warning restore KSIGENERIC01
 
                     self.Count = newCount;
                 }
@@ -224,8 +228,6 @@ public static class RefListTemplates
         """
         using System;
 
-        #pragma warning disable KSIGENERIC01
-
         namespace Ksi
         {
             /// <summary>
@@ -260,8 +262,6 @@ public static class RefListTemplates
         // language=cs
         """
         using System;
-
-        #pragma warning disable KSIGENERIC01
 
         namespace Ksi
         {
@@ -319,14 +319,14 @@ public static class RefListTemplates
             // Suppress missing docstrings warning for trivial iterator implementations
             #pragma warning disable CS1591
 
-            public readonly ref struct |TRefList|Iterator<T> where T : |constraint|
+            public readonly ref struct |TRefList|Iterator<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly Span<T> _span;
                 public |TRefList|Iterator(in Span<T> span) => _span = span;
                 public |TRefList|Enumerator<T> GetEnumerator() => new |TRefList|Enumerator<T>(_span);
             }
 
-            public ref struct |TRefList|Enumerator<T> where T : |constraint|
+            public ref struct |TRefList|Enumerator<[|TraitsAll|] T> where T : |constraint|
             {
                 private Span<T> _span;
                 private int _curr;
@@ -343,14 +343,14 @@ public static class RefListTemplates
                 public void Dispose() {}
             }
 
-            public readonly ref struct |TRefList|ReadOnlyIterator<T> where T : |constraint|
+            public readonly ref struct |TRefList|ReadOnlyIterator<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly ReadOnlySpan<T> _span;
                 public |TRefList|ReadOnlyIterator(in ReadOnlySpan<T> span) => _span = span;
                 public |TRefList|ReadOnlyEnumerator<T> GetEnumerator() => new |TRefList|ReadOnlyEnumerator<T>(_span);
             }
 
-            public ref struct |TRefList|ReadOnlyEnumerator<T> where T : |constraint|
+            public ref struct |TRefList|ReadOnlyEnumerator<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly ReadOnlySpan<T> _span;
                 private int _curr;
@@ -367,14 +367,14 @@ public static class RefListTemplates
                 public void Dispose() {}
             }
 
-            public readonly ref struct |TRefList|IteratorReversed<T> where T : |constraint|
+            public readonly ref struct |TRefList|IteratorReversed<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly Span<T> _span;
                 public |TRefList|IteratorReversed(in Span<T> span) => _span = span;
                 public |TRefList|EnumeratorReversed<T> GetEnumerator() => new |TRefList|EnumeratorReversed<T>(_span);
             }
 
-            public ref struct |TRefList|EnumeratorReversed<T> where T : |constraint|
+            public ref struct |TRefList|EnumeratorReversed<[|TraitsAll|] T> where T : |constraint|
             {
                 private Span<T> _span;
                 private int _curr;
@@ -391,14 +391,14 @@ public static class RefListTemplates
                 public void Dispose() {}
             }
 
-            public readonly ref struct |TRefList|ReadOnlyIteratorReversed<T> where T : |constraint|
+            public readonly ref struct |TRefList|ReadOnlyIteratorReversed<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly ReadOnlySpan<T> _span;
                 public |TRefList|ReadOnlyIteratorReversed(in ReadOnlySpan<T> span) => _span = span;
                 public |TRefList|ReadOnlyEnumeratorReversed<T> GetEnumerator() => new |TRefList|ReadOnlyEnumeratorReversed<T>(_span);
             }
 
-            public ref struct |TRefList|ReadOnlyEnumeratorReversed<T> where T : |constraint|
+            public ref struct |TRefList|ReadOnlyEnumeratorReversed<[|TraitsAll|] T> where T : |constraint|
             {
                 private readonly ReadOnlySpan<T> _span;
                 private int _curr;

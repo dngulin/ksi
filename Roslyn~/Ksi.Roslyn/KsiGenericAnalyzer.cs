@@ -23,7 +23,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         );
     }
 
-    private static readonly DiagnosticDescriptor Rule01IncompatibleItemTypeTraits = Rule(01, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule01IncompatibleGenericTypeTraits = Rule(01, DiagnosticSeverity.Error,
         "Passing TRefList<T> argument with incompatible item type traits",
         "Passing TRefList<T> argument with incompatible item type traits"
     );
@@ -34,8 +34,9 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         "Consider to wrap inner collection with a structure"
     );
 
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        Rule01IncompatibleItemTypeTraits,
+        Rule01IncompatibleGenericTypeTraits,
         Rule02JaggedRefList
     );
 
@@ -100,7 +101,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
             return;
 
         if (!CheckExpCopy(gat, gpt) || !CheckDealloc(gat, gpt) || !CheckTempAlloc(gat, gpt))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule01IncompatibleItemTypeTraits, a.Syntax.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01IncompatibleGenericTypeTraits, a.Syntax.GetLocation()));
     }
 
     private static bool CheckExpCopy(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsExplicitCopy() || p.IsExplicitCopy();
