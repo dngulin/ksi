@@ -41,7 +41,6 @@ public class RefListAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        Rule01GenericItemType,
         Rule02JaggedRefList,
         Rule03NonSpecializedCall
     );
@@ -65,16 +64,8 @@ public class RefListAnalyzer : DiagnosticAnalyzer
             return;
 
         var i = ctx.SemanticModel.GetTypeInfo(s.GetTypeExpr(), ctx.CancellationToken);
-        switch (AnalyzeGenericType(i.Type))
-        {
-            case RuleId.Rule01GenericItemType:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, s.GetLocation()));
-                break;
-
-            case RuleId.Rule02JaggedRefList:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, s.GetLocation()));
-                break;
-        }
+        if (IsJaggedRefList(i.Type))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, s.GetLocation()));
     }
 
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
@@ -83,37 +74,19 @@ public class RefListAnalyzer : DiagnosticAnalyzer
         if (!d.IsVar())
             return;
 
-        switch (AnalyzeGenericType(d.Symbol.Type))
-        {
-            case RuleId.Rule01GenericItemType:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule01GenericItemType, d.GetDeclaredTypeLocation()));
-                break;
-
-            case RuleId.Rule02JaggedRefList:
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, d.GetDeclaredTypeLocation()));
-                break;
-        }
+        if (IsJaggedRefList(d.Symbol.Type))
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, d.GetDeclaredTypeLocation()));
     }
 
-    private enum RuleId
-    {
-        None,
-        Rule01GenericItemType,
-        Rule02JaggedRefList,
-    }
-
-    private static RuleId AnalyzeGenericType(ITypeSymbol? s)
+    private static bool IsJaggedRefList(ITypeSymbol? s)
     {
         if (s is not INamedTypeSymbol { IsGenericType: true, TypeKind: TypeKind.Struct } t || !t.IsRefList())
-            return RuleId.None;
+            return false;
 
         if (t.TypeArguments[0] is not INamedTypeSymbol gt)
-            return RuleId.Rule01GenericItemType;
+            return false;
 
-        if (gt.IsRefList())
-            return RuleId.Rule02JaggedRefList;
-
-        return RuleId.None;
+        return gt.IsRefList();
     }
 
     private static void AnalyzeExtensionInvocation(OperationAnalysisContext ctx)
