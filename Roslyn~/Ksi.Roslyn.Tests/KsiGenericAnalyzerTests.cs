@@ -162,7 +162,7 @@ public class KsiGenericAnalyzerTests
                     Generic<{|KSIGENERIC03:MyStruct|}> a = default;
                     {|KSIGENERIC03:var|} b = new Generic<{|KSIGENERIC03:MyStruct|}>();
                     {|KSIGENERIC03:var|} c = new {|KSIGENERIC03:MyStruct[10]|};
-                    {|KSIGENERIC03:var|} d = (new MyStruct(), 42);
+                    {|KSIGENERIC03:var|} d = ({|KSIGENERIC03:new MyStruct()|}, 42);
                 }
             }
             """

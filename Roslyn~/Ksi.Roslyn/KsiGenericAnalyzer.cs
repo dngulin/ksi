@@ -59,6 +59,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeTupleTypeSyntax, SyntaxKind.TupleType);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
+        context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
 
     }
 
@@ -201,5 +202,19 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     private static bool CheckTraits(ITypeSymbol at, ITypeParameterSymbol pt)
     {
         return CheckExpCopy(at, pt) && CheckDealloc(at, pt) && CheckTempAlloc(at, pt);
+    }
+
+    private static void AnalyzeTuple(OperationAnalysisContext ctx)
+    {
+        var tuple = (ITupleOperation)ctx.Operation;
+        for (var i = 0; i < tuple.Elements.Length; i++)
+        {
+            var e = tuple.Elements[i];
+            if (e.Type == null)
+                continue;
+
+            if (e.Type.IsExplicitCopy())
+                ctx.Report(e.Syntax.GetLocation(), Rule03GenericTypeArgumentTraits, e.Type.Name, $"T{i+1}");
+        }
     }
 }
