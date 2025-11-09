@@ -47,32 +47,4 @@ public class TempAllocAnalyzerTests
             """
         );
     }
-
-    [Fact]
-    public async Task TempAlloc04IncompatibleAllocator()
-    {
-        await TempAllocAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            using Ksi;
-
-            [ExplicitCopy, DynSized, TempAlloc]
-            public struct TestStruct { public TempRefList<int> List; }
-            
-            public static class TestClass
-            {
-                public static void Test(
-                    in TempRefList<TestStruct> a,
-                    in {|TEMPALLOC04:RefList<TestStruct>|} b,
-                    in {|TEMPALLOC04:ManagedRefList<TestStruct>|} c
-                )
-                {
-                    var x = TempRefList.Empty<TestStruct>();
-                    {|TEMPALLOC04:var|} y = RefList.Empty<TestStruct>();
-                    {|TEMPALLOC04:var|} z = ManagedRefList.Empty<TestStruct>();
-                }
-            }
-            """
-        );
-    }
 }

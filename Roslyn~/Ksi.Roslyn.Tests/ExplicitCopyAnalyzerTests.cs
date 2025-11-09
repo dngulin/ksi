@@ -228,48 +228,6 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy11TypeArgument()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            using Ksi;
-            using System;
-            
-            [ExplicitCopy]
-            public struct MyStruct { public int Field; }
-            public struct Generic<T> { public T Field; }
-            
-            [ExplicitCopy]
-            public struct Test
-            {
-                public {|EXPCOPY11:Generic<MyStruct>|} Field;
-                
-                public static void Method(in {|EXPCOPY11:Generic<MyStruct>|} arg)
-                {
-                    {|EXPCOPY11:Generic<MyStruct>|} a = default;
-                    {|EXPCOPY11:var|} b = new {|EXPCOPY11:Generic<MyStruct>|}();
-                    {|EXPCOPY11:var|} c = new {|EXPCOPY11:MyStruct[10]|};
-                }
-                
-                public static void ValidGenerics(
-                    in RefList<MyStruct> refList,
-                    in TempRefList<MyStruct> tempRefList,
-                    in ManagedRefList<MyStruct> managedRefList,
-                    Span<MyStruct> rwSpan,
-                    ReadOnlySpan<MyStruct> roSpan,
-                    ExclusiveAccess<MyStruct> exAcc,
-                    MutableAccessScope<MyStruct> rwScope,
-                    ReadOnlyAccessScope<MyStruct> roScope
-                )
-                {
-                }
-            }
-            """
-        );
-    }
-
-    [Fact]
     public async Task ExpCopy12SpanCopy()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(

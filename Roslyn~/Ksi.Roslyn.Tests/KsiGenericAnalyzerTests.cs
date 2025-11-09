@@ -5,7 +5,7 @@ using KsiGenericAnalyzerTest = Util.KsiAnalyzerTest<KsiGenericAnalyzer>;
 public class KsiGenericAnalyzerTests
 {
     [Fact]
-    public async Task RefList01IncompatibleItemTypeTraits()
+    public async Task KsiGeneric01GenericMethodArgumentTraits()
     {
         await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
@@ -74,7 +74,7 @@ public class KsiGenericAnalyzerTests
     }
 
     [Fact]
-    public async Task RefList01NonSpecializedCall()
+    public async Task KsiGeneric01NonSpecializedCall()
     {
         await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
@@ -109,7 +109,7 @@ public class KsiGenericAnalyzerTests
     }
 
     [Fact]
-    public async Task RefList02JaggedRefList()
+    public async Task KsiGeneric02JaggedRefList()
     {
         await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
@@ -134,6 +134,64 @@ public class KsiGenericAnalyzerTests
             public class TestClass
             {
                 private ExclusiveAccess<{|KSIGENERIC02:RefList<RefList<int>>|}> _listAccess;
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task KsiGeneric03GenericTypeArgumentTraits()
+    {
+        await KsiGenericAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            using System;
+
+            [ExplicitCopy]
+            public struct MyStruct { public int Field; }
+            public struct Generic<T> { public T Field; }
+
+            [ExplicitCopy]
+            public struct Test
+            {
+                public Generic<{|KSIGENERIC03:MyStruct|}> Field;
+                
+                public static void Method(in Generic<{|KSIGENERIC03:MyStruct|}> arg)
+                {
+                    Generic<{|KSIGENERIC03:MyStruct|}> a = default;
+                    {|KSIGENERIC03:var|} b = new Generic<{|KSIGENERIC03:MyStruct|}>();
+                    {|KSIGENERIC03:var|} c = new {|KSIGENERIC03:MyStruct[10]|};
+                    {|KSIGENERIC03:var|} d = (new MyStruct(), 42);
+                }
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task KsiGeneric03TempAllocContainers()
+    {
+        await KsiGenericAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [ExplicitCopy, DynSized, TempAlloc]
+            public struct TestStruct { public TempRefList<int> List; }
+
+            public static class TestClass
+            {
+                public static void Test(
+                    in TempRefList<TestStruct> a,
+                    in RefList<{|KSIGENERIC03:TestStruct|}> b,
+                    in ManagedRefList<{|KSIGENERIC03:TestStruct|}> c
+                )
+                {
+                    var x = TempRefList.Empty<TestStruct>();
+                    {|KSIGENERIC03:var|} y = RefList.Empty<TestStruct>();
+                    {|KSIGENERIC03:var|} z = ManagedRefList.Empty<TestStruct>();
+                }
             }
             """
         );
