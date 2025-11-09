@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace Ksi.Roslyn;
 
@@ -40,16 +39,10 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
         "Structure is marked with the [TempAlloc] attribute but doesn't have any [TempAlloc] fields"
     );
 
-    private static readonly DiagnosticDescriptor Rule04IncompatibleAllocator = Rule(04, DiagnosticSeverity.Error,
-        "Incompatible allocator with the [TempAlloc] type",
-        "[TempAlloc] type `{0}` can be owned only by a [TempAlloc] collection"
-    );
-
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01MissingAttribute,
         Rule02MissingDynSized,
-        Rule03RedundantAttribute,
-        Rule04IncompatibleAllocator
+        Rule03RedundantAttribute
     );
 
     public override void Initialize(AnalysisContext context)
@@ -61,8 +54,6 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
-        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
-        context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -95,49 +86,5 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
 
         if (!hasTempFields)
             ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First()));
-    }
-
-    private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
-    {
-        var s = (GenericNameSyntax)ctx.Node;
-        if (s.IsUnboundGenericName)
-            return;
-
-        var i = ctx.SemanticModel.GetTypeInfo(s, ctx.CancellationToken);
-        if (i.Type == null || !IsInvalidTempAllocContainer(i.Type, out var gt))
-            return;
-
-        ctx.ReportDiagnostic(Diagnostic.Create(Rule04IncompatibleAllocator, s.GetLocation(), gt!.Name));
-    }
-
-    private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)
-    {
-        var d = (IVariableDeclaratorOperation)ctx.Operation;
-
-        if (!d.IsVar())
-            return;
-
-        if (!IsInvalidTempAllocContainer(d.Symbol.Type, out var gt))
-            return;
-
-        var loc = d.GetDeclaredTypeLocation();
-        ctx.ReportDiagnostic(Diagnostic.Create(Rule04IncompatibleAllocator, loc, gt!.Name));
-    }
-
-    private static bool IsInvalidTempAllocContainer(ITypeSymbol t, out ITypeSymbol? gt)
-    {
-        gt = null;
-
-        if (t is not INamedTypeSymbol { IsGenericType: true } nt)
-            return false;
-
-        if (!nt.IsSupportedGenericType())
-            return false;
-
-        gt = nt.TypeArguments.First();
-        if (!gt.IsTempAlloc())
-            return false;
-
-        return nt.IsRefList() && !nt.IsTempAlloc();
     }
 }

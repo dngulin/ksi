@@ -66,16 +66,6 @@ namespace Ksi.Roslyn
             "Declaring a private field prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor Rule09GenericDeclaration = Rule(09,
-            "Generic [ExplicitCopy] type declaration",
-            "Custom generic [ExplicitCopy] types are not allowed. Consider to use TRefList<T> instead"
-        );
-
-        private static readonly DiagnosticDescriptor Rule11TypeArgument = Rule(11,
-            "Passing [ExplicitCopy] type as a type argument",
-            "Passing [ExplicitCopy] type `{0}` as a type argument. Consider to use TRefList<T> instead"
-        );
-
         private static readonly DiagnosticDescriptor Rule12SpanCopy = Rule(12,
             "Using Span copying API with [ExplicitCopy] items",
             "Span operation is not valid for [ExplicitCopy] types"
@@ -96,8 +86,6 @@ namespace Ksi.Roslyn
             Rule06ClosureCapture,
             Rule07Boxing,
             Rule08PrivateField,
-            Rule09GenericDeclaration,
-            Rule11TypeArgument,
             Rule12SpanCopy,
             Rule13LowAccessibility
         );
@@ -124,10 +112,7 @@ namespace Ksi.Roslyn
             context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
-            context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
             context.RegisterOperationAction(AnalyzeInvocation, OperationKind.Invocation);
-            context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
-            context.RegisterSyntaxNodeAction(AnalyzeArrayType, SyntaxKind.ArrayType);
         }
 
         private static void AnalyzeArgument(OperationAnalysisContext ctx)
@@ -228,22 +213,6 @@ namespace Ksi.Roslyn
             var d = (IVariableDeclaratorOperation)ctx.Operation;
             if (!d.Symbol.IsRef && d.Initializer != null)
                 AnalyzeAssignment(ctx, d.Initializer.Value, d.Syntax.GetLocation());
-
-            if (!d.IsVar())
-                return;
-
-            var t = d.Symbol.Type switch
-            {
-                IArrayTypeSymbol a when a.ElementType.IsExplicitCopy() => a.ElementType,
-                INamedTypeSymbol n when n.IsNotSupportedGenericOverExplicitCopy(out var dyn) => dyn,
-                _ => null
-            };
-
-            if (t != null)
-            {
-                var loc = d.GetDeclaredTypeLocation();
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, loc, t.Name));
-            }
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)
@@ -267,25 +236,8 @@ namespace Ksi.Roslyn
             if (t == null)
                 return;
 
-            if (t.IsGenericType && t.IsExplicitCopy() && !t.IsRefList())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule09GenericDeclaration, t.Locations.First(), t.Name));
-
             if (t.IsExplicitCopy() && t.InAssemblyAccessibility() < Accessibility.Internal)
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule13LowAccessibility, t.Locations.First()));
-        }
-
-        private static void AnalyzeTuple(OperationAnalysisContext ctx)
-        {
-            var tuple = (ITupleOperation)ctx.Operation;
-            foreach (var e in tuple.Elements)
-            {
-                if (e.Type == null)
-                    continue;
-
-                if (e.Type.IsExplicitCopy())
-                    ctx.ReportDiagnostic(
-                        Diagnostic.Create(Rule11TypeArgument, e.Syntax.GetLocation(), e.Type.Name));
-            }
         }
 
         private static void AnalyzeInvocation(OperationAnalysisContext ctx)
@@ -320,38 +272,6 @@ namespace Ksi.Roslyn
                     ctx.ReportDiagnostic(Diagnostic.Create(Rule12SpanCopy, op.Syntax.GetLocation(), gt.Name));
                     break;
             }
-        }
-
-        private static void AnalyzeGenericName(SyntaxNodeAnalysisContext ctx)
-        {
-            var s = (GenericNameSyntax)ctx.Node;
-            if (s.IsUnboundGenericName)
-                return;
-
-            var i = ctx.SemanticModel.GetTypeInfo(s.GetTypeExpr(), ctx.CancellationToken);
-            if (i.Type is not INamedTypeSymbol { IsGenericType: true } t)
-                return;
-
-            if (t.IsSupportedGenericType())
-                return;
-
-            foreach (var a in t.TypeArguments)
-            {
-                if (a is INamedTypeSymbol na && na.IsExplicitCopy())
-                    ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, s.GetLocation(), na.Name));
-            }
-        }
-
-        private static void AnalyzeArrayType(SyntaxNodeAnalysisContext ctx)
-        {
-            var a = (ArrayTypeSyntax)ctx.Node;
-
-            var i = ctx.SemanticModel.GetTypeInfo(a.ElementType, ctx.CancellationToken);
-            if (i.Type is not INamedTypeSymbol { TypeKind: TypeKind.Struct } t)
-                return;
-
-            if (t.IsExplicitCopy())
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule11TypeArgument, a.GetLocation(), t.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)

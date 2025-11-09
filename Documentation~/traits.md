@@ -86,8 +86,6 @@ Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g
 | `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure       |
 | `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance            |
 | `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type   |
-| `EXPCOPY09`   | Error    | Generic `[ExplicitCopy]` type declaration                |
-| `EXPCOPY11`   | Error    | Passing `[ExplicitCopy]` type as a type argument         |
 | `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items       |
 | `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility |
 
@@ -237,4 +235,3 @@ Diagnostics related to the [TempAllocAttribute](api/T.TempAllocAttribute.g.md):
 | `TEMPALLOC01`  | Error    | Missing `[TempAlloc]` attribute                    |
 | `TEMPALLOC02`  | Error    | Missing `[ExplicitCopy]` attribute                 |
 | `TEMPALLOC03`  | Warning  | Redundant `[TempAlloc]` attribute                  |
-| `TEMPALLOC04`  | Error    | Incompatible allocator with the `[TempAlloc]` type |

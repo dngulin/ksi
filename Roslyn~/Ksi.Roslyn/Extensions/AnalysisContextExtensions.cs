@@ -11,4 +11,11 @@ public static class AnalysisContextExtensions
     {
         self.ReportDiagnostic(Diagnostic.Create(d, l, args));
     }
+
+    public static void Report(
+        this OperationAnalysisContext self, Location l, DiagnosticDescriptor d, params object?[] args
+    )
+    {
+        self.ReportDiagnostic(Diagnostic.Create(d, l, args));
+    }
 }

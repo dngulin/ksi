@@ -8,7 +8,7 @@ namespace Ksi
     /// Requires manual deallocation.
     /// </summary>
     [ExplicitCopy, DynSized, Dealloc, RefList]
-    public struct RefList<T> where T : unmanaged
+    public struct RefList<[ExplicitCopy, Dealloc] T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;
         internal int Count;
@@ -19,7 +19,7 @@ namespace Ksi
     /// Can be stored only on stack.
     /// </summary>
     [ExplicitCopy, DynSized, TempAlloc, RefList]
-    public struct TempRefList<T> where T : unmanaged
+    public struct TempRefList<[ExplicitCopy, Dealloc, TempAlloc] T> where T : unmanaged
     {
         internal UnsafeArray<T> Array;
         internal int Count;
@@ -30,9 +30,11 @@ namespace Ksi
     /// Can store structures containing reference types, but it is not compatible with <c>Burst</c>.
     /// </summary>
     [ExplicitCopy, DynSized, RefList]
-    public struct ManagedRefList<T> where T : struct
+    public struct ManagedRefList<[ExplicitCopy, Dealloc] T> where T : struct
     {
+#pragma warning disable KSIGENERIC03
         internal T[] Array;
+#pragma warning restore KSIGENERIC03
         internal int Count;
     }
 }
