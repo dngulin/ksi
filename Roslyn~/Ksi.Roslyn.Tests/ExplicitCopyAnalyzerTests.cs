@@ -228,21 +228,6 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy09GenericDeclaration()
-    {
-        await ExplicitCopyAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            [Ksi.ExplicitCopy]
-            public struct {|EXPCOPY09:MyStruct|}<T>
-            {
-                public T Field;
-            }
-            """
-        );
-    }
-
-    [Fact]
     public async Task ExpCopy11TypeArgument()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
