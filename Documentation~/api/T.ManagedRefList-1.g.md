@@ -12,7 +12,7 @@ Can store structures containing reference types, but it is not compatible with `
 
 ```csharp
 [ExplicitCopy, DynSized]
-public struct ManagedRefList<T> where T : struct
+public struct ManagedRefList<[ExplicitCopy, Dealloc] T> where T : struct
 ```
 
 Static Creation Methods

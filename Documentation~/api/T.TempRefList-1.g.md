@@ -12,7 +12,7 @@ Can be stored only on stack.
 
 ```csharp
 [ExplicitCopy, DynSized, TempAlloc]
-public struct TempRefList<T> where T : unmanaged
+public struct TempRefList<[ExplicitCopy, Dealloc, TempAlloc] T> where T : unmanaged
 ```
 
 Static Creation Methods

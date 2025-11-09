@@ -12,7 +12,7 @@ Requires manual deallocation.
 
 ```csharp
 [ExplicitCopy, DynSized, Dealloc]
-public struct RefList<T> where T : unmanaged
+public struct RefList<[ExplicitCopy, Dealloc] T> where T : unmanaged
 ```
 
 Static Creation Methods
