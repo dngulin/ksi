@@ -173,7 +173,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool CheckExpCopy(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsExplicitCopy() || p.IsExplicitCopy();
-    private static bool CheckDealloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsDealloc() || p.IsDealloc();
+    private static bool CheckDealloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsDeallocOrRefListOverDealloc() || p.IsDealloc();
     private static bool CheckTempAlloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsTempAlloc() || p.IsTempAlloc();
 
     private static bool CheckTraits(ITypeSymbol t, ITypeParameterSymbol p)

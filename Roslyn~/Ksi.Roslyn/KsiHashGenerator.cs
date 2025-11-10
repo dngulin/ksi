@@ -122,7 +122,7 @@ public class KsiHashGenerator : IIncrementalGenerator
             .Unwrap("[in ]", h.PassKeyByRef)
             .Unwrap("[in `insertion]", h.PassKeyByRef && !keyIsExpCopy)
             .Unwrap("[.Move()]", keyIsExpCopy)
-            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDealloc())
+            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDeallocOrRefListOverDealloc())
             .Unwrap("[.Deallocated()`self]", h.Type.IsDealloc())
             .Unwrap("[.Deallocated()`slot]", h.SlotType.IsDealloc())
             .ToString();
@@ -144,7 +144,7 @@ public class KsiHashGenerator : IIncrementalGenerator
             .Unwrap("[in `insertion]", h.PassKeyByRef && !keyIsExpCopy)
             .Unwrap("[.Move()`key]", keyIsExpCopy)
             .Unwrap("[.Move()`value]", h.ValueType!.IsExplicitCopy())
-            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDealloc())
+            .Unwrap("[key.Dealloc();\n                    ]", h.KeyType.IsDeallocOrRefListOverDealloc())
             .Unwrap("[.Deallocated()`self]", h.Type.IsDealloc())
             .Unwrap("[.Deallocated()`slot]", h.SlotType.IsDealloc())
             .ToString();
