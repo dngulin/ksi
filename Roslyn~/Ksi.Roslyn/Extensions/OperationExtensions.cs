@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -117,6 +118,42 @@ public static class OperationExtensions
                 default:
                     return op;
             }
+        }
+    }
+
+    public static ImmutableArray<(ITypeSymbol, ITypeParameterSymbol)> GetGenericTypeSubstitutions(this IArgumentOperation a)
+    {
+        var at = a.Value.Type;
+        var pt = a.Parameter?.OriginalDefinition.Type;
+
+        if (at == null || pt == null)
+            return ImmutableArray<(ITypeSymbol, ITypeParameterSymbol)>.Empty;
+
+        var subs = ImmutableArray.CreateBuilder<(ITypeSymbol, ITypeParameterSymbol)>();
+        CollectSubstitutions(at, pt, subs);
+        return subs.ToImmutable();
+    }
+
+    private static void CollectSubstitutions(ITypeSymbol at, ITypeSymbol pt, ImmutableArray<(ITypeSymbol, ITypeParameterSymbol)>.Builder subs)
+    {
+        if (pt is ITypeParameterSymbol p)
+        {
+            subs.Add((at, p));
+            return;
+        }
+
+        switch (at)
+        {
+            case INamedTypeSymbol nat when pt is INamedTypeSymbol npt && nat.TypeArguments.Length == npt.TypeArguments.Length:
+            {
+                for (var i = 0; i < nat.TypeArguments.Length; i++)
+                    CollectSubstitutions(nat.TypeArguments[i], npt.TypeArguments[i], subs);
+                break;
+            }
+
+            case IArrayTypeSymbol aat when pt is IArrayTypeSymbol pat:
+                CollectSubstitutions(aat.ElementType, pat.ElementType, subs);
+                break;
         }
     }
 }

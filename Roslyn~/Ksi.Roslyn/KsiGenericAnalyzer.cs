@@ -156,52 +156,22 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeArgument(OperationAnalysisContext ctx)
     {
         var a = (IArgumentOperation)ctx.Operation;
-        AnalyzeGenericArg(ctx, a);
-        AnalyzeInnerGenericArg(ctx, a);
+        foreach (var (t, p) in a.GetGenericTypeSubstitutions())
+        {
+            if (CheckTraits(t, p))
+                continue;
+
+            ctx.Report(a.Syntax.GetLocation(), Rule01GenericMethodArgumentTraits, t.Name, p.Name);
+        }
     }
 
-    private static void AnalyzeGenericArg(OperationAnalysisContext ctx, IArgumentOperation a)
+    private static bool CheckExpCopy(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsExplicitCopy() || p.IsExplicitCopy();
+    private static bool CheckDealloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsDealloc() || p.IsDealloc();
+    private static bool CheckTempAlloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsTempAlloc() || p.IsTempAlloc();
+
+    private static bool CheckTraits(ITypeSymbol t, ITypeParameterSymbol p)
     {
-        if (a.Value.Type is not INamedTypeSymbol at)
-            return;
-
-        if (a.Parameter?.OriginalDefinition.Type is not ITypeParameterSymbol pt)
-            return;
-
-        if (a.Parameter.RefKind == RefKind.Out)
-            return;
-
-        if (!CheckTraits(at, pt))
-            ctx.Report(a.Syntax.GetLocation(), Rule01GenericMethodArgumentTraits, at.Name, pt.Name);
-    }
-
-    private static void AnalyzeInnerGenericArg(OperationAnalysisContext ctx, IArgumentOperation a)
-    {
-        if (a.Value.Type is not INamedTypeSymbol at || !at.IsSupportedGenericType())
-            return;
-
-        if (a.Parameter?.OriginalDefinition.Type is not INamedTypeSymbol pt || !pt.IsSupportedGenericType())
-            return;
-
-        if (a.Parameter.RefKind == RefKind.Out)
-            return;
-
-        var gat = at.TypeArguments[0];
-
-        if (pt.TypeArguments[0] is not ITypeParameterSymbol gpt)
-            return;
-
-        if (!CheckTraits(gat, gpt))
-            ctx.Report(a.Syntax.GetLocation(), Rule01GenericMethodArgumentTraits, at.Name, pt.Name);
-    }
-
-    private static bool CheckExpCopy(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsExplicitCopy() || p.IsExplicitCopy();
-    private static bool CheckDealloc(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsDealloc() || p.IsDealloc();
-    private static bool CheckTempAlloc(ITypeSymbol a, ITypeParameterSymbol p) => !a.IsTempAlloc() || p.IsTempAlloc();
-
-    private static bool CheckTraits(ITypeSymbol at, ITypeParameterSymbol pt)
-    {
-        return CheckExpCopy(at, pt) && CheckDealloc(at, pt) && CheckTempAlloc(at, pt);
+        return CheckExpCopy(t, p) && CheckDealloc(t, p) && CheckTempAlloc(t, p);
     }
 
     private static void AnalyzeTuple(OperationAnalysisContext ctx)
