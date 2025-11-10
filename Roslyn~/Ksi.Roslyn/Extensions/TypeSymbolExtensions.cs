@@ -318,7 +318,7 @@ public static class TypeSymbolExtensions
                     t = a.ElementType;
                     continue;
 
-                case INamedTypeSymbol nt when nt.IsWellKnownGenericType():
+                case INamedTypeSymbol nt when nt.IsRefList():
                     t = nt.TypeArguments[0];
                     continue;
 

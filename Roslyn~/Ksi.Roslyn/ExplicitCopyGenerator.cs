@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Ksi.Roslyn.Extensions;
@@ -50,21 +51,30 @@ namespace Ksi.Roslyn
                     var result = new ExpCopyTypeInfo(acc, t);
                     var usings = new HashSet<string>();
 
+                    var typeParams = t.TypeParameters.Where(p => p.IsExplicitCopy()).ToImmutableArray();
+
                     foreach (var m in t.GetMembers())
                     {
                         if (m is not IFieldSymbol f || f.IsStatic || f.IsPrivate())
                             continue;
 
-                        if (f.Type is not INamedTypeSymbol ft || ft.IsJaggedRefList())
+                        if (typeParams.Any(tp => f.Type.StoresTraitMarkedGenericType(tp)))
                             continue;
 
-                        var isExplicitCopy = ft.IsExplicitCopy();
+                        var ft = f.Type as INamedTypeSymbol;
+                        if (ft != null && ft.IsJaggedRefList())
+                            continue;
+
+                        var isExplicitCopy = f.Type.IsExplicitCopy();
                         result.Fields.Add((f.Name, isExplicitCopy));
 
                         if (!isExplicitCopy)
                             continue;
 
-                        usings.Add(ft.ContainingNamespace.FullyQualifiedName());
+                        usings.Add(f.Type.ContainingNamespace.FullyQualifiedName());
+
+                        if (ft == null)
+                            continue;
 
                         if (ft.IsRefList() && ft.TryGetGenericArg(out var gt) && gt!.IsExplicitCopy())
                             usings.Add(gt!.ContainingNamespace.FullyQualifiedName());
