@@ -39,7 +39,7 @@ namespace Ksi
     /// </para>
     /// <para>Should be added to a struct that contains fields of the <c>DynSized</c> type.</para>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Struct)]
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
     public sealed class DynSizedAttribute : Attribute
     {
     }

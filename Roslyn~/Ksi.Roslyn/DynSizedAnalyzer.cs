@@ -81,6 +81,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeParameter, SyntaxKind.TypeParameter);
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeDynNoResizeArgs, OperationKind.Invocation);
         context.RegisterSymbolAction(AnalyzeParameter, SymbolKind.Parameter);
@@ -121,6 +122,20 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
         if (!sym.IsExplicitCopy())
             ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingExplicitCopy, sym.Locations.First()));
+    }
+
+    private static void AnalyzeTypeParameter(SyntaxNodeAnalysisContext ctx)
+    {
+        var s = (TypeParameterSyntax)ctx.Node;
+        if (s.AttributeLists.Count == 0)
+            return;
+
+        var t = ctx.SemanticModel.GetDeclaredSymbol(s, ctx.CancellationToken);
+        if (t == null)
+            return;
+
+        if (t.IsDynSized() && !t.IsExplicitCopy())
+            ctx.Report(s.Identifier.GetLocation(), Rule02MissingExplicitCopy);
     }
 
     private static void AnalyzeVariableDeclarator(OperationAnalysisContext ctx)

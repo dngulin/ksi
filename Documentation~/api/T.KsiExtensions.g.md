@@ -26,7 +26,7 @@ Move structure ownership. After invocation the original value is set to `default
 Can be required to work with [ExplicitCopy](T.ExplicitCopyAttribute.g.md) types.
 
 ```csharp
-public static T Move<[ExplicitCopy, Dealloc, TempAlloc] T>(this ref T self) where T : struct
+public static T Move<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>(this ref T self) where T : struct
 ```
 
 Parameters

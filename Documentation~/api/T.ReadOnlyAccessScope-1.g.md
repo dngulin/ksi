@@ -11,7 +11,7 @@ A structure that provides readonly exclusive access to wrapped data.
 Should be disposed after usage to release access lock from the parent [ExclusiveAccess\<T\>](T.ExclusiveAccess-1.g.md) instance.
 
 ```csharp
-public readonly ref struct ReadOnlyAccessScope<[ExplicitCopy, Dealloc] T> where T : struct
+public readonly ref struct ReadOnlyAccessScope<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
 ```
 
 Properties

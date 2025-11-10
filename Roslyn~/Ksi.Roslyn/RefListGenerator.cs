@@ -65,11 +65,11 @@ namespace Ksi.Roslyn
         private static string FillTemplate(string template, string typeName, string constraint)
         {
             var traitsAll = typeName == SymbolNames.TempRefList
-                ? "ExplicitCopy, Dealloc, TempAlloc"
-                : "ExplicitCopy, Dealloc";
+                ? "ExplicitCopy, DynSized, Dealloc, TempAlloc"
+                : "ExplicitCopy, DynSized, Dealloc";
             var traitsExceptDealloc = typeName == SymbolNames.TempRefList
-                ? "ExplicitCopy, TempAlloc"
-                : "ExplicitCopy";
+                ? "ExplicitCopy, DynSized, TempAlloc"
+                : "ExplicitCopy, DynSized";
 
             return template
                 .ToStringBuilder()

@@ -121,6 +121,11 @@ public static class TypeSymbolExtensions
         return self.IsStructOrTypeParameter() && self.Is(SymbolNames.ExplicitCopy);
     }
 
+    public static bool IsDynSized(this ITypeSymbol self)
+    {
+        return self.IsStructOrTypeParameter() && self.Is(SymbolNames.DynSized);
+    }
+
     public static bool IsTempAlloc(this ITypeSymbol self)
     {
         return self.IsStructOrTypeParameter() && self.Is(SymbolNames.TempAlloc);
@@ -166,7 +171,6 @@ public static class TypeSymbolExtensions
         => self is { TypeKind: TypeKind.Struct, IsGenericType: true, TypeArguments.Length: 1 };
 
     public static bool IsRefList(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.RefList);
-    public static bool IsDynSized(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.DynSized);
 
     public static bool IsKsiComponent(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiComponent);
     public static bool IsKsiEntity(this ITypeSymbol self) => self.IsStruct() && self.Is(SymbolNames.KsiEntity);

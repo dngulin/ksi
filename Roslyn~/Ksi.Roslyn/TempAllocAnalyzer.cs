@@ -54,6 +54,7 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
         context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeParameter, SyntaxKind.TypeParameter);
     }
 
     private static void AnalyzeField(SymbolAnalysisContext ctx)
@@ -86,5 +87,19 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
 
         if (!hasTempFields)
             ctx.ReportDiagnostic(Diagnostic.Create(Rule03RedundantAttribute, sym.Locations.First()));
+    }
+
+    private static void AnalyzeTypeParameter(SyntaxNodeAnalysisContext ctx)
+    {
+        var s = (TypeParameterSyntax)ctx.Node;
+        if (s.AttributeLists.Count == 0)
+            return;
+
+        var t = ctx.SemanticModel.GetDeclaredSymbol(s, ctx.CancellationToken);
+        if (t == null)
+            return;
+
+        if (t.IsTempAlloc() && !t.IsDynSized())
+            ctx.Report(s.Identifier.GetLocation(), Rule02MissingDynSized);
     }
 }

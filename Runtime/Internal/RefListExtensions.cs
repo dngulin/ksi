@@ -5,22 +5,22 @@ namespace Ksi
 {
     internal static class RefListExtensions
     {
-        public static int GetBufferSize<[ExplicitCopy, Dealloc] T>(this in RefList<T> self)
+        public static int GetBufferSize<[ExplicitCopy, DynSized, Dealloc] T>(this in RefList<T> self)
             where T : unmanaged => self.Array.Length;
 
-        public static int GetBufferSize<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self)
+        public static int GetBufferSize<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>(this in TempRefList<T> self)
             where T : unmanaged => self.Array.Length;
 
-        public static int GetBufferSize<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self)
+        public static int GetBufferSize<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self)
             where T : struct => self.Array?.Length ?? 0;
 
-        public static void ClearBuffer<[ExplicitCopy] T>(this ref RefList<T> self)
+        public static void ClearBuffer<[ExplicitCopy, DynSized] T>(this ref RefList<T> self)
             where T : unmanaged => self.Array.Clear(self.Count);
 
-        public static void ClearBuffer<[ExplicitCopy, TempAlloc] T>(this ref TempRefList<T> self)
+        public static void ClearBuffer<[ExplicitCopy, DynSized, TempAlloc] T>(this ref TempRefList<T> self)
             where T : unmanaged => self.Array.Clear(self.Count);
 
-        public static void ClearBuffer<[ExplicitCopy] T>(this ref ManagedRefList<T> self)
+        public static void ClearBuffer<[ExplicitCopy, DynSized] T>(this ref ManagedRefList<T> self)
             where T : struct => Array.Clear(self.Array, 0, self.Count);
 
         public static void CopyBufferFrom<T>(this ref RefList<T> self, in RefList<T> other)
@@ -42,43 +42,43 @@ namespace Ksi
             where T : struct => Array.Copy(self.Array, srcIdx, self.Array, dstIdx, count);
 
         [RefListIndexer]
-        public static ref readonly T IndexBuffer<[ExplicitCopy, Dealloc] T>(this in RefList<T> self, int index)
+        public static ref readonly T IndexBuffer<[ExplicitCopy, DynSized, Dealloc] T>(this in RefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
 
         [RefListIndexer]
-        public static ref readonly T IndexBuffer<[ExplicitCopy, Dealloc, TempAlloc] T>(this in TempRefList<T> self, int index)
+        public static ref readonly T IndexBuffer<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>(this in TempRefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
 
         [RefListIndexer]
-        public static ref readonly T IndexBuffer<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self, int index)
+        public static ref readonly T IndexBuffer<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self, int index)
             where T : struct => ref self.Array[index];
 
         [RefListIndexer]
-        public static ref T IndexBufferMut<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref RefList<T> self, int index)
+        public static ref T IndexBufferMut<[ExplicitCopy, DynSized, Dealloc] T>([DynNoResize] this ref RefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
 
         [RefListIndexer]
-        public static ref T IndexBufferMut<[ExplicitCopy, Dealloc, TempAlloc] T>([DynNoResize] this ref TempRefList<T> self, int index)
+        public static ref T IndexBufferMut<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>([DynNoResize] this ref TempRefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
 
         [RefListIndexer]
-        public static ref T IndexBufferMut<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self, int index)
+        public static ref T IndexBufferMut<[ExplicitCopy, DynSized, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self, int index)
             where T : struct => ref self.Array[index];
 
-        public static void SetBufferSize<[ExplicitCopy] T>(this ref RefList<T> self, int size) where T : unmanaged
+        public static void SetBufferSize<[ExplicitCopy, DynSized] T>(this ref RefList<T> self, int size) where T : unmanaged
         {
             self.Array.Resize(size, Allocator.Persistent);
             self.Count = Math.Min(self.Count, size);
         }
 
-        public static void SetBufferSize<[ExplicitCopy, TempAlloc] T>(this ref TempRefList<T> self, int size)
+        public static void SetBufferSize<[ExplicitCopy, DynSized, TempAlloc] T>(this ref TempRefList<T> self, int size)
             where T : unmanaged
         {
             self.Array.Resize(size, Allocator.Temp);
             self.Count = Math.Min(self.Count, size);
         }
 
-        public static void SetBufferSize<[ExplicitCopy] T>(this ref ManagedRefList<T> self, int size)
+        public static void SetBufferSize<[ExplicitCopy, DynSized] T>(this ref ManagedRefList<T> self, int size)
             where T : struct
         {
             if (size == 0)

@@ -173,12 +173,13 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     }
 
     private static bool CheckExpCopy(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsExplicitCopy() || p.IsExplicitCopy();
+    private static bool CheckDynSized(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsDynSized() || p.IsDynSized();
     private static bool CheckDealloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsDeallocOrRefListOverDealloc() || p.IsDealloc();
     private static bool CheckTempAlloc(ITypeSymbol t, ITypeParameterSymbol p) => !t.IsTempAlloc() || p.IsTempAlloc();
 
     private static bool CheckTraits(ITypeSymbol t, ITypeParameterSymbol p)
     {
-        return CheckExpCopy(t, p) && CheckDealloc(t, p) && CheckTempAlloc(t, p);
+        return CheckExpCopy(t, p) && CheckDynSized(t, p) && CheckDealloc(t, p) && CheckTempAlloc(t, p);
     }
 
     private static void AnalyzeTuple(OperationAnalysisContext ctx)

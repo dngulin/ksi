@@ -39,7 +39,7 @@ public class KsiGenericAnalyzerTests
                 
                 public static void Generic<T>(in T value) where T : unmanaged => throw null;
                 public static void ExpCopyGeneric<[ExplicitCopy] T>(in T value) where T : unmanaged => throw null;
-                public static void DeallocGeneric<[ExplicitCopy, Dealloc] T>(in T value) where T : unmanaged => throw null;
+                public static void DeallocGeneric<[ExplicitCopy, DynSized, Dealloc] T>(in T value) where T : unmanaged => throw null;
             }
 
             public static class InnerGenericTest
@@ -67,7 +67,7 @@ public class KsiGenericAnalyzerTests
                 
                 public static void Generic<T>(in RefList<T> list) where T : unmanaged => throw null;
                 public static void ExpCopyGeneric<[ExplicitCopy] T>(in RefList<T> list) where T : unmanaged => throw null;
-                public static void DeallocGeneric<[ExplicitCopy, Dealloc] T>(in RefList<T> list) where T : unmanaged => throw null;
+                public static void DeallocGeneric<[ExplicitCopy, DynSized, Dealloc] T>(in RefList<T> list) where T : unmanaged => throw null;
             }
             """
         );

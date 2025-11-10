@@ -7,9 +7,11 @@ namespace Ksi
     /// It is achieved by maintaining only one active <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> wrapping inner data.
     /// Supposed to wrap <see cref="DynSizedAttribute">DynSized</see> structures.
     /// </summary>
-    public sealed class ExclusiveAccess<[ExplicitCopy, Dealloc] T> where T: struct
+    public sealed class ExclusiveAccess<[ExplicitCopy, DynSized, Dealloc] T> where T: struct
     {
+#pragma warning disable DYNSIZED06
         private T _value;
+#pragma warning restore DYNSIZED06
 
         private ulong _nextAccessId;
         private ulong _activeAccessId;
@@ -62,7 +64,7 @@ namespace Ksi
     /// A structure that provides mutable exclusive access to wrapped data.
     /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
-    public readonly ref struct MutableAccessScope<[ExplicitCopy, Dealloc] T> where T : struct
+    public readonly ref struct MutableAccessScope<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
     {
         private readonly ExclusiveAccess<T> _exclusive;
         private readonly ulong _accessId;
@@ -92,7 +94,7 @@ namespace Ksi
     /// A structure that provides readonly exclusive access to wrapped data.
     /// Should be disposed after usage to release access lock from the parent <see cref="ExclusiveAccess{T}"/> instance.
     /// </summary>
-    public readonly ref struct ReadOnlyAccessScope<[ExplicitCopy, Dealloc] T> where T : struct
+    public readonly ref struct ReadOnlyAccessScope<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
     {
         private readonly ExclusiveAccess<T> _exclusive;
         private readonly ulong _accessId;

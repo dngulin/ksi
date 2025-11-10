@@ -68,6 +68,7 @@ namespace Ksi.Roslyn
 
             context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
             context.RegisterSyntaxNodeAction(AnalyzeStruct, SyntaxKind.StructDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeTypeParameter, SyntaxKind.TypeParameter);
             context.RegisterOperationAction(AnalyzeAssignment, OperationKind.SimpleAssignment);
             context.RegisterOperationAction(AnalyzeInvocationAssignment, OperationKind.Invocation);
             context.RegisterOperationAction(AnalyzeInvocationSafety, OperationKind.Invocation);
@@ -103,6 +104,20 @@ namespace Ksi.Roslyn
 
             if (!sym.IsDynSized())
                 ctx.ReportDiagnostic(Diagnostic.Create(Rule02MissingDynSized, sym.Locations.First()));
+        }
+
+        private static void AnalyzeTypeParameter(SyntaxNodeAnalysisContext ctx)
+        {
+            var s = (TypeParameterSyntax)ctx.Node;
+            if (s.AttributeLists.Count == 0)
+                return;
+
+            var t = ctx.SemanticModel.GetDeclaredSymbol(s, ctx.CancellationToken);
+            if (t == null)
+                return;
+
+            if (t.IsDealloc() && !t.IsDynSized())
+                ctx.Report(s.Identifier.GetLocation(), Rule02MissingDynSized);
         }
 
         private static void AnalyzeAssignment(OperationAnalysisContext ctx)

@@ -14,6 +14,6 @@ It enables reference lifetime and aliasing diagnostics for the marked struct.
 Should be added to a struct that contains fields of the `DynSized` type.
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
+[AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
 public sealed class DynSizedAttribute : Attribute
 ```

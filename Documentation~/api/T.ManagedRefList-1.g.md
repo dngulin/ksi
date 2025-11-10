@@ -12,7 +12,7 @@ Can store structures containing reference types, but it is not compatible with `
 
 ```csharp
 [ExplicitCopy, DynSized]
-public struct ManagedRefList<[ExplicitCopy, Dealloc] T> where T : struct
+public struct ManagedRefList<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
 ```
 
 Static Creation Methods
@@ -96,7 +96,7 @@ Wraps the collection with [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/
 Adds to `RefPath` a non-explicit segment `AsReadOnlySpan()`.
 
 ```csharp
-public static ReadOnlySpan<T> AsReadOnlySpan<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
+public static ReadOnlySpan<T> AsReadOnlySpan<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
 ```
 
 Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) wrapping the list.
@@ -107,7 +107,7 @@ Returns a [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/Syste
 Returns capacity of the list.
 
 ```csharp
-public static int Capacity<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
+public static int Capacity<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -135,7 +135,7 @@ Parameters
 Returns item count in the list.
 
 ```csharp
-public static int Count<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
+public static int Count<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -151,7 +151,7 @@ Returns a readonly reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref readonly T RefReadonlyAt<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self, int index) where T : struct
+public static ref readonly T RefReadonlyAt<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self, int index) where T : struct
 ```
 
 Parameters
@@ -170,7 +170,7 @@ Returns a readonly reference to a list item at the given index.
 Creates a readonly reversed by-ref iterator for the list.
 
 ```csharp
-public static ManagedRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
+public static ManagedRefListReadOnlyIteratorReversed<T> RefReadonlyIterReversed<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -184,7 +184,7 @@ Returns the iterator to use in the foreach loop.
 Creates a readonly by-ref iterator for the list.
 
 ```csharp
-public static ManagedRefListReadOnlyIterator<T> RefReadonlyIter<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
+public static ManagedRefListReadOnlyIterator<T> RefReadonlyIter<[ExplicitCopy, DynSized, Dealloc] T>(this in ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -226,7 +226,7 @@ Returns the string created from bytes.
 Adds a new item to the list.
 
 ```csharp
-public static void Add<[ExplicitCopy, Dealloc] T>(this ref ManagedRefList<T> self, T item) where T : struct
+public static void Add<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self, T item) where T : struct
 ```
 
 Parameters
@@ -239,7 +239,7 @@ Parameters
 Adds a specified number of `default` items.
 
 ```csharp
-public static void AppendDefault<[ExplicitCopy, Dealloc] T>(this ref ManagedRefList<T> self, int count) where T : struct
+public static void AppendDefault<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self, int count) where T : struct
 ```
 
 Parameters
@@ -258,7 +258,7 @@ Wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/a
 Adds to `RefPath` a non-explicit segment `AsSpan()`.
 
 ```csharp
-public static Span<T> AsSpan<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self) where T : struct
+public static Span<T> AsSpan<[ExplicitCopy, DynSized, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self) where T : struct
 ```
 
 Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) wrapping the list.
@@ -269,7 +269,7 @@ Returns a [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1
 Removes all items from the list.
 
 ```csharp
-public static void Clear<[ExplicitCopy] T>(this ref ManagedRefList<T> self) where T : struct
+public static void Clear<[ExplicitCopy, DynSized] T>(this ref ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -298,7 +298,7 @@ Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
 [NonAllocatedResult]
-public static ref T RefAdd<[ExplicitCopy, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
+public static ref T RefAdd<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -314,7 +314,7 @@ Returns a mutable reference to a list item.
 Adds to `RefPath` an indexer segment `[n]`.
 
 ```csharp
-public static ref T RefAt<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self, int index) where T : struct
+public static ref T RefAt<[ExplicitCopy, DynSized, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self, int index) where T : struct
 ```
 
 Parameters
@@ -329,7 +329,7 @@ Returns a mutable reference to a list item at the given index.
 Creates a mutable reversed by-ref iterator for the list.
 
 ```csharp
-public static ManagedRefListIteratorReversed<T> RefIterReversed<[ExplicitCopy, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
+public static ManagedRefListIteratorReversed<T> RefIterReversed<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -343,7 +343,7 @@ Returns the iterator to use in the foreach loop.
 Creates a mutable by-ref iterator for the list.
 
 ```csharp
-public static ManagedRefListIterator<T> RefIter<[ExplicitCopy, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
+public static ManagedRefListIterator<T> RefIter<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self) where T : struct
 ```
 
 Parameters
@@ -357,7 +357,7 @@ Returns the iterator to use in the foreach loop.
 Removes an item from the list at the given index.
 
 ```csharp
-public static void RemoveAt<[ExplicitCopy] T>(this ref ManagedRefList<T> self, int index) where T : struct
+public static void RemoveAt<[ExplicitCopy, DynSized] T>(this ref ManagedRefList<T> self, int index) where T : struct
 ```
 
 Parameters
