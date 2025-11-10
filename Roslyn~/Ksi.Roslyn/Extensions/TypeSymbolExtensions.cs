@@ -44,33 +44,6 @@ public static class TypeSymbolExtensions
         return nt.IsWrappedRef() && gt.IsDynSizedOrWrapsDynSized();
     }
 
-    public static bool IsNotSupportedGenericOverExplicitCopy(this INamedTypeSymbol self, out ITypeSymbol? t)
-    {
-        if (!self.IsGenericType || self.IsWellKnownGenericType())
-        {
-            t = null;
-            return false;
-        }
-
-        foreach (var arg in self.TypeArguments)
-        {
-            if (arg is not INamedTypeSymbol namedArg)
-                continue;
-
-            if (namedArg.IsExplicitCopy())
-            {
-                t = namedArg;
-                return true;
-            }
-
-            if (namedArg.IsNotSupportedGenericOverExplicitCopy(out t))
-                return true;
-        }
-
-        t = null;
-        return false;
-    }
-
     public static bool IsWellKnownGenericType(this INamedTypeSymbol self)
     {
         return self is { IsGenericType: true, TypeArguments.Length: 1 } &&
