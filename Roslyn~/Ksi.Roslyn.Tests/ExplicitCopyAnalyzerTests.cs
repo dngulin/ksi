@@ -228,7 +228,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy12SpanCopy()
+    public async Task ExpCopy12SpanToArray()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -242,13 +242,6 @@ public class ExplicitCopyAnalyzerTests
             {
                 public static void Method(Span<MyStruct> rw, ReadOnlySpan<MyStruct> ro)
                 {
-                    {|EXPCOPY12:ro.CopyTo(rw)|};
-                    {|EXPCOPY12:ro.TryCopyTo(rw)|};
-                    
-                    var span = new Span<MyStruct>();
-                    {|EXPCOPY12:rw.CopyTo(span)|};
-                    {|EXPCOPY12:rw.TryCopyTo(span)|};
-                    
                     {|EXPCOPY12:ro.ToArray()|};
                     {|EXPCOPY12:rw.ToArray()|};
                 }

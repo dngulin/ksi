@@ -66,9 +66,9 @@ namespace Ksi.Roslyn
             "Declaring a private field prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor Rule12SpanCopy = Rule(12,
-            "Using Span copying API with [ExplicitCopy] items",
-            "Span operation is not valid for [ExplicitCopy] types"
+        private static readonly DiagnosticDescriptor Rule12SpanToArray = Rule(12,
+            "Implicit copy caused by Span<TExplicitCopy>.ToArray() conversion",
+            "Implicit copy caused by {0}<{1}>.ToArray() conversion"
         );
 
         private static readonly DiagnosticDescriptor Rule13LowAccessibility = Rule(13,
@@ -86,7 +86,7 @@ namespace Ksi.Roslyn
             Rule06ClosureCapture,
             Rule07Boxing,
             Rule08PrivateField,
-            Rule12SpanCopy,
+            Rule12SpanToArray,
             Rule13LowAccessibility
         );
 
@@ -264,14 +264,8 @@ namespace Ksi.Roslyn
             if (!nt.TryGetGenericArg(out var gt) || gt == null || !gt.IsExplicitCopy())
                 return;
 
-            switch (op.TargetMethod.Name)
-            {
-                case "CopyTo":
-                case "TryCopyTo":
-                case "ToArray":
-                    ctx.ReportDiagnostic(Diagnostic.Create(Rule12SpanCopy, op.Syntax.GetLocation(), gt.Name));
-                    break;
-            }
+            if (op.TargetMethod.Name == "ToArray")
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule12SpanToArray, op.Syntax.GetLocation(), nt.Name, gt.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)
