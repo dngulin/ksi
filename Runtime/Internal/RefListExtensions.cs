@@ -82,9 +82,15 @@ namespace Ksi
             where T : struct
         {
             if (size == 0)
+            {
                 self.Array = null;
+            }
             else
+            {
+#pragma warning disable KSIGENERIC01
                 Array.Resize(ref self.Array, size);
+#pragma warning restore KSIGENERIC01
+            }
 
             self.Count = Math.Min(self.Count, size);
         }

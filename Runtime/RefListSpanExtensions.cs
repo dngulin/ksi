@@ -28,7 +28,12 @@ namespace Ksi
         /// </summary>
         /// <returns>A <see cref="ReadOnlySpan{T}"/> wrapping the list.</returns>
         [RefListIterator] public static ReadOnlySpan<T> AsReadOnlySpan<[ExplicitCopy, Dealloc] T>(this in ManagedRefList<T> self)
-            where T : struct => new ReadOnlySpan<T>(self.Array, 0, self.Count);
+            where T : struct
+        {
+#pragma warning disable KSIGENERIC01
+            return new ReadOnlySpan<T>(self.Array, 0, self.Count);
+#pragma warning restore KSIGENERIC01
+        }
 
         /// <summary>
         /// <para>Wraps the collection with <see cref="Span{T}"/>.</para>
@@ -51,6 +56,11 @@ namespace Ksi
         /// </summary>
         /// <returns>A <see cref="Span{T}"/> wrapping the list.</returns>
         [RefListIterator] public static Span<T> AsSpan<[ExplicitCopy, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self)
-            where T : struct => new Span<T>(self.Array, 0, self.Count);
+            where T : struct
+        {
+#pragma warning disable KSIGENERIC01
+            return new Span<T>(self.Array, 0, self.Count);
+#pragma warning restore KSIGENERIC01
+        }
     }
 }

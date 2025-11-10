@@ -6,7 +6,7 @@ namespace Ksi
 {
     internal static class UnsafeArrayExtensions
     {
-        public static unsafe void Clear<T>(this ref UnsafeArray<T> self, int len)
+        public static unsafe void Clear<[ExplicitCopy, TempAlloc] T>(this ref UnsafeArray<T> self, int len)
             where T : unmanaged => MemClear(self.Buffer, sizeof(T) * len);
 
         public static unsafe void CopyFrom<T>(this ref UnsafeArray<T> self, in UnsafeArray<T> other, int len)
@@ -15,10 +15,10 @@ namespace Ksi
         public static unsafe void CopyInner<T>(this ref UnsafeArray<T> self, int srcIdx, int dstIdx, int count)
             where T : unmanaged => MemMove(&self.Buffer[dstIdx], &self.Buffer[srcIdx], sizeof(T) * count);
 
-        public static unsafe ref T Index<T>(this in UnsafeArray<T> self, int idx)
+        public static unsafe ref T Index<[ExplicitCopy, Dealloc, TempAlloc] T>(this in UnsafeArray<T> self, int idx)
             where T : unmanaged => ref self.Buffer[idx];
 
-        public static unsafe void Resize<T>(this ref UnsafeArray<T> self, int len, Allocator allocator) where T : unmanaged
+        public static unsafe void Resize<[ExplicitCopy, TempAlloc] T>(this ref UnsafeArray<T> self, int len, Allocator allocator) where T : unmanaged
         {
             if (self.Length == len)
                 return;
