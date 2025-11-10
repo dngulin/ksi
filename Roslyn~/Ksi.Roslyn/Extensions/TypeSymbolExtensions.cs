@@ -46,7 +46,7 @@ public static class TypeSymbolExtensions
 
     public static bool IsNotSupportedGenericOverExplicitCopy(this INamedTypeSymbol self, out ITypeSymbol? t)
     {
-        if (!self.IsGenericType || self.IsSupportedGenericType())
+        if (!self.IsGenericType || self.IsWellKnownGenericType())
         {
             t = null;
             return false;
@@ -71,7 +71,7 @@ public static class TypeSymbolExtensions
         return false;
     }
 
-    public static bool IsSupportedGenericType(this INamedTypeSymbol self)
+    public static bool IsWellKnownGenericType(this INamedTypeSymbol self)
     {
         return self is { IsGenericType: true, TypeArguments.Length: 1 } &&
                (self.IsWrappedRef() || self.IsRefList() || self.IsExclusiveAccess());
@@ -303,5 +303,28 @@ public static class TypeSymbolExtensions
             SpecialType.System_String => true,
             _ => false
         };
+    }
+
+    public static bool StoresTraitMarkedGenericType(this ITypeSymbol t, ITypeParameterSymbol p)
+    {
+        while (true)
+        {
+            switch (t)
+            {
+                case ITypeParameterSymbol:
+                    return SymbolEqualityComparer.Default.Equals(t, p);
+
+                case IArrayTypeSymbol a:
+                    t = a.ElementType;
+                    continue;
+
+                case INamedTypeSymbol nt when nt.IsWellKnownGenericType():
+                    t = nt.TypeArguments[0];
+                    continue;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

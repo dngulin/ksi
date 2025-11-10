@@ -316,8 +316,7 @@ public static class RefListTemplates
                 }
             }
             
-            // Suppress missing docstrings warning for trivial iterator implementations
-            #pragma warning disable CS1591
+            #pragma warning disable CS1591, KSIGENERIC04
 
             public readonly ref struct |TRefList|Iterator<[|TraitsAll|] T> where T : |constraint|
             {
@@ -415,7 +414,7 @@ public static class RefListTemplates
                 public void Dispose() {}
             }
             
-            #pragma warning restore CS1591
+            #pragma warning restore CS1591, KSIGENERIC04
         }
         """;
 

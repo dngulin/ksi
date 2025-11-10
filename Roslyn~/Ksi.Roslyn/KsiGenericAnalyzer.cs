@@ -40,11 +40,16 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         "Generic type argument `{0}` traits are not compatible with generic type parameter `{1}` traits"
     );
 
+    private static readonly DiagnosticDescriptor Rule04GenericFieldMarkedWithTrait = Rule(04, DiagnosticSeverity.Error,
+        "Field stores a generic value that is marked with a trait attribute",
+        "Field stores a generic value that is marked with a trait attribute"
+    );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01GenericMethodArgumentTraits,
         Rule02JaggedRefList,
-        Rule03GenericTypeArgumentTraits
+        Rule03GenericTypeArgumentTraits,
+        Rule04GenericFieldMarkedWithTrait
     );
 
     public override void Initialize(AnalysisContext context)
@@ -57,6 +62,8 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeGenericTypeSyntax, SyntaxKind.GenericName);
         context.RegisterSyntaxNodeAction(AnalyzeArrayTypeSyntax, SyntaxKind.ArrayType);
         context.RegisterSyntaxNodeAction(AnalyzeTupleTypeSyntax, SyntaxKind.TupleType);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.ClassDeclaration);
+
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
         context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
@@ -185,6 +192,34 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
 
             if (e.Type.IsExplicitCopy())
                 ctx.Report(e.Syntax.GetLocation(), Rule03GenericTypeArgumentTraits, e.Type.Name, $"T{i+1}");
+        }
+    }
+
+    private static void AnalyzeTypeDeclaration(SyntaxNodeAnalysisContext ctx)
+    {
+        var tds = (TypeDeclarationSyntax)ctx.Node;
+        if (tds.TypeParameterList == null)
+            return;
+
+        var t = ctx.SemanticModel.GetDeclaredSymbol(tds, ctx.CancellationToken);
+        if (t == null)
+            return;
+
+        if (t.IsWellKnownGenericType())
+            return;
+
+        var typeParams = t.TypeParameters.Where(p => p.IsExplicitCopy()).ToImmutableArray();
+        if (typeParams.IsEmpty)
+            return;
+
+        foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
+        foreach (var tp in typeParams)
+        {
+            if (!f.Type.StoresTraitMarkedGenericType(tp))
+                continue;
+
+            ctx.Report(f.Locations.First(), Rule04GenericFieldMarkedWithTrait);
+            break;
         }
     }
 }
