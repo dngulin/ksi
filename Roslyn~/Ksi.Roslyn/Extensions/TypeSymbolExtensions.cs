@@ -281,27 +281,4 @@ public static class TypeSymbolExtensions
             _ => false
         };
     }
-
-    public static bool StoresTraitMarkedGenericType(this ITypeSymbol t, ITypeParameterSymbol p)
-    {
-        while (true)
-        {
-            switch (t)
-            {
-                case ITypeParameterSymbol:
-                    return SymbolEqualityComparer.Default.Equals(t, p);
-
-                case IArrayTypeSymbol a:
-                    t = a.ElementType;
-                    continue;
-
-                case INamedTypeSymbol nt when nt.IsRefList():
-                    t = nt.TypeArguments[0];
-                    continue;
-
-                default:
-                    return false;
-            }
-        }
-    }
 }
