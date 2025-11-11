@@ -47,8 +47,10 @@ namespace Ksi
 
         internal ref T Access(ulong id)
         {
+#pragma warning disable BORROW01
             if (_activeAccessId == id)
                 return ref _value;
+#pragma warning restore BORROW01
 
             throw new InvalidOperationException();
         }
@@ -82,7 +84,9 @@ namespace Ksi
         /// <exception cref="InvalidOperationException">
         /// If the data is not available to this access scope (e.g. usage after disposing).
         /// </exception>
+#pragma warning disable BORROW01
         public ref T Value => ref _exclusive.Access(_accessId);
+#pragma warning restore BORROW01
 
         /// <summary>
         /// Deactivates the access scope and allows creating a new one from the parent <see cref="ExclusiveAccess{T}"/> instance.
@@ -112,7 +116,9 @@ namespace Ksi
         /// <exception cref="InvalidOperationException">
         /// If the data is not available to this access scope (e.g. usage after disposing).
         /// </exception>
+#pragma warning disable BORROW01
         public ref readonly T Value => ref _exclusive.Access(_accessId);
+#pragma warning restore BORROW01
 
         /// <summary>
         /// Deactivates the access scope and allows creating a new one from the parent <see cref="ExclusiveAccess{T}"/> instance.

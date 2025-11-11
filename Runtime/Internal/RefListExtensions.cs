@@ -41,6 +41,8 @@ namespace Ksi
         public static void CopyWithinBuffer<T>(this ref ManagedRefList<T> self, int srcIdx, int dstIdx, int count)
             where T : struct => Array.Copy(self.Array, srcIdx, self.Array, dstIdx, count);
 
+        #pragma warning disable BORROW01
+
         [RefListIndexer]
         public static ref readonly T IndexBuffer<[ExplicitCopy, DynSized, Dealloc] T>(this in RefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
@@ -60,6 +62,8 @@ namespace Ksi
         [RefListIndexer]
         public static ref T IndexBufferMut<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>([DynNoResize] this ref TempRefList<T> self, int index)
             where T : unmanaged => ref self.Array.Index(index);
+
+        #pragma warning restore BORROW01
 
         [RefListIndexer]
         public static ref T IndexBufferMut<[ExplicitCopy, DynSized, Dealloc] T>([DynNoResize] this ref ManagedRefList<T> self, int index)

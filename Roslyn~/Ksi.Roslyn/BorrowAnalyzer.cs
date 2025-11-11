@@ -255,5 +255,8 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
         var path = v.ToRefPath();
         if (path.IsDerivedFromLocalAccessScope)
             ctx.ReportDiagnostic(Diagnostic.Create(Rule05RefEscapesAccessScope, r.Syntax.GetLocation()));
+
+        if (v.ReferencesDynSized() && path.IsEmpty)
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule01NonRefPath, v.Syntax.GetLocation()));
     }
 }
