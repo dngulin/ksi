@@ -255,6 +255,10 @@ public static void UpdateViews<[ExplicitCopy] T>(in RefList<T> entities, List<En
 }
 ```
 
+Note that marking a type parameter with a trait attribute _enables compatibility_ rather than sets a restriction.
+In other words, if you declare a type parameter `<[ExplicitCopy, DynSized, Dealloc] T>`,
+it is still compatible with types without any traits.  
+
 > [!IMPORTANT]
 > Type parameter traits are designed for generic data processing and not for generic data composition.
 > You cannot declare a generic `struct` marked with a trait attribute.
