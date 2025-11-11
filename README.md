@@ -31,7 +31,7 @@ Key features:
   // This API call is possible only if you have a MUTABLE REFERENCE to the data
   public static ref T RefAt<T>(this ref RefList<T> self, int index);
   ```
-- Deallocation [management](Documentation~/traits.md#dealloc-attribute)
+- [Deallocation management](Documentation~/traits.md#dealloc-attribute)
   ```csharp
   [ExplicitCopy, DynSized, Dealloc]
   public struct Node { public RefList<Node> Children; }
