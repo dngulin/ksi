@@ -158,6 +158,7 @@ namespace Ksi.Roslyn
                 case OperationKind.FieldInitializer:
                 case OperationKind.MemberInitializer:
                 case OperationKind.VariableInitializer:
+                case OperationKind.Argument when i.Parent is IArgumentOperation { Parameter.RefKind: RefKind.None }:
                     break;
 
                 default:

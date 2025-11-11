@@ -82,7 +82,13 @@ public class DeallocAnalyzerTests
                 {
                     {|DEALLOC05:RefList.WithCapacity<int>(42)|};
                     var list = RefList.WithCapacity<int>(42);
+                    
+                    ByVal(RefList.WithCapacity<int>(42));
+                    ByRef({|DEALLOC05:RefList.WithCapacity<int>(42)|});
                 }
+                
+                private static void ByVal(RefList<int> list) => list.Dealloc();
+                private static void ByRef(in RefList<int> list) {}
             }
             """
         );
