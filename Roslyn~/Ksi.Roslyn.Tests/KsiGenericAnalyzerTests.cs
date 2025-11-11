@@ -196,4 +196,18 @@ public class KsiGenericAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiGeneric04GenericExplicitCopyType()
+    {
+        await KsiGenericAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            [ExplicitCopy]
+            public struct {|KSIGENERIC04:TestStruct|}<T> { public T Field; }
+            """
+        );
+    }
 }

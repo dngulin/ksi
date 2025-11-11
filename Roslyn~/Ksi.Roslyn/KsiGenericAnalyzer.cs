@@ -40,16 +40,16 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         "Consider to wrap inner collection with a structure"
     );
 
-    private static readonly DiagnosticDescriptor Rule04GenericFieldMarkedWithTrait = Rule(04, DiagnosticSeverity.Error,
-        "Field stores a generic value that is marked with a trait attribute",
-        "Field stores a generic value that is marked with a trait attribute"
+    private static readonly DiagnosticDescriptor Rule04GenericExplicitCopyType = Rule(04, DiagnosticSeverity.Error,
+        "Declaring a generic [ExplicitCopy] type",
+        "Type marked with [ExplicitCopy] cannot be declared as a generic type"
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01GenericMethodArgumentTraits,
         Rule02GenericTypeArgumentTraits,
         Rule03JaggedRefList,
-        Rule04GenericFieldMarkedWithTrait
+        Rule04GenericExplicitCopyType
     );
 
     public override void Initialize(AnalysisContext context)
@@ -62,7 +62,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeGenericTypeSyntax, SyntaxKind.GenericName);
         context.RegisterSyntaxNodeAction(AnalyzeArrayTypeSyntax, SyntaxKind.ArrayType);
         context.RegisterSyntaxNodeAction(AnalyzeTupleTypeSyntax, SyntaxKind.TupleType);
-        context.RegisterSyntaxNodeAction(AnalyzeTypeDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.ClassDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeStructDeclaration, SyntaxKind.StructDeclaration);
 
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
@@ -196,31 +196,17 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeTypeDeclaration(SyntaxNodeAnalysisContext ctx)
+    private static void AnalyzeStructDeclaration(SyntaxNodeAnalysisContext ctx)
     {
-        var tds = (TypeDeclarationSyntax)ctx.Node;
-        if (tds.TypeParameterList == null)
+        var sds = (StructDeclarationSyntax)ctx.Node;
+        if (sds.TypeParameterList == null || !sds.AttributeLists.ContainsExplicitCopy())
             return;
 
-        var t = ctx.SemanticModel.GetDeclaredSymbol(tds, ctx.CancellationToken);
-        if (t == null)
+        var t = ctx.SemanticModel.GetDeclaredSymbol(sds, ctx.CancellationToken);
+        if (t == null || t.IsRefList())
             return;
 
-        if (t.IsWellKnownGenericType())
-            return;
-
-        var typeParams = t.TypeParameters.Where(p => p.IsExplicitCopy()).ToImmutableArray();
-        if (typeParams.IsEmpty)
-            return;
-
-        foreach (var f in t.GetMembers().OfType<IFieldSymbol>())
-        foreach (var tp in typeParams)
-        {
-            if (!f.Type.StoresTraitMarkedGenericType(tp))
-                continue;
-
-            ctx.Report(f.Locations.First(), Rule04GenericFieldMarkedWithTrait);
-            break;
-        }
+        if (t.IsExplicitCopy() && t.IsGenericType)
+            ctx.Report(sds.Identifier.GetLocation(), Rule04GenericExplicitCopyType);
     }
 }
