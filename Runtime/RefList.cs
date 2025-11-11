@@ -32,9 +32,9 @@ namespace Ksi
     [ExplicitCopy, DynSized, RefList]
     public struct ManagedRefList<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
     {
-#pragma warning disable KSIGENERIC03
+#pragma warning disable KSIGENERIC02
         internal T[] Array;
-#pragma warning restore KSIGENERIC03
+#pragma warning restore KSIGENERIC02
         internal int Count;
     }
 }

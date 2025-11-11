@@ -109,38 +109,7 @@ public class KsiGenericAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiGeneric02JaggedRefList()
-    {
-        await KsiGenericAnalyzerTest.RunAsync(
-            // language=cs
-            """
-            using Ksi;
-
-            public static class Test
-            {
-                public static void Method(ref {|KSIGENERIC02:RefList<RefList<int>>|} param)
-                {
-                    {|KSIGENERIC02:RefList<RefList<int>>|} a = default;
-                    {|KSIGENERIC02:var|} b = RefList.Empty<RefList<int>>();
-                }
-            }
-            
-            [ExplicitCopy, DynSized, Dealloc]
-            public struct TestStruct
-            {
-                public {|KSIGENERIC02:RefList<RefList<int>>|} Jagged;
-            }
-
-            public class TestClass
-            {
-                private ExclusiveAccess<{|KSIGENERIC02:RefList<RefList<int>>|}> _listAccess;
-            }
-            """
-        );
-    }
-
-    [Fact]
-    public async Task KsiGeneric03GenericTypeArgumentTraits()
+    public async Task KsiGeneric02GenericTypeArgumentTraits()
     {
         await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
@@ -155,14 +124,14 @@ public class KsiGenericAnalyzerTests
             [ExplicitCopy]
             public struct Test
             {
-                public Generic<{|KSIGENERIC03:MyStruct|}> Field;
+                public Generic<{|KSIGENERIC02:MyStruct|}> Field;
                 
-                public static void Method(in Generic<{|KSIGENERIC03:MyStruct|}> arg)
+                public static void Method(in Generic<{|KSIGENERIC02:MyStruct|}> arg)
                 {
-                    Generic<{|KSIGENERIC03:MyStruct|}> a = default;
-                    {|KSIGENERIC03:var|} b = new Generic<{|KSIGENERIC03:MyStruct|}>();
-                    {|KSIGENERIC03:var|} c = new {|KSIGENERIC03:MyStruct[10]|};
-                    {|KSIGENERIC03:var|} d = ({|KSIGENERIC03:new MyStruct()|}, 42);
+                    Generic<{|KSIGENERIC02:MyStruct|}> a = default;
+                    {|KSIGENERIC02:var|} b = new Generic<{|KSIGENERIC02:MyStruct|}>();
+                    {|KSIGENERIC02:var|} c = new {|KSIGENERIC02:MyStruct[10]|};
+                    {|KSIGENERIC02:var|} d = ({|KSIGENERIC02:new MyStruct()|}, 42);
                 }
             }
             """
@@ -170,7 +139,7 @@ public class KsiGenericAnalyzerTests
     }
 
     [Fact]
-    public async Task KsiGeneric03TempAllocContainers()
+    public async Task KsiGeneric02TempAllocContainers()
     {
         await KsiGenericAnalyzerTest.RunAsync(
             // language=cs
@@ -184,14 +153,45 @@ public class KsiGenericAnalyzerTests
             {
                 public static void Test(
                     in TempRefList<TestStruct> a,
-                    in RefList<{|KSIGENERIC03:TestStruct|}> b,
-                    in ManagedRefList<{|KSIGENERIC03:TestStruct|}> c
+                    in RefList<{|KSIGENERIC02:TestStruct|}> b,
+                    in ManagedRefList<{|KSIGENERIC02:TestStruct|}> c
                 )
                 {
                     var x = TempRefList.Empty<TestStruct>();
-                    {|KSIGENERIC03:var|} y = RefList.Empty<TestStruct>();
-                    {|KSIGENERIC03:var|} z = ManagedRefList.Empty<TestStruct>();
+                    {|KSIGENERIC02:var|} y = RefList.Empty<TestStruct>();
+                    {|KSIGENERIC02:var|} z = ManagedRefList.Empty<TestStruct>();
                 }
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task KsiGeneric03JaggedRefList()
+    {
+        await KsiGenericAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class Test
+            {
+                public static void Method(ref {|KSIGENERIC03:RefList<RefList<int>>|} param)
+                {
+                    {|KSIGENERIC03:RefList<RefList<int>>|} a = default;
+                    {|KSIGENERIC03:var|} b = RefList.Empty<RefList<int>>();
+                }
+            }
+
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct TestStruct
+            {
+                public {|KSIGENERIC03:RefList<RefList<int>>|} Jagged;
+            }
+
+            public class TestClass
+            {
+                private ExclusiveAccess<{|KSIGENERIC03:RefList<RefList<int>>|}> _listAccess;
             }
             """
         );

@@ -29,15 +29,15 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         "Argument type `{0}` traits are not compatible with generic parameter type {1} traits"
     );
 
-    private static readonly DiagnosticDescriptor Rule02JaggedRefList = Rule(02, DiagnosticSeverity.Error,
+    private static readonly DiagnosticDescriptor Rule02GenericTypeArgumentTraits = Rule(02, DiagnosticSeverity.Error,
+        "Generic type argument traits are not compatible with generic type parameter traits",
+        "Generic type argument `{0}` traits are not compatible with generic type parameter `{1}` traits"
+    );
+
+    private static readonly DiagnosticDescriptor Rule03JaggedRefList = Rule(03, DiagnosticSeverity.Error,
         "Jagged TRefList<T> types are not supported",
         "Jagged TRefList<T> types are not supported. " +
         "Consider to wrap inner collection with a structure"
-    );
-
-    private static readonly DiagnosticDescriptor Rule03GenericTypeArgumentTraits = Rule(03, DiagnosticSeverity.Error,
-        "Generic type argument traits are not compatible with generic type parameter traits",
-        "Generic type argument `{0}` traits are not compatible with generic type parameter `{1}` traits"
     );
 
     private static readonly DiagnosticDescriptor Rule04GenericFieldMarkedWithTrait = Rule(04, DiagnosticSeverity.Error,
@@ -47,8 +47,8 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01GenericMethodArgumentTraits,
-        Rule02JaggedRefList,
-        Rule03GenericTypeArgumentTraits,
+        Rule02GenericTypeArgumentTraits,
+        Rule03JaggedRefList,
         Rule04GenericFieldMarkedWithTrait
     );
 
@@ -78,7 +78,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
 
         var i = ctx.SemanticModel.GetTypeInfo(s.GetTypeExpr(), ctx.CancellationToken);
         if (IsJaggedRefList(i.Type))
-            ctx.ReportDiagnostic(Diagnostic.Create(Rule02JaggedRefList, s.GetLocation()));
+            ctx.ReportDiagnostic(Diagnostic.Create(Rule03JaggedRefList, s.GetLocation()));
 
         if (i.Type is INamedTypeSymbol { IsGenericType: true } t && !t.IsSpanOrReadonlySpan())
             AnalyzeGenericTypeArgTraits(ctx, t, s.TypeArgumentList.Arguments.Select(x => x.GetLocation()).ToImmutableArray());
@@ -93,7 +93,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
             return;
 
         if (t.IsExplicitCopy())
-            ctx.Report(s.GetLocation(), Rule03GenericTypeArgumentTraits, t.Name, "TItem");
+            ctx.Report(s.GetLocation(), Rule02GenericTypeArgumentTraits, t.Name, "TItem");
     }
 
     private static void AnalyzeTupleTypeSyntax(SyntaxNodeAnalysisContext ctx)
@@ -114,12 +114,12 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         var loc = d.GetDeclaredTypeLocation();
 
         if (IsJaggedRefList(d.Symbol.Type))
-            ctx.Report(loc, Rule02JaggedRefList);
+            ctx.Report(loc, Rule03JaggedRefList);
 
         switch (d.Symbol.Type)
         {
             case IArrayTypeSymbol a when a.ElementType.IsExplicitCopy():
-                ctx.Report(loc, Rule03GenericTypeArgumentTraits, a.ElementType.Name, "TItem");
+                ctx.Report(loc, Rule02GenericTypeArgumentTraits, a.ElementType.Name, "TItem");
                 break;
             case INamedTypeSymbol { IsGenericType: true } t when !t.IsSpanOrReadonlySpan():
                 AnalyzeGenericTypeArgTraits(ctx, t, loc);
@@ -145,7 +145,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
             var at = t.TypeArguments[i];
             var pt = t.TypeParameters[i];
             if (!CheckTraits(at, pt))
-                ctx.Report(loc, Rule03GenericTypeArgumentTraits, at.Name, pt.Name);
+                ctx.Report(loc, Rule02GenericTypeArgumentTraits, at.Name, pt.Name);
         }
     }
 
@@ -156,7 +156,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
             var at = t.TypeArguments[i];
             var pt = t.TypeParameters[i];
             if (!CheckTraits(at, pt))
-                ctx.Report(locs[i], Rule03GenericTypeArgumentTraits, at.Name, pt.Name);
+                ctx.Report(locs[i], Rule02GenericTypeArgumentTraits, at.Name, pt.Name);
         }
     }
 
@@ -192,7 +192,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
                 continue;
 
             if (e.Type.IsExplicitCopy())
-                ctx.Report(e.Syntax.GetLocation(), Rule03GenericTypeArgumentTraits, e.Type.Name, $"T{i+1}");
+                ctx.Report(e.Syntax.GetLocation(), Rule02GenericTypeArgumentTraits, e.Type.Name, $"T{i+1}");
         }
     }
 
