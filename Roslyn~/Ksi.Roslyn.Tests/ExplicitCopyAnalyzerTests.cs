@@ -228,7 +228,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy12SpanToArray()
+    public async Task ExpCopy09SpanToArray()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -242,8 +242,8 @@ public class ExplicitCopyAnalyzerTests
             {
                 public static void Method(Span<MyStruct> rw, ReadOnlySpan<MyStruct> ro)
                 {
-                    {|EXPCOPY12:ro.ToArray()|};
-                    {|EXPCOPY12:rw.ToArray()|};
+                    {|EXPCOPY09:ro.ToArray()|};
+                    {|EXPCOPY09:rw.ToArray()|};
                 }
             }
             """
@@ -251,7 +251,7 @@ public class ExplicitCopyAnalyzerTests
     }
 
     [Fact]
-    public async Task ExpCopy13LowAccessibility()
+    public async Task ExpCopy10LowAccessibility()
     {
         await ExplicitCopyAnalyzerTest.RunAsync(
             // language=cs
@@ -259,13 +259,13 @@ public class ExplicitCopyAnalyzerTests
             public class Test
             {
                 [Ksi.ExplicitCopy]
-                private struct {|EXPCOPY13:PrivStruct|} { public int Field; }
+                private struct {|EXPCOPY10:PrivStruct|} { public int Field; }
                 
                 [Ksi.ExplicitCopy]
-                private protected struct {|EXPCOPY13:ProvProtStruct|} { public int Field; }
+                private protected struct {|EXPCOPY10:ProvProtStruct|} { public int Field; }
                 
                 [Ksi.ExplicitCopy]
-                protected struct {|EXPCOPY13:ProtStruct|} { public int Field; }
+                protected struct {|EXPCOPY10:ProtStruct|} { public int Field; }
                 
                 [Ksi.ExplicitCopy]
                 internal struct IntStruct { public int Field; }

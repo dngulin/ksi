@@ -66,12 +66,12 @@ namespace Ksi.Roslyn
             "Declaring a private field prevents from providing explicit copy extensions"
         );
 
-        private static readonly DiagnosticDescriptor Rule12SpanToArray = Rule(12,
-            "Implicit copy caused by Span<TExplicitCopy>.ToArray() conversion",
-            "Implicit copy caused by {0}<{1}>.ToArray() conversion"
+        private static readonly DiagnosticDescriptor Rule09SpanToArray = Rule(09,
+            "Implicit copy caused by `Span<TExplicitCopy>.ToArray()` conversion",
+            "Implicit copy caused by `{0}<{1}>.ToArray()` conversion"
         );
 
-        private static readonly DiagnosticDescriptor Rule13LowAccessibility = Rule(13,
+        private static readonly DiagnosticDescriptor Rule10LowAccessibility = Rule(10,
             "Declaring [ExplicitCopy] struct with low accessibility",
             "Declaring [ExplicitCopy] struct with accessibility lower than `internal` " +
             "prevents from providing explicit copy extensions"
@@ -86,8 +86,8 @@ namespace Ksi.Roslyn
             Rule06ClosureCapture,
             Rule07Boxing,
             Rule08PrivateField,
-            Rule12SpanToArray,
-            Rule13LowAccessibility
+            Rule09SpanToArray,
+            Rule10LowAccessibility
         );
 
         public override void Initialize(AnalysisContext context)
@@ -237,7 +237,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (t.IsExplicitCopy() && t.InAssemblyAccessibility() < Accessibility.Internal)
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule13LowAccessibility, t.Locations.First()));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule10LowAccessibility, t.Locations.First()));
         }
 
         private static void AnalyzeInvocation(OperationAnalysisContext ctx)
@@ -265,7 +265,7 @@ namespace Ksi.Roslyn
                 return;
 
             if (op.TargetMethod.Name == "ToArray")
-                ctx.ReportDiagnostic(Diagnostic.Create(Rule12SpanToArray, op.Syntax.GetLocation(), nt.Name, gt.Name));
+                ctx.ReportDiagnostic(Diagnostic.Create(Rule09SpanToArray, op.Syntax.GetLocation(), nt.Name, gt.Name));
         }
 
         private static ITypeSymbol? GetCaptureSymbolType(ISymbol symbol)

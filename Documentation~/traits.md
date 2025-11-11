@@ -86,8 +86,8 @@ Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g
 | `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure                 |
 | `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance                      |
 | `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type             |
-| `EXPCOPY12`   | Error    | Implicit copy caused by `Span<TExplicitCopy>.ToArray()` conversion |
-| `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility           |
+| `EXPCOPY09`   | Error    | Implicit copy caused by `Span<TExplicitCopy>.ToArray()` conversion |
+| `EXPCOPY10`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility           |
 
 ## DynSized Attribute
 
