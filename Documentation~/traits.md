@@ -76,18 +76,18 @@ Note that the `TRefList<T>` types are only `ExplicitCopy` types that can be gene
 
 Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md):
 
-| Diagnostic Id | Severity | Title                                                    |
-|---------------|----------|----------------------------------------------------------|
-| `EXPCOPY01`   | Error    | Missing `[ExplicitCopy]` attribute                       |
-| `EXPCOPY02`   | Error    | Passing `[ExplicitCopy]` instance by value               |
-| `EXPCOPY03`   | Error    | Returning a copy of the `[ExplicitCopy]` instance        |
-| `EXPCOPY04`   | Error    | Assignment copy of the `[ExplicitCopy]` instance         |
-| `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance          |
-| `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure       |
-| `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance            |
-| `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type   |
-| `EXPCOPY12`   | Error    | Using Span copying API with `[ExplicitCopy]` items       |
-| `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility |
+| Diagnostic Id | Severity | Title                                                              |
+|---------------|----------|--------------------------------------------------------------------|
+| `EXPCOPY01`   | Error    | Missing `[ExplicitCopy]` attribute                                 |
+| `EXPCOPY02`   | Error    | Passing `[ExplicitCopy]` instance by value                         |
+| `EXPCOPY03`   | Error    | Returning a copy of the `[ExplicitCopy]` instance                  |
+| `EXPCOPY04`   | Error    | Assignment copy of the `[ExplicitCopy]` instance                   |
+| `EXPCOPY05`   | Error    | Defensive copy of the `[ExplicitCopy]` instance                    |
+| `EXPCOPY06`   | Error    | Capturing the `[ExplicitCopy]` instance by closure                 |
+| `EXPCOPY07`   | Error    | Boxing/unboxing the `[ExplicitCopy]` instance                      |
+| `EXPCOPY08`   | Error    | Private field declaration in the `[ExplicitCopy]` type             |
+| `EXPCOPY12`   | Error    | Implicit copy caused by `Span<TExplicitCopy>.ToArray()` conversion |
+| `EXPCOPY13`   | Error    | Declaring `[ExplicitCopy]` struct with low accessibility           |
 
 ## DynSized Attribute
 
@@ -235,3 +235,38 @@ Diagnostics related to the [TempAllocAttribute](api/T.TempAllocAttribute.g.md):
 | `TEMPALLOC01`  | Error    | Missing `[TempAlloc]` attribute                    |
 | `TEMPALLOC02`  | Error    | Missing `[ExplicitCopy]` attribute                 |
 | `TEMPALLOC03`  | Warning  | Redundant `[TempAlloc]` attribute                  |
+
+## Traits in Generic Context
+
+You can use traits to mark type parameters in the same way as you would use regular types.
+That allows passing trait-marked concrete types to generic code.
+
+For example, you can use it for state-to-view mapping:
+```csharp
+public abstract class EntityView<[ExplicitCopy] T> : MonoBehaviour where T : struct
+{
+    public abstract void UpdateState(in T entity);
+}
+
+public static void UpdateViews<[ExplicitCopy] T>(in RefList<T> entities, List<EntityView<T>> views) 
+{
+    for (var i = 0; i < entities.Count(); i++)
+        views[i].UpdateState(entities.RefReadonlyAt(i));
+}
+```
+
+> [!IMPORTANT]
+> Type parameter traits are designed for generic data processing and not for generic data composition.
+> You cannot declare a generic `struct` marked with a trait attribute.
+
+### Generic Context Diagnostics
+
+Diagnostics related to trait usage in the generic context:
+
+| Diagnostic Id  | Severity | Title                                                                              |
+|----------------|----------|------------------------------------------------------------------------------------|
+| `KSIGENERIC01` | Error    | Argument type traits are not compatible with generic parameter type traits         |
+| `KSIGENERIC02` | Error    | Generic type argument traits are not compatible with generic type parameter traits |
+| `KSIGENERIC03` | Error    | Jagged `TRefList<T>` types are not supported                                       |
+| `KSIGENERIC04` | Error    | Declaring a generic `[ExplicitCopy]` type                                          |
+| `KSIGENERIC05` | Error    | Non-concrete type is used as a type argument of the `ExclusiveAccess<T>`           |
