@@ -210,4 +210,22 @@ public class KsiGenericAnalyzerTests
             """
         );
     }
+
+    [Fact]
+    public async Task KsiGeneric05NonConcreteExclusiveAccessType()
+    {
+        await KsiGenericAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            public class TestClass<[ExplicitCopy, DynSized, Dealloc] T> where T : unmanaged
+            {
+                private ExclusiveAccess<{|KSIGENERIC05:T|}> _a;
+                private ExclusiveAccess<{|KSIGENERIC05:RefList<T>|}> _b;
+                private ExclusiveAccess<RefList<int>> _c;
+            }
+            """
+        );
+    }
 }

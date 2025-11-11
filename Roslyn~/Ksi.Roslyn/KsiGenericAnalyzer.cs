@@ -45,11 +45,17 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         "Type marked with [ExplicitCopy] cannot be declared as a generic type"
     );
 
+    private static readonly DiagnosticDescriptor Rule05NonConcreteExAccTypeArg = Rule(05, DiagnosticSeverity.Error,
+        "Non-concrete type is used as a type argument of the `ExclusiveAccess<T>`",
+        "Non-concrete type `{0}` is used as a type argument of the `ExclusiveAccess<T>`"
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         Rule01GenericMethodArgumentTraits,
         Rule02GenericTypeArgumentTraits,
         Rule03JaggedRefList,
-        Rule04GenericExplicitCopyType
+        Rule04GenericExplicitCopyType,
+        Rule05NonConcreteExAccTypeArg
     );
 
     public override void Initialize(AnalysisContext context)
@@ -67,6 +73,8 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
         context.RegisterOperationAction(AnalyzeVariableDeclarator, OperationKind.VariableDeclarator);
         context.RegisterOperationAction(AnalyzeArgument, OperationKind.Argument);
         context.RegisterOperationAction(AnalyzeTuple, OperationKind.Tuple);
+
+        context.RegisterSymbolAction(AnalyzeField, SymbolKind.Field);
 
     }
 
@@ -208,5 +216,19 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
 
         if (t.IsExplicitCopy() && t.IsGenericType)
             ctx.Report(sds.Identifier.GetLocation(), Rule04GenericExplicitCopyType);
+    }
+
+    private static void AnalyzeField(SymbolAnalysisContext ctx)
+    {
+        var f = (IFieldSymbol)ctx.Symbol;
+        if (f.Type is not INamedTypeSymbol t || !t.IsExclusiveAccess())
+            return;
+
+        if (f.ContainingType.IsAccessScope())
+            return;
+
+        var gt = t.TypeArguments[0];
+        if (!gt.IsConcreteType())
+            ctx.Report(f.GetTypeArgLocation(ctx.CancellationToken), Rule05NonConcreteExAccTypeArg, gt.Name);
     }
 }

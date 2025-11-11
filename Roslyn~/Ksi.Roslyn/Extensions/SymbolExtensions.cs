@@ -23,6 +23,18 @@ public static class SymbolExtensions
         return s.Parent is VariableDeclarationSyntax d ? d.Type.GetLocation() : self.Locations.First();
     }
 
+    public static Location GetTypeArgLocation(this IFieldSymbol self, CancellationToken ct)
+    {
+        var s = self.DeclaringSyntaxReferences.First().GetSyntax(ct);
+
+        return s.Parent is VariableDeclarationSyntax
+        {
+            Type: GenericNameSyntax { TypeArgumentList.Arguments.Count: 1 } gn
+        }
+            ? gn.TypeArgumentList.Arguments[0].GetLocation()
+            : self.Locations.First();
+    }
+
     public static bool IsPublic(this ISymbol self) => self.DeclaredAccessibility == Accessibility.Public;
     public static bool IsPrivate(this ISymbol self) => self.DeclaredAccessibility == Accessibility.Private;
 

@@ -281,4 +281,12 @@ public static class TypeSymbolExtensions
             _ => false
         };
     }
+
+    public static bool IsConcreteType(this ITypeSymbol t)
+    {
+        if (t is not INamedTypeSymbol nt)
+            return false;
+
+        return !nt.IsGenericType || nt.TypeArguments.All(IsConcreteType);
+    }
 }
