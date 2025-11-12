@@ -31,7 +31,7 @@ Key features:
   // This API call is possible only if you have a MUTABLE REFERENCE to the data
   public static ref T RefAt<T>(this ref RefList<T> self, int index);
   ```
-- [Deallocation management](Documentation~/traits.md#dealloc-attribute)
+- [Deallocation management](Documentation~/traits.md#dealloc-attribute) extensions
   ```csharp
   [ExplicitCopy, DynSized, Dealloc]
   public struct Node { public RefList<Node> Children; }
@@ -96,7 +96,7 @@ TODO:
 - [ECS-Like Data Composition](Documentation~/ecs.md)
 - [API Reference](Documentation~/api/index.g.md)
 
-See also [package unit tests](Tests) and [roslyn unit tests](Roslyn~/Ksi.Roslyn.Tests).
+See also [Roslyn projects](Roslyn~) and specifically [package unit tests](Tests) and [Roslyn unit tests](Roslyn~/Ksi.Roslyn.Tests).
 
 ## Installation
 
