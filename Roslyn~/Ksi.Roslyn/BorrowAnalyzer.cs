@@ -183,8 +183,7 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
         if (body == null)
             return;
 
-        var vars = body
-            .FindLocalRefsWithLifetimeIntersectingPos(op.Syntax.SpanStart)
+        var vars = op.FindVarsWithIntersectedLifetime()
             .Where(v => v.ReferencesDynSized())
             .Select(v => (v.Symbol, RefPath: v.GetRefPath()))
             .Where(t => !t.RefPath.IsEmpty)

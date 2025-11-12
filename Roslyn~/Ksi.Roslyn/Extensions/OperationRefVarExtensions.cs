@@ -3,77 +3,66 @@ using System.Linq;
 using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Ksi.Roslyn.Extensions;
 
 public static class OperationRefVarExtensions
 {
-    public static IEnumerable<RefVarInfo> FindLocalRefsWithLifetimeIntersectingPos(this IOperation self, int pos)
+    public static IEnumerable<RefVarInfo> FindVarsWithIntersectedLifetime(this IInvocationOperation self)
     {
-        var eqc = SymbolEqualityComparer.Default;
-        var variables = new Dictionary<ILocalSymbol, (RefVarInfo Info, int LifetimeStart)>(17, eqc);
+        var body = self.GetEnclosingBody();
+        if (body == null)
+            yield break;
 
-        foreach (var op in self.Descendants())
+        var variables = new Dictionary<ILocalSymbol, RefVarInfo>(17, SymbolEqualityComparer.Default);
+        var invocationPos = self.Syntax.SpanStart;
+        var invocationReached = false;
+
+        foreach (var op in body.Descendants())
         {
             switch (op)
             {
-                case IVariableDeclaratorOperation d:
+                case IInvocationOperation invocation when !invocationReached && invocation == self:
                 {
-                    if (d.Syntax.Span.End > pos || !d.Symbol.IsRefOrWrappedRef())
-                        continue;
-
-                    var optV = d.GetVarInfoWithLifetime();
-                    if (optV == null)
-                        continue;
-
-                    var v = optV.Value;
-                    if (v.Info.Kind == RefVarKind.IteratorItemRef)
-                    {
-                        if (v.Lifetime.IntersectsWith(pos)) yield return v.Info;
-                        continue;
-                    }
-
-                    variables[d.Symbol] = (v.Info, v.Lifetime.Start);
+                    invocationReached = true;
                     break;
                 }
 
-                case ILocalReferenceOperation r:
+                case IVariableInitializerOperation initializer when !invocationReached:
+                {
+                    if (initializer.Syntax.Span.IntersectsWith(invocationPos))
+                        continue;
+
+                    if (initializer.Parent is not IVariableDeclaratorOperation d || !d.Symbol.IsRefOrWrappedRef())
+                        continue;
+
+                    variables[d.Symbol] = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, initializer.Value);
+                    break;
+                }
+
+                case IForEachLoopOperation loop when !invocationReached:
+                {
+                    if (!loop.Body.Syntax.Span.IntersectsWith(invocationPos))
+                        continue;
+
+                    if (loop.LoopControlVariable is not IVariableDeclaratorOperation d || !d.Symbol.IsRef)
+                        continue;
+
+                    yield return new RefVarInfo(d.Symbol, RefVarKind.IteratorItemRef, loop.Collection.Unwrapped());
+                    break;
+                }
+
+                case ILocalReferenceOperation r when invocationReached:
                 {
                     if (!variables.TryGetValue(r.Local, out var v))
                         continue;
 
-                    var lifetime = TextSpan.FromBounds(v.LifetimeStart, r.Syntax.Span.End);
-                    if (lifetime.IntersectsWith(pos))
-                    {
-                        variables.Remove(r.Local);
-                        yield return v.Info;
-                    }
-
+                    variables.Remove(r.Local);
+                    yield return v;
                     break;
                 }
             }
         }
-    }
-
-    private static (RefVarInfo Info, TextSpan Lifetime)? GetVarInfoWithLifetime(this IVariableDeclaratorOperation d)
-    {
-        if (d.Initializer != null)
-        {
-            var varInfo = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, d.Initializer!.Value);
-            var lifetime = new TextSpan(d.Initializer!.Syntax.SpanStart, 0);
-
-            return (varInfo, lifetime);
-        }
-
-        if (d.Parent is IForEachLoopOperation l)
-        {
-            var producer = l.Collection.Unwrapped();
-            var iterInfo = new RefVarInfo(d.Symbol, RefVarKind.IteratorItemRef, producer);
-            return (iterInfo, l.Body.Syntax.Span);
-        }
-
-        return null;
     }
 
     public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)

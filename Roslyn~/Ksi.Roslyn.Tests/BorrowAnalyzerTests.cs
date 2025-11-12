@@ -78,7 +78,7 @@ public class BorrowAnalyzerTests
                         {|BORROW03:list|}.RemoveAt(0);
                     }
                     
-                    ref var a = ref list.RefAt(0);
+                    ref var a = ref list.RefAdd();
                     
                     // Resizing collection within item reference lifetime
                     {|BORROW03:list|}.RefAdd() = 42;
