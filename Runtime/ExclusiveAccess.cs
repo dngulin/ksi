@@ -32,6 +32,11 @@ namespace Ksi
         /// </exception>
         public ReadOnlyAccessScope<T> ReadOnly => new ReadOnlyAccessScope<T>(this, GetNextAccessId());
 
+        /// <summary>
+        /// Returns exclusive access lock status.
+        /// </summary>
+        public bool IsLocked => _activeAccessId != 0;
+
         private ulong GetNextAccessId()
         {
             if (_activeAccessId != 0)
@@ -48,7 +53,7 @@ namespace Ksi
         internal ref T Access(ulong id)
         {
 #pragma warning disable BORROW01
-            if (_activeAccessId == id)
+            if (IsLocked && _activeAccessId == id)
                 return ref _value;
 #pragma warning restore BORROW01
 

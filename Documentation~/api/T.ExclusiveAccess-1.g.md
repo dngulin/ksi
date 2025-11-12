@@ -18,6 +18,7 @@ public sealed class ExclusiveAccess<[ExplicitCopy, DynSized, Dealloc] T> where T
 Properties
 - [Mutable](#mutable) — creates a new instance of [MutableAccessScope\<T\>](T.MutableAccessScope-1.g.md)
 - [ReadOnly](#readonly) — creates a new instance of `[ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope-1.g.md)
+- [IsLocked](#islocked) — returns exclusive access lock status
 
 
 ## Properties
@@ -47,3 +48,12 @@ public ReadOnlyAccessScope<T> ReadOnly { get; }
 > [!CAUTION]
 > Possible exceptions: 
 > - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — if an active instance of [MutableAccessScope\<T\>](T.MutableAccessScope-1.g.md) or [ReadOnlyAccessScope\<T\>](T.ReadOnlyAccessScope-1.g.md) already exists.
+
+
+### IsLocked
+
+Returns exclusive access lock status.
+
+```csharp
+public bool IsLocked { get; }
+```
