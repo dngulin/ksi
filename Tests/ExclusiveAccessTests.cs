@@ -7,48 +7,6 @@ namespace Ksi.Tests
     public class ExclusiveAccessTests
     {
         [Test]
-        public void IsLocked()
-        {
-            var exAcc = new ExclusiveAccess<RefList<int>>();
-            Assert.That(exAcc.IsLocked, Is.False);
-
-            using (var accessScope = exAcc.Mutable)
-            {
-                Assert.That(exAcc.IsLocked, Is.True);
-                _ = ref accessScope.Value;
-            }
-
-            Assert.That(exAcc.IsLocked, Is.False);
-
-            using (var accessScope = exAcc.ReadOnly)
-            {
-                Assert.That(exAcc.IsLocked, Is.True);
-                _ = ref accessScope.Value;
-            }
-
-            Assert.That(exAcc.IsLocked, Is.False);
-        }
-
-        [Test]
-        public void ProvidesExclusiveAccess()
-        {
-            var exAcc = new ExclusiveAccess<RefList<int>>();
-            using (var accessScope = exAcc.Mutable)
-            {
-                Assert.Throws<InvalidOperationException>(() => _ = exAcc.Mutable);
-                Assert.Throws<InvalidOperationException>(() => _ = exAcc.ReadOnly);
-                _ = ref accessScope.Value;
-            }
-
-            using (var accessScope = exAcc.ReadOnly)
-            {
-                Assert.Throws<InvalidOperationException>(() => _ = exAcc.Mutable);
-                Assert.Throws<InvalidOperationException>(() => _ = exAcc.ReadOnly);
-                _ = ref accessScope.Value;
-            }
-        }
-
-        [Test]
         public void ProvidesAccess()
         {
             var exAcc = new ExclusiveAccess<RefList<int>>();
@@ -65,6 +23,44 @@ namespace Ksi.Tests
             using (var accessScope = exAcc.Mutable)
             {
                 accessScope.Value.Dealloc();
+            }
+        }
+
+        [Test]
+        public void IsLocked()
+        {
+            var exAcc = new ExclusiveAccess<RefList<int>>();
+            Assert.That(exAcc.IsLocked, Is.False);
+
+            using (exAcc.Mutable)
+            {
+                Assert.That(exAcc.IsLocked, Is.True);
+            }
+
+            Assert.That(exAcc.IsLocked, Is.False);
+
+            using (exAcc.ReadOnly)
+            {
+                Assert.That(exAcc.IsLocked, Is.True);
+            }
+
+            Assert.That(exAcc.IsLocked, Is.False);
+        }
+
+        [Test]
+        public void ProvidesExclusiveAccess()
+        {
+            var exAcc = new ExclusiveAccess<RefList<int>>();
+            using (exAcc.Mutable)
+            {
+                Assert.Throws<InvalidOperationException>(() => _ = exAcc.Mutable);
+                Assert.Throws<InvalidOperationException>(() => _ = exAcc.ReadOnly);
+            }
+
+            using (exAcc.ReadOnly)
+            {
+                Assert.Throws<InvalidOperationException>(() => _ = exAcc.Mutable);
+                Assert.Throws<InvalidOperationException>(() => _ = exAcc.ReadOnly);
             }
         }
     }
