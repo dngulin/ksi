@@ -92,6 +92,15 @@ public class BorrowAnalyzerTests
                     list.Clear();
                 }
                 
+                public static void LoopBodyInvalidation(ref RefList<int> list, int pos)
+                {
+                    ref var test = ref list.RefAt(pos);
+                    for (var i = list.Count() - 1; i >= 0; i++)
+                    {
+                        test++;
+                        list.RemoveAt(i);
+                    }
+                }
             }
             """
         );
