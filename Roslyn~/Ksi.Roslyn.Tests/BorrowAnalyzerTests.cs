@@ -98,7 +98,7 @@ public class BorrowAnalyzerTests
                     for (var i = list.Count() - 1; i >= 0; i++)
                     {
                         test++;
-                        list.RemoveAt(i);
+                        {|BORROW03:list|}.RemoveAt(i);
                     }
                 }
             }

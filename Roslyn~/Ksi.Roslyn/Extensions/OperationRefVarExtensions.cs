@@ -14,7 +14,7 @@ public static class OperationRefVarExtensions
         if (body == null)
             yield break;
 
-        var variables = new Dictionary<ILocalSymbol, RefVarInfo>(17, SymbolEqualityComparer.Default);
+        var variables = new Dictionary<ILocalSymbol, (RefVarInfo, IBlockOperation)>(17, SymbolEqualityComparer.Default);
         var invocationPos = self.Syntax.SpanStart;
         var invocationReached = false;
 
@@ -36,7 +36,10 @@ public static class OperationRefVarExtensions
                     if (initializer.Parent is not IVariableDeclaratorOperation d || !d.Symbol.IsRefOrWrappedRef())
                         continue;
 
-                    variables[d.Symbol] = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, initializer.Value);
+                    var info = new RefVarInfo(d.Symbol, RefVarKind.LocalSymbolRef, initializer.Value);
+                    var block = d.GetContainingBlock();
+
+                    variables[d.Symbol] = (info, block);
                     break;
                 }
 
@@ -52,17 +55,28 @@ public static class OperationRefVarExtensions
                     break;
                 }
 
-                case ILocalReferenceOperation r when invocationReached:
+                case ILocalReferenceOperation r:
                 {
-                    if (!variables.TryGetValue(r.Local, out var v))
+                    if (!variables.TryGetValue(r.Local, out var entry))
+                        continue;
+
+                    var (info, declBlock) = entry;
+                    var lifetimeIntersected = invocationReached || CheckInLoopReference(r, declBlock, invocationPos);
+                    if (!lifetimeIntersected)
                         continue;
 
                     variables.Remove(r.Local);
-                    yield return v;
+                    yield return info;
                     break;
                 }
             }
         }
+    }
+
+    private static bool CheckInLoopReference(ILocalReferenceOperation r, IBlockOperation declBlock, int pos)
+    {
+        var loopBody = r.FindParentLoopBodyWithin(declBlock);
+        return loopBody != null && loopBody.Syntax.Span.IntersectsWith(pos);
     }
 
     public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)

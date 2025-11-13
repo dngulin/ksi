@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,31 @@ public static class OperationExtensions
         {
             if (p is IMethodBodyOperation || p is IConstructorBodyOperation)
                 return p;
+        }
+
+        return null;
+    }
+
+    public static IBlockOperation GetContainingBlock(this IOperation self)
+    {
+        for (var p = self; p != null; p = p.Parent)
+        {
+            if (p is IBlockOperation b)
+                return b;
+        }
+
+        throw new Exception("Unreachable");
+    }
+
+    public static IBlockOperation? FindParentLoopBodyWithin(this IOperation self, IBlockOperation parentBlock)
+    {
+        for (var p = self; p != null; p = p.Parent)
+        {
+            if (p == parentBlock)
+                return null;
+
+            if (p is IBlockOperation { Parent: ILoopOperation } b)
+                return b;
         }
 
         return null;
