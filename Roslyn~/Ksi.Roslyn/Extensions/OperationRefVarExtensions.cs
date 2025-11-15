@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
@@ -61,7 +63,8 @@ public static class OperationRefVarExtensions
                         continue;
 
                     var (info, declBlock) = entry;
-                    var lifetimeIntersected = invocationReached || CheckInLoopReference(r, declBlock, invocationPos);
+                    var lifetimeIntersected = (invocationReached && SameBranches(declBlock, r, self)) ||
+                                              CheckInLoopReference(r, declBlock, invocationPos);
                     if (!lifetimeIntersected)
                         continue;
 
@@ -71,6 +74,39 @@ public static class OperationRefVarExtensions
                 }
             }
         }
+    }
+
+    private static bool SameBranches(IBlockOperation root, ILocalReferenceOperation localRef, IInvocationOperation inv)
+    {
+        var rNodes = GetBranchingNodes(localRef, root);
+        var iNodes = GetBranchingNodes(inv, root);
+
+        for (var i = 0; i < Math.Min(rNodes.Length, iNodes.Length); i++)
+        {
+            if (rNodes[i] != iNodes[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    private static ImmutableArray<IOperation> GetBranchingNodes(IOperation op, IBlockOperation root)
+    {
+        if (op.Parent == null || op.Parent == root)
+            return ImmutableArray<IOperation>.Empty;
+
+        var builder = ImmutableArray.CreateBuilder<IOperation>();
+
+        for (var p = op; p != null; p = p.Parent)
+        {
+            if (p.Parent == root)
+                break;
+
+            if (p.Parent is IConditionalOperation or ISwitchOperation or ISwitchExpressionOperation)
+                builder.Insert(0, p);
+        }
+
+        return builder.ToImmutable();
     }
 
     private static bool CheckInLoopReference(ILocalReferenceOperation r, IBlockOperation declBlock, int pos)

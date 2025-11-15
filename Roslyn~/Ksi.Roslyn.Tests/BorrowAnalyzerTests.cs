@@ -91,14 +91,72 @@ public class BorrowAnalyzerTests
                     // Mutating collection outside of any item reference lifetime
                     list.Clear();
                 }
-                
-                public static void LoopBodyInvalidation(ref RefList<int> list, int pos)
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task Borrow03LoopsAreSupported()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+
+            public static class TestClass
+            {
+                public static void Test(ref RefList<int> list, int pos)
                 {
                     ref var test = ref list.RefAt(pos);
                     for (var i = list.Count() - 1; i >= 0; i++)
                     {
                         test++;
                         {|BORROW03:list|}.RemoveAt(i);
+                    }
+                }
+            }
+            """
+        );
+    }
+
+    [Fact]
+    public async Task Borrow03BranchingIsRespected()
+    {
+        await BorrowAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            
+            public enum TestEnum { A, B }
+
+            public static class TestClass
+            {
+                public static void IfControlFlowIsRespected(ref RefList<int> list, int pos)
+                {
+                    ref var test = ref list.RefAt(pos);
+                    if (pos > 42)
+                    {
+                        list.Clear();
+                    }
+                    else
+                    {
+                        test++;
+                    }
+                }
+                
+                public static void SwitchControlFlowIsRespected(ref RefList<int> list, TestEnum e)
+                {
+                    ref var test = ref list.RefAt(42);
+                    switch (e)
+                    {
+                        case TestEnum.A:
+                            list.Clear();
+                            break;
+                        
+                        case TestEnum.B:
+                            test++;
+                            break;
                     }
                 }
             }
