@@ -2,8 +2,6 @@ namespace Ksi.Roslyn
 {
     public static class DeallocTemplates
     {
-        public static readonly string[] RefListExtensionNames = ["Dealloc", "Deallocated", "Clear", "RemoveAt"];
-
         public const string RefListDeallocItemsAndSelf =
             // language=cs
             """
