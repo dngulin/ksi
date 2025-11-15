@@ -25,7 +25,7 @@ namespace Ksi
         public MutableAccessScope<T> Mutable => new MutableAccessScope<T>(this, GetNextAccessId());
 
         /// <summary>
-        /// Creates a new instance of `<see cref="ReadOnlyAccessScope{T}"/>.
+        /// Creates a new instance of <see cref="ReadOnlyAccessScope{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">
         /// If an active instance of <see cref="MutableAccessScope{T}"/> or <see cref="ReadOnlyAccessScope{T}"/> already exists.
