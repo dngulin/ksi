@@ -90,6 +90,7 @@ TODO:
 
 ## Documentation
 
+- [Getting Started](getting-started.md)
 - [Trait Attributes](Documentation~/traits.md)
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)

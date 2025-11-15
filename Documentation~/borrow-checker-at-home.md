@@ -1,6 +1,7 @@
 # Referencing Rules
 
-> \[ [Traits](traits.md)
+> \[ [Getting Started](getting-started.md)
+> \| [Traits](traits.md)
 > \| [Collections](collections.md)
 > \| **Referencing**
 > \| [ECS](ecs.md)

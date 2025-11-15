@@ -1,6 +1,7 @@
 # Trait Attributes
 
-> \[ **Traits**
+> \[ [Getting Started](getting-started.md)
+> \| **Traits**
 > \| [Collections](collections.md)
 > \| [Referencing](borrow-checker-at-home.md)
 > \| [ECS](ecs.md)

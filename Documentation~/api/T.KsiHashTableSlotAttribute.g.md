@@ -1,6 +1,7 @@
 # KsiHashTableSlotAttribute
 
-> \[ [Traits](../traits.md)
+> \[ [Getting Started](getting-started.md)
+> \| [Traits](../traits.md)
 > \| [Collections](../collections.md)
 > \| [Referencing](../borrow-checker-at-home.md)
 > \| [ECS](../ecs.md)
