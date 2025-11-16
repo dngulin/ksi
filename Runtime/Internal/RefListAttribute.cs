@@ -1,6 +1,6 @@
 using System;
 
-namespace Ksi
+namespace Ksi.Internal
 {
     [AttributeUsage(AttributeTargets.Struct)]
     internal class RefListAttribute : Attribute

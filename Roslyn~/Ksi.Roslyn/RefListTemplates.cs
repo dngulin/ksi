@@ -5,6 +5,8 @@ public static class RefListTemplates
     public const string StaticApi =
         // language=cs
         """
+        using Ksi.Internal;
+        
         namespace Ksi
         {
             /// <summary>
@@ -49,6 +51,7 @@ public static class RefListTemplates
         // language=cs
         """
         using System;
+        using Ksi.Internal;
 
         namespace Ksi
         {
@@ -227,6 +230,7 @@ public static class RefListTemplates
         // language=cs
         """
         using System;
+        using Ksi.Internal;
 
         namespace Ksi
         {
@@ -262,6 +266,7 @@ public static class RefListTemplates
         // language=cs
         """
         using System;
+        using Ksi.Internal;
 
         namespace Ksi
         {

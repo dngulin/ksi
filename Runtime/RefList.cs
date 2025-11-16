@@ -1,4 +1,5 @@
-// Disable diagnostics for redundant DynSized, Dealloc & Temp attributes
+using Ksi.Internal;
+
 #pragma warning disable DYNSIZED03, DEALLOC03, TEMPALLOC03
 
 namespace Ksi

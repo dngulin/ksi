@@ -1,4 +1,5 @@
 using System;
+using Ksi.Internal;
 
 namespace Ksi
 {

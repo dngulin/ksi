@@ -1,7 +1,7 @@
 using System;
 using Unity.Collections;
 
-namespace Ksi
+namespace Ksi.Internal
 {
     internal static class RefListExtensions
     {

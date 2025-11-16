@@ -2,7 +2,7 @@ using System;
 using Unity.Collections;
 using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
 
-namespace Ksi
+namespace Ksi.Internal
 {
     internal static class UnsafeArrayExtensions
     {

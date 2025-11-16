@@ -1,4 +1,4 @@
-namespace Ksi
+namespace Ksi.Internal
 {
     internal unsafe struct UnsafeArray<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T> where T : unmanaged
     {
