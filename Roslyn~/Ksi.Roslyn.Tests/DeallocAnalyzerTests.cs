@@ -69,6 +69,29 @@ public class DeallocAnalyzerTests
     }
 
     [Fact]
+    public async Task Dealloc04SpanClear()
+    {
+        await DeallocAnalyzerTest.RunAsync(
+            // language=cs
+            """
+            using Ksi;
+            using System;
+            
+            [ExplicitCopy, DynSized, Dealloc]
+            public struct MyStruct { public RefList<int> Items; }
+
+            public static class TestClass
+            {
+                public static void Test(Span<MyStruct> span)
+                {
+                    {|DEALLOC04:span.Clear()|};
+                }
+            }
+            """
+        );
+    }
+
+    [Fact]
     public async Task Dealloc05UnusedInstance()
     {
         await DeallocAnalyzerTest.RunAsync(
