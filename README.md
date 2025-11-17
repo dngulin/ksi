@@ -2,7 +2,7 @@
 
 ![](Documentation~/img/logo.png)
 
-_Pronounced as /ksi/_
+_That [letter](https://en.wikipedia.org/wiki/Ksi_(Cyrillic)) is pronounced as /ksi/_
 
 ## About
 
