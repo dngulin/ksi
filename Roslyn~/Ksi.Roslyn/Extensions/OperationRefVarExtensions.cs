@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Ksi.Roslyn.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
@@ -117,33 +116,27 @@ public static class OperationRefVarExtensions
 
     public static RefVarInfo? FindRefVar(this ILocalReferenceOperation self)
     {
-        return self
-            .GetEnclosingBody()
-            .Descendants()
-            .Select(op =>
-            {
-                if (op.Syntax.Span.End >= self.Syntax.SpanStart)
-                    return null as RefVarInfo?;
+        var body = self.GetEnclosingBody();
+        if (body == null)
+            return null;
 
-                switch (op)
-                {
-                    case IVariableDeclaratorOperation d:
-                    {
-                        if (!SymbolEqualityComparer.Default.Equals(self.Local, d.Symbol))
-                            return null;
+        var eqc = SymbolEqualityComparer.Default;
+        foreach (var op in body.Descendants())
+        {
+            if (op == self)
+                break;
 
-                        var p = d.GetRefVarProducerOp(out var varKind);
-                        if (p == null)
-                            return null;
+            if (op is not IVariableDeclaratorOperation d || !eqc.Equals(d.Symbol, self.Local))
+                continue;
 
-                        return new RefVarInfo(d.Symbol, varKind, p);
-                    }
+            var p = d.GetRefVarProducerOp(out var varKind);
+            if (p == null)
+                return null;
 
-                    default:
-                        return null;
-                }
-            })
-            .LastOrDefault(v => v != null);
+            return new RefVarInfo(d.Symbol, varKind, p);
+        }
+
+        return null;
     }
 
     private static IOperation? GetRefVarProducerOp(this IVariableDeclaratorOperation self, out RefVarKind kind)
