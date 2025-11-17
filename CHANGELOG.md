@@ -10,7 +10,7 @@
 ### Security
 --->
 
-## [Unreleased]
+## 1.0.0-beta - 2025-11-17
 ### Added
 - Initial codebase based on the `frog.collections`
 [package](https://github.com/dngulin/frogalicious-project/tree/main/Frogalicious/Packages/frog.collections).

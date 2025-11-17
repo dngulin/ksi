@@ -7,7 +7,9 @@ _Pronounced as /ksi/_
 ## About
 
 > [!WARNING]
-> The project is in the alpha version stage
+> The project is in the beta version stage. \
+> It is fully functional and covered with unit tests,
+> but requires usage feedback to reveal issues and to improve the API.
 
 This unity package provides a data-oriented design framework for Unity DOTS.
 It implies using the special attribute (trait) system
@@ -85,8 +87,9 @@ Key features:
   ref var valRef = ref map.RefGet(key);
   ```
 
-TODO:
-- Binary serialization
+Planned:
+- Binary serialization attributes
+  (based on the [ProtoPuff package](https://github.com/dngulin/frogalicious-project/tree/main/Frogalicious/Packages/frog.proto-puff))
 
 ## Documentation
 
