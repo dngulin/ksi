@@ -6,6 +6,8 @@ _Pronounced as /ksi/_
 
 ## About
 
+[![openupm](https://img.shields.io/npm/v/dev.dngulin.ksi?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/dev.dngulin.ksi/)
+
 > [!WARNING]
 > The project is in the beta version stage. \
 > It is fully functional and covered with unit tests,
@@ -105,12 +107,5 @@ See also [Roslyn projects](Roslyn~) and specifically [package unit tests](Tests)
 ## Installation
 
 - Ensure that the .NET API compatibility level provides `Netstandard 2.1` API (Unity 2021.2+)
-- Add the package to your `manifest.json`:
-    ```json
-    {
-      "dependencies": {
-        ...,
-        "dev.dngulin.ksi": "git@github.com:dngulin/ksi.git"
-      }
-    }
-    ```
+- Add the package to your project from [OpenUPM](https://openupm.com/packages/dev.dngulin.ksi/)
+  or from the git URL `git@github.com:dngulin/ksi.git#1.0.0-beta`
