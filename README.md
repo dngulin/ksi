@@ -102,7 +102,12 @@ Planned:
 - [ECS-Like Data Composition](Documentation~/ecs.md)
 - [API Reference](Documentation~/api/index.g.md)
 
-See also [Roslyn projects](Roslyn~) and specifically [package unit tests](Tests) and [Roslyn unit tests](Roslyn~/Ksi.Roslyn.Tests).
+See also:
+- Sample project: [ksi-sample-tanks](https://github.com/dngulin/ksi-sample-tanks)
+- [Roslyn projects](Roslyn~)
+- Unit tests:
+  - [Consumer API tests](Tests)
+  - [Roslyn analyzers and generators tests](Roslyn~/Ksi.Roslyn.Tests)
 
 ## Installation
 
