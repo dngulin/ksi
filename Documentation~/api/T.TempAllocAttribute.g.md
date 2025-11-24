@@ -1,6 +1,6 @@
 # TempAllocAttribute
 
-> \[ [Getting Started](getting-started.md)
+> \[ [Getting Started](../getting-started.md)
 > \| [Traits](../traits.md)
 > \| [Collections](../collections.md)
 > \| [Referencing](../borrow-checker-at-home.md)
