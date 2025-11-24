@@ -47,7 +47,7 @@ Key features:
 
   var root = new Node();
   BuildTree(ref root);
-  root.Children.RemoveAt(0); // This extension method deallcoate item before removing it
+  root.Children.RemoveAt(0); // This extension method deallocate item before removing it
   root.Dealloc(); // This extension method deallocate the full tree
   ```
 - Compile time [memory safety checks](Documentation~/borrow-checker-at-home.md)
