@@ -1,4 +1,4 @@
-# ѯ-Framework for Unity DOTS
+# ѯ-Framework
 
 ![](Documentation~/img/logo.png)
 
@@ -13,17 +13,22 @@ _That [letter](https://en.wikipedia.org/wiki/Ksi_(Cyrillic)) is pronounced as /k
 > It is fully functional and covered with unit tests,
 > but requires usage feedback to reveal issues and to improve the API.
 
-This unity package provides a data-oriented design framework for Unity DOTS.
-It implies using the special attribute (trait) system
+This unity package provides a data-oriented design framework for Unity.
+It relies on the special attribute (trait) system
 and extensively uses Roslyn analyzers and code generators.
+
+The framework enforces explicit data ownership and data flow patterns,
+implies using data references
+and provides compile time memory-safety checks.
 
 Key features:
 
-- Fully Burst-compatible
+- Fully `Burst`-compatible
 - [Dynamic collections](Documentation~/collections.md#collections) with by-reference data access
   ```csharp
   var list = RefList.Empty<int>();
-  ref var x = ref list.RefAdd();
+  list.Add(42);
+  ref var x = ref list.RefAt(0);
   x = 3;
   list.RefAt(0) = 0; // Same as the `x = 0`
   ```
@@ -42,24 +47,25 @@ Key features:
 
   var root = new Node();
   BuildTree(ref root);
+  root.Children.RemoveAt(0); // This extension method deallcoate item before removing it
   root.Dealloc(); // This extension method deallocate the full tree
   ```
 - Compile time [memory safety checks](Documentation~/borrow-checker-at-home.md)
   ```csharp
   var list = RefList.Empty<int>();
-  ref var x = ref list.RefAdd();
-  ref var y = ref list.RefAdd();
-  //              ^^^^ ERROR
+  PopulateList(ref list);
+  
+  ref var x = ref list.RefAt(0);
+  ModifyList(ref list);
+  //             ^^^^ ERROR
   // BORROW03: Passing a mutable reference argument to `list!` invalidates memory safety
   // guaranties for the local variable `x` pointing to `list![n]`.
   // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
   x++;
-  y++;
   ```
   ```csharp
-  var list = RefList.Empty<Entity>();
-  ParentChild(ref list, list.RefReadonlyAt(0));
-  //              ^^^^ ERROR
+  ProcessParentAndChild(ref list, list.RefReadonlyAt(0));
+  //                        ^^^^ ERROR
   // BORROW04: Passing a mutable reference to `list!` alongside with a reference to
   // `list[n]!` as arguments invalidates memory safety rules within the calling method.
   // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
