@@ -138,7 +138,7 @@ If everything is properly declared, you will get the following API:
 
 `HashSet` API:
 - `THashSet.Empty { get; }` — returns an empty hash set instance
-- `HashSet.WithMinCapacity(int capacity)` — returns a new hash set instance with a capacity equal or greater of the given one
+- `THashSet.WithMinCapacity(int capacity)` — returns a new hash set instance with a capacity equal or greater of the given one
 - `(in THashSet).Count()` — returns the number of keys stored in the hash set
 - `(in THashSet).Capacity()` — returns the hash set capacity
 - `(in THashSet).Contains([in ]TKey key)` — determines if the hash set contains a given key
