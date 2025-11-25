@@ -10,6 +10,10 @@
 ### Security
 --->
 
+## Unreleased
+### Fixed
+- Link to the getting started guide in generated documentation
+
 ## 1.0.0-beta - 2025-11-17
 ### Added
 - Initial codebase based on the `frog.collections`
