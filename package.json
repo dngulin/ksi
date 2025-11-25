@@ -1,7 +1,7 @@
 {
   "name": "dev.dngulin.ksi",
   "version": "1.0.0-beta",
-  "displayName": "Ksi-Framework for Unity DOTS",
-  "description": "This package provides data oriented design framework for Unity DOTS",
+  "displayName": "Ksi-Framework",
+  "description": "Data oriented design framework for Unity",
   "dependencies": {}
 }
