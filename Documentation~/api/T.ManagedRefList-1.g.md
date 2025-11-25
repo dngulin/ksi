@@ -36,8 +36,10 @@ Extension Methods
 - [\(ref ManagedRefList\<T\>\).AsSpan\(\)](#ref-managedreflisttasspan) — wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref ManagedRefList\<T\>\).Clear\(\)](#ref-managedreflisttclear) — removes all items from the list
 - [\(ref ManagedRefList\<T\>\).CopyFrom\(in ManagedRefList\<T\>\)](#ref-managedreflisttcopyfromin-managedreflistt) — copies all items from another list
+- [\(ref ManagedRefList\<T\>\).Insert\(int, T\)](#ref-managedreflisttinsertint-t) — adds a new item to the list at a given index
 - [\(ref ManagedRefList\<T\>\).RefAdd\(\)](#ref-managedreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
 - [\(ref ManagedRefList\<T\>\).RefAt\(int\)](#ref-managedreflisttrefatint) — returns a mutable reference to a list item
+- [\(ref ManagedRefList\<T\>\).RefInsert\(int\)](#ref-managedreflisttrefinsertint) — insert a `default` item to the list at a given index and returns a mutable reference to it
 - [\(ref ManagedRefList\<T\>\).RefIterReversed\(\)](#ref-managedreflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
 - [\(ref ManagedRefList\<T\>\).RefIter\(\)](#ref-managedreflisttrefiter) — creates a mutable by-ref iterator for the list
 - [\(ref ManagedRefList\<T\>\).RemoveAt\(int\)](#ref-managedreflisttremoveatint) — removes an item from the list at the given index
@@ -291,6 +293,24 @@ Parameters
 - `other` — source list
 
 
+### \(ref ManagedRefList\<T\>\).Insert\(int, T\)
+
+Adds a new item to the list at a given index.
+
+```csharp
+public static void Insert<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self, int index, T item) where T : struct
+```
+
+Parameters
+- `self` — list to insert an item
+- `index` — index to insert an item
+- `item` — item to insert to the list
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
+
+
 ### \(ref ManagedRefList\<T\>\).RefAdd\(\)
 
 Adds a `default` item to the list and returns a mutable reference to it.
@@ -323,6 +343,28 @@ Parameters
 - `index` — required item index
 
 Returns a mutable reference to a list item at the given index.
+
+
+### \(ref ManagedRefList\<T\>\).RefInsert\(int\)
+
+Insert a `default` item to the list at a given index and returns a mutable reference to it.
+
+Adds to `RefPath` an indexer segment `[n]`.
+
+```csharp
+[NonAllocatedResult]
+public static ref T RefInsert<[ExplicitCopy, DynSized, Dealloc] T>(this ref ManagedRefList<T> self, int index) where T : struct
+```
+
+Parameters
+- `self` — list to add an item
+- `index` — index to insert an item
+
+Returns a mutable reference to the created item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
 
 
 ### \(ref ManagedRefList\<T\>\).RefIterReversed\(\)

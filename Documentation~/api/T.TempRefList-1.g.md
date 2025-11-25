@@ -36,8 +36,10 @@ Extension Methods
 - [\(ref TempRefList\<T\>\).AsSpan\(\)](#ref-tempreflisttasspan) — wraps the collection with [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1)
 - [\(ref TempRefList\<T\>\).Clear\(\)](#ref-tempreflisttclear) — removes all items from the list
 - [\(ref TempRefList\<T\>\).CopyFrom\(in TempRefList\<T\>\)](#ref-tempreflisttcopyfromin-tempreflistt) — copies all items from another list
+- [\(ref TempRefList\<T\>\).Insert\(int, T\)](#ref-tempreflisttinsertint-t) — adds a new item to the list at a given index
 - [\(ref TempRefList\<T\>\).RefAdd\(\)](#ref-tempreflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
 - [\(ref TempRefList\<T\>\).RefAt\(int\)](#ref-tempreflisttrefatint) — returns a mutable reference to a list item
+- [\(ref TempRefList\<T\>\).RefInsert\(int\)](#ref-tempreflisttrefinsertint) — insert a `default` item to the list at a given index and returns a mutable reference to it
 - [\(ref TempRefList\<T\>\).RefIterReversed\(\)](#ref-tempreflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
 - [\(ref TempRefList\<T\>\).RefIter\(\)](#ref-tempreflisttrefiter) — creates a mutable by-ref iterator for the list
 - [\(ref TempRefList\<T\>\).RemoveAt\(int\)](#ref-tempreflisttremoveatint) — removes an item from the list at the given index
@@ -287,6 +289,24 @@ Parameters
 - `other` — source list
 
 
+### \(ref TempRefList\<T\>\).Insert\(int, T\)
+
+Adds a new item to the list at a given index.
+
+```csharp
+public static void Insert<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>(this ref TempRefList<T> self, int index, T item) where T : unmanaged
+```
+
+Parameters
+- `self` — list to insert an item
+- `index` — index to insert an item
+- `item` — item to insert to the list
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
+
+
 ### \(ref TempRefList\<T\>\).RefAdd\(\)
 
 Adds a `default` item to the list and returns a mutable reference to it.
@@ -319,6 +339,28 @@ Parameters
 - `index` — required item index
 
 Returns a mutable reference to a list item at the given index.
+
+
+### \(ref TempRefList\<T\>\).RefInsert\(int\)
+
+Insert a `default` item to the list at a given index and returns a mutable reference to it.
+
+Adds to `RefPath` an indexer segment `[n]`.
+
+```csharp
+[NonAllocatedResult]
+public static ref T RefInsert<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T>(this ref TempRefList<T> self, int index) where T : unmanaged
+```
+
+Parameters
+- `self` — list to add an item
+- `index` — index to insert an item
+
+Returns a mutable reference to the created item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
 
 
 ### \(ref TempRefList\<T\>\).RefIterReversed\(\)

@@ -133,6 +133,61 @@ public static class RefListTemplates
                     self.EnsureCanAdd();
                     return ref self.IndexBufferMut(self.Count++);
                 }
+                
+                /// <summary>
+                /// Adds a new item to the list at a given index.
+                /// </summary>
+                /// <param name="self">List to insert an item</param>
+                /// <param name="index">Index to insert an item</param>
+                /// <param name="item">Item to insert to the list</param>
+                /// <exception cref="IndexOutOfRangeException">If the index is less than 0 or greater than the item count</exception>
+                public static void Insert<[|TraitsAll|] T>(this ref |TRefList|<T> self, int index, T item) where T : |constraint|
+                {
+                    if (index < 0 || index > self.Count)
+                        throw new IndexOutOfRangeException();
+                    
+                    self.EnsureCanAdd();
+                    
+                    #pragma warning disable KSIGENERIC01
+                    self.CopyWithinBuffer(index, index + 1, self.Count - index);
+                    #pragma warning restore KSIGENERIC01
+                    
+                    self.Count++;
+                    
+                    #pragma warning disable EXPCOPY04, DEALLOC04
+                    self.IndexBufferMut(index) = item;
+                    #pragma warning restore EXPCOPY04, DEALLOC04
+                }
+                
+                /// <summary>
+                /// <para>Insert a <c>default</c> item to the list at a given index and returns a mutable reference to it.</para>
+                /// <para>Adds to <c>RefPath</c> an indexer segment <c>[n]</c>.</para>
+                /// </summary>
+                /// <param name="self">List to add an item</param>
+                /// <param name="index">Index to insert an item</param>
+                /// <returns>A mutable reference to the created item.</returns>
+                /// <exception cref="IndexOutOfRangeException">If the index is less than 0 or greater than the item count</exception>
+                [NonAllocatedResult, RefListIndexer]
+                public static ref T RefInsert<[|TraitsAll|] T>(this ref |TRefList|<T> self, int index) where T : |constraint|
+                {
+                    if (index < 0 || index > self.Count)
+                        throw new IndexOutOfRangeException();
+                    
+                    self.EnsureCanAdd();
+        
+                    #pragma warning disable KSIGENERIC01
+                    self.CopyWithinBuffer(index, index + 1, self.Count - index);
+                    #pragma warning restore KSIGENERIC01
+                    
+                    self.Count++;
+                    ref var item = ref self.IndexBufferMut(index);
+                    
+                    #pragma warning disable DEALLOC04
+                    item = default;
+                    #pragma warning restore DEALLOC04
+                    
+                    return ref item;
+                }
 
                 private static void EnsureCanAdd<[|TraitsAll|] T>(this ref |TRefList|<T> self) where T : |constraint|
                 {

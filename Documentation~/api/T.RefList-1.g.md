@@ -38,8 +38,10 @@ Extension Methods
 - [\(ref RefList\<T\>\).CopyFrom\(in RefList\<T\>\)](#ref-reflisttcopyfromin-reflistt) — copies all items from another list
 - [\(ref RefList\<T\>\).Dealloc\(\)](#ref-reflisttdealloc) — deallocate the list
 - [\(ref RefList\<T\>\).Deallocated\(\)](#ref-reflisttdeallocated) — deallocate the list and returns it
+- [\(ref RefList\<T\>\).Insert\(int, T\)](#ref-reflisttinsertint-t) — adds a new item to the list at a given index
 - [\(ref RefList\<T\>\).RefAdd\(\)](#ref-reflisttrefadd) — adds a `default` item to the list and returns a mutable reference to it
 - [\(ref RefList\<T\>\).RefAt\(int\)](#ref-reflisttrefatint) — returns a mutable reference to a list item
+- [\(ref RefList\<T\>\).RefInsert\(int\)](#ref-reflisttrefinsertint) — insert a `default` item to the list at a given index and returns a mutable reference to it
 - [\(ref RefList\<T\>\).RefIterReversed\(\)](#ref-reflisttrefiterreversed) — creates a mutable reversed by-ref iterator for the list
 - [\(ref RefList\<T\>\).RefIter\(\)](#ref-reflisttrefiter) — creates a mutable by-ref iterator for the list
 - [\(ref RefList\<T\>\).RemoveAt\(int\)](#ref-reflisttremoveatint) — removes an item from the list at the given index
@@ -323,6 +325,24 @@ Parameters
 Returns the list as an assignable reference.
 
 
+### \(ref RefList\<T\>\).Insert\(int, T\)
+
+Adds a new item to the list at a given index.
+
+```csharp
+public static void Insert<[ExplicitCopy, DynSized, Dealloc] T>(this ref RefList<T> self, int index, T item) where T : unmanaged
+```
+
+Parameters
+- `self` — list to insert an item
+- `index` — index to insert an item
+- `item` — item to insert to the list
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
+
+
 ### \(ref RefList\<T\>\).RefAdd\(\)
 
 Adds a `default` item to the list and returns a mutable reference to it.
@@ -355,6 +375,28 @@ Parameters
 - `index` — required item index
 
 Returns a mutable reference to a list item at the given index.
+
+
+### \(ref RefList\<T\>\).RefInsert\(int\)
+
+Insert a `default` item to the list at a given index and returns a mutable reference to it.
+
+Adds to `RefPath` an indexer segment `[n]`.
+
+```csharp
+[NonAllocatedResult]
+public static ref T RefInsert<[ExplicitCopy, DynSized, Dealloc] T>(this ref RefList<T> self, int index) where T : unmanaged
+```
+
+Parameters
+- `self` — list to add an item
+- `index` — index to insert an item
+
+Returns a mutable reference to the created item.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [IndexOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.IndexOutOfRangeException?view=netstandard-2.1) — if the index is less than 0 or greater than the item count
 
 
 ### \(ref RefList\<T\>\).RefIterReversed\(\)

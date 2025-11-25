@@ -107,6 +107,36 @@ namespace Ksi.Tests
             Assert.That(list.Count() == 0, $"{nameof(RemoveAtBegin)}.Empty");
         }
 
+        [TestCase(11)]
+        [TestCase(13)]
+        [TestCase(29)]
+        public void InsertAtBegin(int count)
+        {
+            var list = ManagedRefList.Empty<int>();
+
+            for (var i = 0; i < count; i++)
+            {
+                list.Insert(0, i);
+            }
+
+            Assert.That(list.Count(), Is.EqualTo(count), $"{nameof(InsertAtBegin)}.InsertCount: {list.Count()}");
+
+            for (var i = 0; i < count; i++)
+            {
+                list.RefInsert(0) = i + count;
+            }
+
+            Assert.That(list.Count(), Is.EqualTo(count * 2), $"{nameof(InsertAtBegin)}.RefInsertCount: {list.Count()}");
+
+            for (var i = 0; i < count * 2; i++)
+            {
+                Assert.That(
+                    list.RefReadonlyAt(i), Is.EqualTo(count * 2 - 1 - i),
+                    $"{nameof(InsertAtBegin)}.ValueAt({i}): {list.RefReadonlyAt(i)}"
+                );
+            }
+        }
+
         [TestCase(16)]
         [TestCase(17)]
         [TestCase(18)]

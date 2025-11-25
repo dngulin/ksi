@@ -11,6 +11,8 @@
 --->
 
 ## Unreleased
+### Added
+- `Insert` and `RefInsert` extension methods to `TRefList<T>`
 ### Fixed
 - Link to the getting started guide in generated documentation
 
