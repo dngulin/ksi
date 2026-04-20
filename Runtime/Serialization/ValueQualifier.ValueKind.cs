@@ -11,7 +11,7 @@ namespace Ksi.Serialization
         Primitive,
 
         /// <summary>
-        /// A repeated primitive value (e.g., an array or list of primitives).
+        /// A repeated primitive value: <c>TRefList&lt;TPrimitive&gt;</c>.
         /// </summary>
         RepeatedPrimitive,
 
@@ -21,7 +21,7 @@ namespace Ksi.Serialization
         Struct,
 
         /// <summary>
-        /// A repeated struct value (e.g., an array or list of structs).
+        /// A repeated struct value: <c>TRefList&lt;TStruct&gt;</c>.
         /// </summary>
         RepeatedStruct,
     }

@@ -148,23 +148,22 @@ namespace Ksi.Serialization
         /// <param name="lps">The size of the length prefix that was prepended.</param>
         public static void PrependLenPrefix(this BinaryWriter self, uint len, out LenPrefixSize lps)
         {
-            switch (len)
+            lps = ValueQualifier.GetLenPrefixSize(len);
+            switch (lps)
             {
-                case 0:
-                    lps = LenPrefixSize._0;
-                    return;
-                case <= byte.MaxValue:
-                    lps = LenPrefixSize._8;
+                case LenPrefixSize._0:
+                    break;
+                case LenPrefixSize._8:
                     self.Prepend((byte)len);
-                    return;
-                case <= ushort.MaxValue:
-                    lps = LenPrefixSize._16;
+                    break;
+                case LenPrefixSize._16:
                     self.Prepend((ushort)len);
-                    return;
-                default:
-                    lps = LenPrefixSize._32;
+                    break;
+                case LenPrefixSize._32:
                     self.Prepend(len);
                     break;
+                default:
+                    throw new Exception($"Unreachable! Invalid LenPrefixSize estimation: {(byte)lps}");
             }
         }
     }
