@@ -297,9 +297,11 @@ public static class TypeSymbolExtensions
 
     public static bool IsSerializablePrimitive(this ITypeSymbol self)
     {
+        if (self.TypeKind == TypeKind.Enum)
+            return true;
+
         return self.SpecialType switch
         {
-            SpecialType.System_Enum => true,
             SpecialType.System_Boolean => true,
             SpecialType.System_Char => true,
             SpecialType.System_SByte => true,
