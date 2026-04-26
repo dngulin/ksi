@@ -25,16 +25,16 @@ public readonly struct AppendScope : IDisposable
         _closeScope = closeScope;
     }
 
-    public AppendScope Sub(string? header)
+    public AppendScope Sub(string header = "")
     {
-        if (header == null)
-            return new AppendScope(_sb, Depth, false);
+        if (header != "")
+            _sb.AppendLineIndented(Depth, header);
 
-        _sb.AppendLineIndented(Depth, header);
         _sb.AppendLineIndented(Depth, "{");
-
         return new AppendScope(_sb, Depth + 1, true);
     }
+
+    public AppendScope SameDepthNonClosingScope => new AppendScope(_sb, Depth, false);
 
     public void AppendLine(string value) => _sb.AppendLineIndented(Depth, value);
 
@@ -49,7 +49,10 @@ public static class AppendScopeExtensions
 {
     public static AppendScope OptNamespace(this AppendScope self, string ns)
     {
-        return self.Sub(ns == "" ? null : $"namespace {ns}");
+        if (string.IsNullOrEmpty(ns))
+            return self.SameDepthNonClosingScope;
+
+        return self.Sub($"namespace {ns}");
     }
 
     public static AppendScope PubStat(this AppendScope self, string expr)
