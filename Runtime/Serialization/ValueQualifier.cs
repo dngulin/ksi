@@ -122,8 +122,7 @@ namespace Ksi.Serialization
         /// <returns>A new <see cref="ValueQualifier"/>.</returns>
         public static ValueQualifier RepeatedStruct(LenPrefixSize lps, uint count)
         {
-            var cps = GetLenPrefixSize(count);
-            return new ValueQualifier(ValueKind.RepeatedStruct, lps, default, (PrimitiveSize) cps);
+            return new ValueQualifier(ValueKind.RepeatedStruct, lps, default, (PrimitiveSize) GetLenPrefix(count));
         }
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="len">The length value.</param>
         /// <returns>The smallest <see cref="LenPrefixSize"/> that can accommodate the length.</returns>
-        public static LenPrefixSize GetLenPrefixSize(uint len)
+        public static LenPrefixSize GetLenPrefix(uint len)
         {
             return len switch
             {

@@ -148,7 +148,7 @@ namespace Ksi.Serialization
         /// <param name="lps">The size of the length prefix that was prepended.</param>
         public static void PrependLenPrefix(this BinaryWriter self, uint len, out LenPrefixSize lps)
         {
-            lps = ValueQualifier.GetLenPrefixSize(len);
+            lps = ValueQualifier.GetLenPrefix(len);
             switch (lps)
             {
                 case LenPrefixSize._0:
