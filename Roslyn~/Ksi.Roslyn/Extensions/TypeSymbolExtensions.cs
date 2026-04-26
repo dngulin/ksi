@@ -199,6 +199,11 @@ public static class TypeSymbolExtensions
         };
     }
 
+    public static bool IsKsiSerializable(this ITypeSymbol self)
+    {
+        return self.IsStruct() && self.Is(SymbolNames.KsiSerializable);
+    }
+
     private static bool Is(this ITypeSymbol self, string attributeName)
     {
         return self.GetAttributes().Any(attribute => attribute.Is(attributeName));

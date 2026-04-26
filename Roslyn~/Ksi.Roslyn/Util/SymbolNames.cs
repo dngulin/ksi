@@ -43,5 +43,8 @@ public static class SymbolNames
     public const string Hash = "Hash";
     public const string Eq = "Eq";
 
+    public const string KsiSerializable = "KsiSerializable";
+    public const string KsiSerializeField = "KsiSerializeField";
+
     public const string Attribute = "Attribute";
 }
