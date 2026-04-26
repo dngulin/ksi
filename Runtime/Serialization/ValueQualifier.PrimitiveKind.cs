@@ -1,7 +1,7 @@
 namespace Ksi.Serialization
 {
     /// <summary>
-    /// Represents the kind of a primitive value.
+    /// Represents the primitive value kind.
     /// </summary>
     public enum PrimitiveKind : byte
     {
