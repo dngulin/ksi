@@ -38,6 +38,11 @@ namespace Ksi.Serialization
     public struct ValueQualifier
     {
         /// <summary>
+        /// Size of the value qualifier in the packed format (1 byte).
+        /// </summary>
+        public const int PackedSize = sizeof(byte);
+
+        /// <summary>
         /// The kind of the value.
         /// </summary>
         public ValueKind Kind;
