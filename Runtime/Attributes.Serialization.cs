@@ -16,8 +16,8 @@ namespace Ksi
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class KsiSerializeFieldAttribute : Attribute
     {
-        public ushort Id { get; }
+        public byte Id { get; }
 
-        public KsiSerializeFieldAttribute(ushort id) => Id = id;
+        public KsiSerializeFieldAttribute(byte id) => Id = id;
     }
 }

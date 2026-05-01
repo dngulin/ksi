@@ -14,7 +14,7 @@ public class SerdeGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext initCtx)
     {
         var query = initCtx.SyntaxProvider
-            .CreateSyntaxProvider<(INamedTypeSymbol Type, (IFieldSymbol Field, ushort Id)[] Fields)?>(
+            .CreateSyntaxProvider<(INamedTypeSymbol Type, (IFieldSymbol Field, byte Id)[] Fields)?>(
                 predicate: (node, _) =>
                 {
                     if (node is not StructDeclarationSyntax s)
@@ -32,7 +32,7 @@ public class SerdeGenerator : IIncrementalGenerator
                         .Where(f => !f.IsStatic)
                         .Select(f => (Field: f, Attr: f.GetAttributes().FirstOrDefault(a => a.Is(SymbolNames.KsiSerializeField))))
                         .Where(x => x.Attr is { ConstructorArguments.Length: 1 })
-                        .Select(x => (x.Field, Id: (ushort)x.Attr!.ConstructorArguments[0].Value!))
+                        .Select(x => (x.Field, Id: (byte)x.Attr!.ConstructorArguments[0].Value!))
                         .OrderBy(x => x.Id)
                         .ToArray();
 
@@ -55,7 +55,8 @@ public class SerdeGenerator : IIncrementalGenerator
                 using (var type = ns.PubStat($"class {t.FullTypeName().Replace(".", "_")}_SerdeExtensions"))
                 using (var method = type.PubStat($"int GetSerializedSize(this in {t.FullTypeName()} self)"))
                 {
-                    method.AppendLine("const int fieldTagLen = sizeof(ushort);");
+                    method.AppendLine("const int fieldIdLen = sizeof(byte);");
+                    method.AppendLine("const int fieldIdAndQualifierLen = fieldIdLen + ValueQualifier.PackedSize;");
                     method.AppendLine("var result = 0;");
                     method.AppendLine("");
 
@@ -67,7 +68,7 @@ public class SerdeGenerator : IIncrementalGenerator
                         if (ft.IsSerializablePrimitive()) // Primitive
                         {
                             using var fScope = method.Sub($"if (self.{f.Name} != default)");
-                            fScope.AppendLine($"result += fieldTagLen + sizeof({ft.FullTypeName()});");
+                            fScope.AppendLine($"result += fieldIdAndQualifierLen + sizeof({ft.FullTypeName()});");
                         }
                         else if (ft.IsKsiSerializable()) // Struct
                         {
@@ -75,8 +76,7 @@ public class SerdeGenerator : IIncrementalGenerator
                             fScope.AppendLine($"var len = self.{f.Name}.GetSerializedSize();");
 
                             using var lenScope = fScope.Sub("if (len > 0)");
-                            lenScope.AppendLine("var lenPfx = ValueQualifier.GetLenPrefix((uint) len);");
-                            lenScope.AppendLine("result += fieldTagLen + lenPfx.InBytes() + len;");
+                            lenScope.AppendLine("result += fieldIdLen + len;");
                         }
                         else if (ft.IsRefList()) // Repeated primitive or struct
                         {
@@ -88,7 +88,7 @@ public class SerdeGenerator : IIncrementalGenerator
                                 using var fScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
                                 fScope.AppendLine($"var len = self.{f.Name}.Count() * sizeof({gt.FullTypeName()});");
                                 fScope.AppendLine("var lenPfx = ValueQualifier.GetLenPrefix((uint) len);");
-                                fScope.AppendLine("result += fieldTagLen + lenPfx.InBytes() + len;");
+                                fScope.AppendLine("result += fieldIdLen + lenPfx.InBytes() + len;");
                             }
                             else if (gt.IsKsiSerializable()) // Repeated struct
                             {
@@ -98,23 +98,21 @@ public class SerdeGenerator : IIncrementalGenerator
 
                                 using (var loop = fScope.Sub($"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())"))
                                 {
-                                    loop.AppendLine("var itemLen = item.GetSerializedSize();");
-                                    loop.AppendLine("var itemLenPfx = ValueQualifier.GetLenPrefix((uint) itemLen);");
-                                    loop.AppendLine("len += ValueQualifier.PackedSize + itemLenPfx.InBytes() + itemLen;");
+                                    loop.AppendLine("len += item.GetSerializedSize();");
                                 }
 
                                 fScope.AppendLine("");
                                 using var lenScope = fScope.Sub("if (len > 0)");
                                 lenScope.AppendLine("var lenPfx = ValueQualifier.GetLenPrefix((uint) len);");
                                 lenScope.AppendLine($"var cntPfx = ValueQualifier.GetLenPrefix((uint) self.{f.Name}.Count());");
-                                lenScope.AppendLine("result += fieldTagLen + lenPfx.InBytes() + cntPfx.InBytes() + len;");
+                                lenScope.AppendLine("result += fieldIdLen + lenPfx.InBytes() + cntPfx.InBytes() + len;");
                             }
                         }
 
                         method.AppendLine("");
                     }
 
-                    method.AppendLine("return result;");
+                    method.AppendLine("return ValueQualifier.PackedSize + ValueQualifier.GetLenPrefix((uint) result).InBytes() + result;");
                 }
             }
 
