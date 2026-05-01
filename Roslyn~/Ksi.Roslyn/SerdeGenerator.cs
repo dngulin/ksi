@@ -56,22 +56,25 @@ public class SerdeGenerator : IIncrementalGenerator
                 using (var method = type.PubStat($"int GetSerializedSize(this in {t.FullTypeName()} self)"))
                 {
                     method.AppendLine("const int fieldIdLen = sizeof(byte);");
-                    method.AppendLine("const int fieldIdAndQualifierLen = fieldIdLen + ValueQualifier.PackedSize;");
                     method.AppendLine("var result = 0;");
                     method.AppendLine("");
 
-                    foreach (var (f, _) in fields)
+                    const string sizeOf = "KsiSerializedSize";
+
+                    foreach (var (f, id) in fields)
                     {
                         if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
                         if (ft.IsSerializablePrimitive()) // Primitive
                         {
+                            method.AppendLine($"// {id:d3}: {f.Name}");
                             using var fScope = method.Sub($"if (self.{f.Name} != default)");
-                            fScope.AppendLine($"result += fieldIdAndQualifierLen + sizeof({ft.FullTypeName()});");
+                            fScope.AppendLine($"result += {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));");
                         }
                         else if (ft.IsKsiSerializable()) // Struct
                         {
+                            method.AppendLine($"// {id:d3}: {f.Name}");
                             using var fScope = method.Sub();
                             fScope.AppendLine($"var len = self.{f.Name}.GetSerializedSize();");
 
@@ -85,34 +88,34 @@ public class SerdeGenerator : IIncrementalGenerator
 
                             if (gt.IsSerializablePrimitive()) // Repeated primitive
                             {
-                                using var fScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
-                                fScope.AppendLine($"var len = self.{f.Name}.Count() * sizeof({gt.FullTypeName()});");
-                                fScope.AppendLine("var lenPfx = ValueQualifier.GetLenPrefix((uint) len);");
-                                fScope.AppendLine("result += fieldIdLen + lenPfx.InBytes() + len;");
+                                method.AppendLine($"// {id:d3}: {f.Name}");
+                                using var fScope = method.Sub();
+                                fScope.AppendLine($"var count = self.{f.Name}.Count();");
+
+                                using var countScope = fScope.Sub("if (count > 0)");
+                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedPrimitive(sizeof({gt.FullTypeName()}), count);");
                             }
                             else if (gt.IsKsiSerializable()) // Repeated struct
                             {
+                                method.AppendLine($"// {id:d3}: {f.Name}");
                                 using var fScope = method.Sub();
                                 fScope.AppendLine("var len = 0;");
-                                fScope.AppendLine("");
+                                fScope.AppendLine($"var count = self.{f.Name}.Count();");
+                                using var countScope = fScope.Sub("if (count > 0)");
 
-                                using (var loop = fScope.Sub($"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())"))
+                                using (var loop = countScope.Sub($"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())"))
                                 {
                                     loop.AppendLine("len += item.GetSerializedSize();");
                                 }
 
-                                fScope.AppendLine("");
-                                using var lenScope = fScope.Sub("if (len > 0)");
-                                lenScope.AppendLine("var lenPfx = ValueQualifier.GetLenPrefix((uint) len);");
-                                lenScope.AppendLine($"var cntPfx = ValueQualifier.GetLenPrefix((uint) self.{f.Name}.Count());");
-                                lenScope.AppendLine("result += fieldIdLen + lenPfx.InBytes() + cntPfx.InBytes() + len;");
+                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedStruct(len, count);");
                             }
                         }
 
                         method.AppendLine("");
                     }
 
-                    method.AppendLine("return ValueQualifier.PackedSize + ValueQualifier.GetLenPrefix((uint) result).InBytes() + result;");
+                    method.AppendLine($"return {sizeOf}.Struct(result);");
                 }
             }
 

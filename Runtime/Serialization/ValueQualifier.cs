@@ -208,4 +208,33 @@ namespace Ksi.Serialization
             return (LenPrefixSize) self.PrimitiveSize;
         }
     }
+
+    public static class KsiSerializedSize
+    {
+        public static int Primitive(int size)
+        {
+            return ValueQualifier.PackedSize + size;
+        }
+
+        public static int RepeatedPrimitive(int itemSize, int count)
+        {
+            var len = itemSize * count;
+            return ValueQualifier.PackedSize + ValueQualifier.GetLenPrefix((uint) len).InBytes() + len;
+        }
+
+        public static int Struct(int size)
+        {
+            return ValueQualifier.PackedSize +
+                   ValueQualifier.GetLenPrefix((uint) size).InBytes() +
+                   size;
+        }
+
+        public static int RepeatedStruct(int totalSize, int count)
+        {
+            return ValueQualifier.PackedSize +
+                   ValueQualifier.GetLenPrefix((uint) totalSize).InBytes() +
+                   ValueQualifier.GetLenPrefix((uint) count).InBytes() +
+                   totalSize;
+        }
+    }
 }
