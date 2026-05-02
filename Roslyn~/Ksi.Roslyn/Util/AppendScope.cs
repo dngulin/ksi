@@ -59,6 +59,12 @@ public static class AppendScopeExtensions
     {
         return self.Sub("public static " + expr);
     }
+
+    public static void AppendOneLineBlock(this AppendScope self, string header, string expr)
+    {
+        self.AppendLine(header);
+        self.AppendLine(AppendScope.Indent + expr);
+    }
 }
 
 public static class StringBuilderExtensions

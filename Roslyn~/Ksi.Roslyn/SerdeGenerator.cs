@@ -56,7 +56,7 @@ public class SerdeGenerator : IIncrementalGenerator
                 using (var method = type.PubStat($"int GetSerializedSize(this in {t.FullTypeName()} self)"))
                 {
                     method.AppendLine("const int fieldIdLen = sizeof(byte);");
-                    method.AppendLine("var result = 0;");
+                    method.AppendLine("var size = 0;");
                     method.AppendLine("");
 
                     const string sizeOf = "KsiSerializedSize";
@@ -70,16 +70,16 @@ public class SerdeGenerator : IIncrementalGenerator
 
                         if (ft.IsSerializablePrimitive()) // Primitive
                         {
-                            using var fScope = method.Sub($"if (self.{f.Name} != default)");
-                            fScope.AppendLine($"result += {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));");
+                            method.AppendOneLineBlock(
+                                $"if (self.{f.Name} != default)",
+                                $"size += {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));"
+                            );
                         }
                         else if (ft.IsKsiSerializable()) // Struct
                         {
                             using var fScope = method.Sub();
                             fScope.AppendLine($"var len = self.{f.Name}.GetSerializedSize();");
-
-                            using var lenScope = fScope.Sub("if (len > 0)");
-                            lenScope.AppendLine("result += fieldIdLen + len;");
+                            fScope.AppendOneLineBlock("if (len > 0)",  "size += fieldIdLen + len;");
                         }
                         else if (ft.IsRefList()) // Repeated primitive or struct
                         {
@@ -88,27 +88,34 @@ public class SerdeGenerator : IIncrementalGenerator
 
                             if (gt.IsSerializablePrimitive()) // Repeated primitive
                             {
-                                using var countScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
-                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedPrimitive(sizeof({gt.FullTypeName()}), self.{f.Name}.Count());");
+                                var count = $"self.{f.Name}.Count()";
+                                var size = $"sizeof({gt.FullTypeName()})";
+                                method.AppendOneLineBlock(
+                                    $"if ({count} > 0)",
+                                    $"size += fieldIdLen + {sizeOf}.RepeatedPrimitive({size}, {count});"
+                                );
                             }
                             else if (gt.IsKsiSerializable()) // Repeated struct
                             {
-                                using var countScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
+                                var count = $"self.{f.Name}.Count()";
+
+                                using var countScope = method.Sub($"if ({count} > 0)");
                                 countScope.AppendLine("var len = 0;");
 
-                                using (var loop = countScope.Sub($"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())"))
-                                {
-                                    loop.AppendLine("len += item.GetSerializedSize();");
-                                }
+                                countScope.AppendOneLineBlock(
+                                    $"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())",
+                                    "len += item.GetSerializedSize();"
+                                );
 
-                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedStruct(len, self.{f.Name}.Count());");
+                                countScope.AppendLine("");
+                                countScope.AppendLine($"size += fieldIdLen + {sizeOf}.RepeatedStruct(len, {count});");
                             }
                         }
 
                         method.AppendLine("");
                     }
 
-                    method.AppendLine($"return {sizeOf}.Struct(result);");
+                    method.AppendLine($"return {sizeOf}.Struct(size);");
                 }
             }
 
