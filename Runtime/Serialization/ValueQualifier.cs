@@ -211,6 +211,17 @@ namespace Ksi.Serialization
 
     public static class KsiSerializedSize
     {
+        private static int GetLenPrefixSize(uint len)
+        {
+            return len switch
+            {
+                0 => 0,
+                <= byte.MaxValue => sizeof(byte),
+                <= ushort.MaxValue => sizeof(ushort),
+                _ => sizeof(uint),
+            };
+        }
+
         public static int Primitive(int size)
         {
             return ValueQualifier.PackedSize + size;
@@ -218,22 +229,21 @@ namespace Ksi.Serialization
 
         public static int RepeatedPrimitive(int itemSize, int count)
         {
-            var len = itemSize * count;
-            return ValueQualifier.PackedSize + ValueQualifier.GetLenPrefix((uint) len).InBytes() + len;
+            return Struct(itemSize * count);
         }
 
         public static int Struct(int size)
         {
             return ValueQualifier.PackedSize +
-                   ValueQualifier.GetLenPrefix((uint) size).InBytes() +
+                   GetLenPrefixSize((uint) size) +
                    size;
         }
 
         public static int RepeatedStruct(int totalSize, int count)
         {
             return ValueQualifier.PackedSize +
-                   ValueQualifier.GetLenPrefix((uint) totalSize).InBytes() +
-                   ValueQualifier.GetLenPrefix((uint) count).InBytes() +
+                   GetLenPrefixSize((uint) totalSize) +
+                   GetLenPrefixSize((uint) count) +
                    totalSize;
         }
     }
