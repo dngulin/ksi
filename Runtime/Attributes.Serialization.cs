@@ -16,8 +16,15 @@ namespace Ksi
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class KsiSerializeFieldAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the binary field identifier.
+        /// </summary>
         public byte Id { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KsiSerializeFieldAttribute"/> class.
+        /// </summary>
+        /// <param name="id">The binary field identifier.</param>
         public KsiSerializeFieldAttribute(byte id) => Id = id;
     }
 }
