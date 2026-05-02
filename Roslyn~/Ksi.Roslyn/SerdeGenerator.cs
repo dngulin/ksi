@@ -66,15 +66,15 @@ public class SerdeGenerator : IIncrementalGenerator
                         if (f.Type is not INamedTypeSymbol ft)
                             continue;
 
+                        method.AppendLine($"// {id:d3}: {f.Name}");
+
                         if (ft.IsSerializablePrimitive()) // Primitive
                         {
-                            method.AppendLine($"// {id:d3}: {f.Name}");
                             using var fScope = method.Sub($"if (self.{f.Name} != default)");
                             fScope.AppendLine($"result += {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));");
                         }
                         else if (ft.IsKsiSerializable()) // Struct
                         {
-                            method.AppendLine($"// {id:d3}: {f.Name}");
                             using var fScope = method.Sub();
                             fScope.AppendLine($"var len = self.{f.Name}.GetSerializedSize();");
 
@@ -88,27 +88,20 @@ public class SerdeGenerator : IIncrementalGenerator
 
                             if (gt.IsSerializablePrimitive()) // Repeated primitive
                             {
-                                method.AppendLine($"// {id:d3}: {f.Name}");
-                                using var fScope = method.Sub();
-                                fScope.AppendLine($"var count = self.{f.Name}.Count();");
-
-                                using var countScope = fScope.Sub("if (count > 0)");
-                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedPrimitive(sizeof({gt.FullTypeName()}), count);");
+                                using var countScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
+                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedPrimitive(sizeof({gt.FullTypeName()}), self.{f.Name}.Count());");
                             }
                             else if (gt.IsKsiSerializable()) // Repeated struct
                             {
-                                method.AppendLine($"// {id:d3}: {f.Name}");
-                                using var fScope = method.Sub();
-                                fScope.AppendLine("var len = 0;");
-                                fScope.AppendLine($"var count = self.{f.Name}.Count();");
-                                using var countScope = fScope.Sub("if (count > 0)");
+                                using var countScope = method.Sub($"if (self.{f.Name}.Count() > 0)");
+                                countScope.AppendLine("var len = 0;");
 
                                 using (var loop = countScope.Sub($"foreach (ref readonly var item in self.{f.Name}.RefReadonlyIter())"))
                                 {
                                     loop.AppendLine("len += item.GetSerializedSize();");
                                 }
 
-                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedStruct(len, count);");
+                                countScope.AppendLine($"result += fieldIdLen + {sizeOf}.RepeatedStruct(len, self.{f.Name}.Count());");
                             }
                         }
 
