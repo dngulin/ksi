@@ -43,6 +43,8 @@ public class SerdeGenerator : IIncrementalGenerator
         initCtx.RegisterSourceOutput(query, (ctx, info) =>
         {
             var (t, fields) = info;
+            var acc = SyntaxFacts.GetText(t.InAssemblyAccessibility());
+
             var sb = new StringBuilder(16 * 1024);
 
             using (var file = AppendScope.Root(sb))
@@ -52,7 +54,7 @@ public class SerdeGenerator : IIncrementalGenerator
                 file.AppendLine("");
 
                 using (var ns = file.OptNamespace(t.ContainingNamespace.FullyQualifiedName()))
-                using (var type = ns.PubStat($"class {t.FullTypeName().Replace(".", "_")}_SerdeExtensions"))
+                using (var type = ns.Sub($"{acc} static class {t.FullTypeName().Replace(".", "_")}_SerdeExtensions"))
                 using (var method = type.PubStat($"int GetSerializedSize(this in {t.FullTypeName()} self)"))
                 {
                     method.AppendLine("const int fieldIdLen = sizeof(byte);");
