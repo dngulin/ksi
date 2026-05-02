@@ -74,7 +74,7 @@ public class SerdeGenerator : IIncrementalGenerator
                         {
                             method.AppendOneLineBlock(
                                 $"if (self.{f.Name} != default)",
-                                $"size += {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));"
+                                $"size += fieldIdLen + {sizeOf}.Primitive(sizeof({ft.FullTypeName()}));"
                             );
                         }
                         else if (ft.IsKsiSerializable()) // Struct
