@@ -54,9 +54,10 @@ namespace Ksi.Roslyn
             
             /// <summary>
             /// Adds a specified number of <c>default</c> entities to the archetype.
-            /// Inernally adds <c>default</c> default items into each component list.
+            /// Internally adds <c>default</c> default items into each component list.
             /// </summary>
             /// <param name="self">Archetype to append entities</param>
+            /// <param name="count">Item count</param>
             public static void AppendDefault(this ref {0} self, int count)
             {{
                 {2}
