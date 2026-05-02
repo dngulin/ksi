@@ -1,0 +1,2 @@
+A placeholder file to keep the same directory structure with the unity runtime package.
+If in-project directory doesn't exist, Rider complains about invalid namespaces.
