@@ -317,4 +317,17 @@ public static class TypeSymbolExtensions
             _ => false
         };
     }
+
+    public static bool IsSerializableType(this ITypeSymbol self)
+    {
+        if (self.IsSerializablePrimitive() || self.IsKsiSerializable())
+            return true;
+
+        if (self is not INamedTypeSymbol nt || !nt.IsRefList())
+            return false;
+
+        var gt = nt.TypeArguments[0];
+
+        return gt.IsSerializablePrimitive() || gt.IsKsiSerializable();
+    }
 }
