@@ -141,6 +141,18 @@ namespace Ksi.Serialization
         }
 
         /// <summary>
+        /// Prepends a span of <see cref="byte"/>s to the stream.
+        /// </summary>
+        /// <param name="self">The <see cref="BinaryWriter"/>.</param>
+        /// <param name="value">The span to prepend.</param>
+        public static void Prepend(this BinaryWriter self, ReadOnlySpan<byte> value)
+        {
+            self.BaseStream.Position -= value.Length;
+            self.Write(value);
+            self.BaseStream.Position -= value.Length;
+        }
+
+        /// <summary>
         /// Prepends a length prefix to the stream.
         /// </summary>
         /// <param name="self">The <see cref="BinaryWriter"/>.</param>

@@ -53,6 +53,7 @@ public class SerdeGenerator : IIncrementalGenerator
             {
                 file.AppendLine("using Ksi;");
                 file.AppendLine("using Ksi.Serialization;");
+                file.AppendLine("using System.Runtime.InteropServices;");
                 file.AppendLine("");
 
                 using (var ns = file.OptNamespace(t.ContainingNamespace.FullyQualifiedName()))
@@ -159,8 +160,7 @@ public class SerdeGenerator : IIncrementalGenerator
                 var val = GetPrimitiveValueExpr(ft, $"value.{f.Name}");
 
                 fScope.AppendLine($"writer.Prepend({val});");
-                fScope.AppendLine(
-                    $"writer.Prepend(ValueQualifier.Primitive(PrimitiveKind.{pk}, PrimitiveSize.{ps}).Packed());");
+                fScope.AppendLine($"writer.Prepend(ValueQualifier.Primitive(PrimitiveKind.{pk}, PrimitiveSize.{ps}).Packed());");
                 fScope.AppendLine($"writer.Prepend((byte){id});");
             }
             else if (ft.IsKsiSerializable())
@@ -187,14 +187,10 @@ public class SerdeGenerator : IIncrementalGenerator
                 if (gt.IsSerializablePrimitive())
                 {
                     using var fScope = method.Sub($"if ({count} > 0)");
-
                     var (pk, ps) = GetPrimitiveInfo(gt);
 
                     fScope.AppendLine("var contentPos = writer.BaseStream.Position;");
-                    fScope.AppendOneLineBlock(
-                        $"foreach (ref readonly var item in value.{f.Name}.RefReadonlyIterReversed())",
-                        $"writer.Prepend({GetPrimitiveValueExpr(gt, "item")});"
-                    );
+                    fScope.AppendLine($"writer.Prepend({GetPrimitiveSpanExpr(gt, f.Name)});");
                     fScope.AppendLine("var len = (uint)(contentPos - writer.BaseStream.Position);");
                     fScope.AppendLine("writer.PrependLenPrefix(len, out var lps);");
                     fScope.AppendLine($"writer.Prepend(ValueQualifier.RepeatedPrimitive(PrimitiveKind.{pk}, PrimitiveSize.{ps}, lps).Packed());");
@@ -272,5 +268,12 @@ public class SerdeGenerator : IIncrementalGenerator
             SpecialType.System_Char => $"(ushort){valueName}",
             _ => valueName
         };
+    }
+
+    private static string GetPrimitiveSpanExpr(ITypeSymbol gt, string fieldName)
+    {
+        return gt.SpecialType == SpecialType.System_Byte ?
+            $"value.{fieldName}.AsReadOnlySpan()" :
+            $"MemoryMarshal.AsBytes(value.{fieldName}.AsReadOnlySpan())";
     }
 }
