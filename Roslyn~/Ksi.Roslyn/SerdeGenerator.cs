@@ -204,9 +204,10 @@ public class SerdeGenerator : IIncrementalGenerator
                         $"foreach (ref readonly var item in value.{f.Name}.RefReadonlyIterReversed())",
                         "writer.Prepend(item);"
                     );
+                    fScope.AppendLine($"writer.PrependLenPrefix((uint){count}, out var cps);");
                     fScope.AppendLine("var len = (uint)(contentPos - writer.BaseStream.Position);");
                     fScope.AppendLine("writer.PrependLenPrefix(len, out var lps);");
-                    fScope.AppendLine($"writer.Prepend(ValueQualifier.RepeatedStruct(lps, (uint){count}).Packed());");
+                    fScope.AppendLine("writer.Prepend(ValueQualifier.RepeatedStruct(lps, cps).Packed());");
                     fScope.AppendLine($"writer.Prepend((byte){id});");
                 }
             }

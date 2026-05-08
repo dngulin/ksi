@@ -123,11 +123,11 @@ namespace Ksi.Serialization
         /// Creates a <see cref="ValueQualifier"/> for a repeated struct value.
         /// </summary>
         /// <param name="lps">The size of the length prefix.</param>
-        /// <param name="count">The number of items in the repeated struct.</param>
+        /// <param name="cps">The size of the count prefix.</param>
         /// <returns>A new <see cref="ValueQualifier"/>.</returns>
-        public static ValueQualifier RepeatedStruct(LenPrefixSize lps, uint count)
+        public static ValueQualifier RepeatedStruct(LenPrefixSize lps, LenPrefixSize cps)
         {
-            return new ValueQualifier(ValueKind.RepeatedStruct, lps, default, (PrimitiveSize) GetLenPrefix(count));
+            return new ValueQualifier(ValueKind.RepeatedStruct, lps, default, (PrimitiveSize) cps);
         }
 
         /// <summary>
