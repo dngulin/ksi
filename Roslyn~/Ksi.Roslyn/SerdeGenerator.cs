@@ -64,6 +64,10 @@ public class SerdeGenerator : IIncrementalGenerator
                         EmitGetSize(type, t, fields);
                         type.AppendLine("");
                         EmitPrepend(type, t, fields);
+                        type.AppendLine("");
+                        EmitAppend(type, t);
+                        type.AppendLine("");
+                        EmitSerializeTo(type, t);
                     }
                 }
             }
@@ -218,6 +222,22 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("var totalLen = (uint)(initialPos - writer.BaseStream.Position);");
         method.AppendLine("writer.PrependLenPrefix(totalLen, out var totalLps);");
         method.AppendLine("writer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
+    }
+
+    private static void EmitAppend(AppendScope type, INamedTypeSymbol t)
+    {
+        using var method = type.PubStat($"void Append(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
+        method.AppendLine("var size = value.GetSerializedSize();");
+        method.AppendLine("var initialPos = writer.BaseStream.Position;");
+        method.AppendLine("writer.BaseStream.Position += size;");
+        method.AppendLine("writer.Prepend(value);");
+        method.AppendLine("writer.BaseStream.Position = initialPos + size;");
+    }
+
+    private static void EmitSerializeTo(AppendScope type, INamedTypeSymbol t)
+    {
+        using var method = type.PubStat($"void SerializeTo(this in {t.FullTypeName()} value, System.IO.BinaryWriter writer)");
+        method.AppendLine("writer.Append(value);");
     }
 
     private static (string Kind, string Size) GetPrimitiveInfo(ITypeSymbol t)
