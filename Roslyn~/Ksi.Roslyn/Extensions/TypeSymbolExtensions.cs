@@ -253,7 +253,7 @@ public static class TypeSymbolExtensions
     public static bool IsPartial(this ITypeSymbol self, CancellationToken ct)
     {
         var syntax = self.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(ct);
-        return syntax is TypeDeclarationSyntax tds && tds.Modifiers.Any(SyntaxKind.PartialKeyword);
+        return syntax is TypeDeclarationSyntax tds && tds.IsPartial();
     }
 
     public static bool AreUnique(this ImmutableArray<ITypeSymbol> self)

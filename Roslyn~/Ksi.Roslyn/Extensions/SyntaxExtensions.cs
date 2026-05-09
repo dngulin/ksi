@@ -61,4 +61,9 @@ public static class SyntaxExtensions
     {
         return $"{self.Identifier}{self.TypeParameterList}";
     }
+
+    public static bool IsPartial(this TypeDeclarationSyntax self)
+    {
+        return self.Modifiers.Any(SyntaxKind.PartialKeyword);
+    }
 }

@@ -162,7 +162,7 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
         if (t == null)
             return;
 
-        if (t.ContainingType != null || sds.Modifiers.All(m => !m.IsKind(SyntaxKind.PartialKeyword)))
+        if (!t.IsTopLevel() || !sds.IsPartial())
             ctx.ReportDiagnostic(Diagnostic.Create(Rule03InvalidDomain, sds.Identifier.GetLocation()));
 
         foreach (var f in t.GetMembers().OfType<IFieldSymbol>().Where(f => !f.IsStatic))
