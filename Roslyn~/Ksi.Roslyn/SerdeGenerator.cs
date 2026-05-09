@@ -68,6 +68,8 @@ public class SerdeGenerator : IIncrementalGenerator
                         EmitAppend(type, t);
                         type.AppendLine("");
                         EmitSerializeTo(type, t);
+                        type.AppendLine("");
+                        EmitInitializeFrom(type, t, fields);
                     }
                 }
             }
@@ -240,13 +242,80 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("writer.Append(value);");
     }
 
-    private static (string Kind, string Size) GetPrimitiveInfo(ITypeSymbol t)
+    private static void EmitInitializeFrom(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
+    {
+        using var method =
+            type.PubStat($"void InitializeFrom(this ref {t.FullTypeName()} self, System.IO.BinaryReader reader)");
+
+        method.AppendLine("var q = ValueQualifier.Unpack(reader.ReadByte());");
+        method.AppendLine("var endPos = reader.BaseStream.Position + reader.ReadLenPrefix(q.LenPrefixSize);");
+        method.AppendLine("");
+
+        using var loop = method.Sub("while (reader.BaseStream.Position < endPos)");
+        loop.AppendLine("var fieldId = reader.ReadByte();");
+        loop.AppendLine("var fieldQ = ValueQualifier.Unpack(reader.ReadByte());");
+        loop.AppendLine("");
+
+        using var sw = loop.Sub("switch (fieldId)");
+        foreach (var (f, id) in fields)
+        {
+            if (f.Type is not INamedTypeSymbol ft)
+                continue;
+
+            sw.AppendLine($"// {id:d3}: {f.Name}");
+            using var cs = sw.Sub($"case {id}:");
+
+            if (ft.IsSerializablePrimitive())
+            {
+                var readMethod = GetReadMethodName(ft);
+                cs.AppendLine(ft.SpecialType == SpecialType.System_Boolean
+                    ? $"self.{f.Name} = reader.{readMethod}() != 0;"
+                    : $"self.{f.Name} = {GetReadCast(ft)}reader.{readMethod}();");
+            }
+            else if (ft.IsKsiSerializable())
+            {
+                cs.AppendLine($"self.{f.Name}.InitializeFrom(reader);");
+            }
+            else if (ft.IsRefList())
+            {
+                if (!ft.TryGetGenericArg(out var gt) || gt == null)
+                {
+                    cs.AppendLine("break;");
+                    continue;
+                }
+
+                cs.AppendLine($"self.{f.Name}.Clear();");
+                if (gt.IsSerializablePrimitive())
+                {
+                    cs.AppendLine("var fieldLen = reader.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                    cs.AppendLine($"var count = (int)(fieldLen / sizeof({gt.FullTypeName()}));");
+                    cs.AppendLine($"self.{f.Name}.AppendDefault(count);");
+                    cs.AppendLine($"reader.Read(MemoryMarshal.AsBytes(self.{f.Name}.AsSpan()));");
+                }
+                else if (gt.IsKsiSerializable())
+                {
+                    cs.AppendLine("var fieldLen = reader.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                    cs.AppendLine("var itemCount = (int)reader.ReadLenPrefix(fieldQ.ItemCountPrefixSize());");
+                    cs.AppendLine($"self.{f.Name}.AppendDefault(itemCount);");
+                    cs.AppendOneLineBlock(
+                        $"foreach (ref var item in self.{f.Name}.RefIter())",
+                        "item.InitializeFrom(reader);"
+                    );
+                }
+            }
+
+            cs.AppendLine("break;");
+        }
+
+        using var def = sw.Sub("default:");
+        def.AppendLine("reader.Skip(fieldQ);");
+        def.AppendLine("break;");
+    }
+
+    private static (string Kind, string Size) GetPrimitiveInfo(INamedTypeSymbol t)
     {
         if (t.TypeKind == TypeKind.Enum)
-        {
-            var ut = ((INamedTypeSymbol)t).EnumUnderlyingType!;
-            return GetPrimitiveInfo(ut);
-        }
+            return GetPrimitiveInfo(t.EnumUnderlyingType!);
 
         var kind = t.SpecialType switch
         {
@@ -296,5 +365,36 @@ public class SerdeGenerator : IIncrementalGenerator
         return gt.SpecialType == SpecialType.System_Byte ?
             $"value.{fieldName}.AsReadOnlySpan()" :
             $"MemoryMarshal.AsBytes(value.{fieldName}.AsReadOnlySpan())";
+    }
+
+    private static string GetReadMethodName(INamedTypeSymbol t)
+    {
+        if (t.TypeKind == TypeKind.Enum)
+            return GetReadMethodName(t.EnumUnderlyingType!);
+
+        return t.SpecialType switch
+        {
+            SpecialType.System_Boolean => "ReadByte",
+            SpecialType.System_Char => "ReadUInt16",
+            SpecialType.System_SByte => "ReadSByte",
+            SpecialType.System_Byte => "ReadByte",
+            SpecialType.System_Int16 => "ReadInt16",
+            SpecialType.System_UInt16 => "ReadUInt16",
+            SpecialType.System_Int32 => "ReadInt32",
+            SpecialType.System_UInt32 => "ReadUInt32",
+            SpecialType.System_Int64 => "ReadInt64",
+            SpecialType.System_UInt64 => "ReadUInt64",
+            SpecialType.System_Single => "ReadSingle",
+            SpecialType.System_Double => "ReadDouble",
+            _ => "ReadUnknown"
+        };
+    }
+
+    private static string GetReadCast(INamedTypeSymbol t)
+    {
+        if (t.TypeKind == TypeKind.Enum)
+            return $"({t.FullTypeName()})";
+
+        return t.SpecialType == SpecialType.System_Char ? "(char)" : "";
     }
 }
