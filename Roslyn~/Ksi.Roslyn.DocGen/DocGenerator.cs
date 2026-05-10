@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Ksi.Roslyn.DocGen.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn.DocGen;
 
@@ -146,7 +147,7 @@ public static class DocGenerator
 
         Write(writer, f.Summary);
 
-        if (f.Value != null)
+        if (f.Value != null && f.Symbol.ContainingType.TypeKind == TypeKind.Enum)
             Write(writer, $"Value is `{f.Value}`.");
 
         Write(writer, f.Declaration);

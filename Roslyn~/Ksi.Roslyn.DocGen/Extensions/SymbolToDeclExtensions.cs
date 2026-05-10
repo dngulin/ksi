@@ -95,6 +95,11 @@ public static class SymbolToDeclExtensions
     public static string ToDecl(this IFieldSymbol symbol, Compilation comp)
     {
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+        return syntax.ToDeclInternal(comp);
+    }
+
+    private static string ToDeclInternal(this SyntaxNode? syntax, Compilation comp)
+    {
         switch (syntax)
         {
             case EnumMemberDeclarationSyntax mds:
@@ -126,7 +131,7 @@ public static class SymbolToDeclExtensions
             }
 
             default:
-                return "// No declaration found";
+                return syntax != null ? syntax.Parent.ToDeclInternal(comp) : "// No declaration found";
         }
     }
 

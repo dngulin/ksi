@@ -47,10 +47,8 @@ Static Methods
 
 Size of the value qualifier in the packed format (1 byte).
 
-Value is `1`.
-
 ```csharp
-// No declaration found
+public const int PackedSize = sizeof(byte)
 ```
 
 
@@ -59,7 +57,7 @@ Value is `1`.
 The kind of the value.
 
 ```csharp
-// No declaration found
+public ValueKind Kind
 ```
 
 
@@ -69,7 +67,7 @@ The size of the length prefix for the value.
 Is used only for len-prefixed values: `RepeatedPrimitive`, `Struct`, `RepeatedStruct`.
 
 ```csharp
-// No declaration found
+public LenPrefixSize LenPrefixSize
 ```
 
 
@@ -79,7 +77,7 @@ The kind of the primitive value.
 Is used only for primitive-based values: `Primitive`, `RepeatedPrimitive`.
 
 ```csharp
-// No declaration found
+public PrimitiveKind PrimitiveKind
 ```
 
 
@@ -91,7 +89,7 @@ Is used only for primitive-based value values: `Primitive`, `RepeatedPrimitive`.
 For `RepeatedStruct` that field is reinterpreted as `ItemCountPrefixSize`.
 
 ```csharp
-// No declaration found
+public PrimitiveSize PrimitiveSize
 ```
 
 
