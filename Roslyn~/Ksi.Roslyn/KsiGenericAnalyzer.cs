@@ -37,7 +37,7 @@ public class KsiGenericAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule03JaggedRefList = Rule(03, DiagnosticSeverity.Error,
         "Jagged `TRefList<T>` types are not supported",
         "Jagged `TRefList<T>` types are not supported. " +
-        "Consider to wrap inner collection with a structure"
+        "Consider wrapping the inner collection with a structure"
     );
 
     private static readonly DiagnosticDescriptor Rule04GenericExplicitCopyType = Rule(04, DiagnosticSeverity.Error,

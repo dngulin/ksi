@@ -182,7 +182,7 @@ Diagnostic messages related to ECS-like data composition:
 | `KSICOMP02`   | Error    | Repeated entity component                          |
 | `KSICOMP03`   | Error    | Invalid `[KsiDomain]` declaration                  |
 | `KSICOMP04`   | Error    | Invalid `[KsiArchetype]` accessibility             |
-| `KSICOMP05`   | Error    | Non top-level partial type containing `[KsiQuery]` |
+| `KSICOMP05`   | Error    | Non-top-level partial type containing `[KsiQuery]` |
 | `KSICOMP06`   | Error    | Invalid `[KsiQuery]` method signature              |
-| `KSICOMP07`   | Error    | Non reference `[KsiQuery]` method parameter        |
+| `KSICOMP07`   | Error    | Non-reference `[KsiQuery]` method parameter        |
 | `KSICOMP08`   | Error    | Invalid `[KsiQuery]` method parameter type         |

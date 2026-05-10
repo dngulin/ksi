@@ -32,7 +32,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(02, DiagnosticSeverity.Error,
             "Missing [DynSized] attribute",
-            "Structure marked with the [Dealloc] attribute should be also marked with the [DynSized] attribute"
+            "Structure marked with the [Dealloc] attribute should also be marked with the [DynSized] attribute"
         );
 
         private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
@@ -43,7 +43,7 @@ namespace Ksi.Roslyn
         private static readonly DiagnosticDescriptor Rule04Overwrite = Rule(04, DiagnosticSeverity.Error,
             "Overwriting [Dealloc] instance",
             "Operation overwrites a [Dealloc] instance without performing deallocation. " +
-            "Consider to use the `Deallocated` extension method on assignment target."
+            "Consider using the `Deallocated` extension method on the assignment target."
         );
 
         private static readonly DiagnosticDescriptor Rule05UnusedInstance = Rule(05, DiagnosticSeverity.Error,

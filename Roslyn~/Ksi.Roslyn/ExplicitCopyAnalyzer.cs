@@ -33,7 +33,7 @@ namespace Ksi.Roslyn
         private static readonly DiagnosticDescriptor Rule02ArgumentCopy = Rule(02,
             "Passing [ExplicitCopy] instance by value",
             "Implicit copy caused by passing a struct by value. " +
-            "Consider to use the `Move` extension or changing the parameter to receive a value by reference"
+            "Consider using the `Move` extension or changing the parameter to receive a value by reference"
         );
 
         private static readonly DiagnosticDescriptor Rule03ReturningCopy = Rule(03,
@@ -43,7 +43,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule04AssignmentCopy = Rule(04,
             "Assignment copy of the [ExplicitCopy] instance",
-            "Implicit copy caused by a assignment"
+            "Implicit copy caused by an assignment"
         );
 
         private static readonly DiagnosticDescriptor Rule05DefensiveCopy = Rule(05,
@@ -63,7 +63,7 @@ namespace Ksi.Roslyn
 
         private static readonly DiagnosticDescriptor Rule08PrivateField = Rule(08,
             "Private field declaration in the [ExplicitCopy] type",
-            "Declaring a private field prevents from providing explicit copy extensions"
+            "Declaring a private field prevents providing explicit copy extensions"
         );
 
         private static readonly DiagnosticDescriptor Rule09SpanToArray = Rule(09,
@@ -74,7 +74,7 @@ namespace Ksi.Roslyn
         private static readonly DiagnosticDescriptor Rule10LowAccessibility = Rule(10,
             "Declaring [ExplicitCopy] struct with low accessibility",
             "Declaring [ExplicitCopy] struct with accessibility lower than `internal` " +
-            "prevents from providing explicit copy extensions"
+            "prevents providing explicit copy extensions"
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(

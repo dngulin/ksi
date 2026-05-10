@@ -44,11 +44,11 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule04LowArchetypeAccessibility = Rule(04, DiagnosticSeverity.Error,
         "Invalid [KsiArchetype] accessibility",
         "Declaring a [KsiArchetype] struct with accessibility lower than `internal` " +
-        "prevents from generation extension methods"
+        "prevents generating extension methods"
     );
 
     private static readonly DiagnosticDescriptor Rule05InvalidQueryContainingType = Rule(05, DiagnosticSeverity.Error,
-        "Non top-level partial type containing [KsiQuery]",
+        "Non-top-level partial type containing [KsiQuery]",
         "Type containing [KsiQuery] methods should be a partial top-level type"
     );
 
@@ -60,13 +60,13 @@ public class KsiCompAnalyzer : DiagnosticAnalyzer
     );
 
     private static readonly DiagnosticDescriptor Rule07NonRefQueryParameter = Rule(07, DiagnosticSeverity.Error,
-        "Non reference [KsiQuery] method parameter",
-        "Non first [KsiQuery] method parameter should be a struct passed by reference"
+        "Non-reference [KsiQuery] method parameter",
+        "Parameters of [KsiQuery] methods (except the first one) should be structs passed by reference"
     );
 
     private static readonly DiagnosticDescriptor Rule08InvalidQueryParameterType = Rule(08, DiagnosticSeverity.Error,
         "Invalid [KsiQuery] method parameter type",
-        "Non first [KsiQuery] method parameter should be a [KsiComponent] or " +
+        "Parameters of [KsiQuery] methods (except the first one) should be a [KsiComponent] or " +
         "should be marked with [KsiQueryParam]"
     );
 

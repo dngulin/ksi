@@ -32,7 +32,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule02MissingExplicitCopy = Rule(02, DiagnosticSeverity.Error,
         "Missing [ExplicitCopy] attribute",
-        "Structure marked with the [DynSized] attribute should be also marked with the [ExplicitCopy] attribute"
+        "Structure marked with the [DynSized] attribute should also be marked with the [ExplicitCopy] attribute"
     );
 
     private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
@@ -42,8 +42,8 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule04NoResize = Rule(04, DiagnosticSeverity.Error,
         "Resize is not allowed",
-        "Passing as an argument a mutable reference to `{0}` that is derived from the [DynNoResize] parameter. " +
-        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
+        "Passing a mutable reference to `{0}` as an argument that is derived from the [DynNoResize] parameter. " +
+        "Consider passing a readonly/[DynNoResize] reference to avoid the problem"
     );
 
     private static readonly DiagnosticDescriptor Rule05RedundantNoResize = Rule(05, DiagnosticSeverity.Warning,
@@ -54,7 +54,7 @@ public class DynSizedAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule06FieldOfReferenceType = Rule(06, DiagnosticSeverity.Error,
         "[DynSized] field of a reference type",
         "Type `{0}` is [DynSized] and cannot be a field of a reference type. " +
-        "Consider to wrap it with `ExclusiveAccess<{0}>`"
+        "Consider wrapping it with `ExclusiveAccess<{0}>`"
     );
 
     private static readonly DiagnosticDescriptor Rule07RedundantExclusiveAccess = Rule(07, DiagnosticSeverity.Warning,

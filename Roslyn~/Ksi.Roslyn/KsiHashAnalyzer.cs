@@ -36,13 +36,13 @@ public class KsiHashAnalyzer : DiagnosticAnalyzer
     );
 
     private static readonly DiagnosticDescriptor Rule03InvalidSymbolSignature = Rule(03, DiagnosticSeverity.Error,
-        "Invalid KsiHash  symbol signature",
+        "Invalid KsiHash symbol signature",
         "The {0} has a wrong signature. It should be {1}"
     );
 
     private static readonly DiagnosticDescriptor Rule04InvalidAccessibility = Rule(04, DiagnosticSeverity.Error,
         "Invalid KsiHash symbol accessibility",
-        "Accessibility of the {0} is to low. It should be at least internal"
+        "Accessibility of the {0} is too low. It should be at least internal"
     );
 
     private static readonly DiagnosticDescriptor Rule05InvalidHashTableDecl = Rule(05, DiagnosticSeverity.Error,

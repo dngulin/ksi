@@ -27,11 +27,11 @@ public class SerdeAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule01MissingSerializable = Rule(01, DiagnosticSeverity.Error,
         "Missing [KsiSerializable] attribute",
-        "Type should be annotated with [KsiSerializable] because it contains [KsiSerializeField] field `{0}`"
+        "Type should be annotated with [KsiSerializable] because it contains a [KsiSerializeField] field `{0}`"
     );
 
     private static readonly DiagnosticDescriptor Rule02DuplicateFieldId = Rule(02, DiagnosticSeverity.Error,
-        "Duplicated [KsiSerializeField] id",
+        "Duplicate [KsiSerializeField] id",
         "Field id `{0}` is duplicated in serializable type `{1}`"
     );
 
@@ -43,7 +43,7 @@ public class SerdeAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule04LowTypeAccessibility = Rule(04, DiagnosticSeverity.Error,
         "Low [KsiSerializable] accessibility",
         "Declaring a [KsiSerializable] struct with accessibility lower than `internal` " +
-        "prevents from generation extension methods"
+        "prevents generating extension methods"
     );
 
     private static readonly DiagnosticDescriptor Rule05LowFieldAccessibility = Rule(05, DiagnosticSeverity.Error,

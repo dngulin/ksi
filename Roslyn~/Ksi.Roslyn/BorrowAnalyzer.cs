@@ -36,15 +36,15 @@ public class BorrowAnalyzer: DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule03LocalRefInvalidation = Rule(03, DiagnosticSeverity.Error,
         "Local reference invalidation",
         "Passing a mutable reference argument to `{0}` " +
-        "invalidates memory safety guaranties for the local variable `{1}` pointing to `{2}`. " +
-        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
+        "invalidates memory safety guarantees for the local variable `{1}` pointing to `{2}`. " +
+        "Consider passing a readonly/[DynNoResize] reference to avoid the problem"
     );
 
     private static readonly DiagnosticDescriptor Rule04ArgumentAliasing = Rule(04, DiagnosticSeverity.Error,
         "Reference arguments aliasing",
-        "Passing a mutable reference to `{0}` alongside with a reference to `{1}` as arguments " +
+        "Passing a mutable reference to `{0}` alongside a reference to `{1}` as arguments " +
         "invalidates memory safety rules within the calling method. " +
-        "Consider to pass a readonly/[DynNoResize] reference to avoid the problem"
+        "Consider passing a readonly/[DynNoResize] reference to avoid the problem"
     );
 
     private static readonly DiagnosticDescriptor Rule05RefEscapesAccessScope = Rule(05, DiagnosticSeverity.Error,

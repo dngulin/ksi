@@ -31,7 +31,7 @@ public class TempAllocAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor Rule02MissingDynSized = Rule(02, DiagnosticSeverity.Error,
         "Missing [DynSized] attribute",
-        "Structure marked with the [TempAlloc] attribute should be also marked with the [DynSized] attribute"
+        "Structure marked with the [TempAlloc] attribute should also be marked with the [DynSized] attribute"
     );
 
     private static readonly DiagnosticDescriptor Rule03RedundantAttribute = Rule(03, DiagnosticSeverity.Warning,
