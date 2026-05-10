@@ -13,7 +13,10 @@ It is achieved by maintaining only one active [MutableAccessScope\<T\>](T.Mutabl
 Supposed to wrap [DynSized](T.DynSizedAttribute.g.md) structures.
 
 ```csharp
-public sealed class ExclusiveAccess<[ExplicitCopy, DynSized, Dealloc] T> where T: struct
+namespace Ksi
+{
+    public sealed class ExclusiveAccess<[ExplicitCopy, DynSized, Dealloc] T> where T: struct
+}
 ```
 
 Properties

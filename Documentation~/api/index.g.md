@@ -30,6 +30,8 @@ Extension methods are grouped together with their target types.
 - [KsiDomainAttribute](T.KsiDomainAttribute.g.md) — an attribute to mark a domain that can be queried by [KsiQuery](T.KsiQueryAttribute.g.md) methods
 - [KsiQueryAttribute](T.KsiQueryAttribute.g.md) — an attribute to produce the `ECS`-like query
 - [KsiQueryParamAttribute](T.KsiQueryParamAttribute.g.md) — an attribute to mark a [KsiQuery](T.KsiQueryAttribute.g.md) parameter
+- [KsiSerializableAttribute](T.KsiSerializableAttribute.g.md) — marks a struct for Ksi binary serialization source generation
+- [KsiSerializeFieldAttribute](T.KsiSerializeFieldAttribute.g.md) — marks a serializable field and specifies its binary field id
 
 
 ## TRefList\<T\> Variants
@@ -47,3 +49,14 @@ Extension methods are grouped together with their target types.
 - [KsiExtensions](T.KsiExtensions.g.md) — general purpose extension methods provided by the ѯ-Framework
 - [KsiHashTableSlotState](T.KsiHashTableSlotState.g.md) — an enum indicating a slot state for open addressing hash tables with lazy deletion
 - [KsiPrimeUtil](T.KsiPrimeUtil.g.md) — utility class to work with prime numbers
+- [BinaryReaderExtensions](T.BinaryReaderExtensions.g.md) — provides extension methods for [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) to support Ksi serialization
+- [BinaryWriterExtensions](T.BinaryWriterExtensions.g.md) — provides extension methods for [BinaryWriter](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryWriter?view=netstandard-2.1) to support Ksi serialization
+- [PrefixedSizeOf](T.PrefixedSizeOf.g.md) — utility class for calculating the size of serialized data
+- [ValueQualifier](T.ValueQualifier.g.md) — describes a value in the Ksi binary format
+- [ValueQualifierExtensions](T.ValueQualifierExtensions.g.md) — provides extension methods for [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1)
+- [LenPrefixSize](T.LenPrefixSize.g.md) — represents the size of the length prefix in bytes
+- [LenPrefixSizeExtensions](T.LenPrefixSizeExtensions.g.md) — provides extension methods for [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1)
+- [PrimitiveKind](T.PrimitiveKind.g.md) — represents the primitive value kind
+- [PrimitiveSize](T.PrimitiveSize.g.md) — represents the size of a primitive value in bits
+- [PrimitiveSizeExtensions](T.PrimitiveSizeExtensions.g.md) — provides extension methods for [PrimitiveSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.PrimitiveSize?view=netstandard-2.1)
+- [ValueKind](T.ValueKind.g.md) — represents the kind of value being serialized

@@ -24,9 +24,12 @@ public class PublicApi(
         var compilation = KsiCompilation.Create();
         var globalNs = compilation.Assembly.GlobalNamespace;
         var ksiNs = globalNs.GetNamespaceMembers().First(ns => ns.Name == "Ksi");
+        var namespaces = new List<INamespaceSymbol> { ksiNs };
+        namespaces.AddRange(ksiNs.GetNamespaceMembers());
 
         // Collect types
-        foreach (var t in ksiNs.GetTypeMembers())
+        foreach (var ns in namespaces)
+        foreach (var t in ns.GetTypeMembers())
         {
             if (t.DeclaredAccessibility != Accessibility.Public)
                 continue;
@@ -63,7 +66,7 @@ public class PublicApi(
         }
 
 
-        Comparison<TypeSpec> tCmp = static (a, b) => string.Compare(a.FileName, b.FileName, StringComparison.Ordinal);
+        Comparison<TypeSpec> tCmp = static (a, b) => a.SortingKey.CompareTo(b.SortingKey);
         attributes.Sort(tCmp);
         otherTypes.Sort(tCmp);
 

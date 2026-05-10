@@ -12,6 +12,9 @@ An attribute to mark a [KsiQuery](T.KsiQueryAttribute.g.md) parameter.
 It is passed through from the generated method to the marked one.
 
 ```csharp
-[AttributeUsage(AttributeTargets.Parameter)]
-public sealed class KsiQueryParamAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public sealed class KsiQueryParamAttribute : Attribute
+}
 ```

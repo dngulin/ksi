@@ -23,6 +23,9 @@ of the current list to another one
 of another struct to the current one
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
-public sealed class ExplicitCopyAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
+    public sealed class ExplicitCopyAttribute : Attribute
+}
 ```

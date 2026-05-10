@@ -24,6 +24,9 @@ Attribute triggers code generation for deallocation extension methods:
 - `(ref TRefList<TDealloc>).Clear()` — deallocates all items and clears the list
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
-public sealed class DeallocAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.GenericParameter)]
+    public sealed class DeallocAttribute : Attribute
+}
 ```

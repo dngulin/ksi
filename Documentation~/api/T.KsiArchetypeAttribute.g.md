@@ -24,6 +24,9 @@ Triggers extension methods code generation to keep all inner lists with the same
 - `(ref TArchetype).Clear()` — clears all inner lists
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
-public sealed class KsiArchetypeAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct)]
+    public sealed class KsiArchetypeAttribute : Attribute
+}
 ```

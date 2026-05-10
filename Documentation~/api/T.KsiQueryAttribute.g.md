@@ -27,6 +27,9 @@ that are passed through from the generated method to the marked query method.
 Only the [DynNoResizeAttribute](T.DynNoResizeAttribute.g.md) is inherited for these parameters
 
 ```csharp
-[AttributeUsage(AttributeTargets.Method)]
-public sealed class KsiQueryAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class KsiQueryAttribute : Attribute
+}
 ```

@@ -23,6 +23,9 @@ Is composed of the `{DomainTypeName}.KsiSection` and the entity index (`int`) in
 Should be used as the first argument for [KsiQuery](T.KsiQueryAttribute.g.md) methods
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
-public sealed class KsiDomainAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct)]
+    public sealed class KsiDomainAttribute : Attribute
+}
 ```

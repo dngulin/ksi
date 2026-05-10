@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Ksi.Roslyn.DocGen.Extensions;
+using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn.DocGen;
@@ -7,7 +8,7 @@ namespace Ksi.Roslyn.DocGen;
 public sealed class TypeSpec
 {
     public readonly INamedTypeSymbol Symbol;
-    public readonly string FileName;
+    public readonly TypeSortingKey SortingKey;
 
     public readonly ImmutableArray<MethodSpec> Constructors;
     public readonly ImmutableArray<PropertySpec> Properties;
@@ -36,7 +37,7 @@ public sealed class TypeSpec
     public TypeSpec(INamedTypeSymbol symbol, Compilation comp)
     {
         Symbol = symbol;
-        FileName = Path.GetFileNameWithoutExtension(symbol.DeclaringSyntaxReferences.First().SyntaxTree.FilePath);
+        SortingKey = new TypeSortingKey(symbol);
 
         Constructors = symbol.Constructors
             .Where(m => m is { DeclaredAccessibility: Accessibility.Public, IsImplicitlyDeclared: false })
@@ -70,9 +71,39 @@ public sealed class TypeSpec
         Methods = methods.ToImmutableArray();
 
         Title = symbol.ToMd();
-        Declaration = $"```csharp\n{symbol.ToDecl(comp)}\n```";
+        Declaration =
+            $$"""
+            ```csharp
+            namespace {{symbol.ContainingNamespace.FullyQualifiedName()}}
+            {
+                {{symbol.ToDecl(comp).Replace("\n", "\n    ")}}
+            }
+            ```
+            """;
         Summary = symbol.DocXml().ToMd("summary", comp)!;
     }
+}
+
+public readonly struct TypeSortingKey : IComparable<TypeSortingKey>
+{
+    public readonly string Path;
+    public readonly int Line;
+
+    public TypeSortingKey(ITypeSymbol symbol)
+    {
+        var decl = symbol.DeclaringSyntaxReferences.First();
+        var ls = decl.SyntaxTree.GetLineSpan(decl.Span);
+        Path = ls.Path[..^3];
+        Line = ls.StartLinePosition.Line;
+    }
+
+    public int CompareTo(TypeSortingKey other)
+    {
+        var declPathComparison = string.Compare(Path, other.Path, StringComparison.Ordinal);
+        return declPathComparison != 0 ? declPathComparison : Line.CompareTo(other.Line);
+    }
+
+    public override string ToString() => $"{Path}:{Line}";
 }
 
 public sealed class MethodSpec

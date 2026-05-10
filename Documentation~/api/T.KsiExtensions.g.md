@@ -11,7 +11,10 @@
 General purpose extension methods provided by the ѯ-Framework.
 
 ```csharp
-public static class KsiExtensions
+namespace Ksi
+{
+    public static class KsiExtensions
+}
 ```
 
 Static Methods

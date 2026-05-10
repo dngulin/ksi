@@ -11,7 +11,10 @@
 An enum indicating a slot state for open addressing hash tables with lazy deletion.
 
 ```csharp
-public enum KsiHashTableSlotState 
+namespace Ksi
+{
+    public enum KsiHashTableSlotState 
+}
 ```
 
 Fields

@@ -12,8 +12,11 @@ A dynamic array collection wrapping a managed array.
 Can store structures containing reference types, but it is not compatible with `Burst`.
 
 ```csharp
-[ExplicitCopy, DynSized]
-public struct ManagedRefList<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
+namespace Ksi
+{
+    [ExplicitCopy, DynSized]
+    public struct ManagedRefList<[ExplicitCopy, DynSized, Dealloc] T> where T : struct
+}
 ```
 
 Static Creation Methods

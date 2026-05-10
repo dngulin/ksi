@@ -13,6 +13,9 @@ An attribute to disallow resizing operations on a [DynSized](T.DynSizedAttribute
 Hints the reference lifetime analyzer that any internal buffer cannot be resized.
 
 ```csharp
-[AttributeUsage(AttributeTargets.Parameter)]
-public sealed class DynNoResizeAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Parameter)]
+    public sealed class DynNoResizeAttribute : Attribute
+}
 ```

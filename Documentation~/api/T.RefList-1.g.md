@@ -12,8 +12,11 @@ A dynamic array collection wrapping the `Persistent` allocator.
 Requires manual deallocation.
 
 ```csharp
-[ExplicitCopy, DynSized, Dealloc]
-public struct RefList<[ExplicitCopy, DynSized, Dealloc] T> where T : unmanaged
+namespace Ksi
+{
+    [ExplicitCopy, DynSized, Dealloc]
+    public struct RefList<[ExplicitCopy, DynSized, Dealloc] T> where T : unmanaged
+}
 ```
 
 Static Creation Methods

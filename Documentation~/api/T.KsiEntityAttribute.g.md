@@ -18,6 +18,9 @@ Requirements:
 - All field types should be unique
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
-public sealed class KsiEntityAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct)]
+    public sealed class KsiEntityAttribute : Attribute
+}
 ```

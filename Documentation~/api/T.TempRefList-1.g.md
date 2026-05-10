@@ -12,8 +12,11 @@ A dynamic array collection wrapping the `Temp` allocator.
 Can be stored only on stack.
 
 ```csharp
-[ExplicitCopy, DynSized, TempAlloc]
-public struct TempRefList<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T> where T : unmanaged
+namespace Ksi
+{
+    [ExplicitCopy, DynSized, TempAlloc]
+    public struct TempRefList<[ExplicitCopy, DynSized, Dealloc, TempAlloc] T> where T : unmanaged
+}
 ```
 
 Static Creation Methods

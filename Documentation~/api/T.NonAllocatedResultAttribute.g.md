@@ -15,6 +15,9 @@ Attribute usage is not verified by roslyn analyzers.
 Returning a non-deallocated instance can cause memory leaks.
 
 ```csharp
-[AttributeUsage(AttributeTargets.Method)]
-public sealed class NonAllocatedResultAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class NonAllocatedResultAttribute : Attribute
+}
 ```

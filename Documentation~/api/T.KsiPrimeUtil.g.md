@@ -12,7 +12,10 @@ Utility class to work with prime numbers.
 Used by generated hash table implementations produced by [KsiHashTableAttribute](T.KsiHashTableAttribute.g.md).
 
 ```csharp
-public static class KsiPrimeUtil
+namespace Ksi
+{
+    public static class KsiPrimeUtil
+}
 ```
 
 Static Methods

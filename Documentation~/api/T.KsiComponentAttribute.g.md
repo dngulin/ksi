@@ -13,6 +13,9 @@ It can be queried with the [KsiQuery](T.KsiQueryAttribute.g.md)
 from the [KsiDomain](T.KsiDomainAttribute.g.md).
 
 ```csharp
-[AttributeUsage(AttributeTargets.Struct)]
-public sealed class KsiComponentAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Struct)]
+    public sealed class KsiComponentAttribute : Attribute
+}
 ```

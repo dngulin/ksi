@@ -22,8 +22,11 @@ meaning it doesn't contribute to the parent reference path
 - `[RefPath("self", "Field", "!", "[n]")]` corresponds to the reference path `self.Field![n]`
 
 ```csharp
-[AttributeUsage(AttributeTargets.Method)]
-public sealed class RefPathAttribute : Attribute
+namespace Ksi
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RefPathAttribute : Attribute
+}
 ```
 
 Constructors

@@ -58,5 +58,8 @@ Use only the generated API to modify the collection state.
 - `(ref THashSet).Clear()` — clears the hash map
 
 ```csharp
-public class KsiHashTableAttribute : Attribute
+namespace Ksi
+{
+    public class KsiHashTableAttribute : Attribute
+}
 ```

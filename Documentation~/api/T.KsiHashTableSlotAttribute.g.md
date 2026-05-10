@@ -20,5 +20,8 @@ If you define the `Value` field, the structure will represent the `HashMap` slot
 Otherwise, it will be a `HashSet` slot.
 
 ```csharp
-public class KsiHashTableSlotAttribute : Attribute
+namespace Ksi
+{
+    public class KsiHashTableSlotAttribute : Attribute
+}
 ```
