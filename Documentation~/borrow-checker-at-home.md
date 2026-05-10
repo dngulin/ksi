@@ -12,8 +12,8 @@ Referencing rules are based on the [DynSized](api/T.DynSizedAttribute.g.md) type
 Any change to dynamically sized data can invalidate existing references.
 
 There are two reference invalidation cases:
-- Passing a mutable reference to `[DynSized]` data within the lifetime
-of a local reference that is derived from the same data:
+- Passing a mutable reference to `[DynSized]` data while a local reference
+  derived from the same data is still active:
     ```csharp
     var list = RefList.Empty<int>();
     PopulateList(ref list);
@@ -21,12 +21,12 @@ of a local reference that is derived from the same data:
     ref var x = ref list.RefAt(0);
     DoSomething(ref list);
     //              ^^^^ Error: BORROW03
-    // It is possible to clear or re-allcoate the list within the method,
-    // so the `x` varibale will point to unreachable or deallcoated memory
+    // It is possible to clear or re-allocate the list within the method,
+    // so the `x` variable will point to unreachable or deallocated memory.
     UseValue(in x);
     ```
-- Passing a mutable reference to `[DynSized]` data alongside a reference
-that is derived from the same data or can produce a reference derived from the same data:
+- Passing a mutable reference to `[DynSized]` data alongside another reference
+  derived from (or capable of producing a reference from) the same data:
     ```csharp
     var list = RefList.Empty<int>();
     PopulateList(ref list);
@@ -34,48 +34,48 @@ that is derived from the same data or can produce a reference derived from the s
     ref var x = ref list.RefAt(0);
     DoSomething(ref list, in x);
     //              ^^^^ Error: BORROW04
-    // It is possible to clear or re-allcoate the list within the method,
-    // so the `x` argument will point to unreachable or deallcoated memory
+    // It is possible to clear or re-allocate the list within the method,
+    // so the `x` argument will point to unreachable or deallocated memory.
     ```
 
 > [!NOTE]
-> For analyzers' simplicity reasons,
+> For simplicity in analyzer logic,
 > reassigning local references derived from `[DynSized]` data is not allowed.
 
-In some cases when mutable access doesn't require resizing any collections,
-you can mark the method parameter with the [DynNoResizeAttribute](api/T.DynNoResizeAttribute.g.md).
-It will disallow resizing but keep mutable data access.
+In cases where mutable access does not require resizing collections,
+you can mark a method parameter with the [DynNoResizeAttribute](api/T.DynNoResizeAttribute.g.md).
+This will disallow resizing while maintaining mutable data access.
 
 ```csharp
 void DoSomething([DynNoResize] ref RefList<int> list)
 {
     list.Clear();
 //  ^^^^ Error: DYNSIZED04
-// It is not possible to resize a parameter that is marked with [DynNoResize]
+// Resizing a parameter marked with [DynNoResize] is not allowed.
 }
 ```
 
 ## ExclusiveAccess\<T\>
 
-Referencing rules make analyzers' logic quite simple, but it handles only parameters and local symbols.
+Referencing rules keep analyzer logic simple, but they only handle parameters and local symbols.
 
-It is not possible to quickly verify reference compatibility between by-ref arguments and local fields
-because it is not possible to check if the argument is derived from the same field or not.
-Furthermore, calling non-static methods having a reference to a `[DynSized]` field can also invalidate the reference.
+It is difficult to verify reference compatibility between by-ref arguments and fields
+because it is hard to determine if an argument is derived from a specific field.
+Furthermore, calling non-static methods while holding a reference to a `[DynSized]` field can also invalidate that reference.
 
-To solve this problem, ѯ-Framework provides the [ExclusiveAccess\<T\>](api/T.ExclusiveAccess-1.g.md) type.
-It is a wrapper around the `[DynSized]` data, that guarantees that the owned data is exclusively accessed.
+To address this, ѯ-Framework provides the [ExclusiveAccess\<T\>](api/T.ExclusiveAccess-1.g.md) type.
+It is a wrapper around `[DynSized]` data that guarantees exclusive access.
 
-It has two access properties that return mutable and read-only access scopes:
+It provides two properties that return mutable and read-only access scopes:
 - `public MutableAccessScope<T> Mutable { get; }`
 - `public ReadOnlyAccessScope<T> ReadOnly { get; }`
 
-Each access scope is a disposable ref-struct that provides by-ref access to the data:
+Each access scope is a disposable ref struct that provides by-ref access to the data:
 - `public ref T MutableAccessScope<T>.Value { get; }`
 - `public ref readonly T ReadOnlyAccessScope<T>.Value { get; }`
 
 Only one access scope can be active at a time.
-Creating a new access scope within other access scope's lifetime throws the `InvalidOperationException`.
+Attempting to create a new access scope within another's lifetime throws an `InvalidOperationException`.
 
 Example:
 ```csharp
@@ -103,57 +103,57 @@ public class DataOwner
 }
 ```
 
-## RefLike Types Support
+## Ref-like Types Support
 
 Reference safety analyzers support only these `ref struct` types:
-- `Span<T>` and `ReadOnlySpan<T>` derived from a `TRefList<T>`
+- `Span<T>` and `ReadOnlySpan<T>` derived from a `TRefList<T>`.
 - [MutableAccessScope\<T\>](api/T.MutableAccessScope-1.g.md) and
-[ReadOnlyAccessScope\<T\>](api/T.ReadOnlyAccessScope-1.g.md) for top-level data access
+[ReadOnlyAccessScope\<T\>](api/T.ReadOnlyAccessScope-1.g.md) for top-level data access.
 
-It is recommended to use spans only to work with external libraries that are not dependent on the ѯ-Framework.
+It is recommended to use spans only when working with external libraries that do not depend on ѯ-Framework.
 
 > [!CAUTION]
-> Wrapping references derived from `[DynSized]` data into any other RefLike types can cause memory access errors.
+> Wrapping references derived from `[DynSized]` data into any other ref-like types can cause memory access errors.
 
 ## RefPath
 
-To make the safety checks possible by Roslyn analyzers,
+To enable safety checks via Roslyn analyzers,
 there is a strict requirement for referencing `[DynSized]` data:
 
 > [!IMPORTANT]
-> If expression returns a reference and also references a `[DynSized]` data,
-> it should be a `RefPath`-compatible expression.
+> If an expression returns a reference and also references `[DynSized]` data,
+> it must be a `RefPath`-compatible expression.
 
-A valid `RefPath` expression should be composed of:
-- Local variable reference
-- Parameter reference
-- Field reference (except `static` and `this` fields)
+A valid `RefPath` expression must be composed of:
+- Local variable references
+- Parameter references
+- Field references (except `static` and `this` fields)
 - `TRefList<T>` API:
-  - Indexing extension methods: `RefAt`, `ReferadOnlyAt`, `RefAdd`
+  - Indexing extension methods: `RefAt`, `RefReadonlyAt`, `RefAdd`
   - Span representation methods: `AsSpan`, `AsReadOnlySpan`
   - Iterator items produced by: `RefIter`, `RefIterReversed`, `AsSpan`, `AsReadOnlySpan`
-- `(ReadOnly)Span<T>` indexers and `Slcie` methods
+- `(ReadOnly)Span<T>` indexers and `Slice` methods
 - `(ReadOnly)AccessScope<T>.Value` property
 - `[RefPath]` extension methods
 
 ### RefPath Representation
 
-Internally `RefPath` is composed of:
-- `Segments` - array of strings representing the reference path
-- `DynSizedLength` - number of segments that point to a `[DynSized]` data
-- `ExplicitLength` - number of segments that explicitly point to some data
-(number of segments before the first extension method in the path)
+Internally, a `RefPath` is composed of:
+- `Segments` — an array of strings representing the reference path.
+- `DynSizedLength` — the number of segments pointing to `[DynSized]` data.
+- `ExplicitLength` — the number of segments explicitly pointing to data
+  (the number of segments before the first extension method in the path).
 
-Every segment can be one of the following:
-- local symbol name (variable or parameter)
-- field name
-- collection indexer `[n]`
-- `[RefPath]` extension method name suffixed with `()`, e.g. `ExtMethodName()`
+Each segment can be one of the following:
+- A local symbol name (variable or parameter).
+- A field name.
+- A collection indexer `[n]`.
+- A `[RefPath]` extension method name suffixed with `()`, e.g., `ExtMethodName()`.
 
-In the string representation the last `[DynSized]` segment is suffixed with `!` symbol, e.g. `myData.List![n]`.
+In string representation, the last `[DynSized]` segment is suffixed with the `!` symbol, e.g., `myData.List![n]`.
 
 > [!NOTE]
-> Note that `[DynSized]` struct can contain a non-`[DynSized]` data but not vice versa.
+> A `[DynSized]` struct can contain non-`[DynSized]` data, but not vice versa.
 
 Examples:
 ```csharp
@@ -181,10 +181,10 @@ ref var y = ref x.Number; // root.ListOfNonDyn![n].Number
 
 ### RefPathAttribute
 
-In some cases it is necessary to get an internal reference applying some logic.
+In some cases, it is necessary to get an internal reference using custom logic.
 The [RefPathAttribute](api/T.RefPathAttribute.g.md) serves this purpose.
 
-You can use it to mark extension methods that return inner references:
+You can use it to mark extension methods that return internal references:
 ```csharp
 [ExplicitCopy, DynSized, Dealloc]
 public struct State
@@ -207,15 +207,15 @@ ref var items = ref state.CurrentSide(turn); // state.CurrentSide()!
 ProcessItems(ref items);
 ```
 
-In the given example the `CurrentSide()` segment is a _non-explicit segment_.
-That means it _can reference any internal data_ of the `state`.
+In this example, the `CurrentSide()` segment is a _non-explicit segment_.
+This means it _can reference any internal data_ of the `state`.
 
 > [!WARNING]
-> Extensive usage of non-explicit references can trigger redundant reference compatibility errors
-> because the analyzer can compare only explicit parts of paths.
+> Excessive use of non-explicit references can trigger redundant reference compatibility errors
+> because the analyzer can only compare explicit parts of paths.
 
 If your extension method returns the same reference every time,
-you can avoid that problem by passing the returning path to the `[RefPath]` attribute:
+you can avoid this problem by passing the return path to the `[RefPath]` attribute:
 
 ```csharp
 [ExplicitCopy, DynSized, Dealloc]
@@ -232,5 +232,5 @@ ref var item = ref state.RefItemAt(42); // state.Items[n]!
 ```
 
 > [!NOTE]
-> When you pass the explicit path to the `[RefPath]` attribute,
-> you have to pass a DynSized separator "!" as a segment.
+> When passing an explicit path to the `[RefPath]` attribute,
+> you must include the DynSized separator "!" as a segment.

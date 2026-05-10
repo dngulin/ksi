@@ -12,19 +12,19 @@
 and code generation for marked structures:
 
 - Structures that should not be implicitly copied should be marked with
-the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md)
+the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md).
 - Structures that own dynamically allocated data should be marked with
-the [DynSizedAttribute](api/T.DynSizedAttribute.g.md) that enables referencing safety checks
-- For some `[DynSized]` structures the allocator policy trait is also required:
-  - The [DeallocAttribute](api/T.DeallocAttribute.g.md) generates deallocation API and enables extra diagnostics
-  - The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) makes deallocation not required
-  in exchange to be stored only on stack
+the [DynSizedAttribute](api/T.DynSizedAttribute.g.md), which enables referencing safety checks.
+- For some `[DynSized]` structures, an allocator policy trait is also required:
+  - The [DeallocAttribute](api/T.DeallocAttribute.g.md) generates deallocation API and enables extra diagnostics.
+  - The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) removes the need for manual deallocation,
+    but requires the structure to be stored only on the stack.
 
 ## ExplicitCopy Attribute
 
-The [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) enforces move semantics for a marked struct
+The [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) enforces move semantics for a marked struct,
 preventing any implicit copying.
-It should be used for structures that have any `[ExplicitCopy]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
+It should be used for structures that have `[ExplicitCopy]` fields, such as [RefList\<T\>](api/T.RefList-1.g.md).
 
 Usage example:
 ```csharp
@@ -34,14 +34,14 @@ public struct ChildStruct
     public int UniqueId;
 }
 
-[ExplicitCopy] // <--- required because of the `ChildStruct` field
-public struc ParentStruct
+[ExplicitCopy] // <--- Required because of the `ChildStruct` field
+public struct ParentStruct
 {
     public ChildStruct Child;
 }
 ```
 
-For moving ownership use the `Move` extension method:
+To move ownership, use the `Move` extension method:
 ```csharp
 var listA = RefList.Empty<int>();
 listA.RefAdd() = 42;
@@ -52,15 +52,15 @@ The trait also enables code generation that produces explicit copy extensions.
 
 ### Generated ExplicitCopy API
 
-Usage of the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) triggers
-code generation of `CopyTo` and `CopyFrom` methods for the marked type and possible containers:
+Usage of the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) triggers the
+code generation of `CopyTo` and `CopyFrom` methods for the marked type and its potential containers:
 
-- `(in TExpCopy).CopyTo(ref TExpCopy other)` — copies the current struct to another one
-- `(ref TExpCopy).CopyFrom(in TExpCopy other)` — copies another struct to the current one
+- `(in TExpCopy).CopyTo(ref TExpCopy other)` — copies the current struct to another.
+- `(ref TExpCopy).CopyFrom(in TExpCopy other)` — copies another struct to the current one.
 - `(in TRefList<TExpCopy>).CopyTo(ref TRefList<TExpCopy> other)` — copies all items
-  of the current list to another one
+  from the current list to another.
 - `(ref TRefList<TExpCopy>).CopyFrom(in TRefList<TExpCopy> other)` — copies all items
-  of another struct to the current one
+  from another list to the current one.
 
 Where `TExpCopy` is the structure name and `TRefList<T>` is a [compatible collection](collections.md) name.
 
@@ -71,7 +71,7 @@ Where `TExpCopy` is the structure name and `TRefList<T>` is a [compatible collec
 > - cannot have `private` fields
 > - **cannot be generic**
 
-Note that the `TRefList<T>` types are only `ExplicitCopy` types that can be generic. 
+Note that `TRefList<T>` types are the only `ExplicitCopy` types that can be generic.
 
 ### ExplicitCopy Diagnostics
 
@@ -92,23 +92,23 @@ Diagnostics related to the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g
 
 ## DynSized Attribute
 
-The [DynSizedAttribute](api/T.DynSizedAttribute.g.md) indicates that the structure owns dynamically allocated data.
-It should be used for structures that have any `[DynSized]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
-And it also requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md).
+The [DynSizedAttribute](api/T.DynSizedAttribute.g.md) indicates that a structure owns dynamically allocated data.
+It should be used for structures that have `[DynSized]` fields, such as [RefList\<T\>](api/T.RefList-1.g.md).
+It also requires the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md).
 
-The main purpose of the attribute is to indicate types affected by compile time referencing safety analysis.
-For details see the [Referencing Rules](borrow-checker-at-home.md) section.
+The main purpose of the attribute is to indicate types affected by compile-time referencing safety analysis.
+For details, see the [Referencing Rules](borrow-checker-at-home.md) section.
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized] // <--- required because of the `ManagedRefList<int>` field
+[ExplicitCopy, DynSized] // <--- Required because of the `ManagedRefList<int>` field
 public struct ChildStruct
 {
     public ManagedRefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized] // <--- required because of the `ChildStruct` field
-public struc ParentStruct
+[ExplicitCopy, DynSized] // <--- Required because of the `ChildStruct` field
+public struct ParentStruct
 {
     public ChildStruct Child;
 }
@@ -136,19 +136,19 @@ Diagnostics related to the [DynSizedAttribute](api/T.DynSizedAttribute.g.md):
 ## Dealloc Attribute
 
 The [DeallocAttribute](api/T.DeallocAttribute.g.md) indicates a type that should be deallocated
-with the `Dealloc` extension method. It requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md)
-and should be used for structures that have any `[Dealloc]` fields like [RefList\<T\>](api/T.RefList-1.g.md).
+using the `Dealloc` extension method. It requires the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md)
+and should be used for structures that have `[Dealloc]` fields, such as [RefList\<T\>](api/T.RefList-1.g.md).
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `RefList<int>` field
+[ExplicitCopy, DynSized, Dealloc] // <--- Required because of the `RefList<int>` field
 public struct ChildStruct
 {
     public RefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized, Dealloc] // <--- required because of the `ChildStruct` field
-public struc ParentStruct
+[ExplicitCopy, DynSized, Dealloc] // <--- Required because of the `ChildStruct` field
+public struct ParentStruct
 {
     public ChildStruct Child;
 }
@@ -156,21 +156,21 @@ public struc ParentStruct
 
 ### Generated Dealloc API
 
-Usage of the [DeallocAttribute](api/T.DeallocAttribute.g.md) attribute triggers
+Usage of the [DeallocAttribute](api/T.DeallocAttribute.g.md) triggers the
 code generation of `Dealloc` and `Deallocated` methods for the marked type:
-- `(ref TDealloc).Dealloc()` — deallocates all data owned by the struct
-- `(ref TDealloc).Deallocated()` — deallocates the struct and returns a reference to it
-- `(ref TRefList<TDealloc>).Dealloc()` — deallocates all data owned by the list
-- `(ref TRefList<TDealloc>).Deallocated()` — deallocates the list and returns a reference to it
-- `(ref TRefList<TDealloc>).RemoveAt(int index)` — deallocates an item and removes it from the list
-- `(ref TRefList<TDealloc>).Clear()` — deallocates all items and clears the list
+- `(ref TDealloc).Dealloc()` — deallocates all data owned by the struct.
+- `(ref TDealloc).Deallocated()` — deallocates the struct and returns a reference to it.
+- `(ref TRefList<TDealloc>).Dealloc()` — deallocates all data owned by the list.
+- `(ref TRefList<TDealloc>).Deallocated()` — deallocates the list and returns a reference to it.
+- `(ref TRefList<TDealloc>).RemoveAt(int index)` — deallocates an item and removes it from the list.
+- `(ref TRefList<TDealloc>).Clear()` — deallocates all items and clears the list.
 
 Where `TDealloc` is the structure name and `TRefList` is a [compatible collection](collections.md) name.
 
 > [!NOTE]
 > The `Dealloc` extension method is also generated for collections
-> that don't require deallocation like `TempRefList<T>`.
-> In that case collection items are deallocated, but the collection itself is not cleared
+> that do not require deallocation, such as `TempRefList<T>`.
+> In that case, collection items are deallocated, but the collection itself is not cleared.
 
 ### NonAllocatedResult Attribute
 
@@ -205,23 +205,23 @@ Diagnostics related to the [DeallocAttribute](api/T.DeallocAttribute.g.md):
 
 ## TempAlloc Attribute
 
-The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) indicates a type with a lifetime limited by a frame time.
-It requires [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) and should be used for structures that have
-any `[TempAlloc]` fields like [TempRefList\<T\>](api/T.TempRefList-1.g.md).
+The [TempAllocAttribute](api/T.TempAllocAttribute.g.md) indicates a type with a lifetime limited to a frame.
+It requires the [ExplicitCopyAttribute](api/T.ExplicitCopyAttribute.g.md) and should be used for structures that have
+any `[TempAlloc]` fields, such as [TempRefList\<T\>](api/T.TempRefList-1.g.md).
 
-Heap-allocated `[TempAlloc]` types can be allocated only with the `Temp` allocator in the `TempRefList<T>`.
-It means that the root `[TempAlloc]` structure can be stored only on stack similarly to a `ref struct`.
+Heap-allocated `[TempAlloc]` types can be allocated only using the `Temp` allocator in a `TempRefList<T>`.
+This means that a root `[TempAlloc]` structure can be stored only on the stack, similarly to a `ref struct`.
 
 Usage example:
 ```csharp
-[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `TempRefList<int>` field
+[ExplicitCopy, DynSized, TempAlloc] // <--- Required because of the `TempRefList<int>` field
 public struct ChildStruct
 {
     public TempRefList<int> Numbers;
 }
 
-[ExplicitCopy, DynSized, TempAlloc] // <--- required because of the `ChildStruct` field
-public struc ParentStruct
+[ExplicitCopy, DynSized, TempAlloc] // <--- Required because of the `ChildStruct` field
+public struct ParentStruct
 {
     public ChildStruct Child;
 }
@@ -240,7 +240,7 @@ Diagnostics related to the [TempAllocAttribute](api/T.TempAllocAttribute.g.md):
 ## Traits in Generic Context
 
 You can use traits to mark type parameters in the same way as you would use regular types.
-That allows passing trait-marked concrete types to generic code.
+This allows passing trait-marked concrete types to generic code.
 
 For example, you can use it for state-to-view mapping:
 ```csharp
@@ -256,7 +256,7 @@ public static void UpdateViews<[ExplicitCopy] T>(in RefList<T> entities, List<En
 }
 ```
 
-Note that marking a type parameter with a trait attribute _enables compatibility_ rather than sets a restriction.
+Note that marking a type parameter with a trait attribute _enables compatibility_ rather than setting a restriction.
 In other words, if you declare a type parameter `<[ExplicitCopy, DynSized, Dealloc] T>`,
 it is still compatible with types without any traits.  
 

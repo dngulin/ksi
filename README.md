@@ -13,13 +13,13 @@ _That [letter](https://en.wikipedia.org/wiki/Ksi_(Cyrillic)) is pronounced as /k
 > It is fully functional and covered with unit tests,
 > but requires usage feedback to reveal issues and to improve the API.
 
-This unity package provides a data-oriented design framework for Unity.
-It relies on the special attribute (trait) system
+This Unity package provides a data-oriented design framework for Unity.
+It relies on a special attribute (trait) system
 and extensively uses Roslyn analyzers and code generators.
 
 The framework enforces explicit data ownership and data flow patterns,
-implies using data references
-and provides compile time memory-safety checks.
+relies on data references,
+and provides compile-time memory-safety checks.
 
 Key features:
 
@@ -47,10 +47,10 @@ Key features:
 
   var root = new Node();
   BuildTree(ref root);
-  root.Children.RemoveAt(0); // This extension method deallocate item before removing it
-  root.Dealloc(); // This extension method deallocate the full tree
+  root.Children.RemoveAt(0); // This extension method deallocates the item before removing it
+  root.Dealloc(); // This extension method deallocates the full tree
   ```
-- Compile time [memory safety checks](Documentation~/borrow-checker-at-home.md)
+- Compile-time [memory safety checks](Documentation~/borrow-checker-at-home.md)
   ```csharp
   var list = RefList.Empty<int>();
   PopulateList(ref list);
@@ -59,16 +59,16 @@ Key features:
   ModifyList(ref list);
   //             ^^^^ ERROR
   // BORROW03: Passing a mutable reference argument to `list!` invalidates memory safety
-  // guaranties for the local variable `x` pointing to `list![n]`.
-  // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
+  // guarantees for the local variable `x` pointing to `list![n]`.
+  // Consider passing a readonly/[DynNoResize] reference to avoid the problem
   x++;
   ```
   ```csharp
   ProcessParentAndChild(ref list, list.RefReadonlyAt(0));
   //                        ^^^^ ERROR
-  // BORROW04: Passing a mutable reference to `list!` alongside with a reference to
+  // BORROW04: Passing a mutable reference to `list!` alongside a reference to
   // `list[n]!` as arguments invalidates memory safety rules within the calling method.
-  // Consider to pass a readonly/[DynNoResize] reference to avoid the problem
+  // Consider passing a readonly/[DynNoResize] reference to avoid the problem
   ```
 - ECS-like [data composition and queries](Documentation~/ecs.md)
   ```csharp

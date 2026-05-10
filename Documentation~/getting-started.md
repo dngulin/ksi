@@ -9,26 +9,26 @@
 > \]
 
 The main goal of the framework is to help set up data-oriented designs
-that are performant, convenient to implement and safe.
+that are performant, easy to implement, and safe.
 
-Usage guideline:
-- Represent your data as a C# `struct`
-- Pass it by mutable (`ref`) or readonly (`in`) reference to _control mutability_
-- Use `TRefList<T>` fields to control mutability in [dynamic collections](collections.md)
-  - It requires inheriting some [trait attributes](traits.md) from collection types 
-  - and following [the referencing rules](borrow-checker-at-home.md)
-- Process your data with the `Burst`-compiled code 
-  
+Usage guidelines:
+- Represent your data as a C# `struct`.
+- Pass it by mutable (`ref`) or readonly (`in`) reference to _control mutability_.
+- Use `RefList<T>` fields for [dynamic collections](collections.md).
+  - This requires inheriting certain [trait attributes](traits.md) from collection types 
+  - and following [the referencing rules](borrow-checker-at-home.md).
+- Process your data with `Burst`-compiled code.
+
 It is also recommended to set up a custom _game loop_ to process your data:
-- Represent the data as:
-  - `logical state` — mutable state that is updated every `logical update`
-  - `specs` — immutable state containing configurations (e.g., weapon damage, unit speed, etc.)
-  - `frame state` — short-lived state required to process one game loop update
-  - `view state` — state of the visualization (e.g., set of unity game objects)
-- Process it in that order:
-  - Read player inputs
-  - Modify the `logical state` in the `logical update`
-  - Map the `logical state` to the `visualization state`
+- Categorize your data as:
+  - `logical state` — mutable state that is updated every `logical update`.
+  - `specs` — immutable state containing configurations (e.g., weapon damage, unit speed, etc.).
+  - `frame state` — short-lived state required for a single game loop update.
+  - `view state` — state of the visualization (e.g., a set of Unity GameObjects).
+- Process it in this order:
+  - Read player inputs.
+  - Modify the `logical state` during the `logical update`.
+  - Map the `logical state` to the `visualization state`.
 
 ## Sample Project
 
@@ -51,8 +51,8 @@ The logical game state contains:
 - a list of bullets
 - some auxiliary data
 
-Both lists are `RefList<T>` that requries require to mark the logical state
-with `ExplicitCopy`, `DynSized` and `Dealloc` [trait attributes](traits.md):
+Both lists are `RefList<T>`, which requires marking the logical state
+with the `ExplicitCopy`, `DynSized`, and `Dealloc` [trait attributes](traits.md):
 
 ```csharp
 [ExplicitCopy, DynSized, Dealloc]
@@ -65,7 +65,7 @@ public struct GameState
 }
 ```
 
-At the `GameLoop` level the `GameState` structure is stored in the [ExclusiveAcess\<T\>](api/T.ExclusiveAccess-1.g.md):
+At the `GameLoop` level, the `GameState` structure is stored in [ExclusiveAccess\<T\>](api/T.ExclusiveAccess-1.g.md):
 
 ```csharp
 public class GameLoop : MonoBehaviour
@@ -76,16 +76,16 @@ public class GameLoop : MonoBehaviour
 }
 ```
 
-It is required, because the structure inherits the `DynSized` trait,
-that implies following the [referecning rules](borrow-checker-at-home.md).
+This is required because the structure inherits the `DynSized` trait,
+which implies following the [referencing rules](borrow-checker-at-home.md).
 
-In short, every `DynSized` data should be referenced with `RefPath`-compatible expression, that:
+In short, every `DynSized` data should be referenced with a `RefPath`-compatible expression that:
 - is a chain of fields and special extension methods
 - that points to a local variable or a method parameter.
 
-The `ExclusiveAccess<T>` provides API to create a single-instance local variable to access the wrapped structure:
+The `ExclusiveAccess<T>` provides an API to create a single-instance local variable to access the wrapped structure:
 ```csharp
-// You can have only one state acessor at the moment
+// You can have only one state accessor at the moment
 using (var stateAccessor = _state.Mutable)
 {
     ref var state = ref stateAccessor.Value;
@@ -95,7 +95,7 @@ using (var stateAccessor = _state.Mutable)
 
 ### Specs
 
-The same rules are applied to the `Specs` data structure, that stores all configuration parameters:
+The same rules apply to the `Specs` data structure, which stores all configuration parameters:
 
 ```csharp
 [ExplicitCopy, DynSized, Dealloc]
@@ -120,7 +120,7 @@ you cannot modify the `Obstacles` field if you have a `readonly` reference to a 
 
 ### Frame State
 
-The `FrameState` lifetime is limited by one frame, so it relies on the temporary allocator:
+The `FrameState` lifetime is limited to one frame, so it relies on a temporary allocator:
 
 ```csharp
 [ExplicitCopy, DynSized, TempAlloc]
@@ -132,7 +132,7 @@ public struct FrameState
 }
 ```
 
-It is not stored as a field but created on stack every `GameLoop` update:
+It is not stored as a field but created on the stack during every `GameLoop` update:
 
 ```csharp
 private void Update()
@@ -154,7 +154,7 @@ private void Update()
 }
 ```
 
-Also, the `TempRefList<Directions>` has a custom indexer extension method that receives a cell position as a parameter:
+Additionally, `TempRefList<Directions>` has a custom indexer extension method that receives a cell position as a parameter:
 ```csharp
 [RefPath("self", "!", "[n]")]
 public static ref Directions RefAtCell([DynNoResize] ref this TempRefList<Directions> self, in Specs specs, Vector2Int cell)
@@ -164,13 +164,13 @@ public static ref Directions RefAtCell([DynNoResize] ref this TempRefList<Direct
 ```
 
 The declaration contains two important attributes:
-- [RefPath](api/T.RefPathAttribute.g.md) — specifies a returned reference path by the extension method
+- [RefPath](api/T.RefPathAttribute.g.md) — specifies the reference path returned by the extension method
 - [DynNoResize](api/T.DynNoResizeAttribute.g.md) — relaxes some reference compatibility constraints
   (see [referencing rules](borrow-checker-at-home.md) for details)
 
 ### Game Logic
 
-The game logic is implemented as a sequence of static method execution:
+The game logic is implemented as a sequence of static method executions:
 
 ```csharp
 [BurstCompile]
@@ -193,7 +193,7 @@ The whole logical update is `Burst`-compiled 🚀🚀🚀
 ### View Synchronization
 
 The visualization logic is a simple state-synchronization class
-that maps entities from the logical state to the unity scene:
+that maps entities from the logical state to the Unity scene:
 
 ```csharp
 public class GameView
@@ -201,7 +201,7 @@ public class GameView
     private readonly EntityViewPool<Tank> _tankPool;
     private readonly EntityViewPool<Bullet> _bulletPool;
 
-    // Theese two fields represent the ViewState
+    // These two fields represent the ViewState
     private readonly List<EntityView<Tank>> _tanks = new List<EntityView<Tank>>(4);
     private readonly List<EntityView<Bullet>> _bullets = new List<EntityView<Bullet>>(10);
     
