@@ -80,6 +80,10 @@ public class SerdeGenerator : IIncrementalGenerator
 
     private static void EmitGetSize(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
     {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Returns the size of the serialized <see cref=\"{t.FullTypeName()}\"/> in bytes.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{t.FullTypeName()}\"/> instance.</param>");
         using var method = type.PubStat($"int GetSerializedSize(this in {t.FullTypeName()} self)");
         method.AppendLine("const int fieldIdLen = sizeof(byte);");
         method.AppendLine("var size = 0;");
@@ -146,6 +150,11 @@ public class SerdeGenerator : IIncrementalGenerator
 
     private static void EmitPrepend(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
     {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> and prepends it to the <see cref=\"System.IO.BinaryWriter\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to prepend to.</param>");
+        type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
         using var method =
             type.PubStat($"void Prepend(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
         method.AppendLine("var initialPos = writer.BaseStream.Position;");
@@ -228,6 +237,11 @@ public class SerdeGenerator : IIncrementalGenerator
 
     private static void EmitAppend(AppendScope type, INamedTypeSymbol t)
     {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> and appends it to the <see cref=\"System.IO.BinaryWriter\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to append to.</param>");
+        type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
         using var method = type.PubStat($"void Append(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
         method.AppendLine("var size = value.GetSerializedSize();");
         method.AppendLine("var initialPos = writer.BaseStream.Position;");
@@ -238,12 +252,25 @@ public class SerdeGenerator : IIncrementalGenerator
 
     private static void EmitSerializeTo(AppendScope type, INamedTypeSymbol t)
     {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> to the <see cref=\"System.IO.BinaryWriter\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
+        type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to serialize to.</param>");
         using var method = type.PubStat($"void SerializeTo(this in {t.FullTypeName()} value, System.IO.BinaryWriter writer)");
         method.AppendLine("writer.Append(value);");
     }
 
     private static void EmitInitializeFrom(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
     {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Initializes the <see cref=\"{t.FullTypeName()}\"/> from the <see cref=\"System.IO.BinaryReader\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{t.FullTypeName()}\"/> instance to initialize.</param>");
+        type.AppendLine("/// <param name=\"reader\">The <see cref=\"System.IO.BinaryReader\"/> to read from.</param>");
+        type.AppendLine("/// <remarks>");
+        type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
+        type.AppendLine("/// </remarks>");
         using var method =
             type.PubStat($"void InitializeFrom(this ref {t.FullTypeName()} self, System.IO.BinaryReader reader)");
 
