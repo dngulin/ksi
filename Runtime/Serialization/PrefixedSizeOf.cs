@@ -3,7 +3,7 @@ namespace Ksi.Serialization
     /// <summary>
     /// Utility class for calculating the size of serialized data.
     /// </summary>
-    public static class KsiSerializedSize
+    public static class PrefixedSizeOf
     {
         /// <summary>
         /// Gets the size of the length prefix for a given length.

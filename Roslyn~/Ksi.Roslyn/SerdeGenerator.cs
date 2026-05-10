@@ -85,7 +85,7 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("var size = 0;");
         method.AppendLine("");
 
-        const string sizeOf = "KsiSerializedSize";
+        const string sizeOf = "PrefixedSizeOf";
 
         foreach (var (f, id) in fields)
         {
