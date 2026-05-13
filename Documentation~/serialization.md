@@ -17,7 +17,7 @@ To enable serialization for a data structure, use the following attributes:
 - [KsiSerializeField](api/T.KsiSerializeFieldAttribute.g.md) — Marks a field to be included in the serialized output.
 Each field must have a unique `byte` identifier.
   - Only fields marked with this attribute are serialized.
-  - The `id` is used to identify the field in the binary stream.
+  - The `id` is used to identify the field in the binary data.
 
 The following types are supported for `[KsiSerializeField]` fields:
 - **Primitives**: `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `float`, `double`,
@@ -71,7 +71,8 @@ The Value Qualifier is composed of:
   Only used for the `Primitive` and `RepeatedPrimitive` value kinds.
 - [Primitive Size](api/T.PrimitiveSize.g.md): `8`, `16`, `32`, or `64` bits. 
   Used for the `Primitive` and `RepeatedPrimitive` value kinds.
-  In the case of `RepeatedStruct`, it is reinterpreted as the [Count Prefix Size](api/T.ValueQualifierExtensions.g.md#in-valuequalifieritemcountprefixsize).
+  In the case of `RepeatedStruct`, it is reinterpreted as
+  the [Count Prefix Size](api/T.ValueQualifierExtensions.g.md#in-valuequalifieritemcountprefixsize).
 
 All four components of the Value Qualifier can have no more than 4 values.
 So, in the [packed](api/T.ValueQualifierExtensions.g.md#in-valuequalifierpacked) form
