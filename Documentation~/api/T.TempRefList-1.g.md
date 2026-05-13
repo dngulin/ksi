@@ -5,6 +5,7 @@
 > \| [Collections](../collections.md)
 > \| [Referencing](../borrow-checker-at-home.md)
 > \| [ECS](../ecs.md)
+> \| [Serialization](../serialization.md)
 > \| **[API](index.g.md) / TempRefList\<T\>**
 > \]
 

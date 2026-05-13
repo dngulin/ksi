@@ -14,6 +14,7 @@ public static class DocGenerator
         > \| [Collections](../collections.md)
         > \| [Referencing](../borrow-checker-at-home.md)
         > \| [ECS](../ecs.md)
+        > \| [Serialization](../serialization.md)
         > \| {0}
         > \]
         """;

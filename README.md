@@ -85,6 +85,18 @@ Key features:
       // Modify components here
   }
   ```
+- [Binary serialization](Documentation~/serialization.md)
+  ```csharp
+  [KsiSerializable]
+  public struct PlayerData
+  {
+      [KsiSerializeField(1)] public int Health;
+      [KsiSerializeField(2)] public RefList<int> Inventory;
+  }
+  
+  data.SerializeTo(writer);
+  loadedData.InitializeFrom(reader);
+  ```
 - HashSet and HashMap [collections](Documentation~/collections.md#hashset-and-hashmap)
   ```csharp
   [KsiHashTable]
@@ -95,10 +107,6 @@ Key features:
   ref var valRef = ref map.RefGet(key);
   ```
 
-Planned:
-- Binary serialization attributes
-  (based on the [ProtoPuff package](https://github.com/dngulin/frogalicious-project/tree/main/Frogalicious/Packages/frog.proto-puff))
-
 ## Documentation
 
 - [Getting Started](Documentation~/getting-started.md)
@@ -106,6 +114,7 @@ Planned:
 - [Collections](Documentation~/collections.md)
 - [Referencing Rules](Documentation~/borrow-checker-at-home.md)
 - [ECS-Like Data Composition](Documentation~/ecs.md)
+- [Serialization](Documentation~/serialization.md)
 - [API Reference](Documentation~/api/index.g.md)
 
 See also:

@@ -5,6 +5,7 @@
 > \| [Collections](collections.md)
 > \| [Referencing](borrow-checker-at-home.md)
 > \| **ECS**
+> \| [Serialization](serialization.md)
 > \| [API](api/index.g.md)
 > \]
 

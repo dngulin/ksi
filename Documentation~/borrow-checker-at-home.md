@@ -5,6 +5,7 @@
 > \| [Collections](collections.md)
 > \| **Referencing**
 > \| [ECS](ecs.md)
+> \| [Serialization](serialization.md)
 > \| [API](api/index.g.md)
 > \]
 
