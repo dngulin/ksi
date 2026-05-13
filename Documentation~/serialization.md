@@ -20,9 +20,9 @@ Each field must have a unique `byte` identifier.
   - The `id` is used to identify the field in the binary stream.
 
 Generated extension methods:
-- `(in TSerializable).GetSerializedSize()` — gets serialized size.
-- `(in TSerializable).SerializeTo(BinaryWriter writer)` — serializes struct to a stream.
-- `(ref TSerializable).InitializeFrom(BinaryReader writer)` — initializes struct from serialized data.
+- `(in TSerializable).GetSerializedSize()` — Gets the serialized size.
+- `(in TSerializable).SerializeTo(BinaryWriter writer)` — Serializes the struct to a stream.
+- `(ref TSerializable).InitializeFrom(BinaryReader reader)` — Initializes the struct from serialized data.
 
 Usage example:
 ```csharp
@@ -47,7 +47,7 @@ using (var writer = new BinaryWriter(stream))
     data.SerializeTo(writer);
 
 // Deserialize
-var loadedData = default; // Should be zeroed before calling InitializeFrom
+PlayerData loadedData = default; // Should be zeroed before calling InitializeFrom
 using (var reader = new BinaryReader(stream))
     loadedData.InitializeFrom(reader);
 ```
@@ -60,13 +60,12 @@ Every serialized value is preceded by a [Value Qualifier](api/T.ValueQualifier.g
 The Value Qualifier is composed of:
 - [Value Kind](api/T.ValueKind.g.md): `Primitive`, `RepeatedPrimitive`, `Struct`, or `RepeatedStruct`.
 - [Length Prefix Size](api/T.LenPrefixSize.g.md): `0`, `8`, `16`, or `32` bits.
-Is not sued for the `Primitive` value kinds.
+  It is not used for the `Primitive` value kinds.
 - [Primitive Kind](api/T.PrimitiveKind.g.md): `Unsigned Integer`, `Integer`, `Float`.
-Only used for the `Primitive` and `RepeatedPrimitive` value kinds.
+  Only used for the `Primitive` and `RepeatedPrimitive` value kinds.
 - [Primitive Size](api/T.PrimitiveSize.g.md): `8`, `16`, `32`, or `64` bits. 
-Used for the `Primitive` and `RepeatedPrimitive` value kinds.
-In case of `RepeatedStruct` it is reinterpreted as the
-[Count Prefix Size](api/T.ValueQualifierExtensions.g.md#in-valuequalifieritemcountprefixsize).
+  Used for the `Primitive` and `RepeatedPrimitive` value kinds.
+  In the case of `RepeatedStruct`, it is reinterpreted as the [Count Prefix Size](api/T.ValueQualifierExtensions.g.md#in-valuequalifieritemcountprefixsize).
 
 All four components of the Value Qualifier can have no more than 4 values.
 So, in the [packed](api/T.ValueQualifierExtensions.g.md#in-valuequalifierpacked) form
@@ -96,9 +95,9 @@ Serialized layout for a repeated primitive:
 ```
 
 Notes:
-- The `Qualifier` determines the size of the len prefix, and size and type of the primitive.
-- For empty arrays `Length` is omitted
-- Item count can be calculated dividing `Length` by `PrimitiveSize`
+- The `Qualifier` determines the size of the length prefix, as well as the size and type of the primitive.
+- For empty arrays, the `Length` is omitted.
+- The item count can be calculated by dividing the `Length` by the `PrimitiveSize`.
 
 #### Struct
 
@@ -108,12 +107,12 @@ Serialized layout for a single structure:
 ```
 
 Notes:
-- Default (zeroed) and empty repeated fields are not serialized
-- For empty structs `Length` is omitted
-- `[Value]` is any serialized value: `Primitive`, `RepeatedPrimitive`, `Struct`, or `RepeatedStruct`
+- Default (zeroed) and empty repeated fields are not serialized.
+- For empty structs, the `Length` is omitted.
+- `[Value]` is any serialized value: `Primitive`, `RepeatedPrimitive`, `Struct`, or `RepeatedStruct`.
 
 > [!IMPORTANT]
-> Zeroed fields are not serialized, so during the deserialization the field cannot be reset to zeroed state.
+> Zeroed fields are not serialized, so during deserialization, a field cannot be reset to its zeroed state.
 > Always call `InitializeFrom` on a zeroed structure.
 
 #### Repeated Struct
@@ -124,7 +123,7 @@ Serialized layout for a repeated structure:
 ```
 
 Notes:
-- The `Qualifier` determines the size of the len and count prefixes
+- The `Qualifier` determines the size of the length and count prefixes.
 
 ## Serialization Diagnostics
 
