@@ -85,18 +85,6 @@ Key features:
       // Modify components here
   }
   ```
-- [Binary serialization](Documentation~/serialization.md)
-  ```csharp
-  [KsiSerializable]
-  public struct PlayerData
-  {
-      [KsiSerializeField(1)] public int Health;
-      [KsiSerializeField(2)] public RefList<int> Inventory;
-  }
-  
-  data.SerializeTo(writer);
-  loadedData.InitializeFrom(reader);
-  ```
 - HashSet and HashMap [collections](Documentation~/collections.md#hashset-and-hashmap)
   ```csharp
   [KsiHashTable]
@@ -105,6 +93,17 @@ Key features:
   var map = MyHashMap.Empty;
   map.RefSet(key) = value;
   ref var valRef = ref map.RefGet(key);
+  ```
+- [Binary serialization](Documentation~/serialization.md)
+  ```csharp
+  [KsiSerializable]
+  public struct PlayerData
+  {
+      [KsiSerializeField(0)] public int Health;
+      [KsiSerializeField(1)] public RefList<Item> Inventory;
+  }
+  
+  playerData.SerializeTo(binaryWriter);
   ```
 
 ## Documentation
