@@ -19,6 +19,12 @@ Each field must have a unique `byte` identifier.
   - Only fields marked with this attribute are serialized.
   - The `id` is used to identify the field in the binary stream.
 
+The following types are supported for `[KsiSerializeField]` fields:
+- **Primitives**: `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`, `float`, `double`,
+  `bool`, `char`.
+- **Enums**: Serialized using their underlying primitive type.
+- **Serializable Structs**: Structures marked with the `[KsiSerializable]` attribute.
+
 Generated extension methods:
 - `(in TSerializable).GetSerializedSize()` — Gets the serialized size.
 - `(in TSerializable).SerializeTo(BinaryWriter writer)` — Serializes the struct to a stream.
