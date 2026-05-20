@@ -13,12 +13,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written (1).</returns>
-        public static int Prepend(this ref Span<byte> span, byte value)
+        public static void Prepend(this ref Span<byte> span, byte value)
         {
             span[^1] = value;
             span = span[..^1];
-            return 1;
         }
 
         /// <summary>
@@ -26,12 +24,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written (1).</returns>
-        public static int Prepend(this ref Span<byte> span, sbyte value)
+        public static void Prepend(this ref Span<byte> span, sbyte value)
         {
             span[^1] = (byte)value;
             span = span[..^1];
-            return 1;
         }
 
         /// <summary>
@@ -39,12 +35,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, ushort value)
+        public static void Prepend(this ref Span<byte> span, ushort value)
         {
             BinaryPrimitives.WriteUInt16LittleEndian(span[^sizeof(ushort)..], value);
             span = span[..^sizeof(ushort)];
-            return sizeof(ushort);
         }
 
         /// <summary>
@@ -52,12 +46,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, short value)
+        public static void Prepend(this ref Span<byte> span, short value)
         {
             BinaryPrimitives.WriteInt16LittleEndian(span[^sizeof(short)..], value);
             span = span[..^sizeof(short)];
-            return sizeof(short);
         }
 
         /// <summary>
@@ -65,12 +57,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, uint value)
+        public static void Prepend(this ref Span<byte> span, uint value)
         {
             BinaryPrimitives.WriteUInt32LittleEndian(span[^sizeof(uint)..], value);
             span = span[..^sizeof(uint)];
-            return sizeof(uint);
         }
 
         /// <summary>
@@ -78,12 +68,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, int value)
+        public static void Prepend(this ref Span<byte> span, int value)
         {
             BinaryPrimitives.WriteInt32LittleEndian(span[^sizeof(int)..], value);
             span = span[..^sizeof(int)];
-            return sizeof(int);
         }
 
         /// <summary>
@@ -91,10 +79,9 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, float value)
+        public static void Prepend(this ref Span<byte> span, float value)
         {
-            return span.Prepend(BitConverter.SingleToInt32Bits(value));
+            span.Prepend(BitConverter.SingleToInt32Bits(value));
         }
 
         /// <summary>
@@ -102,12 +89,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, ulong value)
+        public static void Prepend(this ref Span<byte> span, ulong value)
         {
             BinaryPrimitives.WriteUInt64LittleEndian(span[^sizeof(ulong)..], value);
             span = span[..^sizeof(ulong)];
-            return sizeof(ulong);
         }
 
         /// <summary>
@@ -115,12 +100,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, long value)
+        public static void Prepend(this ref Span<byte> span, long value)
         {
             BinaryPrimitives.WriteInt64LittleEndian(span[^sizeof(long)..], value);
             span = span[..^sizeof(long)];
-            return sizeof(long);
         }
 
         /// <summary>
@@ -128,10 +111,9 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, double value)
+        public static void Prepend(this ref Span<byte> span, double value)
         {
-            return span.Prepend(BitConverter.DoubleToInt64Bits(value));
+            span.Prepend(BitConverter.DoubleToInt64Bits(value));
         }
 
         /// <summary>
@@ -139,12 +121,10 @@ namespace Ksi.Serialization
         /// </summary>
         /// <param name="span">The span to write to.</param>
         /// <param name="value">The value to write.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int Prepend(this ref Span<byte> span, ReadOnlySpan<byte> value)
+        public static void Prepend(this ref Span<byte> span, ReadOnlySpan<byte> value)
         {
             value.CopyTo(span[^value.Length..]);
             span = span[..^value.Length];
-            return value.Length;
         }
 
         /// <summary>
@@ -153,20 +133,22 @@ namespace Ksi.Serialization
         /// <param name="span">The span to write to.</param>
         /// <param name="len">The length to write.</param>
         /// <param name="lps">The size of the length prefix used.</param>
-        /// <returns>The number of bytes written.</returns>
-        public static int PrependLenPrefix(this ref Span<byte> span, uint len, out LenPrefixSize lps)
+        public static void PrependLenPrefix(this ref Span<byte> span, uint len, out LenPrefixSize lps)
         {
             lps = ValueQualifier.GetLenPrefix(len);
             switch (lps)
             {
                 case LenPrefixSize._0:
-                    return 0;
+                    return;
                 case LenPrefixSize._8:
-                    return span.Prepend((byte)len);
+                    span.Prepend((byte)len);
+                    return;
                 case LenPrefixSize._16:
-                    return span.Prepend((ushort)len);
+                    span.Prepend((ushort)len);
+                    return;
                 case LenPrefixSize._32:
-                    return span.Prepend(len);
+                    span.Prepend(len);
+                    return;
                 default:
                     throw new Exception($"Unreachable! Invalid LenPrefixSize estimation: {(byte)lps}");
             }
