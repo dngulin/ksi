@@ -53,6 +53,8 @@ Extension methods are grouped together with their target types.
 - [BinaryReaderExtensions](T.BinaryReaderExtensions.g.md) — provides extension methods for [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) to support Ksi serialization
 - [BinaryWriterExtensions](T.BinaryWriterExtensions.g.md) — provides extension methods for [BinaryWriter](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryWriter?view=netstandard-2.1) to support Ksi serialization
 - [PrefixedSizeOf](T.PrefixedSizeOf.g.md) — utility class for calculating the size of serialized data
+- [SpanReadExtensions](T.SpanReadExtensions.g.md) — provides extension methods for [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) to read binary data
+- [SpanWriteExtensions](T.SpanWriteExtensions.g.md) — provides extension methods for [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) to write binary data by prepending it to the end of the span
 - [ValueQualifier](T.ValueQualifier.g.md) — describes a value in the Ksi binary format
 - [ValueQualifierExtensions](T.ValueQualifierExtensions.g.md) — provides extension methods for [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1)
 - [LenPrefixSize](T.LenPrefixSize.g.md) — represents the size of the length prefix in bytes
