@@ -28,9 +28,18 @@ The following types are supported for `[KsiSerializeField]` fields:
 Generated extension methods:
 - `(in TSerializable).GetSerializedSize()` — Gets the serialized size.
 - `(in TSerializable).SerializeTo(BinaryWriter writer)` — Serializes the struct to a stream.
-- `(ref TSerializable).InitializeFrom(BinaryReader reader)` — Initializes the struct from serialized data.
+- `(in TSerializable).SerializeTo(Span<byte> buffer)` — Serializes the struct to a buffer. Returns the number of bytes written.
+- `(ref TSerializable).InitializeFrom(BinaryReader reader)` — Initializes the struct from a stream.
+- `(ref TSerializable).InitializeFrom(ReadOnlySpan<byte> buffer)` — Initializes the struct from a buffer. Returns the number of bytes read.
 
-Usage example:
+Additional low-level extension methods:
+- `(this BinaryWriter writer).Prepend(in TSerializable value)` — Serializes and prepends the struct to the current position of the stream, moving the position backwards.
+- `(this BinaryWriter writer).Write(in TSerializable value)` — Serializes the struct to the current position of the stream.
+- `(ref Span<byte> buffer).Prepend(in TSerializable value)` — Serializes and prepends the struct to the end of the span, shrinking the span from the end.
+- `(ref Span<byte> buffer).Write(in TSerializable value)` — Serializes and writes the struct to the end of the span, shrinking the span from the end.
+
+
+Usage example (Stream):
 ```csharp
 [KsiSerializable]
 [ExplicitCopy, DynSized, Dealloc]
@@ -56,6 +65,24 @@ using (var writer = new BinaryWriter(stream))
 PlayerData loadedData = default; // Should be zeroed before calling InitializeFrom
 using (var reader = new BinaryReader(stream))
     loadedData.InitializeFrom(reader);
+```
+
+Usage example (Buffer):
+```csharp
+var data = new PlayerData { Health = 100 };
+
+// Prepare buffer
+var size = data.GetSerializedSize();
+var buffer = new byte[size];
+
+// Serialize
+Span<byte> writeSpan = buffer; 
+data.SerializeTo(buffer); // use buffer.Prepend(data) for exact-sized buffers
+
+// Deserialize
+ReadOnlySpan<byte> readSpan = buffer; 
+PlayerData loadedData = default;
+loadedData.InitializeFrom(readSpan);
 ```
 
 ## Data Layout
