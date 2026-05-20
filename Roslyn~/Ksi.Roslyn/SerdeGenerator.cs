@@ -66,13 +66,15 @@ public class SerdeGenerator : IIncrementalGenerator
                         type.AppendLine("");
                         EmitPrependToStream(type, t, fields);
                         type.AppendLine("");
-                        EmitAppendToStream(type, t);
+                        EmitWriteToStream(type, t);
                         type.AppendLine("");
                         EmitSerializeToStream(type, t);
                         type.AppendLine("");
                         EmitInitializeFromStream(type, t, fields);
                         type.AppendLine("");
                         EmitPrependToBuffer(type, t, fields);
+                        type.AppendLine("");
+                        EmitWriteToBuffer(type, t);
                         type.AppendLine("");
                         EmitSerializeToBuffer(type, t);
                         type.AppendLine("");
@@ -242,14 +244,14 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("writer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
     }
 
-    private static void EmitAppendToStream(AppendScope type, INamedTypeSymbol t)
+    private static void EmitWriteToStream(AppendScope type, INamedTypeSymbol t)
     {
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> and appends it to the <see cref=\"System.IO.BinaryWriter\"/>.");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> and writes it to the <see cref=\"System.IO.BinaryWriter\"/>.");
         type.AppendLine("/// </summary>");
-        type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to append to.</param>");
+        type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to serialize to.</param>");
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
-        using var method = type.PubStat($"void Append(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
+        using var method = type.PubStat($"void Write(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
         method.AppendLine("var size = value.GetSerializedSize();");
         method.AppendLine("var initialPos = writer.BaseStream.Position;");
         method.AppendLine("writer.BaseStream.Position += size;");
@@ -265,7 +267,7 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
         type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to serialize to.</param>");
         using var method = type.PubStat($"void SerializeTo(this in {t.FullTypeName()} value, System.IO.BinaryWriter writer)");
-        method.AppendLine("writer.Append(value);");
+        method.AppendLine("writer.Write(value);");
     }
 
     private static void EmitInitializeFromStream(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
@@ -432,6 +434,20 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("buffer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
     }
 
+    private static void EmitWriteToBuffer(AppendScope type, INamedTypeSymbol t)
+    {
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> and writes it to the <see cref=\"System.Span{{T}}\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.Span{T}\"/> to serialize to.</param>");
+        type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
+        using var method = type.PubStat($"void Write(this ref Span<byte> buffer, in {t.FullTypeName()} value)");
+        method.AppendLine("var size = value.GetSerializedSize();");
+        method.AppendLine("var slice = buffer[..size];");
+        method.AppendLine("buffer = slice;");
+        method.AppendLine("slice.Prepend(value);");
+    }
+
     private static void EmitSerializeToBuffer(AppendScope type, INamedTypeSymbol t)
     {
         type.AppendLine("/// <summary>");
@@ -441,10 +457,9 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.Span{T}\"/> to serialize to.</param>");
         type.AppendLine("/// <returns>The number of bytes written.</returns>");
         using var method = type.PubStat($"int SerializeTo(this in {t.FullTypeName()} value, Span<byte> buffer)");
-        method.AppendLine("var size = value.GetSerializedSize();");
-        method.AppendLine("var slice = buffer[..size];");
-        method.AppendLine("slice.Prepend(value);");
-        method.AppendLine("return size;");
+        method.AppendLine("var initialLen = buffer.Length;");
+        method.AppendLine("buffer.Write(value);");
+        method.AppendLine("return initialLen - buffer.Length;");
     }
 
     private static void EmitInitializeFromBuffer(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
