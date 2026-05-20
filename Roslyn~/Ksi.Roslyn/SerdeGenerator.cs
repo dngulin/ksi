@@ -443,8 +443,8 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
         using var method = type.PubStat($"void Write(this ref Span<byte> buffer, in {t.FullTypeName()} value)");
         method.AppendLine("var size = value.GetSerializedSize();");
-        method.AppendLine("var slice = buffer[..size];");
-        method.AppendLine("buffer = slice;");
+        method.AppendLine("buffer = buffer[..^size];");
+        method.AppendLine("var slice = buffer[^size..];");
         method.AppendLine("slice.Prepend(value);");
     }
 
