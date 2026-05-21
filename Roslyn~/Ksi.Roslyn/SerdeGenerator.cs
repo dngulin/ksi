@@ -164,8 +164,8 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine("/// </summary>");
         type.AppendLine("/// <param name=\"writer\">The <see cref=\"System.IO.BinaryWriter\"/> to prepend to.</param>");
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
-        using var method =
-            type.PubStat($"void Prepend(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value)");
+        type.AppendLine("/// <param name=\"qualified\">Prepend value with len prefix and value qualifier.</param>");
+        using var method = type.PubStat($"void Prepend(this System.IO.BinaryWriter writer, in {t.FullTypeName()} value, bool qualified)");
         method.AppendLine("var initialPos = writer.BaseStream.Position;");
         method.AppendLine("");
 
@@ -191,7 +191,7 @@ public class SerdeGenerator : IIncrementalGenerator
             {
                 using var fScope = method.Sub();
                 fScope.AppendLine("var contentPos = writer.BaseStream.Position;");
-                fScope.AppendLine($"writer.Prepend(value.{f.Name});");
+                fScope.AppendLine($"writer.Prepend(value.{f.Name}, false);");
                 fScope.AppendLine("var len = (uint)(contentPos - writer.BaseStream.Position);");
 
                 using (var inner = fScope.Sub("if (len > 0)"))
@@ -226,7 +226,7 @@ public class SerdeGenerator : IIncrementalGenerator
                     fScope.AppendLine("var contentPos = writer.BaseStream.Position;");
                     fScope.AppendOneLineBlock(
                         $"foreach (ref readonly var item in value.{f.Name}.RefReadonlyIterReversed())",
-                        "writer.Prepend(item);"
+                        "writer.Prepend(item, true);"
                     );
                     fScope.AppendLine($"writer.PrependLenPrefix((uint){count}, out var cps);");
                     fScope.AppendLine("var len = (uint)(contentPos - writer.BaseStream.Position);");
@@ -239,9 +239,10 @@ public class SerdeGenerator : IIncrementalGenerator
             method.AppendLine("");
         }
 
-        method.AppendLine("var totalLen = (uint)(initialPos - writer.BaseStream.Position);");
-        method.AppendLine("writer.PrependLenPrefix(totalLen, out var totalLps);");
-        method.AppendLine("writer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
+        using var qScope = method.Sub("if (qualified)");
+        qScope.AppendLine("var totalLen = (uint)(initialPos - writer.BaseStream.Position);");
+        qScope.AppendLine("writer.PrependLenPrefix(totalLen, out var totalLps);");
+        qScope.AppendLine("writer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
     }
 
     private static void EmitWriteToStream(AppendScope type, INamedTypeSymbol t)
@@ -255,7 +256,7 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("var size = value.GetSerializedSize();");
         method.AppendLine("var initialPos = writer.BaseStream.Position;");
         method.AppendLine("writer.BaseStream.Position += size;");
-        method.AppendLine("writer.Prepend(value);");
+        method.AppendLine("writer.Prepend(value, true);");
         method.AppendLine("writer.BaseStream.Position = initialPos + size;");
     }
 
@@ -355,7 +356,8 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine("/// </summary>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.Span{T}\"/> to prepend to.</param>");
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
-        using var method = type.PubStat($"void Prepend(this ref Span<byte> buffer, in {t.FullTypeName()} value)");
+        type.AppendLine("/// <param name=\"qualified\">Prepend value with len prefix and value qualifier.</param>");
+        using var method = type.PubStat($"void Prepend(this ref Span<byte> buffer, in {t.FullTypeName()} value, bool qualified)");
         method.AppendLine("var initialLen = buffer.Length;");
         method.AppendLine("");
 
@@ -381,7 +383,7 @@ public class SerdeGenerator : IIncrementalGenerator
             {
                 using var fScope = method.Sub();
                 fScope.AppendLine("var contentLen = buffer.Length;");
-                fScope.AppendLine($"buffer.Prepend(value.{f.Name});");
+                fScope.AppendLine($"buffer.Prepend(value.{f.Name}, false);");
                 fScope.AppendLine("var len = (uint)(contentLen - buffer.Length);");
 
                 using (var inner = fScope.Sub("if (len > 0)"))
@@ -416,7 +418,7 @@ public class SerdeGenerator : IIncrementalGenerator
                     fScope.AppendLine("var contentLen = buffer.Length;");
                     fScope.AppendOneLineBlock(
                         $"foreach (ref readonly var item in value.{f.Name}.RefReadonlyIterReversed())",
-                        "buffer.Prepend(item);"
+                        "buffer.Prepend(item, true);"
                     );
                     fScope.AppendLine($"buffer.PrependLenPrefix((uint){count}, out var cps);");
                     fScope.AppendLine("var len = (uint)(contentLen - buffer.Length);");
@@ -429,9 +431,10 @@ public class SerdeGenerator : IIncrementalGenerator
             method.AppendLine("");
         }
 
-        method.AppendLine("var totalLen = (uint)(initialLen - buffer.Length);");
-        method.AppendLine("buffer.PrependLenPrefix(totalLen, out var totalLps);");
-        method.AppendLine("buffer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
+        using var qScope = method.Sub("if (qualified)");
+        qScope.AppendLine("var totalLen = (uint)(initialLen - buffer.Length);");
+        qScope.AppendLine("buffer.PrependLenPrefix(totalLen, out var totalLps);");
+        qScope.AppendLine("buffer.Prepend(ValueQualifier.Struct(totalLps).Packed());");
     }
 
     private static void EmitWriteToBuffer(AppendScope type, INamedTypeSymbol t)
@@ -445,7 +448,7 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("var size = value.GetSerializedSize();");
         method.AppendLine("buffer = buffer[..^size];");
         method.AppendLine("var slice = buffer[^size..];");
-        method.AppendLine("slice.Prepend(value);");
+        method.AppendLine("slice.Prepend(value, true);");
     }
 
     private static void EmitSerializeToBuffer(AppendScope type, INamedTypeSymbol t)
