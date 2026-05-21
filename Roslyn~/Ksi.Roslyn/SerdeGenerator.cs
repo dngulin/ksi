@@ -118,7 +118,7 @@ public class SerdeGenerator : IIncrementalGenerator
             {
                 using var fScope = method.Sub();
                 fScope.AppendLine($"var len = self.{f.Name}.GetSerializedSize();");
-                fScope.AppendOneLineBlock("if (len > 0)", "size += fieldIdLen + len;");
+                fScope.AppendOneLineBlock("if (len > ValueQualifier.PackedSize)", "size += fieldIdLen + len;");
             }
             else if (ft.IsRefList()) // Repeated primitive or struct
             {
