@@ -57,15 +57,12 @@ namespace Ksi.Serialization
         /// <summary>
         /// Calculates the serialized size of a repeated struct.
         /// </summary>
-        /// <param name="totalSize">The total size of all struct items in bytes.</param>
+        /// <param name="size">The total size of all struct items in bytes.</param>
         /// <param name="count">The number of items.</param>
         /// <returns>The total serialized size including value qualifier, length prefix, and count prefix.</returns>
-        public static int RepeatedStruct(int totalSize, int count)
+        public static int RepeatedStruct(int size, int count)
         {
-            return ValueQualifier.PackedSize +
-                   GetLenPrefixSize((uint) totalSize) +
-                   GetLenPrefixSize((uint) count) +
-                   totalSize;
+            return Struct(size + GetLenPrefixSize((uint) count));
         }
     }
 }
