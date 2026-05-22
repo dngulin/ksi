@@ -5,20 +5,36 @@ using NUnit.Framework;
 namespace Ksi.Tests
 {
     [KsiSerializable]
+    [ExplicitCopy, DynSized]
     public struct TestSerializableStruct
     {
-        [KsiSerializeField(0)] public sbyte SByteField;
-        [KsiSerializeField(1)] public byte ByteField;
-        [KsiSerializeField(2)] public short ShortField;
-        [KsiSerializeField(3)] public ushort UShortField;
-        [KsiSerializeField(4)] public int IntField;
-        [KsiSerializeField(5)] public uint UIntField;
-        [KsiSerializeField(6)] public long LongField;
-        [KsiSerializeField(7)] public ulong ULongField;
-        [KsiSerializeField(8)] public float FloatField;
-        [KsiSerializeField(9)] public double DoubleField;
-        [KsiSerializeField(10)] public bool BoolField;
-        [KsiSerializeField(11)] public char CharField;
+        [KsiSerializeField(0)] public sbyte SByte;
+        [KsiSerializeField(1)] public byte Byte;
+        [KsiSerializeField(2)] public short Short;
+        [KsiSerializeField(3)] public ushort UShort;
+        [KsiSerializeField(4)] public int Int;
+        [KsiSerializeField(5)] public uint UInt;
+        [KsiSerializeField(6)] public long Long;
+        [KsiSerializeField(7)] public ulong ULong;
+        [KsiSerializeField(8)] public float Float;
+        [KsiSerializeField(9)] public double Double;
+        [KsiSerializeField(10)] public bool Bool;
+        [KsiSerializeField(11)] public char Char;
+        [KsiSerializeField(12)] public SampleEnum Enum;
+        [KsiSerializeField(14)] public InnerStruct Struct;
+        [KsiSerializeField(13)] public ManagedRefList<SampleEnum> RepEnum;
+        [KsiSerializeField(15)] public ManagedRefList<InnerStruct> RepStruct;
+    }
+
+    public enum SampleEnum : ushort
+    {
+        A, B, C, D
+    }
+
+    [KsiSerializable]
+    public struct InnerStruct
+    {
+        [KsiSerializeField(0)] public int Value;
     }
 
     [TestFixture]
@@ -34,21 +50,36 @@ namespace Ksi.Tests
             random.NextBytes(span);
             var ulongValue = BitConverter.ToUInt64(span);
 
-            return new TestSerializableStruct
+            var result = new TestSerializableStruct
             {
-                SByteField = (sbyte)random.Next(sbyte.MinValue, sbyte.MaxValue + 1),
-                ByteField = (byte)random.Next(byte.MinValue, byte.MaxValue + 1),
-                ShortField = (short)random.Next(short.MinValue, short.MaxValue + 1),
-                UShortField = (ushort)random.Next(ushort.MinValue, ushort.MaxValue + 1),
-                IntField = random.Next(),
-                UIntField = (uint)random.Next(),
-                LongField = longValue,
-                ULongField = ulongValue,
-                FloatField = (float)random.NextDouble(),
-                DoubleField = random.NextDouble(),
-                BoolField = random.Next(2) == 0,
-                CharField = (char)random.Next(char.MinValue, char.MaxValue + 1)
+                SByte = (sbyte)random.Next(sbyte.MinValue, sbyte.MaxValue + 1),
+                Byte = (byte)random.Next(byte.MinValue, byte.MaxValue + 1),
+                Short = (short)random.Next(short.MinValue, short.MaxValue + 1),
+                UShort = (ushort)random.Next(ushort.MinValue, ushort.MaxValue + 1),
+                Int = random.Next(),
+                UInt = (uint)random.Next(),
+                Long = longValue,
+                ULong = ulongValue,
+                Float = (float)random.NextDouble(),
+                Double = random.NextDouble(),
+                Bool = random.Next(2) == 0,
+                Char = (char)random.Next(char.MinValue, char.MaxValue + 1),
+                Enum = (SampleEnum)random.Next(0, 4),
+                Struct = new InnerStruct
+                {
+                    Value = random.Next()
+                },
             };
+
+            var iterations = random.Next(0, 100);
+            for (var i = 0; i < iterations; i++)
+                result.RepEnum.Add((SampleEnum)random.Next(0, 4));
+
+            iterations = random.Next(0, 100);
+            for (var i = 0; i < iterations; i++)
+                result.RepStruct.RefAdd().Value = random.Next();
+
+            return result;
         }
 
         [Test]
@@ -70,18 +101,32 @@ namespace Ksi.Tests
             var deserialized = new TestSerializableStruct();
             deserialized.InitializeFrom(reader);
 
-            Assert.That(deserialized.SByteField, Is.EqualTo(original.SByteField));
-            Assert.That(deserialized.ByteField, Is.EqualTo(original.ByteField));
-            Assert.That(deserialized.ShortField, Is.EqualTo(original.ShortField));
-            Assert.That(deserialized.UShortField, Is.EqualTo(original.UShortField));
-            Assert.That(deserialized.IntField, Is.EqualTo(original.IntField));
-            Assert.That(deserialized.UIntField, Is.EqualTo(original.UIntField));
-            Assert.That(deserialized.LongField, Is.EqualTo(original.LongField));
-            Assert.That(deserialized.ULongField, Is.EqualTo(original.ULongField));
-            Assert.That(deserialized.FloatField, Is.EqualTo(original.FloatField));
-            Assert.That(deserialized.DoubleField, Is.EqualTo(original.DoubleField));
-            Assert.That(deserialized.BoolField, Is.EqualTo(original.BoolField));
-            Assert.That(deserialized.CharField, Is.EqualTo(original.CharField));
+            Assert.That(deserialized.SByte, Is.EqualTo(original.SByte));
+            Assert.That(deserialized.Byte, Is.EqualTo(original.Byte));
+            Assert.That(deserialized.Short, Is.EqualTo(original.Short));
+            Assert.That(deserialized.UShort, Is.EqualTo(original.UShort));
+            Assert.That(deserialized.Int, Is.EqualTo(original.Int));
+            Assert.That(deserialized.UInt, Is.EqualTo(original.UInt));
+            Assert.That(deserialized.Long, Is.EqualTo(original.Long));
+            Assert.That(deserialized.ULong, Is.EqualTo(original.ULong));
+            Assert.That(deserialized.Float, Is.EqualTo(original.Float));
+            Assert.That(deserialized.Double, Is.EqualTo(original.Double));
+            Assert.That(deserialized.Bool, Is.EqualTo(original.Bool));
+            Assert.That(deserialized.Char, Is.EqualTo(original.Char));
+            Assert.That(deserialized.Enum, Is.EqualTo(original.Enum));
+            Assert.That(deserialized.Struct.Value, Is.EqualTo(original.Struct.Value));
+            Assert.That(deserialized.RepEnum.Count(), Is.EqualTo(original.RepEnum.Count()));
+            Assert.That(deserialized.RepStruct.Count(), Is.EqualTo(original.RepStruct.Count()));
+
+            for (var i = 0; i < deserialized.RepEnum.Count(); i++)
+                Assert.That(deserialized.RepEnum.RefReadonlyAt(i), Is.EqualTo(original.RepEnum.RefReadonlyAt(i)));
+
+            for (var i = 0; i < deserialized.RepStruct.Count(); i++)
+            {
+                var oVal = deserialized.RepStruct.RefReadonlyAt(i).Value;
+                var dVal = original.RepStruct.RefReadonlyAt(i).Value;
+                Assert.That(oVal, Is.EqualTo(dVal));
+            }
         }
 
         [Test]
@@ -95,25 +140,39 @@ namespace Ksi.Tests
             Span<byte> span = buffer;
 
             // Serialize
-            span.Prepend(original);
+            span.Prepend(original, true);
 
             // Deserialize
             var deserialized = new TestSerializableStruct();
             ReadOnlySpan<byte> readSpan = buffer;
-            deserialized.InitializeFrom(readSpan);
+            deserialized.InitializeFrom(ref readSpan);
 
-            Assert.That(deserialized.SByteField, Is.EqualTo(original.SByteField));
-            Assert.That(deserialized.ByteField, Is.EqualTo(original.ByteField));
-            Assert.That(deserialized.ShortField, Is.EqualTo(original.ShortField));
-            Assert.That(deserialized.UShortField, Is.EqualTo(original.UShortField));
-            Assert.That(deserialized.IntField, Is.EqualTo(original.IntField));
-            Assert.That(deserialized.UIntField, Is.EqualTo(original.UIntField));
-            Assert.That(deserialized.LongField, Is.EqualTo(original.LongField));
-            Assert.That(deserialized.ULongField, Is.EqualTo(original.ULongField));
-            Assert.That(deserialized.FloatField, Is.EqualTo(original.FloatField));
-            Assert.That(deserialized.DoubleField, Is.EqualTo(original.DoubleField));
-            Assert.That(deserialized.BoolField, Is.EqualTo(original.BoolField));
-            Assert.That(deserialized.CharField, Is.EqualTo(original.CharField));
+            Assert.That(deserialized.SByte, Is.EqualTo(original.SByte));
+            Assert.That(deserialized.Byte, Is.EqualTo(original.Byte));
+            Assert.That(deserialized.Short, Is.EqualTo(original.Short));
+            Assert.That(deserialized.UShort, Is.EqualTo(original.UShort));
+            Assert.That(deserialized.Int, Is.EqualTo(original.Int));
+            Assert.That(deserialized.UInt, Is.EqualTo(original.UInt));
+            Assert.That(deserialized.Long, Is.EqualTo(original.Long));
+            Assert.That(deserialized.ULong, Is.EqualTo(original.ULong));
+            Assert.That(deserialized.Float, Is.EqualTo(original.Float));
+            Assert.That(deserialized.Double, Is.EqualTo(original.Double));
+            Assert.That(deserialized.Bool, Is.EqualTo(original.Bool));
+            Assert.That(deserialized.Char, Is.EqualTo(original.Char));
+            Assert.That(deserialized.Enum, Is.EqualTo(original.Enum));
+            Assert.That(deserialized.Struct.Value, Is.EqualTo(original.Struct.Value));
+            Assert.That(deserialized.RepEnum.Count(), Is.EqualTo(original.RepEnum.Count()));
+            Assert.That(deserialized.RepStruct.Count(), Is.EqualTo(original.RepStruct.Count()));
+
+            for (var i = 0; i < deserialized.RepEnum.Count(); i++)
+                Assert.That(deserialized.RepEnum.RefReadonlyAt(i), Is.EqualTo(original.RepEnum.RefReadonlyAt(i)));
+
+            for (var i = 0; i < deserialized.RepStruct.Count(); i++)
+            {
+                var oVal = deserialized.RepStruct.RefReadonlyAt(i).Value;
+                var dVal = original.RepStruct.RefReadonlyAt(i).Value;
+                Assert.That(oVal, Is.EqualTo(dVal));
+            }
         }
     }
 }
