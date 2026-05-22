@@ -71,6 +71,7 @@ public class SerdeGenerator : IIncrementalGenerator
                         EmitSerializeToStream(type, t);
                         type.AppendLine("");
                         EmitInitFromStream(type, t);
+                        type.AppendLine("");
                         EmitInitFromStreamWithLen(type, t, fields);
                         type.AppendLine("");
                         EmitPrependToBuffer(type, t, fields);
@@ -79,7 +80,9 @@ public class SerdeGenerator : IIncrementalGenerator
                         type.AppendLine("");
                         EmitSerializeToBuffer(type, t);
                         type.AppendLine("");
-                        EmitInitializeFromBuffer(type, t, fields);
+                        EmitInitFromBuffer(type, t);
+                        type.AppendLine("");
+                        EmitInitFromBufferWithLen(type, t, fields);
                     }
                 }
             }
@@ -492,91 +495,107 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("return initialLen - buffer.Length;");
     }
 
-    private static void EmitInitializeFromBuffer(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
+    private static void EmitInitFromBuffer(AppendScope type, INamedTypeSymbol t)
     {
+        var typeName = t.FullTypeName();
+
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Initializes the <see cref=\"{t.FullTypeName()}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/>.");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/>.");
         type.AppendLine("/// </summary>");
-        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{t.FullTypeName()}\"/> instance to initialize.</param>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
         type.AppendLine("/// <returns>The number of bytes read.</returns>");
         type.AppendLine("/// <remarks>");
         type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
         type.AppendLine("/// </remarks>");
-        using var method = type.PubStat($"int InitializeFrom(this ref {t.FullTypeName()} self, ReadOnlySpan<byte> buffer)");
+        using var method = type.PubStat($"int InitializeFrom(this ref {typeName} self, ReadOnlySpan<byte> buffer)");
 
         method.AppendLine("var initialLen = buffer.Length;");
         method.AppendLine("var q = ValueQualifier.Unpack(buffer.ReadByte());");
-        method.AppendLine("var len = buffer.ReadLenPrefix(q.LenPrefixSize);");
+        method.AppendLine("var len = (int) buffer.ReadLenPrefix(q.LenPrefixSize);");
+        method.AppendLine("self.InitializeFrom(ref buffer, len);");
+        method.AppendLine("return initialLen - buffer.Length;");
+    }
+
+    private static void EmitInitFromBufferWithLen(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
+    {
+        var typeName = t.FullTypeName();
+
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/>.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
+        type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
+        type.AppendLine("/// <param name=\"len\">The length of the data.</param>");
+        type.AppendLine("/// <returns>The number of bytes read.</returns>");
+        type.AppendLine("/// <remarks>");
+        type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
+        type.AppendLine("/// </remarks>");
+        using var method = type.PubStat($"void InitializeFrom(this ref {typeName} self, ref ReadOnlySpan<byte> buffer, int len)");
+
         method.AppendLine("var endLen = buffer.Length - (int)len;");
-        method.AppendLine("");
 
-        using (var loop = method.Sub("while (buffer.Length > endLen)"))
+        using var loop = method.Sub("while (buffer.Length > endLen)");
+        loop.AppendLine("var fieldId = buffer.ReadByte();");
+        loop.AppendLine("var fieldQ = ValueQualifier.Unpack(buffer.ReadByte());");
+        loop.AppendLine("");
+
+        using var sw = loop.Sub("switch (fieldId)");
+
+        foreach (var (f, id) in fields)
         {
-            loop.AppendLine("var fieldId = buffer.ReadByte();");
-            loop.AppendLine("var fieldQ = ValueQualifier.Unpack(buffer.ReadByte());");
-            loop.AppendLine("");
+            if (f.Type is not INamedTypeSymbol ft)
+                continue;
 
-            using (var sw = loop.Sub("switch (fieldId)"))
+            sw.AppendLine($"// {id:d3}: {f.Name}");
+            using var cs = sw.Sub($"case {id}:");
+
+            if (ft.IsSerializablePrimitive())
             {
-                foreach (var (f, id) in fields)
+                var readMethod = GetReadMethodName(ft);
+                cs.AppendLine(ft.SpecialType == SpecialType.System_Boolean
+                    ? $"self.{f.Name} = buffer.{readMethod}() != 0;"
+                    : $"self.{f.Name} = {GetReadCast(ft)}buffer.{readMethod}();");
+            }
+            else if (ft.IsKsiSerializable())
+            {
+                cs.AppendLine("var fieldLen = (int) buffer.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                cs.AppendLine($"self.{f.Name}.InitializeFrom(ref buffer, fieldLen);");
+            }
+            else if (ft.IsRefList())
+            {
+                if (!ft.TryGetGenericArg(out var gt) || gt == null)
                 {
-                    if (f.Type is not INamedTypeSymbol ft)
-                        continue;
-
-                    sw.AppendLine($"// {id:d3}: {f.Name}");
-                    using var cs = sw.Sub($"case {id}:");
-
-                    if (ft.IsSerializablePrimitive())
-                    {
-                        var readMethod = GetReadMethodName(ft);
-                        cs.AppendLine(ft.SpecialType == SpecialType.System_Boolean
-                            ? $"self.{f.Name} = buffer.{readMethod}() != 0;"
-                            : $"self.{f.Name} = {GetReadCast(ft)}buffer.{readMethod}();");
-                    }
-                    else if (ft.IsKsiSerializable())
-                    {
-                        cs.AppendLine($"self.{f.Name}.InitializeFrom(buffer);");
-                    }
-                    else if (ft.IsRefList())
-                    {
-                        if (!ft.TryGetGenericArg(out var gt) || gt == null)
-                        {
-                            cs.AppendLine("break;");
-                            continue;
-                        }
-
-                        cs.AppendLine($"self.{f.Name}.Clear();");
-                        if (gt.IsSerializablePrimitive())
-                        {
-                            cs.AppendLine("var fieldLen = buffer.ReadLenPrefix(fieldQ.LenPrefixSize);");
-                            cs.AppendLine($"var count = (int)(fieldLen / sizeof({gt.FullTypeName()}));");
-                            cs.AppendLine($"self.{f.Name}.AppendDefault(count);");
-                            cs.AppendLine($"buffer.Read(MemoryMarshal.AsBytes(self.{f.Name}.AsSpan()));");
-                        }
-                        else if (gt.IsKsiSerializable())
-                        {
-                            cs.AppendLine("var fieldLen = buffer.ReadLenPrefix(fieldQ.LenPrefixSize);");
-                            cs.AppendLine("var itemCount = (int)buffer.ReadLenPrefix(fieldQ.ItemCountPrefixSize());");
-                            cs.AppendLine($"self.{f.Name}.AppendDefault(itemCount);");
-                            cs.AppendOneLineBlock(
-                                $"foreach (ref var item in self.{f.Name}.RefIter())",
-                                "item.InitializeFrom(buffer);"
-                            );
-                        }
-                    }
-
                     cs.AppendLine("break;");
+                    continue;
                 }
 
-                using var def = sw.Sub("default:");
-                def.AppendLine("buffer.Skip(fieldQ);");
-                def.AppendLine("break;");
+                cs.AppendLine($"self.{f.Name}.Clear();");
+                if (gt.IsSerializablePrimitive())
+                {
+                    cs.AppendLine("var fieldLen = buffer.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                    cs.AppendLine($"var count = (int)(fieldLen / sizeof({gt.FullTypeName()}));");
+                    cs.AppendLine($"self.{f.Name}.AppendDefault(count);");
+                    cs.AppendLine($"buffer.Read(MemoryMarshal.AsBytes(self.{f.Name}.AsSpan()));");
+                }
+                else if (gt.IsKsiSerializable())
+                {
+                    cs.AppendLine("var fieldLen = buffer.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                    cs.AppendLine("var itemCount = (int)buffer.ReadLenPrefix(fieldQ.ItemCountPrefixSize());");
+                    cs.AppendLine($"self.{f.Name}.AppendDefault(itemCount);");
+                    cs.AppendOneLineBlock(
+                        $"foreach (ref var item in self.{f.Name}.RefIter())",
+                        "item.InitializeFrom(buffer);"
+                    );
+                }
             }
+
+            cs.AppendLine("break;");
         }
 
-        method.AppendLine("");
-        method.AppendLine("return initialLen - buffer.Length;");
+        using var def = sw.Sub("default:");
+        def.AppendLine("buffer.Skip(fieldQ);");
+        def.AppendLine("break;");
     }
 
     private static (string Kind, string Size) GetPrimitiveInfo(INamedTypeSymbol t)
