@@ -70,7 +70,8 @@ public class SerdeGenerator : IIncrementalGenerator
                         type.AppendLine("");
                         EmitSerializeToStream(type, t);
                         type.AppendLine("");
-                        EmitInitializeFromStream(type, t, fields);
+                        EmitInitFromStream(type, t);
+                        EmitInitFromStreamWithLen(type, t, fields);
                         type.AppendLine("");
                         EmitPrependToBuffer(type, t, fields);
                         type.AppendLine("");
@@ -271,22 +272,47 @@ public class SerdeGenerator : IIncrementalGenerator
         method.AppendLine("writer.Write(value);");
     }
 
-    private static void EmitInitializeFromStream(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
+    private static void EmitInitFromStream(AppendScope type, INamedTypeSymbol t)
     {
+        var typeName = t.FullTypeName();
+
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Initializes the <see cref=\"{t.FullTypeName()}\"/> from the <see cref=\"System.IO.BinaryReader\"/>.");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.IO.BinaryReader\"/>.");
+        type.AppendLine("/// Method reads <see cref=\"ValueQualifier\"/> and length prefix before reading the value.");
         type.AppendLine("/// </summary>");
-        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{t.FullTypeName()}\"/> instance to initialize.</param>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"reader\">The <see cref=\"System.IO.BinaryReader\"/> to read from.</param>");
         type.AppendLine("/// <remarks>");
         type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
         type.AppendLine("/// </remarks>");
-        using var method =
-            type.PubStat($"void InitializeFrom(this ref {t.FullTypeName()} self, System.IO.BinaryReader reader)");
+
+        var methodDef = $"void InitializeFrom(this ref {typeName} self, System.IO.BinaryReader reader)";
+        using var method = type.PubStat(methodDef);
 
         method.AppendLine("var q = ValueQualifier.Unpack(reader.ReadByte());");
-        method.AppendLine("var endPos = reader.BaseStream.Position + reader.ReadLenPrefix(q.LenPrefixSize);");
-        method.AppendLine("");
+        method.AppendLine("var len = (int)reader.ReadLenPrefix(q.LenPrefixSize);");
+        method.AppendLine("self.InitializeFrom(reader, len);");
+    }
+
+    private static void EmitInitFromStreamWithLen(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
+    {
+        var typeName = t.FullTypeName();
+
+        type.AppendLine("/// <summary>");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.IO.BinaryReader\"/>.");
+        type.AppendLine("/// Method reads the value without reading a qualifier.");
+        type.AppendLine("/// </summary>");
+        type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
+        type.AppendLine("/// <param name=\"reader\">The <see cref=\"System.IO.BinaryReader\"/> to read from.</param>");
+        type.AppendLine("/// <param name=\"len\">Lenght of the data to read.</param>");
+        type.AppendLine("/// <remarks>");
+        type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
+        type.AppendLine("/// </remarks>");
+
+        var methodDef = $"void InitializeFrom(this ref {typeName} self, System.IO.BinaryReader reader, int len)";
+        using var method = type.PubStat(methodDef);
+
+        method.AppendLine("var endPos = reader.BaseStream.Position + len;");
 
         using var loop = method.Sub("while (reader.BaseStream.Position < endPos)");
         loop.AppendLine("var fieldId = reader.ReadByte();");
@@ -311,7 +337,8 @@ public class SerdeGenerator : IIncrementalGenerator
             }
             else if (ft.IsKsiSerializable())
             {
-                cs.AppendLine($"self.{f.Name}.InitializeFrom(reader);");
+                cs.AppendLine("var fieldLen = (int)reader.ReadLenPrefix(fieldQ.LenPrefixSize);");
+                cs.AppendLine($"self.{f.Name}.InitializeFrom(reader, fieldLen);");
             }
             else if (ft.IsRefList())
             {
