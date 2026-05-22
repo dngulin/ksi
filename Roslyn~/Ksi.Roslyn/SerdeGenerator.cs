@@ -504,17 +504,14 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine("/// </summary>");
         type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
-        type.AppendLine("/// <returns>The number of bytes read.</returns>");
         type.AppendLine("/// <remarks>");
         type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
         type.AppendLine("/// </remarks>");
-        using var method = type.PubStat($"int InitializeFrom(this ref {typeName} self, ReadOnlySpan<byte> buffer)");
+        using var method = type.PubStat($"void InitializeFrom(this ref {typeName} self, ref ReadOnlySpan<byte> buffer)");
 
-        method.AppendLine("var initialLen = buffer.Length;");
         method.AppendLine("var q = ValueQualifier.Unpack(buffer.ReadByte());");
         method.AppendLine("var len = (int) buffer.ReadLenPrefix(q.LenPrefixSize);");
         method.AppendLine("self.InitializeFrom(ref buffer, len);");
-        method.AppendLine("return initialLen - buffer.Length;");
     }
 
     private static void EmitInitFromBufferWithLen(AppendScope type, INamedTypeSymbol t, (IFieldSymbol Field, byte Id)[] fields)
@@ -527,7 +524,6 @@ public class SerdeGenerator : IIncrementalGenerator
         type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
         type.AppendLine("/// <param name=\"len\">The length of the data.</param>");
-        type.AppendLine("/// <returns>The number of bytes read.</returns>");
         type.AppendLine("/// <remarks>");
         type.AppendLine("/// The structure should be in zeroed state before calling this method (it updates only non-default fields).");
         type.AppendLine("/// </remarks>");
@@ -585,7 +581,7 @@ public class SerdeGenerator : IIncrementalGenerator
                     cs.AppendLine($"self.{f.Name}.AppendDefault(itemCount);");
                     cs.AppendOneLineBlock(
                         $"foreach (ref var item in self.{f.Name}.RefIter())",
-                        "item.InitializeFrom(buffer);"
+                        "item.InitializeFrom(ref buffer);"
                     );
                 }
             }
