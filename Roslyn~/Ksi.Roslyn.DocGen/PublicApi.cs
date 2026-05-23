@@ -1,24 +1,29 @@
 using System.Collections.Immutable;
 using Ksi.Roslyn.DocGen.Extensions;
-using Ksi.Roslyn.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Ksi.Roslyn.DocGen;
 
-public class PublicApi(
-    ImmutableArray<TypeSpec> attributes,
-    ImmutableArray<TypeSpec> collections,
-    ImmutableArray<TypeSpec> otherTypes)
+public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>)> index)
 {
-    public readonly ImmutableArray<TypeSpec> Attributes = attributes;
-    public readonly ImmutableArray<TypeSpec> Collections = collections;
-    public readonly ImmutableArray<TypeSpec> OtherTypes = otherTypes;
+    public readonly ImmutableArray<(string Category, ImmutableArray<TypeSpec>)> Index = index;
+
+    private static class TypeNamePrefixes
+    {
+        public static readonly string[] Ecs = new[]
+            { "KsiQuery", "KsiDomain", "KsiArchetype", "KsiEntity", "KsiComponent" };
+
+        public static readonly string[] Hash = new[] { "KsiHash", "KsiPrime" };
+    }
+
 
     public static PublicApi Gather()
     {
-        var attributes = new List<TypeSpec>(16);
-        var collections = new List<TypeSpec>(3);
-        var otherTypes = new List<TypeSpec>(32);
+        var general = new List<TypeSpec>(16);
+        var refList = new List<TypeSpec>(3);
+        var hashTable = new List<TypeSpec>(32);
+        var ecs = new List<TypeSpec>(32);
+        var serialization = new List<TypeSpec>(32);
 
         // Get "Ksi" namespace
         var compilation = KsiCompilation.Create();
@@ -40,40 +45,58 @@ public class PublicApi(
 
             var spec = new TypeSpec(t, compilation);
 
-            if (t.Name.EndsWith("Attribute"))
-                attributes.Add(spec);
-            else if (t.IsRefList())
-                collections.Add(spec);
+            if (t.ContainingNamespace.Name == "Serialization" || t.Name.StartsWith("KsiSerial"))
+            {
+                serialization.Add(spec);
+            }
+            else if (TypeNamePrefixes.Ecs.Any(p => t.Name.StartsWith(p, StringComparison.Ordinal)))
+            {
+                ecs.Add(spec);
+            }
+            else if (TypeNamePrefixes.Hash.Any(p => t.Name.StartsWith(p, StringComparison.Ordinal)))
+            {
+                hashTable.Add(spec);
+            }
+            else if (t.Name.Contains("RefList"))
+            {
+                refList.Add(spec);
+            }
             else
-                otherTypes.Add(spec);
+            {
+                general.Add(spec);
+            }
         }
 
         // Move extension methods and external constructors to collections
-        foreach (var ts in otherTypes.Where(ts => ts.Symbol.IsStatic))
+        foreach (var ts in refList.Where(ts => ts.Symbol.IsStatic))
         {
             for (var i = ts.StaticMethods.Count - 1; i >= 0; i--)
             {
-                if (collections.Any(c => c.TryAddExternalMethod(ts.StaticMethods[i])))
+                if (refList.Any(c => c.TryAddExternalMethod(ts.StaticMethods[i])))
                     ts.StaticMethods.RemoveAt(i);
             }
         }
 
-        foreach (var c in collections)
+        foreach (var c in refList)
         {
             Comparison<MethodSpec> mCmp = static (a, b) => string.Compare(a.Title, b.Title, StringComparison.Ordinal);
             c.ExternalConstructors.Sort(mCmp);
             c.ExternalMethods.Sort(mCmp);
         }
 
+        foreach (var category in new[] {general, refList, hashTable, ecs, serialization})
+        {
+            category.Sort(static (a, b) => a.SortingKey.CompareTo(b.SortingKey));
+        }
 
-        Comparison<TypeSpec> tCmp = static (a, b) => a.SortingKey.CompareTo(b.SortingKey);
-        attributes.Sort(tCmp);
-        otherTypes.Sort(tCmp);
-
-        return new PublicApi(
-            attributes.ToImmutableArray(),
-            collections.ToImmutableArray(),
-            otherTypes.ToImmutableArray()
+        var index = ImmutableArray.Create<(string Category, ImmutableArray<TypeSpec>)>(
+            ("General", general.ToImmutableArray()),
+            (@"TRefList\<T\> Variants", refList.ToImmutableArray()),
+            ("Hash Tables", hashTable.ToImmutableArray()),
+            ("Entity Component System", ecs.ToImmutableArray()),
+            ("Serialization", serialization.ToImmutableArray())
         );
+
+        return new PublicApi(index);
     }
 }

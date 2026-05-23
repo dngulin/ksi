@@ -23,9 +23,12 @@ public static class DocGenerator
     {
         RemoveGeneratedFiles(path);
         WriteIndex(path, api);
-        WriteTypes(path, api.Attributes);
-        WriteTypes(path, api.Collections);
-        WriteTypes(path, api.OtherTypes);
+
+        foreach (var (_, types) in api.Index)
+        foreach (var type in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
+        {
+            WriteType(path, type);
+        }
     }
 
     private static void RemoveGeneratedFiles(string path)
@@ -43,11 +46,12 @@ public static class DocGenerator
 
         writer.WriteLine();
         writer.WriteLine("The API Reference is generated from XML documentation comments.\n");
-        writer.WriteLine("Extension methods are grouped together with their target types.");
+        writer.WriteLine(@"`TRefList\<T\>` extension methods are grouped together with their target types.");
 
-        WriteIndexSection(writer, "Attributes", api.Attributes);
-        WriteIndexSection(writer, @"TRefList\<T\> Variants", api.Collections);
-        WriteIndexSection(writer, "Other Types", api.OtherTypes);
+        foreach (var (category, types) in api.Index)
+        {
+            WriteIndexSection(writer, category, types);
+        }
     }
 
     private static void WriteIndexSection(StreamWriter writer, string title, ImmutableArray<TypeSpec> types)
@@ -57,15 +61,6 @@ public static class DocGenerator
         writer.WriteLine();
         foreach (var t in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
             writer.WriteLine($"- [{t.Symbol.ToMd()}]({t.Symbol.MdFileName()}) — {t.Summary.Brief()}");
-    }
-
-    private static void WriteTypes(string path, ImmutableArray<TypeSpec> types)
-    {
-        foreach (var t in types)
-        {
-            if (!t.Symbol.IsStatic || !t.IsEmpty)
-                WriteType(path, t);
-        }
     }
 
     private static void WriteType(string path, TypeSpec t)
