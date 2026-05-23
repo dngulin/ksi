@@ -92,7 +92,7 @@ namespace Ksi.Tests
             using var writer = new BinaryWriter(ms);
 
             // Serialize
-            writer.Write(original);
+            original.SerializeTo(writer);
 
             ms.Position = 0;
             using var reader = new BinaryReader(ms);
