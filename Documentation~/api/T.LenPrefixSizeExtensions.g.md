@@ -9,7 +9,7 @@
 > \| **[API](index.g.md) / LenPrefixSizeExtensions**
 > \]
 
-Provides extension methods for [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1).
+Provides extension methods for [LenPrefixSize](T.LenPrefixSize.g.md).
 
 ```csharp
 namespace Ksi.Serialization
@@ -34,10 +34,10 @@ public static int InBytes(this LenPrefixSize size)
 ```
 
 Parameters
-- `size` — the [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1).
+- `size` — the [LenPrefixSize](T.LenPrefixSize.g.md).
 
 Returns the size in bytes.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - [ArgumentOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException?view=netstandard-2.1) — thrown when an invalid [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1) is provided.
+> - [ArgumentOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException?view=netstandard-2.1) — thrown when an invalid [LenPrefixSize](T.LenPrefixSize.g.md) is provided.

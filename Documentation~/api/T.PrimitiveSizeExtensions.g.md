@@ -9,7 +9,7 @@
 > \| **[API](index.g.md) / PrimitiveSizeExtensions**
 > \]
 
-Provides extension methods for [PrimitiveSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.PrimitiveSize?view=netstandard-2.1).
+Provides extension methods for [PrimitiveSize](T.PrimitiveSize.g.md).
 
 ```csharp
 namespace Ksi.Serialization
@@ -34,10 +34,10 @@ public static int InBytes(this PrimitiveSize size)
 ```
 
 Parameters
-- `size` — the [PrimitiveSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.PrimitiveSize?view=netstandard-2.1).
+- `size` — the [PrimitiveSize](T.PrimitiveSize.g.md).
 
 Returns the size in bytes.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - [ArgumentOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException?view=netstandard-2.1) — thrown when an invalid [PrimitiveSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.PrimitiveSize?view=netstandard-2.1) is provided.
+> - [ArgumentOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException?view=netstandard-2.1) — thrown when an invalid [PrimitiveSize](T.PrimitiveSize.g.md) is provided.

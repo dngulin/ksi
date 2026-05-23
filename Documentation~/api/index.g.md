@@ -56,10 +56,10 @@ Extension methods are grouped together with their target types.
 - [SpanReadExtensions](T.SpanReadExtensions.g.md) — provides extension methods for [ReadOnlySpan\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.ReadOnlySpan-1?view=netstandard-2.1) to read binary data
 - [SpanWriteExtensions](T.SpanWriteExtensions.g.md) — provides extension methods for [Span\<T\>](https://learn.microsoft.com/en-us/dotnet/api/System.Span-1?view=netstandard-2.1) to write binary data by prepending it to the end of the span
 - [ValueQualifier](T.ValueQualifier.g.md) — describes a value in the Ksi binary format
-- [ValueQualifierExtensions](T.ValueQualifierExtensions.g.md) — provides extension methods for [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1)
+- [ValueQualifierExtensions](T.ValueQualifierExtensions.g.md) — provides extension methods for [ValueQualifier](T.ValueQualifier.g.md)
 - [LenPrefixSize](T.LenPrefixSize.g.md) — represents the size of the length prefix in bytes
-- [LenPrefixSizeExtensions](T.LenPrefixSizeExtensions.g.md) — provides extension methods for [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1)
+- [LenPrefixSizeExtensions](T.LenPrefixSizeExtensions.g.md) — provides extension methods for [LenPrefixSize](T.LenPrefixSize.g.md)
 - [PrimitiveKind](T.PrimitiveKind.g.md) — represents the primitive value kind
 - [PrimitiveSize](T.PrimitiveSize.g.md) — represents the size of a primitive value in bits
-- [PrimitiveSizeExtensions](T.PrimitiveSizeExtensions.g.md) — provides extension methods for [PrimitiveSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.PrimitiveSize?view=netstandard-2.1)
+- [PrimitiveSizeExtensions](T.PrimitiveSizeExtensions.g.md) — provides extension methods for [PrimitiveSize](T.PrimitiveSize.g.md)
 - [ValueKind](T.ValueKind.g.md) — represents the kind of value being serialized

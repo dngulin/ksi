@@ -20,7 +20,7 @@ namespace Ksi.Serialization
 
 Static Methods
 - [\(BinaryReader\).ReadLenPrefix\(LenPrefixSize\)](#binaryreaderreadlenprefixlenprefixsize) — reads a length prefix of the specified size from the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1)
-- [\(BinaryReader\).Skip\(ValueQualifier\)](#binaryreaderskipvaluequalifier) — skips a value in the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) based on the provided [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1)
+- [\(BinaryReader\).Skip\(ValueQualifier\)](#binaryreaderskipvaluequalifier) — skips a value in the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) based on the provided [ValueQualifier](T.ValueQualifier.g.md)
 
 
 ## Static Methods
@@ -42,12 +42,12 @@ Returns the length value read from the stream.
 
 > [!CAUTION]
 > Possible exceptions: 
-> - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — thrown when an invalid [LenPrefixSize](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.LenPrefixSize?view=netstandard-2.1) is provided.
+> - [InvalidOperationException](https://learn.microsoft.com/en-us/dotnet/api/System.InvalidOperationException?view=netstandard-2.1) — thrown when an invalid [LenPrefixSize](T.LenPrefixSize.g.md) is provided.
 
 
 ### \(BinaryReader\).Skip\(ValueQualifier\)
 
-Skips a value in the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) based on the provided [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Skips a value in the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) based on the provided [ValueQualifier](T.ValueQualifier.g.md).
 
 ```csharp
 public static void Skip(this BinaryReader br, ValueQualifier q)
@@ -55,4 +55,4 @@ public static void Skip(this BinaryReader br, ValueQualifier q)
 
 Parameters
 - `br` — the [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) to skip in.
-- `q` — the [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) describing the value to skip.
+- `q` — the [ValueQualifier](T.ValueQualifier.g.md) describing the value to skip.

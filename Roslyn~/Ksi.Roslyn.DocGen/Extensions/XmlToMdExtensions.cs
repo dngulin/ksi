@@ -134,7 +134,7 @@ public static class XmlToMdExtensions
             title = t.ToMd();
 
         var ns = t.ContainingNamespace.ToDisplayString();
-        if (ns == "Ksi")
+        if (ns == "Ksi" || ns.StartsWith("Ksi."))
         {
             link = t.MdFileName();
         }

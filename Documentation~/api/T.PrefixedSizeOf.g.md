@@ -76,11 +76,11 @@ Returns the total serialized size including the value qualifier and length prefi
 Calculates the serialized size of a repeated struct.
 
 ```csharp
-public static int RepeatedStruct(int totalSize, int count)
+public static int RepeatedStruct(int size, int count)
 ```
 
 Parameters
-- `totalSize` — the total size of all struct items in bytes.
+- `size` — the total size of all struct items in bytes.
 - `count` — the number of items.
 
 Returns the total serialized size including value qualifier, length prefix, and count prefix.

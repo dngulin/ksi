@@ -33,12 +33,12 @@ Fields
 - [PrimitiveSize](#primitivesize) — the size of the primitive value
 
 Static Methods
-- [ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)](#valuequalifierprimitiveprimitivekind-primitivesize) — creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a primitive value
-- [ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)](#valuequalifierrepeatedprimitiveprimitivekind-primitivesize-lenprefixsize) — creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a repeated primitive value
-- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a struct value
-- [ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)](#valuequalifierrepeatedstructlenprefixsize-lenprefixsize) — creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a repeated struct value
+- [ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)](#valuequalifierprimitiveprimitivekind-primitivesize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a primitive value
+- [ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)](#valuequalifierrepeatedprimitiveprimitivekind-primitivesize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated primitive value
+- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
+- [ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)](#valuequalifierrepeatedstructlenprefixsize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value
 - [ValueQualifier.GetLenPrefix\(uint\)](#valuequalifiergetlenprefixuint) — gets the required `LenPrefixSize` to store the specified length
-- [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
+- [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
 
 
 ## Fields
@@ -99,7 +99,7 @@ public PrimitiveSize PrimitiveSize
 
 ### ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)
 
-Creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a primitive value.
+Creates a [ValueQualifier](T.ValueQualifier.g.md) for a primitive value.
 
 ```csharp
 public static ValueQualifier Primitive(PrimitiveKind pk, PrimitiveSize ps)
@@ -109,12 +109,12 @@ Parameters
 - `pk` — the kind of the primitive value.
 - `ps` — the size of the primitive value.
 
-Returns a new [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
 ### ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)
 
-Creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a repeated primitive value.
+Creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated primitive value.
 
 ```csharp
 public static ValueQualifier RepeatedPrimitive(PrimitiveKind pk, PrimitiveSize ps, LenPrefixSize lps)
@@ -125,12 +125,12 @@ Parameters
 - `ps` — the size of the primitive value.
 - `lps` — the size of the length prefix.
 
-Returns a new [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
 ### ValueQualifier.Struct\(LenPrefixSize\)
 
-Creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a struct value.
+Creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value.
 
 ```csharp
 public static ValueQualifier Struct(LenPrefixSize lps)
@@ -139,12 +139,12 @@ public static ValueQualifier Struct(LenPrefixSize lps)
 Parameters
 - `lps` — the size of the length prefix.
 
-Returns a new [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
 ### ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)
 
-Creates a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) for a repeated struct value.
+Creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value.
 
 ```csharp
 public static ValueQualifier RepeatedStruct(LenPrefixSize lps, LenPrefixSize cps)
@@ -154,7 +154,7 @@ Parameters
 - `lps` — the size of the length prefix.
 - `cps` — the size of the count prefix.
 
-Returns a new [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
 ### ValueQualifier.GetLenPrefix\(uint\)
@@ -173,7 +173,7 @@ Returns the smallest `LenPrefixSize` that can accommodate the length.
 
 ### ValueQualifier.Unpack\(byte\)
 
-Unpacks a [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1).
+Unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1).
 
 ```csharp
 public static ValueQualifier Unpack(byte packed)
@@ -182,4 +182,4 @@ public static ValueQualifier Unpack(byte packed)
 Parameters
 - `packed` — the packed byte.
 
-Returns the unpacked [ValueQualifier](https://learn.microsoft.com/en-us/dotnet/api/Ksi.Serialization.ValueQualifier?view=netstandard-2.1).
+Returns the unpacked [ValueQualifier](T.ValueQualifier.g.md).
