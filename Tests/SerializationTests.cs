@@ -141,11 +141,13 @@ namespace Ksi.Tests
 
             // Serialize
             span.Prepend(original, true);
+            Assert.That(span.Length, Is.EqualTo(0));
 
             // Deserialize
             var deserialized = new TestSerializableStruct();
             ReadOnlySpan<byte> readSpan = buffer;
             deserialized.InitializeFrom(ref readSpan);
+            Assert.That(readSpan.Length, Is.EqualTo(0));
 
             Assert.That(deserialized.SByte, Is.EqualTo(original.SByte));
             Assert.That(deserialized.Byte, Is.EqualTo(original.Byte));
