@@ -82,25 +82,8 @@ namespace Ksi.Tests
             return result;
         }
 
-        [Test]
-        public void SerializeAndDeserializeFromStream()
+        private static void AssertEqual(in TestSerializableStruct original, in TestSerializableStruct deserialized)
         {
-            var random = new Random(42);
-            var original = CreateRandomStruct(random);
-
-            using var ms = new MemoryStream();
-            using var writer = new BinaryWriter(ms);
-
-            // Serialize
-            original.SerializeTo(writer);
-
-            ms.Position = 0;
-            using var reader = new BinaryReader(ms);
-
-            // Deserialize
-            var deserialized = new TestSerializableStruct();
-            deserialized.InitializeFrom(reader);
-
             Assert.That(deserialized.SByte, Is.EqualTo(original.SByte));
             Assert.That(deserialized.Byte, Is.EqualTo(original.Byte));
             Assert.That(deserialized.Short, Is.EqualTo(original.Short));
@@ -130,6 +113,28 @@ namespace Ksi.Tests
         }
 
         [Test]
+        public void SerializeAndDeserializeFromStream()
+        {
+            var random = new Random(42);
+            var original = CreateRandomStruct(random);
+
+            using var ms = new MemoryStream();
+            using var writer = new BinaryWriter(ms);
+
+            // Serialize
+            original.SerializeTo(writer);
+
+            ms.Position = 0;
+            using var reader = new BinaryReader(ms);
+
+            // Deserialize
+            var deserialized = new TestSerializableStruct();
+            deserialized.InitializeFrom(reader);
+
+            AssertEqual(original, deserialized);
+        }
+
+        [Test]
         public void SerializeAndDeserializeFromBuffer()
         {
             var random = new Random(24);
@@ -149,32 +154,7 @@ namespace Ksi.Tests
             deserialized.InitializeFrom(ref readSpan);
             Assert.That(readSpan.Length, Is.EqualTo(0));
 
-            Assert.That(deserialized.SByte, Is.EqualTo(original.SByte));
-            Assert.That(deserialized.Byte, Is.EqualTo(original.Byte));
-            Assert.That(deserialized.Short, Is.EqualTo(original.Short));
-            Assert.That(deserialized.UShort, Is.EqualTo(original.UShort));
-            Assert.That(deserialized.Int, Is.EqualTo(original.Int));
-            Assert.That(deserialized.UInt, Is.EqualTo(original.UInt));
-            Assert.That(deserialized.Long, Is.EqualTo(original.Long));
-            Assert.That(deserialized.ULong, Is.EqualTo(original.ULong));
-            Assert.That(deserialized.Float, Is.EqualTo(original.Float));
-            Assert.That(deserialized.Double, Is.EqualTo(original.Double));
-            Assert.That(deserialized.Bool, Is.EqualTo(original.Bool));
-            Assert.That(deserialized.Char, Is.EqualTo(original.Char));
-            Assert.That(deserialized.Enum, Is.EqualTo(original.Enum));
-            Assert.That(deserialized.Struct.Value, Is.EqualTo(original.Struct.Value));
-            Assert.That(deserialized.RepEnum.Count(), Is.EqualTo(original.RepEnum.Count()));
-            Assert.That(deserialized.RepStruct.Count(), Is.EqualTo(original.RepStruct.Count()));
-
-            for (var i = 0; i < deserialized.RepEnum.Count(); i++)
-                Assert.That(deserialized.RepEnum.RefReadonlyAt(i), Is.EqualTo(original.RepEnum.RefReadonlyAt(i)));
-
-            for (var i = 0; i < deserialized.RepStruct.Count(); i++)
-            {
-                var oVal = deserialized.RepStruct.RefReadonlyAt(i).Value;
-                var dVal = original.RepStruct.RefReadonlyAt(i).Value;
-                Assert.That(oVal, Is.EqualTo(dVal));
-            }
+            AssertEqual(original, deserialized);
         }
     }
 }
