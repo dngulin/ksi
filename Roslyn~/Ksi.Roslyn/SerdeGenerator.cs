@@ -484,15 +484,14 @@ public class SerdeGenerator : IIncrementalGenerator
     private static void EmitSerializeToBuffer(AppendScope type, INamedTypeSymbol t)
     {
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> to the <see cref=\"System.Span{{T}}\"/>.");
+        type.AppendLine($"/// Serializes the <see cref=\"{t.FullTypeName()}\"/> to the <see cref=\"System.Span{{T}}\"/> " +
+                        "and shrinks the span from the start by a number of written bytes.");
         type.AppendLine("/// </summary>");
         type.AppendLine($"/// <param name=\"value\">The <see cref=\"{t.FullTypeName()}\"/> instance to serialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.Span{T}\"/> to serialize to.</param>");
         type.AppendLine("/// <returns>The number of bytes written.</returns>");
-        using var method = type.PubStat($"int SerializeTo(this in {t.FullTypeName()} value, Span<byte> buffer)");
-        method.AppendLine("var initialLen = buffer.Length;");
+        using var method = type.PubStat($"void SerializeTo(this in {t.FullTypeName()} value, ref Span<byte> buffer)");
         method.AppendLine("buffer.Write(value);");
-        method.AppendLine("return initialLen - buffer.Length;");
     }
 
     private static void EmitInitFromBuffer(AppendScope type, INamedTypeSymbol t)
@@ -500,7 +499,9 @@ public class SerdeGenerator : IIncrementalGenerator
         var typeName = t.FullTypeName();
 
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/>.");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/> " +
+                        "and shrinks the span from the start by a number of read bytes.");
+        type.AppendLine("/// Method reads <see cref=\"ValueQualifier\"/> and length prefix before reading the value.");
         type.AppendLine("/// </summary>");
         type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
@@ -519,7 +520,9 @@ public class SerdeGenerator : IIncrementalGenerator
         var typeName = t.FullTypeName();
 
         type.AppendLine("/// <summary>");
-        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/>.");
+        type.AppendLine($"/// Initializes the <see cref=\"{typeName}\"/> from the <see cref=\"System.ReadOnlySpan{{T}}\"/> " +
+                        "and shrinks the span from the start by a number of read bytes.");
+        type.AppendLine("/// Method reads the value without reading a qualifier.");
         type.AppendLine("/// </summary>");
         type.AppendLine($"/// <param name=\"self\">The <see cref=\"{typeName}\"/> instance to initialize.</param>");
         type.AppendLine("/// <param name=\"buffer\">The <see cref=\"System.ReadOnlySpan{T}\"/> to read from.</param>");
