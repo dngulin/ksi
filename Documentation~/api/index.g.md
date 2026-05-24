@@ -11,7 +11,7 @@
 
 The API Reference is generated from XML documentation comments.
 
-`TRefList\<T\>` extension methods are grouped together with their target types.
+`TRefList<T>` extension methods are grouped together with their target types.
 
 
 ## General

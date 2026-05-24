@@ -46,7 +46,7 @@ public static class DocGenerator
 
         writer.WriteLine();
         writer.WriteLine("The API Reference is generated from XML documentation comments.\n");
-        writer.WriteLine(@"`TRefList\<T\>` extension methods are grouped together with their target types.");
+        writer.WriteLine("`TRefList<T>` extension methods are grouped together with their target types.");
 
         foreach (var (category, types) in api.Index)
         {
