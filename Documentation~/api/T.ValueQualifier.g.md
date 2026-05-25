@@ -25,6 +25,13 @@ namespace Ksi.Serialization
 }
 ```
 
+Static Creation Methods
+- [ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)](#valuequalifierprimitiveprimitivekind-primitivesize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a primitive value
+- [ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)](#valuequalifierrepeatedprimitiveprimitivekind-primitivesize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated primitive value
+- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
+- [ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)](#valuequalifierrepeatedstructlenprefixsize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value
+- [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
+
 Fields
 - [PackedSize](#packedsize) — size of the value qualifier in the packed format (1 byte)
 - [Kind](#kind) — the kind of the value
@@ -33,68 +40,10 @@ Fields
 - [PrimitiveSize](#primitivesize) — the size of the primitive value
 
 Static Methods
-- [ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)](#valuequalifierprimitiveprimitivekind-primitivesize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a primitive value
-- [ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)](#valuequalifierrepeatedprimitiveprimitivekind-primitivesize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated primitive value
-- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
-- [ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)](#valuequalifierrepeatedstructlenprefixsize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value
 - [ValueQualifier.GetLenPrefix\(uint\)](#valuequalifiergetlenprefixuint) — gets the required `LenPrefixSize` to store the specified length
-- [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
 
 
-## Fields
-
-
-### PackedSize
-
-Size of the value qualifier in the packed format (1 byte).
-
-```csharp
-public const int PackedSize = sizeof(byte)
-```
-
-
-### Kind
-
-The kind of the value.
-
-```csharp
-public ValueKind Kind
-```
-
-
-### LenPrefixSize
-
-The size of the length prefix for the value.
-Is used only for len-prefixed values: `RepeatedPrimitive`, `Struct`, `RepeatedStruct`.
-
-```csharp
-public LenPrefixSize LenPrefixSize
-```
-
-
-### PrimitiveKind
-
-The kind of the primitive value.
-Is used only for primitive-based values: `Primitive`, `RepeatedPrimitive`.
-
-```csharp
-public PrimitiveKind PrimitiveKind
-```
-
-
-### PrimitiveSize
-
-The size of the primitive value.
-Is used only for primitive-based value values: `Primitive`, `RepeatedPrimitive`.
-
-For `RepeatedStruct` that field is reinterpreted as `ItemCountPrefixSize`.
-
-```csharp
-public PrimitiveSize PrimitiveSize
-```
-
-
-## Static Methods
+## Static Creation Methods
 
 
 ### ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)
@@ -157,20 +106,6 @@ Parameters
 Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
-### ValueQualifier.GetLenPrefix\(uint\)
-
-Gets the required `LenPrefixSize` to store the specified length.
-
-```csharp
-public static LenPrefixSize GetLenPrefix(uint len)
-```
-
-Parameters
-- `len` — the length value.
-
-Returns the smallest `LenPrefixSize` that can accommodate the length.
-
-
 ### ValueQualifier.Unpack\(byte\)
 
 Unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1).
@@ -183,3 +118,73 @@ Parameters
 - `packed` — the packed byte.
 
 Returns the unpacked [ValueQualifier](T.ValueQualifier.g.md).
+
+
+## Fields
+
+
+### PackedSize
+
+Size of the value qualifier in the packed format (1 byte).
+
+```csharp
+public const int PackedSize = sizeof(byte)
+```
+
+
+### Kind
+
+The kind of the value.
+
+```csharp
+public ValueKind Kind
+```
+
+
+### LenPrefixSize
+
+The size of the length prefix for the value.
+Is used only for len-prefixed values: `RepeatedPrimitive`, `Struct`, `RepeatedStruct`.
+
+```csharp
+public LenPrefixSize LenPrefixSize
+```
+
+
+### PrimitiveKind
+
+The kind of the primitive value.
+Is used only for primitive-based values: `Primitive`, `RepeatedPrimitive`.
+
+```csharp
+public PrimitiveKind PrimitiveKind
+```
+
+
+### PrimitiveSize
+
+The size of the primitive value.
+Is used only for primitive-based value values: `Primitive`, `RepeatedPrimitive`.
+
+For `RepeatedStruct` that field is reinterpreted as `ItemCountPrefixSize`.
+
+```csharp
+public PrimitiveSize PrimitiveSize
+```
+
+
+## Static Methods
+
+
+### ValueQualifier.GetLenPrefix\(uint\)
+
+Gets the required `LenPrefixSize` to store the specified length.
+
+```csharp
+public static LenPrefixSize GetLenPrefix(uint len)
+```
+
+Parameters
+- `len` — the length value.
+
+Returns the smallest `LenPrefixSize` that can accommodate the length.

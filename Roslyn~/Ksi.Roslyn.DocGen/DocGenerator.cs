@@ -76,7 +76,7 @@ public static class DocGenerator
         WriteToc(writer, t);
 
         WriteMethods(writer, t.Constructors, "Constructors");
-        WriteMethods(writer, t.ExternalConstructors, "Static Creation Methods");
+        WriteMethods(writer, t.ConstructionMethods, "Static Creation Methods");
         WriteFields(writer, t.Fields);
         WriteProperties(writer, t.Properties);
         WriteMethods(writer, t.Methods, "Methods");
@@ -87,7 +87,7 @@ public static class DocGenerator
     private static void WriteToc(StreamWriter writer, TypeSpec t)
     {
         WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
-        WriteTocSection(writer, t.ExternalConstructors.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
+        WriteTocSection(writer, t.ConstructionMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
         WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
         WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
         WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");

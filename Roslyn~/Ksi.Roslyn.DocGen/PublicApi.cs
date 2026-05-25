@@ -80,7 +80,7 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
         foreach (var c in refList)
         {
             Comparison<MethodSpec> mCmp = static (a, b) => string.Compare(a.Title, b.Title, StringComparison.Ordinal);
-            c.ExternalConstructors.Sort(mCmp);
+            c.ConstructionMethods.Sort(mCmp);
             c.ExternalMethods.Sort(mCmp);
         }
 

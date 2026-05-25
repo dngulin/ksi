@@ -26,7 +26,7 @@ public static class TypeSpecExtensions
 
         if (ms is { ReturnsByRef: false, ReturnType: INamedTypeSymbol rt } && rt.Eq(ts))
         {
-            self.ExternalConstructors.Add(method);
+            self.ConstructionMethods.Add(method);
             return true;
         }
 

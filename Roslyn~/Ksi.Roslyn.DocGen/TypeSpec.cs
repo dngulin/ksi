@@ -19,7 +19,7 @@ public sealed class TypeSpec
     public List<MethodSpec> StaticMethods { get; } = new List<MethodSpec>(16);
 
     // Can be received from another type
-    public List<MethodSpec> ExternalConstructors { get; } = new List<MethodSpec>(8);
+    public List<MethodSpec> ConstructionMethods { get; } = new List<MethodSpec>(8);
     public List<MethodSpec> ExternalMethods { get; } = new List<MethodSpec>(64);
 
     public bool IsEmpty => Constructors.IsEmpty &&
@@ -27,7 +27,7 @@ public sealed class TypeSpec
                            Methods.IsEmpty &&
                            Fields.IsEmpty &&
                            StaticMethods.Count == 0 &&
-                           ExternalConstructors.Count == 0 &&
+                           ConstructionMethods.Count == 0 &&
                            ExternalMethods.Count == 0;
 
     public readonly string Title;
@@ -64,6 +64,8 @@ public sealed class TypeSpec
 
             if (!m.IsStatic)
                 methods.Add(new MethodSpec(m, comp));
+            else if (!m.IsExtensionMethod && SymbolEqualityComparer.Default.Equals(m.ReturnType, symbol))
+                ConstructionMethods.Add(new MethodSpec(m, comp));
             else
                 StaticMethods.Add(new MethodSpec(m, comp));
         }
