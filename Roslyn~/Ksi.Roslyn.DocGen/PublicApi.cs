@@ -103,5 +103,7 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
             c.ConstructionMethods.Sort(mCmp);
             c.ExternalMethods.Sort(mCmp);
         }
+
+        category.RemoveAll(static ts => ts.IsEmpty);
     }
 }

@@ -25,7 +25,7 @@ public static class DocGenerator
         WriteIndex(path, api);
 
         foreach (var (_, types) in api.Index)
-        foreach (var type in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
+        foreach (var type in types)
         {
             WriteType(path, type);
         }
@@ -59,7 +59,7 @@ public static class DocGenerator
         writer.WriteLine("\n\n## " + title);
 
         writer.WriteLine();
-        foreach (var t in types.Where(t => !t.Symbol.IsStatic || !t.IsEmpty))
+        foreach (var t in types)
             writer.WriteLine($"- [{t.Symbol.ToMd()}]({t.Symbol.MdFileName()}) — {t.Summary.Brief()}");
     }
 
