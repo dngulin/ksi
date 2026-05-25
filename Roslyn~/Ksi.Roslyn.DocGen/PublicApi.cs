@@ -68,21 +68,7 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
         }
 
         // Move extension methods and external constructors to collections
-        foreach (var ts in refList.Where(ts => ts.Symbol.IsStatic))
-        {
-            for (var i = ts.StaticMethods.Count - 1; i >= 0; i--)
-            {
-                if (refList.Any(c => c.TryAddExternalMethod(ts.StaticMethods[i])))
-                    ts.StaticMethods.RemoveAt(i);
-            }
-        }
-
-        foreach (var c in refList)
-        {
-            Comparison<MethodSpec> mCmp = static (a, b) => string.Compare(a.Title, b.Title, StringComparison.Ordinal);
-            c.ConstructionMethods.Sort(mCmp);
-            c.ExternalMethods.Sort(mCmp);
-        }
+        GroupConstructionAndExtensionMethods(refList);
 
         foreach (var category in new[] {general, refList, hashTable, ecs, serialization})
         {
@@ -98,5 +84,24 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
         );
 
         return new PublicApi(index);
+    }
+
+    private static void GroupConstructionAndExtensionMethods(List<TypeSpec> category)
+    {
+        foreach (var ts in category.Where(ts => ts.Symbol.IsStatic))
+        {
+            for (var i = ts.StaticMethods.Count - 1; i >= 0; i--)
+            {
+                if (category.Any(c => c.TryAddExternalMethod(ts.StaticMethods[i])))
+                    ts.StaticMethods.RemoveAt(i);
+            }
+        }
+
+        foreach (var c in category)
+        {
+            Comparison<MethodSpec> mCmp = static (a, b) => string.Compare(a.Title, b.Title, StringComparison.Ordinal);
+            c.ConstructionMethods.Sort(mCmp);
+            c.ExternalMethods.Sort(mCmp);
+        }
     }
 }
