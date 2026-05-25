@@ -18,7 +18,7 @@ namespace Ksi.Serialization
 }
 ```
 
-Fields
+Values
 - [_8](#8) — 8-bit primitive (1 byte)
 - [_16](#16) — 16-bit primitive (2 bytes)
 - [_32](#32) — 32-bit primitive (4 bytes)
@@ -28,7 +28,7 @@ Extension Methods
 - [\(PrimitiveSize\).InBytes\(\)](#primitivesizeinbytes) — gets the size of the primitive in bytes
 
 
-## Fields
+## Values
 
 
 ### _8
@@ -37,22 +37,12 @@ Extension Methods
 
 Value is `0`.
 
-```csharp
-_8
-
-```
-
 
 ### _16
 
 16-bit primitive (2 bytes).
 
 Value is `1`.
-
-```csharp
-_16
-
-```
 
 
 ### _32
@@ -61,22 +51,12 @@ _16
 
 Value is `2`.
 
-```csharp
-_32
-
-```
-
 
 ### _64
 
 64-bit primitive (8 bytes).
 
 Value is `3`.
-
-```csharp
-_64
-
-```
 
 
 ## Extension Methods

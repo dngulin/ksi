@@ -18,7 +18,7 @@ namespace Ksi.Serialization
 }
 ```
 
-Fields
+Values
 - [_0](#0) — no length prefix (0 bytes)
 - [_8](#8) — 8-bit length prefix (1 byte)
 - [_16](#16) — 16-bit length prefix (2 bytes)
@@ -28,7 +28,7 @@ Extension Methods
 - [\(LenPrefixSize\).InBytes\(\)](#lenprefixsizeinbytes) — gets the size of the length prefix in bytes
 
 
-## Fields
+## Values
 
 
 ### _0
@@ -37,22 +37,12 @@ No length prefix (0 bytes).
 
 Value is `0`.
 
-```csharp
-_0
-
-```
-
 
 ### _8
 
 8-bit length prefix (1 byte).
 
 Value is `1`.
-
-```csharp
-_8
-
-```
 
 
 ### _16
@@ -61,22 +51,12 @@ _8
 
 Value is `2`.
 
-```csharp
-_16
-
-```
-
 
 ### _32
 
 32-bit length prefix (4 bytes).
 
 Value is `3`.
-
-```csharp
-_32
-
-```
 
 
 ## Extension Methods

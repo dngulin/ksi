@@ -70,10 +70,27 @@ public static class DocGenerator
         writer.WriteLine("# " + t.Title);
         writer.WriteLine(Navbar, $"**[API](index.g.md) / {t.Title}**");
 
+        if (t.Symbol.TypeKind == TypeKind.Enum)
+        {
+            WriteEnumType(writer, t);
+            return;
+        }
+
+        WriteType(writer, t);
+    }
+
+    private static void WriteType(StreamWriter writer, TypeSpec t)
+    {
         Write(writer, t.Summary);
         Write(writer, t.Declaration);
 
-        WriteToc(writer, t);
+        WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
+        WriteTocSection(writer, t.ConstructionMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
+        WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
+        WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
+        WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");
+        WriteTocSection(writer, t.StaticMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Methods");
+        WriteTocSection(writer, t.ExternalMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Extension Methods");
 
         WriteMethods(writer, t.Constructors, "Constructors");
         WriteMethods(writer, t.ConstructionMethods, "Static Creation Methods");
@@ -84,15 +101,16 @@ public static class DocGenerator
         WriteMethods(writer, t.ExternalMethods, "Extension Methods");
     }
 
-    private static void WriteToc(StreamWriter writer, TypeSpec t)
+    private static void WriteEnumType(StreamWriter writer, TypeSpec t)
     {
-        WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
-        WriteTocSection(writer, t.ConstructionMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
-        WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
-        WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
-        WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");
-        WriteTocSection(writer, t.StaticMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Methods");
+        Write(writer, t.Summary);
+        Write(writer, t.Declaration);
+
+        WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Values");
         WriteTocSection(writer, t.ExternalMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Extension Methods");
+
+        WriteEnumValues(writer, t.Fields);
+        WriteMethods(writer, t.ExternalMethods, "Extension Methods");
     }
 
     private static void WriteTocSection(StreamWriter writer, (string Caption, string Desc)[] entries, string title)
@@ -142,11 +160,25 @@ public static class DocGenerator
         writer.WriteLine("\n\n### " + f.Title);
 
         Write(writer, f.Summary);
-
-        if (f.Value != null && f.Symbol.ContainingType.TypeKind == TypeKind.Enum)
-            Write(writer, $"Value is `{f.Value}`.");
-
         Write(writer, f.Declaration);
+    }
+
+    private static void WriteEnumValues(StreamWriter writer, IReadOnlyList<FieldSpec> fields)
+    {
+        if (fields.Count == 0)
+            return;
+
+        writer.WriteLine("\n\n## Values");
+        foreach (var f in fields)
+            WriteEnumValue(writer, f);
+    }
+
+    private static void WriteEnumValue(StreamWriter writer, FieldSpec f)
+    {
+        writer.WriteLine("\n\n### " + f.Title);
+
+        Write(writer, f.Summary);
+        Write(writer, $"Value is `{f.Value}`.");
     }
 
     private static void WriteProperties(StreamWriter writer, IReadOnlyList<PropertySpec> properties)
