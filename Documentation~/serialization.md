@@ -112,7 +112,8 @@ So, in the [packed](api/T.ValueQualifier.g.md#in-valuequalifierpacked) form
 the Value Qualifier is represented as a single byte:
 
 ```
-[Value Kind: 2 bits][Length Prefix Size: 2 bits][Primitive Kind: 2 bits][Primitive Size / Count Prefix Size: 2 bits]
+[Value Kind] [Length Prefix Size] [Primitive Kind] [Primitive Size / Count Prefix Size]
+ 2 bits       2 bits               2 bits           2 bits
 ```
 
 ### Serialized Layouts
@@ -121,7 +122,8 @@ the Value Qualifier is represented as a single byte:
 
 Serialized layout for a single primitive:
 ```
-[Qualifier: 1 byte] [Primitive: 1-8 bytes]
+[Qualifier] [Primitive]
+ 1 byte      1-8 bytes
 ```
 
 Notes:
@@ -131,7 +133,8 @@ Notes:
 
 Serialized layout for a repeated primitive:
 ```
-[Qualifier: 1 byte] [Length: 0-4 bytes] [Primitive: 1-8 bytes] [Primitive: 1-8 bytes] ...
+[Qualifier] [Length Prefix] [Primitive] [Primitive] ...
+ 1 byte      0-4 bytes       1-8 bytes   1-8 bytes
 ```
 
 Notes:
@@ -143,7 +146,9 @@ Notes:
 
 Serialized layout for a single structure:
 ```
-[Qualifier: 1 byte] [Length: 0-4 bytes] [Field ID: 1 byte] [Value] [Field ID: 1 byte] [Value] ...
+[Qualifier] [Length Prefix] [Field ID] [Value  ] [Field ID] [Value  ] ...
+ 1 byte      0-4 bytes       1 byte     N bytes   1 byte     N bytes
+                                        N > 0                N > 0               
 ```
 
 Notes:
@@ -159,7 +164,9 @@ Notes:
 
 Serialized layout for a repeated structure:
 ```
-[Qualifier: 1 byte] [Length: 0-4 bytes] [Item Count: 0-4 bytes] [Struct] [Struct] ...
+[Qualifier] [Length Prefix] [Item Count] [Struct ] [Struct ] ...
+ 1 byte      0-4 bytes       0-4 bytes    N bytes   N bytes
+                                          N > 0     N > 0
 ```
 
 Notes:
