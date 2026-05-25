@@ -24,6 +24,9 @@ Fields
 - [_16](#16) — 16-bit length prefix (2 bytes)
 - [_32](#32) — 32-bit length prefix (4 bytes)
 
+Extension Methods
+- [\(LenPrefixSize\).InBytes\(\)](#lenprefixsizeinbytes) — gets the size of the length prefix in bytes
+
 
 ## Fields
 
@@ -74,3 +77,24 @@ Value is `3`.
 _32
 
 ```
+
+
+## Extension Methods
+
+
+### \(LenPrefixSize\).InBytes\(\)
+
+Gets the size of the length prefix in bytes.
+
+```csharp
+public static int InBytes(this LenPrefixSize size)
+```
+
+Parameters
+- `size` — the [LenPrefixSize](T.LenPrefixSize.g.md).
+
+Returns the size in bytes.
+
+> [!CAUTION]
+> Possible exceptions: 
+> - [ArgumentOutOfRangeException](https://learn.microsoft.com/en-us/dotnet/api/System.ArgumentOutOfRangeException?view=netstandard-2.1) — thrown when an invalid [LenPrefixSize](T.LenPrefixSize.g.md) is provided.

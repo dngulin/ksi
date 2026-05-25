@@ -99,10 +99,10 @@ The Value Qualifier is composed of:
 - [Primitive Size](api/T.PrimitiveSize.g.md): `8`, `16`, `32`, or `64` bits. 
   Used for the `Primitive` and `RepeatedPrimitive` value kinds.
   In the case of `RepeatedStruct`, it is reinterpreted as
-  the [Count Prefix Size](api/T.ValueQualifierExtensions.g.md#in-valuequalifieritemcountprefixsize).
+  the [Count Prefix Size](api/T.ValueQualifier.g.md#in-valuequalifieritemcountprefixsize).
 
 All four components of the Value Qualifier can have no more than 4 values.
-So, in the [packed](api/T.ValueQualifierExtensions.g.md#in-valuequalifierpacked) form
+So, in the [packed](api/T.ValueQualifier.g.md#in-valuequalifierpacked) form
 the Value Qualifier is represented as a single byte:
 
 ```

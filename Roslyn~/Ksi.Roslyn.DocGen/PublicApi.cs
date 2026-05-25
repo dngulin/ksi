@@ -60,13 +60,11 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
             category.Add(new TypeSpec(t, compilation));
         }
 
-        // Move extension methods and external constructors to collections
-        GroupConstructionAndExtensionMethods(refList);
+        foreach (var category in new[] {refList, serialization})
+            GroupConstructionAndExtensionMethods(category);
 
         foreach (var category in new[] {general, refList, hashTable, ecs, serialization})
-        {
             category.Sort(static (a, b) => a.SortingKey.CompareTo(b.SortingKey));
-        }
 
         var index = ImmutableArray.Create<(string Category, ImmutableArray<TypeSpec>)>(
             ("General", general.ToImmutableArray()),

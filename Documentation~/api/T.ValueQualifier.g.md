@@ -28,8 +28,8 @@ namespace Ksi.Serialization
 Static Creation Methods
 - [ValueQualifier.Primitive\(PrimitiveKind, PrimitiveSize\)](#valuequalifierprimitiveprimitivekind-primitivesize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a primitive value
 - [ValueQualifier.RepeatedPrimitive\(PrimitiveKind, PrimitiveSize, LenPrefixSize\)](#valuequalifierrepeatedprimitiveprimitivekind-primitivesize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated primitive value
-- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
 - [ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)](#valuequalifierrepeatedstructlenprefixsize-lenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value
+- [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
 - [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
 
 Fields
@@ -41,6 +41,10 @@ Fields
 
 Static Methods
 - [ValueQualifier.GetLenPrefix\(uint\)](#valuequalifiergetlenprefixuint) — gets the required `LenPrefixSize` to store the specified length
+
+Extension Methods
+- [\(in ValueQualifier\).ItemCountPrefixSize\(\)](#in-valuequalifieritemcountprefixsize) — gets the [LenPrefixSize](T.LenPrefixSize.g.md) for the item count in a `RepeatedStruct`
+- [\(in ValueQualifier\).Packed\(\)](#in-valuequalifierpacked) — packs a [ValueQualifier](T.ValueQualifier.g.md) into a single [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
 
 
 ## Static Creation Methods
@@ -77,20 +81,6 @@ Parameters
 Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
 
-### ValueQualifier.Struct\(LenPrefixSize\)
-
-Creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value.
-
-```csharp
-public static ValueQualifier Struct(LenPrefixSize lps)
-```
-
-Parameters
-- `lps` — the size of the length prefix.
-
-Returns a new [ValueQualifier](T.ValueQualifier.g.md).
-
-
 ### ValueQualifier.RepeatedStruct\(LenPrefixSize, LenPrefixSize\)
 
 Creates a [ValueQualifier](T.ValueQualifier.g.md) for a repeated struct value.
@@ -102,6 +92,20 @@ public static ValueQualifier RepeatedStruct(LenPrefixSize lps, LenPrefixSize cps
 Parameters
 - `lps` — the size of the length prefix.
 - `cps` — the size of the count prefix.
+
+Returns a new [ValueQualifier](T.ValueQualifier.g.md).
+
+
+### ValueQualifier.Struct\(LenPrefixSize\)
+
+Creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value.
+
+```csharp
+public static ValueQualifier Struct(LenPrefixSize lps)
+```
+
+Parameters
+- `lps` — the size of the length prefix.
 
 Returns a new [ValueQualifier](T.ValueQualifier.g.md).
 
@@ -188,3 +192,34 @@ Parameters
 - `len` — the length value.
 
 Returns the smallest `LenPrefixSize` that can accommodate the length.
+
+
+## Extension Methods
+
+
+### \(in ValueQualifier\).ItemCountPrefixSize\(\)
+
+Gets the [LenPrefixSize](T.LenPrefixSize.g.md) for the item count in a `RepeatedStruct`.
+
+```csharp
+public static LenPrefixSize ItemCountPrefixSize(this in ValueQualifier self)
+```
+
+Parameters
+- `self` — the [ValueQualifier](T.ValueQualifier.g.md).
+
+Returns the [LenPrefixSize](T.LenPrefixSize.g.md) used for item count.
+
+
+### \(in ValueQualifier\).Packed\(\)
+
+Packs a [ValueQualifier](T.ValueQualifier.g.md) into a single [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1).
+
+```csharp
+public static byte Packed(this in ValueQualifier unpacked)
+```
+
+Parameters
+- `unpacked` — the [ValueQualifier](T.ValueQualifier.g.md) to pack.
+
+Returns the packed byte.
