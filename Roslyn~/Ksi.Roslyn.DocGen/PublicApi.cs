@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using Ksi.Roslyn.DocGen.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -14,6 +15,8 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
             { "KsiQuery", "KsiDomain", "KsiArchetype", "KsiEntity", "KsiComponent" };
 
         public static readonly string[] Hash = new[] { "KsiHash", "KsiPrime" };
+
+        public static readonly string[] RefList = new[] { "RefList", "TempRefList", "ManagedRefList" };
     }
 
 
@@ -43,28 +46,18 @@ public class PublicApi(ImmutableArray<(string Category, ImmutableArray<TypeSpec>
             if (string.IsNullOrEmpty(xml))
                 continue;
 
-            var spec = new TypeSpec(t, compilation);
+            var category = t switch
+            {
+                not null when t.ContainingNamespace.Name == "Serialization" => serialization,
+                not null when t.Name.StartsWith("KsiSerial") => serialization,
+                not null when TypeNamePrefixes.Ecs.Any(p => t.Name.StartsWith(p)) => ecs,
+                not null when TypeNamePrefixes.Hash.Any(p => t.Name.StartsWith(p)) => hashTable,
+                not null when TypeNamePrefixes.RefList.Any(p => t.Name.StartsWith(p)) => refList,
+                not null => general,
+                _ => throw new UnreachableException()
+            };
 
-            if (t.ContainingNamespace.Name == "Serialization" || t.Name.StartsWith("KsiSerial"))
-            {
-                serialization.Add(spec);
-            }
-            else if (TypeNamePrefixes.Ecs.Any(p => t.Name.StartsWith(p, StringComparison.Ordinal)))
-            {
-                ecs.Add(spec);
-            }
-            else if (TypeNamePrefixes.Hash.Any(p => t.Name.StartsWith(p, StringComparison.Ordinal)))
-            {
-                hashTable.Add(spec);
-            }
-            else if (t.Name.Contains("RefList"))
-            {
-                refList.Add(spec);
-            }
-            else
-            {
-                general.Add(spec);
-            }
+            category.Add(new TypeSpec(t, compilation));
         }
 
         // Move extension methods and external constructors to collections
