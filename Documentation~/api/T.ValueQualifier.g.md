@@ -32,8 +32,10 @@ Static Creation Methods
 - [ValueQualifier.Struct\(LenPrefixSize\)](#valuequalifierstructlenprefixsize) — creates a [ValueQualifier](T.ValueQualifier.g.md) for a struct value
 - [ValueQualifier.Unpack\(byte\)](#valuequalifierunpackbyte) — unpacks a [ValueQualifier](T.ValueQualifier.g.md) from a packed [byte](https://learn.microsoft.com/en-us/dotnet/api/System.Byte?view=netstandard-2.1)
 
-Fields
+Constants
 - [PackedSize](#packedsize) — size of the value qualifier in the packed format (1 byte)
+
+Fields
 - [Kind](#kind) — the kind of the value
 - [LenPrefixSize](#lenprefixsize) — the size of the length prefix for the value
 - [PrimitiveKind](#primitivekind) — the kind of the primitive value
@@ -124,7 +126,7 @@ Parameters
 Returns the unpacked [ValueQualifier](T.ValueQualifier.g.md).
 
 
-## Fields
+## Constants
 
 
 ### PackedSize
@@ -135,7 +137,8 @@ Size of the value qualifier in the packed format (1 byte).
 public const int PackedSize = sizeof(byte)
 ```
 
-Type: [int](https://learn.microsoft.com/en-us/dotnet/api/System.Int32?view=netstandard-2.1)
+
+## Fields
 
 
 ### Kind

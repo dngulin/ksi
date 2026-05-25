@@ -86,7 +86,8 @@ public static class DocGenerator
 
         WriteTocSection(writer, t.Constructors.Select(x => (x.Title, x.Summary)).ToArray(), "Constructors");
         WriteTocSection(writer, t.ConstructionMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Creation Methods");
-        WriteTocSection(writer, t.Fields.Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
+        WriteTocSection(writer, t.Fields.Where(x => x.Symbol.IsConst).Select(x => (x.Title, x.Summary)).ToArray(), "Constants");
+        WriteTocSection(writer, t.Fields.Where(x => !x.Symbol.IsConst).Select(x => (x.Title, x.Summary)).ToArray(), "Fields");
         WriteTocSection(writer, t.Properties.Select(x => (x.Title, x.Summary)).ToArray(), "Properties");
         WriteTocSection(writer, t.Methods.Select(x => (x.Title, x.Summary)).ToArray(), "Methods");
         WriteTocSection(writer, t.StaticMethods.Select(x => (x.Title, x.Summary)).ToArray(), "Static Methods");
@@ -94,7 +95,8 @@ public static class DocGenerator
 
         WriteMethods(writer, t.Constructors, "Constructors");
         WriteMethods(writer, t.ConstructionMethods, "Static Creation Methods");
-        WriteFields(writer, t.Fields);
+        WriteConstants(writer, t.Fields.Where(x => x.Symbol.IsConst).ToList());
+        WriteFields(writer, t.Fields.Where(x => !x.Symbol.IsConst).ToList());
         WriteProperties(writer, t.Properties);
         WriteMethods(writer, t.Methods, "Methods");
         WriteMethods(writer, t.StaticMethods, "Static Methods");
@@ -164,6 +166,24 @@ public static class DocGenerator
 
         if (f.Symbol.Type is INamedTypeSymbol t)
             Write(writer, $"Type: [{t.ToMd()}]({t.MdLinkUrl()})");
+    }
+
+    private static void WriteConstants(StreamWriter writer, IReadOnlyList<FieldSpec> fields)
+    {
+        if (fields.Count == 0)
+            return;
+
+        writer.WriteLine("\n\n## Constants");
+        foreach (var f in fields)
+            WriteConstant(writer, f);
+    }
+
+    private static void WriteConstant(StreamWriter writer, FieldSpec f)
+    {
+        writer.WriteLine("\n\n### " + f.Title);
+
+        Write(writer, f.Summary);
+        Write(writer, f.Declaration);
     }
 
     private static void WriteEnumValues(StreamWriter writer, IReadOnlyList<FieldSpec> fields)
