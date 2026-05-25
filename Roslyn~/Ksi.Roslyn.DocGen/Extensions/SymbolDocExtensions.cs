@@ -22,4 +22,14 @@ public static class SymbolDocExtensions
         var suffix = self.IsGenericType ? $"-{self.TypeArguments.Length}" : "";
         return $"T.{self.Name}{suffix}.g.md";
     }
+
+    public static string MdLinkUrl(this INamedTypeSymbol self)
+    {
+        var ns = self.ContainingNamespace.ToDisplayString();
+        if (ns == "Ksi" || ns.StartsWith("Ksi."))
+            return self.MdFileName();
+
+        var name = self.MetadataName.Replace('`', '-');
+        return $"https://learn.microsoft.com/en-us/dotnet/api/{ns}.{name}?view=netstandard-2.1";
+    }
 }

@@ -161,6 +161,9 @@ public static class DocGenerator
 
         Write(writer, f.Summary);
         Write(writer, f.Declaration);
+
+        if (f.Symbol.Type is INamedTypeSymbol t)
+            Write(writer, $"Type: [{t.ToMd()}]({t.MdLinkUrl()})");
     }
 
     private static void WriteEnumValues(StreamWriter writer, IReadOnlyList<FieldSpec> fields)

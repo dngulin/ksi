@@ -133,17 +133,7 @@ public static class XmlToMdExtensions
         if (title == "")
             title = t.ToMd();
 
-        var ns = t.ContainingNamespace.ToDisplayString();
-        if (ns == "Ksi" || ns.StartsWith("Ksi."))
-        {
-            link = t.MdFileName();
-        }
-        else
-        {
-            var name = t.MetadataName.Replace('`', '-');
-            link = $"https://learn.microsoft.com/en-us/dotnet/api/{ns}.{name}?view=netstandard-2.1";
-        }
-
+        link = t.MdLinkUrl();
         return true;
     }
 }

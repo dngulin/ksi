@@ -135,6 +135,8 @@ Size of the value qualifier in the packed format (1 byte).
 public const int PackedSize = sizeof(byte)
 ```
 
+Type: [int](https://learn.microsoft.com/en-us/dotnet/api/System.Int32?view=netstandard-2.1)
+
 
 ### Kind
 
@@ -143,6 +145,8 @@ The kind of the value.
 ```csharp
 public ValueKind Kind
 ```
+
+Type: [ValueKind](T.ValueKind.g.md)
 
 
 ### LenPrefixSize
@@ -154,6 +158,8 @@ Is used only for len-prefixed values: `RepeatedPrimitive`, `Struct`, `RepeatedSt
 public LenPrefixSize LenPrefixSize
 ```
 
+Type: [LenPrefixSize](T.LenPrefixSize.g.md)
+
 
 ### PrimitiveKind
 
@@ -163,6 +169,8 @@ Is used only for primitive-based values: `Primitive`, `RepeatedPrimitive`.
 ```csharp
 public PrimitiveKind PrimitiveKind
 ```
+
+Type: [PrimitiveKind](T.PrimitiveKind.g.md)
 
 
 ### PrimitiveSize
@@ -175,6 +183,8 @@ For `RepeatedStruct` that field is reinterpreted as `ItemCountPrefixSize`.
 ```csharp
 public PrimitiveSize PrimitiveSize
 ```
+
+Type: [PrimitiveSize](T.PrimitiveSize.g.md)
 
 
 ## Static Methods
