@@ -25,19 +25,25 @@ The following types are supported for `[KsiSerializeField]` fields:
 - **Enums**: Serialized using their underlying primitive type.
 - **Serializable Structs**: Structures marked with the `[KsiSerializable]` attribute.
 
+Serialization attributes trigger code generation that produces stream- and buffer-based serialization APIs.
+The buffer-based API receives a buffer by reference and shrinks it after reading or writing data.
+
 Generated extension methods:
 - `(in TSerializable).GetSerializedSize()` — Gets the serialized size.
-- `(in TSerializable).SerializeTo(BinaryWriter writer)` — Serializes the struct to a stream.
-- `(in TSerializable).SerializeTo(Span<byte> buffer)` — Serializes the struct to a buffer. Returns the number of bytes written.
-- `(ref TSerializable).InitializeFrom(BinaryReader reader)` — Initializes the struct from a stream.
-- `(ref TSerializable).InitializeFrom(ReadOnlySpan<byte> buffer)` — Initializes the struct from a buffer. Returns the number of bytes read.
-
-Additional low-level extension methods:
-- `(this BinaryWriter writer).Prepend(in TSerializable value)` — Serializes and prepends the struct to the current position of the stream, moving the position backwards.
-- `(this BinaryWriter writer).Write(in TSerializable value)` — Serializes the struct to the current position of the stream.
-- `(ref Span<byte> buffer).Prepend(in TSerializable value)` — Serializes and prepends the struct to the end of the span, shrinking the span from the end.
-- `(ref Span<byte> buffer).Write(in TSerializable value)` — Serializes and writes the struct to the end of the span, shrinking the span from the end.
-
+- Stream-based API:
+  - `(this BinaryWriter writer).Write(in TSerializable value)` — Serializes the struct to a stream.
+  - `(in TSerializable).SerializeTo(BinaryWriter writer)` — Serializes the struct to a stream.
+  - `(ref TSerializable).InitializeFrom(BinaryReader reader)` — Initializes the struct from a stream.
+  - Low-level:
+    - `(this BinaryWriter writer).Prepend(in TSerializable value, bool qualified)` — Serializes the struct to a stream, moving the position backwards.
+    - `(ref TSerializable).InitializeFrom(BinaryReader reader, int len)` — Initializes the struct from a stream without reading a `ValueQualifier`.
+- Buffer-based API:
+  - `(ref Span<byte> buffer).Write(in TSerializable value)` — Serializes the struct to a buffer and shrinks the buffer size.
+  - `(in TSerializable).SerializeTo(ref Span<byte> buffer)` — Serializes the struct to a buffer and shrinks the buffer size.
+  - `(ref TSerializable).InitializeFrom(ref ReadOnlySpan<byte> buffer)` — Initializes the struct from a buffer and shrinks the buffer size.
+  - Low-level:
+      - `(ref Span<byte> buffer).Prepend(in TSerializable value, bool qualified)` — Serializes the struct to a buffer, shrinking it from the end.
+      - `(ref TSerializable).InitializeFrom(ref ReadOnlySpan<byte> buffer, int len)` — Initializes the struct from a buffer without reading a `ValueQualifier`.
 
 Usage example (Stream):
 ```csharp
@@ -77,12 +83,12 @@ var buffer = new byte[size];
 
 // Serialize
 Span<byte> writeSpan = buffer; 
-data.SerializeTo(buffer); // use buffer.Prepend(data) for exact-sized buffers
+data.SerializeTo(buffer); // use buffer.Prepend(data, true) for exact-sized buffers
 
 // Deserialize
 ReadOnlySpan<byte> readSpan = buffer; 
 PlayerData loadedData = default;
-loadedData.InitializeFrom(readSpan);
+loadedData.InitializeFrom(ref readSpan);
 ```
 
 ## Data Layout
