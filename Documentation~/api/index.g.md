@@ -56,6 +56,7 @@ The API Reference is generated from XML documentation comments.
 
 ## Serialization
 
+- [KsiSerializableAttribute](T.KsiSerializableAttribute.g.md) — marks a struct for Ksi binary serialization source generation
 - [KsiSerializeFieldAttribute](T.KsiSerializeFieldAttribute.g.md) — marks a serializable field and specifies its binary field id
 - [BinaryReaderExtensions](T.BinaryReaderExtensions.g.md) — provides extension methods for [BinaryReader](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryReader?view=netstandard-2.1) to support Ksi serialization
 - [BinaryWriterExtensions](T.BinaryWriterExtensions.g.md) — provides extension methods for [BinaryWriter](https://learn.microsoft.com/en-us/dotnet/api/System.IO.BinaryWriter?view=netstandard-2.1) to support Ksi serialization
