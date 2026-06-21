@@ -13,6 +13,11 @@
 ## Unreleased
 ### Added
 - `Insert` and `RefInsert` extension methods to `TRefList<T>`
+- Initial serialization support with generated stream- and buffer-based APIs
+- Serialization analyzer, documentation and tests
+### Changed
+- Non-Unity Roslyn projects now target `.NET 10.0`
+- Generated documentation is better structured
 ### Fixed
 - Link to the getting started guide in generated documentation
 
